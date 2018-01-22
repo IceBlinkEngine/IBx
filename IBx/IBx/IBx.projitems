@@ -59,6 +59,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IbbPanel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IbbPortrait.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IbbToggleButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBminiMessageBox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IbRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IbRectF.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBScriptEngine.cs" />

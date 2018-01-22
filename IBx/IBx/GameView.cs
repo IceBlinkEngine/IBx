@@ -80,6 +80,8 @@ namespace IBx
         public int triggerPropIndex = 0;
 
         public IB2HtmlLogBox log;
+        public IBminiMessageBox messageBox;
+        public bool showMessageBox = false;
         public CommonCode cc;
         public Module mod;
         public ScriptFunctions sf;
@@ -105,38 +107,35 @@ namespace IBx
         public ScreenPartyBuild screenPartyBuild;
         public ScreenPartyRoster screenPartyRoster;
         public bool touchEnabled = true;
-        public WMPLib.WindowsMediaPlayer areaMusic;
-        public WMPLib.WindowsMediaPlayer areaSounds;
-        public WMPLib.WindowsMediaPlayer weatherSounds1;
-        public WMPLib.WindowsMediaPlayer weatherSounds2;
-        public WMPLib.WindowsMediaPlayer weatherSounds3;
+        //public WMPLib.WindowsMediaPlayer areaMusic;
+        //public WMPLib.WindowsMediaPlayer areaSounds;
+        //public WMPLib.WindowsMediaPlayer weatherSounds1;
+        //public WMPLib.WindowsMediaPlayer weatherSounds2;
+        //public WMPLib.WindowsMediaPlayer weatherSounds3;
        
-        public SoundPlayer soundPlayer = new SoundPlayer();
+        //public SoundPlayer soundPlayer = new SoundPlayer();
         public Dictionary<string, Stream> oSoundStreams = new Dictionary<string, Stream>();
-        public System.Media.SoundPlayer playerButtonEnter = new System.Media.SoundPlayer();
-        public System.Media.SoundPlayer playerButtonClick = new System.Media.SoundPlayer();
+        //public System.Media.SoundPlayer playerButtonEnter = new System.Media.SoundPlayer();
+        //public System.Media.SoundPlayer playerButtonClick = new System.Media.SoundPlayer();
        
         public string currentMainMusic = "";
         public string currentAmbientMusic = "";
         public string currentCombatMusic = "";
 
         //timers
-        public Timer gameTimer = new Timer();
-        //public Timer moveTimer = new Timer();
+        //public Timer gameTimer = new Timer();
         public Stopwatch gameTimerStopwatch = new Stopwatch();
         public long previousTime = 0;
         public bool stillProcessingGameLoop = false;
         public float fps = 0;
         public int reportFPScount = 0;
 
-        public Timer animationTimer = new Timer();
-        //public Timer floatyTextTimer = new Timer();
-        //public Timer floatyTextMainMapTimer = new Timer();
-        public Timer areaMusicTimer = new Timer();
-        public Timer areaSoundsTimer = new Timer();
-        public Timer weatherSounds1Timer = new Timer();
-        public Timer weatherSounds2Timer = new Timer();
-        public Timer weatherSounds3Timer = new Timer();
+        //public Timer animationTimer = new Timer();
+        //public Timer areaMusicTimer = new Timer();
+        //public Timer areaSoundsTimer = new Timer();
+        //public Timer weatherSounds1Timer = new Timer();
+        //public Timer weatherSounds2Timer = new Timer();
+        //public Timer weatherSounds3Timer = new Timer();
         
         public float floatPixMovedPerTick = 4f;
         public int realTimeTimerMilliSecondsEllapsed = 0;
@@ -161,36 +160,37 @@ namespace IBx
             mod = new Module();
 
             
-            this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.GameView_MouseWheel);
+            //this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.GameView_MouseWheel);
             mainDirectory = Directory.GetCurrentDirectory();
 
-            this.IceBlinkButtonClose.setupAll(this);
-            this.IceBlinkButtonResize.setupAll(this);
             try
             {
-                playerButtonClick.SoundLocation = mainDirectory + "\\default\\NewModule\\sounds\\btn_click.wav";
-                playerButtonClick.Load();
+                //playerButtonClick.SoundLocation = mainDirectory + "\\default\\NewModule\\sounds\\btn_click.wav";
+                //playerButtonClick.Load();
             }
             catch (Exception ex) { errorLog(ex.ToString()); } 
             try
             {
-                playerButtonEnter.SoundLocation = mainDirectory + "\\default\\NewModule\\sounds\\btn_hover.wav";
-                playerButtonEnter.Load();
+                //playerButtonEnter.SoundLocation = mainDirectory + "\\default\\NewModule\\sounds\\btn_hover.wav";
+                //playerButtonEnter.Load();
             }
             catch (Exception ex) { errorLog(ex.ToString()); }
 
             //this is the standard way, comment out the next 3 lines if manually forcing a screen resolution for testing UI layouts
-            this.WindowState = FormWindowState.Maximized;
-            this.Width = Screen.PrimaryScreen.Bounds.Width;
-            this.Height = Screen.PrimaryScreen.Bounds.Height;
+            //this.WindowState = FormWindowState.Maximized;
+            //this.Width = Screen.PrimaryScreen.Bounds.Width;
+            //this.Height = Screen.PrimaryScreen.Bounds.Height;
             
             //for testing other screen sizes, manually enter a resolution here
             //typical resolutions: 1366x768, 1920x1080, 1280x1024, 1280x800, 1024x768, 800x600, 1440x900
             //this.Width = 1366;
             //this.Height = 768;
 
-            screenWidth = this.Width; //getResources().getDisplayMetrics().widthPixels;
-            screenHeight = this.Height; //getResources().getDisplayMetrics().heightPixels;
+            //screenWidth = this.Width; //getResources().getDisplayMetrics().widthPixels;
+            //screenHeight = this.Height; //getResources().getDisplayMetrics().heightPixels;
+            screenWidth = App.ScreenWidth;
+            screenHeight = App.ScreenHeight;
+
             float sqrW = (float)screenWidth / (squaresInWidth + 2f/10f);
             float sqrH = (float)screenHeight / (squaresInHeight + 3f/10f);
             if (sqrW > sqrH)
@@ -992,7 +992,7 @@ namespace IBx
         }
         */
         
-        private void gameTimer_Tick(object sender, EventArgs e)
+        public void gameTimer_Tick(SKCanvasView sk_canvas)
         {
             if (!stillProcessingGameLoop)
             {
@@ -1000,7 +1000,8 @@ namespace IBx
                 long current = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
                 elapsed = (int)(current - previousTime); //calculate the total ms elapsed since the last time through the game loop
                 Update(elapsed); //runs AI and physics
-                Render(elapsed); //draw the screen frame
+                //Render(elapsed); //draw the screen frame
+                sk_canvas.InvalidateSurface();
                 if (reportFPScount >= 10)
                 {
                     reportFPScount = 0;
@@ -1009,7 +1010,7 @@ namespace IBx
                 reportFPScount++;
                 previousTime = current; //remember the current time at the beginning of this tick call for the next time through the game loop to calculate elapsed time
                 stillProcessingGameLoop = false; //finished game loop so okay to let the next tick call enter the game loop      
-            }  
+            }
         }
         private void Update(int elapsed)
         {
@@ -1225,101 +1226,10 @@ namespace IBx
             DrawD2DBitmap(bitmap, src, tar, mirror, opac, NearestNeighbourInterpolation);
         }
 
-        //DIRECT2D STUFF
-        public void InitializeRenderer()
+        public void Render(SKCanvas c)
         {
-            string state = "";
-            try
-            {                
-                // SwapChain description
-                state += "Creating Swap Chain:";
-                var desc = new SwapChainDescription()
-                {
-                    BufferCount = 1,
-                    ModeDescription =
-                        new ModeDescription(this.Width, this.Height,
-                                            new Rational(60, 1), Format.R8G8B8A8_UNorm),
-                    IsWindowed = true,
-                    OutputHandle = this.Handle,
-                    SampleDescription = new SampleDescription(1, 0),
-                    SwapEffect = SwapEffect.Discard,
-                    Usage = Usage.RenderTargetOutput
-                };
-
-                // Create Device and SwapChain                
-                state += "Get Highest Feature Level:";
-                var featureLvl = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
-                state += " Highest Feature Level is: " + featureLvl.ToString() + " :Create Device:";
-                try
-                {
-                    SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.BgraSupport, new[] { featureLvl }, desc, out _device, out _swapChain);
-                }
-                catch (Exception ex)
-                {
-                    this.errorLog(state + "<--->" + ex.ToString());
-                    MessageBox.Show("Failed on Create Device using a feature level of " + featureLvl.ToString() + ". Will try using feature level 'Level_9_1' and DriverType.Software instead of DriverType.Hardware");
-                    SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Software, DeviceCreationFlags.BgraSupport, new[] { SharpDX.Direct3D.FeatureLevel.Level_9_1 }, desc, out _device, out _swapChain);                    
-                }
-
-                if (_device == null)
-                {
-                    MessageBox.Show("Failed to create a device, closing IceBlink 2. Please send us your 'IB2ErrorLog.txt' file for more debugging help.");
-                    Application.Exit();
-                }
-
-                // Ignore all windows events
-                state += "Create Factory:";
-                SharpDX.DXGI.Factory factory = _swapChain.GetParent<SharpDX.DXGI.Factory>();
-                factory.MakeWindowAssociation(this.Handle, WindowAssociationFlags.IgnoreAll);
-
-                // New RenderTargetView from the backbuffer
-                state += "Creating Back Buffer:";
-                _backBuffer = Texture2D.FromSwapChain<Texture2D>(_swapChain, 0);
-                
-                state += "Create RenderTargetView:";
-                _backBufferView = new RenderTargetView(_device, _backBuffer);
-                
-                factory2D = new SharpDX.Direct2D1.Factory();
-                using (var surface = _backBuffer.QueryInterface<Surface>())
-                {
-                    renderTarget2D = new RenderTarget(factory2D, surface, new RenderTargetProperties(new SharpDX.Direct2D1.PixelFormat(Format.Unknown, AlphaMode.Premultiplied)));
-                }
-                renderTarget2D.AntialiasMode = AntialiasMode.PerPrimitive;
-
-                //TEXT STUFF
-                state += "Creating Text Factory:";
-                factoryDWrite = new SharpDX.DirectWrite.Factory();
-                sceneColorBrush = new SolidColorBrush(renderTarget2D, SharpDX.Color.Blue);
-                renderTarget2D.TextAntialiasMode = TextAntialiasMode.Cleartype;
-            }
-            catch (SharpDXException ex)
-            {
-                MessageBox.Show("SharpDX error message appended to IB2ErrorLog.txt");
-                this.errorLog(state + "<--->" + ex.ToString());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("SharpDX error message appended to IB2ErrorLog.txt");
-                this.errorLog(state + "<--->" + ex.ToString());
-            }
-        }
-        public void BeginDraw()
-        {
-            _device.ImmediateContext.Rasterizer.SetViewport(new Viewport(0, 0, this.Width, this.Height));
-            _device.ImmediateContext.OutputMerger.SetTargets(_backBufferView);
-            renderTarget2D.BeginDraw();
-        }        
-        public void EndDraw()
-        {
-            renderTarget2D.EndDraw();
-            _swapChain.Present(1, PresentFlags.None);
-        }
-        public void Render(float elapsed)
-        {
-            BeginDraw(); //uncomment this for DIRECT2D ADDITIONS  
-          
-            renderTarget2D.Clear(Color4.Black); //uncomment this for DIRECT2D ADDITIONS
-
+            canvas = c;
+            
             if ((mod.useUIBackground) && (!screenType.Equals("main")) && (!screenType.Equals("combat")) && (!screenType.Equals("launcher")) && (! screenType.Equals("title")))
             {
                 drawUIBackground();
@@ -1444,10 +1354,7 @@ namespace IBx
 
             EndDraw(); //uncomment this for DIRECT2D ADDITIONS
         }
-        private void RenderCallback()
-        {
-            Render(0);
-        }
+
         public void drawUIBackground()
         {
             try
@@ -1626,12 +1533,44 @@ namespace IBx
         {
             onMouseEvent(sender, e, MouseEventType.EventType.MouseClick);
         }
-        public void onMouseEvent(object sender, MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onMouseEvent(object sender, SKTouchEventArgs e)
         {
+            MouseEventType.EventType eventType = MouseEventType.EventType.MouseMove;
+            if (e.ActionType == SKTouchAction.Moved)
+            {
+                eventType = MouseEventType.EventType.MouseMove;
+            }
+            else if (e.ActionType == SKTouchAction.Pressed)
+            {
+                eventType = MouseEventType.EventType.MouseDown;
+            }
+            else if (e.ActionType == SKTouchAction.Released)
+            {
+                eventType = MouseEventType.EventType.MouseUp;
+            }
             try 
             {
+                int eX = (int)e.Location.X - oXshift;
+                int eY = (int)e.Location.Y - oYshift;
+                //do only itemListSelector if visible
+                /*if (itemListSelector.showIBminiItemListSelector)
+                {
+                    itemListSelector.onTouchItemListSelection(eX, eY, eventType);
+                    return;
+                }*/
                 if (touchEnabled)
                 {
+                    //do touch scrolling if in a scrolling text box
+                    if (showMessageBox)
+                    {
+                        messageBox.onTouchSwipe(eX, eY, eventType);
+                    }
+                    else if ((screenType.Equals("main")) || (screenType.Equals("combat")))
+                    {
+                        log.onTouchSwipe(eX, eY, eventType);
+                    }
+
+                    //GAME SCREENS
                     if (screenType.Equals("main"))
                     {
                         screenMainMap.onTouchMain(e, eventType);	
@@ -1751,7 +1690,7 @@ namespace IBx
                 errorLog(ex.ToString());   		
             }		
         }
-
+        
         public void onKeyboardEvent(Keys keyData)
         {
             try
