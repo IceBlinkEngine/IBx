@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace IBx
+{
+    public class SpellAllowed 
+    {
+	    public string name = "";
+	    public string tag = "";
+	    public int atWhatLevelIsAvailable = 0;
+	    public bool automaticallyLearned = false;
+	    public bool allow = true;
+        public bool needsSpecificTrainingToLearn = false;
+	
+	    public SpellAllowed()
+	    {
+		
+	    }
+	
+	    public SpellAllowed DeepCopy()
+	    {
+		    SpellAllowed copy = new SpellAllowed();
+            copy.needsSpecificTrainingToLearn = this.needsSpecificTrainingToLearn;
+		    copy.name = this.name;
+		    copy.tag = this.tag;
+		    copy.atWhatLevelIsAvailable = this.atWhatLevelIsAvailable;
+		    copy.automaticallyLearned = this.automaticallyLearned;
+		    copy.allow = this.allow;		
+		    return copy;
+	    }
+    }
+}

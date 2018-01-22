@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>{EA73FCF1-4854-47FF-BE7A-9A8376F10AFA}</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>IBx</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)App.xaml" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)MainPage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Action.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AnimationSequence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AnimationStackGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AnimationState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Area.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AreaOfEffectShape.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BarkString.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)buttonState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommonCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Condition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Container.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ContentNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Convo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConvoSavedValues.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Coordinate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CoordinateF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Creature.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CreatureRefs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Effect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EffectTagForDropDownList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encounter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatyText.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FloatyTextByPixel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FormattedLine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FormattedLineGDI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FormattedWord.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FormattedWordGDI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FullScreenEffectLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalInt.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalString.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IB2Button.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IB2HtmlLogBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IB2Panel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IB2Portrait.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IB2ToggleButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IB2UILayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbbButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbbHtmlLogBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbbHtmlTextBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbbPanel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbbPortrait.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbbToggleButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbRect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IbRectF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IBScriptEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Item.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ItemRefs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JournalEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JournalQuest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalImmunityString.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalInt.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalString.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Module.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModuleInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MouseEventType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MoveOrder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PathFinderAreas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PathFinderEncounters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Player.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlayerClass.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Prop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Race.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResourceFontFileEnumerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResourceFontFileStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResourceFontLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Schedule.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenCastSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenCombat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenConvo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenInventory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenItemSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenJournal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenLauncher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenMainMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenParty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenPartyBuild.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenPartyRoster.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenPcCreation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenPcSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenPortraitSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenShop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenSpellLevelUp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenTitle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenTokenSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenTraitLevelUp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScreenTraitUseSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptFunctions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SpellAllowed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Sprite.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TileEnc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Trait.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TraitAllowed.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Trigger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WayPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Weather.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WeatherEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WeatherTypeList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WeatherTypeListItem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Metamorphous-Regular.ttf" />
+  </ItemGroup>
+</Project>
