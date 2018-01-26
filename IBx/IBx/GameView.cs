@@ -7,6 +7,7 @@ using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using Xamarin.Forms;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace IBx
 {
@@ -42,6 +43,10 @@ namespace IBx
         public bool moveTimerRuns = false;
         public float moveTimerCounter = 0;
         public int standardTokenSize = 100;
+        public SKRect srcRect = new SKRect();
+        public SKRect dstRect = new SKRect();
+        public SKPaint drawPaint = new SKPaint();
+        public SKPaint textPaint = new SKPaint();
 
 
         //public Graphics gCanvas;
@@ -392,8 +397,7 @@ namespace IBx
             }
 
             //reset fonts
-            ResetGDIFont();
-            ResetDirect2DFont();
+            ResetFont();
             //reset log number of lines based on the value from the Module's mod file
             log.numberOfLinesToShow = mod.logNumberOfLines;            
                         
@@ -481,45 +485,24 @@ namespace IBx
 		    cc.stringMessageMainMap = cc.loadTextToString("MessageMainMap.txt");
 	    }
 
-        public void ResetGDIFont()
+        private void ResetFont()
         {
-            if (File.Exists(mainDirectory + "\\modules\\" + mod.moduleName + "\\fonts\\" + mod.fontFilename))
+            foreach (var res in GetType().GetTypeInfo().Assembly.GetManifestResourceNames())
             {
-                family = LoadFontFamily(mainDirectory + "\\modules\\" + mod.moduleName + "\\fonts\\" + mod.fontFilename, out myFonts);
+                System.Diagnostics.Debug.WriteLine("found resource: " + res);
             }
-            else
+            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream("IBx.metamorphous_regular.ttf"))
+            using (var managedStream = new SKManagedStream(stream, true))
+            using (var tf = SKTypeface.FromStream(managedStream))
             {
-                family = LoadFontFamily(mainDirectory + "\\default\\NewModule\\fonts\\Metamorphous-Regular.ttf", out myFonts);
+                textPaint.Color = SKColors.White;
+                textPaint.TextSize = 60;
+                textPaint.Typeface = tf;
             }
             float multiplr = (float)squareSize / 100.0f;
-            drawFontLarge = new Font(family, 24.0f * multiplr);
-            drawFontReg = new Font(family, 20.0f * multiplr);
-            drawFontSmall = new Font(family, 16.0f * multiplr);
             drawFontLargeHeight = 32.0f * multiplr * mod.fontD2DScaleMultiplier;
             drawFontRegHeight = 26.0f * multiplr * mod.fontD2DScaleMultiplier;
             drawFontSmallHeight = 20.0f * multiplr * mod.fontD2DScaleMultiplier;
-        }
-        private FontFamily LoadFontFamily(string fileName, out PrivateFontCollection _myFonts)
-        {
-            //IN MEMORY _myFonts point to the myFonts created in the load event.
-            _myFonts = new PrivateFontCollection();//here is where we assing memory space to myFonts 
-            _myFonts.AddFontFile(fileName);//we add the full path of the ttf file
-            return _myFonts.Families[0];//returns the family object as usual.
-        }
-        private void ResetDirect2DFont()
-        {
-            string folderPath = "";
-            if (Directory.Exists(mainDirectory + "\\modules\\" + mod.moduleName + "\\fonts"))
-            {
-                folderPath = mainDirectory + "\\modules\\" + mod.moduleName + "\\fonts";
-            }
-            else
-            {
-                folderPath = mainDirectory + "\\default\\NewModule\\fonts";
-            }
-            CurrentResourceFontLoader = new ResourceFontLoader(factoryDWrite, folderPath);
-            CurrentFontCollection = new SharpDX.DirectWrite.FontCollection(factoryDWrite, CurrentResourceFontLoader, CurrentResourceFontLoader.Key);
-            FontFamilyName = mod.fontName;
         }
 
         #region Area Music/Sounds
@@ -1027,205 +1010,280 @@ namespace IBx
         }
 
         //DRAW ROUTINES
-        public void CleanUpDrawTextResources()
-        {
-            if (textFormat != null)
-            {
-                textFormat.Dispose();
-                textFormat = null;
-            }
-            if (textLayout != null)
-            {
-                textLayout.Dispose();
-                textLayout = null;
-            }
-        }
         public void DrawText(string text, float xLoc, float yLoc)
         {
-            DrawText(text, xLoc, yLoc, FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 1.0f, SharpDX.Color.White, false);
+            DrawText(text, xLoc, yLoc, "regular", "white", "normal", false);
         }
-        public void DrawText(string text, float x, float y, FontWeight fw, SharpDX.DirectWrite.FontStyle fs, SharpDX.Color fontColor)
+        public void DrawText(string text, float xLoc, float yLoc, string color)
         {
-            DrawText(text, x, y, FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 1.0f, fontColor, false);
+            DrawText(text, xLoc, yLoc, "regular", color, "normal", false);
         }
-        public void DrawText(string text, float xLoc, float yLoc, float scaler, SharpDX.Color fontColor)
+        public void DrawText(string text, float xLoc, float yLoc, string size, string color)
         {
-            DrawText(text, xLoc, yLoc, FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, scaler, fontColor, false);
+            DrawText(text, xLoc, yLoc, size, color, "normal", false);
         }
-        public void DrawText(string text, IbRect rect, float scaler, SharpDX.Color fontColor)
+        public void DrawText(string text, float xLoc, float yLoc, string size, string color, string style)
         {
-            DrawText(text, rect, FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, scaler, fontColor);
+            DrawText(text, xLoc, yLoc, size, color, style, false);
         }
-        public void DrawText(string text, IbRect rect, FontWeight fw, SharpDX.DirectWrite.FontStyle fs, float scaler, SharpDX.Color fontColor)
+        public void DrawText(string text, float xLoc, float yLoc, string size, string color, string style, bool isUnderlined)
         {
-            CleanUpDrawTextResources();
-            float thisFontHeight = drawFontRegHeight;
-            if (scaler > 1.05f)
+            //underline is no longer available in skiaSharp. Google removed it from skia
+            //From Google: "In Skia the text decorations(underline and strike - through) only affect drawText calls,
+            //and this is done mostly just for backward compatibility and will probably be removed soon.
+            //Text decoration can get quite complex with layout, and since different users will disagree 
+            //about what the behavior should be it's best that the user do the drawing."
+            
+            //So we in IB will need to create our own underlining function by drawing a line under text after getting text bounds
+
+            //Font size  (small, regular, large)          
+            if (size.Equals("small"))
             {
-                thisFontHeight = drawFontLargeHeight;
+                textPaint.TextSize = drawFontSmallHeight;
             }
-            else if (scaler < 0.95f)
+            else if (size.Equals("large"))
             {
-                thisFontHeight = drawFontSmallHeight;
+                textPaint.TextSize = drawFontLargeHeight;
             }
-            RectangleF rectF = new RectangleF(rect.Left, rect.Top + oYshift, rect.Width, rect.Height);
-            using (SolidColorBrush scb = new SolidColorBrush(renderTarget2D, fontColor))
+            else
             {
-                textFormat = new TextFormat(factoryDWrite, FontFamilyName, CurrentFontCollection, fw, fs, FontStretch.Normal, thisFontHeight) { TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-                textLayout = new TextLayout(factoryDWrite, text, textFormat, rect.Width, rect.Height);
-                renderTarget2D.DrawTextLayout(new Vector2(rect.Left, rect.Top + oYshift), textLayout, scb, DrawTextOptions.None);
+                textPaint.TextSize = drawFontRegHeight;
+            }
+
+            //Font Style (bold, bolditalic, italic, normal)
+            if (style.Equals("bold"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Bold);
+            }
+            else if (style.Equals("italic"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Italic);
+            }
+            else if (style.Equals("bolditalic"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.BoldItalic);
+            }
+            else
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Normal);
+            }
+
+            //color            
+            if (color.Equals("red"))
+            {
+                textPaint.Color = SKColors.Red;
+            }
+            else if (color.Equals("lime"))
+            {
+                textPaint.Color = SKColors.Lime;
+            }
+            else if (color.Equals("black"))
+            {
+                textPaint.Color = SKColors.Black;
+            }
+            else if (color.Equals("white"))
+            {
+                textPaint.Color = SKColors.White;
+            }
+            else if (color.Equals("silver"))
+            {
+                textPaint.Color = SKColors.Silver;
+            }
+            else if (color.Equals("grey"))
+            {
+                textPaint.Color = SKColors.DimGray;
+            }
+            else if (color.Equals("aqua"))
+            {
+                textPaint.Color = SKColors.Aqua;
+            }
+            else if (color.Equals("fuchsia"))
+            {
+                textPaint.Color = SKColors.Fuchsia;
+            }
+            else if (color.Equals("yellow"))
+            {
+                textPaint.Color = SKColors.Yellow;
+            }
+            else if (color.Equals("magenta"))
+            {
+                textPaint.Color = SKColors.Magenta;
+            }
+            else if (color.Equals("green"))
+            {
+                textPaint.Color = SKColors.Green;
+            }
+            else if (color.Equals("gray"))
+            {
+                textPaint.Color = SKColors.Gray;
+            }            
+            else
+            {
+                textPaint.Color = SKColors.White;
+            }
+
+            canvas.DrawText(text, xLoc, yLoc, textPaint);
+        }
+
+        public void DrawRectangle(IbRect rect, SKColor penColor, int penWidth)
+        {
+            using (SKPaint skp = new SKPaint())
+            {
+                SKRect SKRectangle = new SKRect();
+                rect.Left = rect.Left + oXshift;
+                rect.Top = rect.Top + oYshift;
+
+                skp.IsAntialias = true;
+                skp.Style = SKPaintStyle.Stroke;
+                skp.Color = penColor;
+                skp.StrokeWidth = penWidth;
+                canvas.DrawRect(SKRectangle, skp);
             }
         }
-        public void DrawText(string text, float x, float y, FontWeight fw, SharpDX.DirectWrite.FontStyle fs, float scaler, SharpDX.Color fontColor, bool isUnderlined)
+        public void DrawLine(int lastX, int lastY, int nextX, int nextY, string penColor, int penWidth)
         {
-            CleanUpDrawTextResources();
-            float thisFontHeight = drawFontRegHeight;
-            if (scaler > 1.05f)
+            using (SKPaint skp = new SKPaint())
             {
-                thisFontHeight = drawFontLargeHeight;
-            }
-            else if (scaler < 0.95f)
-            {
-                thisFontHeight = drawFontSmallHeight;
-            }
-            using (SolidColorBrush scb = new SolidColorBrush(renderTarget2D, fontColor))
-            {
-                textFormat = new TextFormat(factoryDWrite, FontFamilyName, CurrentFontCollection, fw, fs, FontStretch.Normal, thisFontHeight) { TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-                textLayout = new TextLayout(factoryDWrite, text, textFormat, this.Width, this.Height);
-                if (isUnderlined)
+                skp.IsAntialias = true;
+                skp.Style = SKPaintStyle.Stroke;
+                if (penColor == "green")
                 {
-                    textLayout.SetUnderline(true, new TextRange(0, text.Length - 1));
+                    skp.Color = SKColors.Lime;
                 }
-                renderTarget2D.DrawTextLayout(new Vector2(x, y + oYshift), textLayout, scb, DrawTextOptions.None);
+                else if (penColor == "red")
+                {
+                    skp.Color = SKColors.Red;
+                }
+                else
+                {
+                    skp.Color = SKColors.White;
+                }
+                skp.StrokeWidth = penWidth;
+                canvas.DrawLine(lastX + oXshift, lastY + oYshift, nextX + oXshift, nextY + oYshift, skp);
+                //renderTarget2D.DrawLine(new Vector2(lastX + oXshift, lastY + oYshift), new Vector2(nextX + oXshift, nextY + oYshift), scb, penWidth);
             }
         }
-        public void DrawRoundRectangle(IbRect rect, int rad, SharpDX.Color penColor, int penWidth)
-        {
-            RoundedRectangle r = new RoundedRectangle();
-            r.Rect = new SharpDX.RectangleF(rect.Left, rect.Top + oYshift, rect.Width, rect.Height);
-            r.RadiusX = rad;
-            r.RadiusY = rad;
-            using (SolidColorBrush scb = new SolidColorBrush(renderTarget2D, penColor))
-            {
-                renderTarget2D.DrawRoundedRectangle(r, scb, penWidth);
-            }
-        }   
-        public void DrawRectangle(IbRect rect, SharpDX.Color penColor, int penWidth)
-        {
-            SharpDX.RectangleF r = new SharpDX.RectangleF(rect.Left, rect.Top + oYshift, rect.Width, rect.Height);
-            using (SolidColorBrush scb = new SolidColorBrush(renderTarget2D, penColor))
-            {
-                renderTarget2D.DrawRectangle(r, scb, penWidth);
-            }
-        }
-        public void DrawLine(int lastX, int lastY, int nextX, int nextY, SharpDX.Color penColor, int penWidth)
-        {
-            using (SolidColorBrush scb = new SolidColorBrush(renderTarget2D, penColor))
-            {
-                renderTarget2D.DrawLine(new Vector2(lastX,lastY), new Vector2(nextX, nextY), scb, penWidth);
-            }
-        }
-        public void DrawBitmapGDI(System.Drawing.Bitmap bitmap, IbRect source, IbRect target)
+        
+        /*public void DrawBitmapGDI(System.Drawing.Bitmap bitmap, IbRect source, IbRect target)
         {
             Rectangle tar = new Rectangle(target.Left, target.Top + oYshift, target.Width, target.Height);
             Rectangle src = new Rectangle(source.Left, source.Top, source.Width, source.Height);
             gCanvas.DrawImage(bitmap, tar, src, GraphicsUnit.Pixel);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRectF source, IbRectF target)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, bool mirror)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, mirror);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRectF source, IbRectF target, bool mirror)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, mirror);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInDegrees, mirror);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInRadians, mirror);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity)
-        {
-            //test
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInRadians, mirror, opacity);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInDegrees, mirror, Xshift, Yshift, 0, 0);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInRadians, mirror, Xshift, Yshift, 0, 0);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInDegrees, mirror, Xshift, Yshift, Xscale, Yscale);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale, float opacity)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInDegrees, mirror, Xshift, Yshift, Xscale, Yscale, opacity);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            DrawD2DBitmap(bitmap, src, tar, angleInRadians, mirror, Xshift, Yshift, Xscale, Yscale);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, bool mirror, float opac)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            //calling new overloaded draw that takes in opacity, too
-            DrawD2DBitmap(bitmap, src, tar, mirror, opac);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRectF source, IbRectF target, bool mirror, float opac)
-        {
-            SharpDX.RectangleF tar = new SharpDX.RectangleF(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-            //calling new overloaded draw that takes in opacity, too
-            DrawD2DBitmap(bitmap, src, tar, mirror, opac);
-        }
-        public void DrawBitmap(SharpDX.Direct2D1.Bitmap bitmap, IbRect source, IbRect target, bool mirror, float opac, bool NearestNeighbourInterpolation)
-        {
-            SharpDX.Rectangle tar = new SharpDX.Rectangle(target.Left, target.Top + oYshift, target.Width, target.Height);
-            SharpDX.Rectangle src = new SharpDX.Rectangle(source.Left, source.Top, source.Width, source.Height);
-            //calling new overloaded draw that takes in opacity, too
-            DrawD2DBitmap(bitmap, src, tar, mirror, opac, NearestNeighbourInterpolation);
-        }
+        }*/
 
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target)
+        {
+            DrawBitmap(bitmap, source, target, 0f, false, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target)
+        {
+            DrawBitmap(bitmap, source, target, 0f, false, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror)
+        {
+            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, bool mirror)
+        {
+            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror)
+        {
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror)
+        {
+            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity)
+        {
+            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift)
+        {
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift)
+        {
+            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
+        {
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale, float opacity)
+        {
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, Xshift, Yshift, Xscale, Yscale);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
+        {
+            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror, float opacity)
+        {
+            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, bool mirror, float opacity)
+        {
+            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect destination, float angleInDegrees, bool mirror, float opacity, int Xshift, int Yshift, int Xscale, int Yscale)
+        {
+            int mir = 1;
+            if (mirror) { mir = -1; }
+            float xshf = (float)Xshift * 2 * screenDensity;
+            float yshf = (float)Yshift * 2 * screenDensity;
+            float xscl = 1f + (((float)Xscale * 2 * screenDensity) / squareSize);
+            float yscl = 1f + (((float)Yscale * 2 * screenDensity) / squareSize);            
+
+            canvas.Save();
+            canvas.Scale(mir * xscl, yscl, (destination.Left + oXshift) + (destination.Width / 2), (destination.Top + oYshift) + (destination.Height / 2));
+            canvas.RotateDegrees(angleInDegrees, (destination.Left + oXshift) + (destination.Width / 2), (destination.Top + oYshift) + (destination.Height / 2));
+            canvas.Translate(xshf, yshf);
+            dstRect.Left = destination.Left + oXshift;
+            dstRect.Top = destination.Top + oYshift;
+            dstRect.Right = destination.Width + destination.Left + oXshift;
+            dstRect.Bottom = destination.Height + destination.Top + oYshift;
+            srcRect.Left = source.Left;
+            srcRect.Top = source.Top;
+            srcRect.Right = source.Left + source.Width;
+            srcRect.Bottom = source.Top + source.Height;
+            drawPaint.Color = SKColors.Black.WithAlpha((byte)(255 * opacity));
+            //used for sprites
+            canvas.DrawBitmap(bitmap, srcRect, dstRect, drawPaint);
+            canvas.Restore();
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF destination, float angleInDegrees, bool mirror, float opacity, int Xshift, int Yshift, int Xscale, int Yscale)
+        {
+            int mir = 1;
+            if (mirror) { mir = -1; }
+            float xshf = (float)Xshift * 2 * screenDensity;
+            float yshf = (float)Yshift * 2 * screenDensity;
+            float xscl = 1f + (((float)Xscale * 2 * screenDensity) / squareSize);
+            float yscl = 1f + (((float)Yscale * 2 * screenDensity) / squareSize);
+
+            canvas.Save();
+            canvas.Scale(mir * xscl, yscl, (destination.Left + oXshift) + (destination.Width / 2), (destination.Top + oYshift) + (destination.Height / 2));
+            canvas.RotateDegrees(angleInDegrees, (destination.Left + oXshift) + (destination.Width / 2), (destination.Top + oYshift) + (destination.Height / 2));
+            canvas.Translate(xshf, yshf);
+            dstRect.Left = destination.Left + oXshift;
+            dstRect.Top = destination.Top + oYshift;
+            dstRect.Right = destination.Width + destination.Left + oXshift;
+            dstRect.Bottom = destination.Height + destination.Top + oYshift;
+            srcRect.Left = source.Left;
+            srcRect.Top = source.Top;
+            srcRect.Right = source.Left + source.Width;
+            srcRect.Bottom = source.Top + source.Height;
+            drawPaint.Color = SKColors.Black.WithAlpha((byte)(255 * opacity));
+            //used for sprites
+            canvas.DrawBitmap(bitmap, srcRect, dstRect, drawPaint);
+            canvas.Restore();
+        }
+        
         public void Render(SKCanvas c)
         {
             canvas = c;
@@ -1352,7 +1410,7 @@ namespace IBx
                 DrawText("FPS:" + fps.ToString(), new IbRect(5, screenHeight - txtH - 5 - oYshift, 100, 100), 1.0f, SharpDX.Color.White);
             }
 
-            EndDraw(); //uncomment this for DIRECT2D ADDITIONS
+            //EndDraw(); //uncomment this for DIRECT2D ADDITIONS
         }
 
         public void drawUIBackground()
@@ -1367,132 +1425,6 @@ namespace IBx
             { }
         }
 
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target)
-        {
-            DrawD2DBitmap(bitmap, source, target, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, bool mirror)
-        {
-            DrawD2DBitmap(bitmap, source, target, 0, mirror, 1.0f , 0, 0, 0, 0, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, int angleInDegrees, bool mirror)
-        {
-            DrawD2DBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 0, 0, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, float angleInRadians, bool mirror)
-        {
-            DrawD2DBitmap(bitmap, source, target, angleInRadians, mirror, 1.0f, 0, 0, 0, 0, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, float angleInRadians, bool mirror, float opacity)
-        {
-            DrawD2DBitmap(bitmap, source, target, angleInRadians, mirror, opacity, 0, 0, 0, 0, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, bool mirror, float opac)
-        {
-            DrawD2DBitmap(bitmap, source, target, 0, mirror, opac, 0, 0, 0, 0, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, bool mirror, float opac, bool NearestNeighbourInterpolation)
-        {
-            DrawD2DBitmap(bitmap, source, target, 0, mirror, opac, 0, 0, 0, 0, NearestNeighbourInterpolation);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
-        {
-            DrawD2DBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale, float opacity)
-        {
-            DrawD2DBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale, false, opacity);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, float angleInRadians, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
-        {
-            DrawD2DBitmap(bitmap, source, target, angleInRadians, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale, false);
-        }
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, int angleInDegrees, bool mirror, float opac, int Xshift, int Yshift, int Xscale, int Yscale, bool NearestNeighbourInterpolation)
-        {
-            //convert degrees to radians
-            float angleInRadians = (float)(Math.PI * 2 * (float)angleInDegrees / (float)360);
-            DrawD2DBitmap(bitmap, source, target, angleInRadians, mirror, opac, Xshift, Yshift, Xscale, Yscale, false);
-        }
-
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, int angleInDegrees, bool mirror, float opac, int Xshift, int Yshift, int Xscale, int Yscale, bool NearestNeighbourInterpolation, float opacity)
-        {
-            //convert degrees to radians
-            float angleInRadians = (float)(Math.PI * 2 * (float)angleInDegrees / (float)360);
-            DrawD2DBitmap(bitmap, source, target, angleInRadians, mirror, opacity, Xshift, Yshift, Xscale, Yscale, false);
-        }
-
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, float angleInRadians, bool mirror, float opac, int Xshift, int Yshift, int Xscale, int Yscale, bool NearestNeighbourInterpolation)
-        {
-            int mir = 1;
-            if (mirror) { mir = -1; }
-            float xshf = (float)Xshift * 2 * screenDensity;
-            float yshf = (float)Yshift * 2 * screenDensity;
-            float xscl = 1f + (((float)Xscale * 2 * screenDensity) / squareSize);
-            float yscl = 1f + (((float)Yscale * 2 * screenDensity) / squareSize);
-
-            Vector2 center = new Vector2(target.Left + (target.Width / 2), target.Top + (target.Height / 2));
-            renderTarget2D.Transform = SharpDX.Matrix.Transformation2D(center, 0, new Vector2(mir * xscl, yscl), center, angleInRadians, new Vector2(xshf, yshf));
-            SharpDX.RectangleF trg = new SharpDX.RectangleF(target.Left, target.Top, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-
-            /*
-            if (bitmap == cc.offScreen)
-            {
-                if ((target.Left <= (screenWidth / 2 - mod.pixDistanceToBorderWest)) && (target.Left >= (screenWidth / 2 - mod.pixDistanceToBorderWest - squareSize)))
-                {
-                    bitmap = cc.offScreenTrans;
-                }
-            }
-            */
-
-            if (NearestNeighbourInterpolation)
-            {
-                renderTarget2D.DrawBitmap(bitmap, trg, opac, BitmapInterpolationMode.NearestNeighbor, src);
-            }
-            else
-            {
-                renderTarget2D.DrawBitmap(bitmap, trg, opac, BitmapInterpolationMode.Linear, src);
-            }            
-            renderTarget2D.Transform = Matrix3x2.Identity;
-            //TBSüd
-        }
-
-        /*
-        public void DrawD2DBitmap(SharpDX.Direct2D1.Bitmap bitmap, SharpDX.RectangleF source, SharpDX.RectangleF target, float angleInRadians, bool mirror, float opac, int Xshift, int Yshift, int Xscale, int Yscale, bool NearestNeighbourInterpolation, float opacity)
-        {
-            int mir = 1;
-            if (mirror) { mir = -1; }
-            float xshf = (float)Xshift * 2 * screenDensity;
-            float yshf = (float)Yshift * 2 * screenDensity;
-            float xscl = 1f + (((float)Xscale * 2 * screenDensity) / squareSize);
-            float yscl = 1f + (((float)Yscale * 2 * screenDensity) / squareSize);
-
-            Vector2 center = new Vector2(target.Left + (target.Width / 2), target.Top + (target.Height / 2));
-            renderTarget2D.Transform = SharpDX.Matrix.Transformation2D(center, 0, new Vector2(mir * xscl, yscl), center, angleInRadians, new Vector2(xshf, yshf));
-            SharpDX.RectangleF trg = new SharpDX.RectangleF(target.Left, target.Top, target.Width, target.Height);
-            SharpDX.RectangleF src = new SharpDX.RectangleF(source.Left, source.Top, source.Width, source.Height);
-
-            /*
-            if (bitmap == cc.offScreen)
-            {
-                if ((target.Left <= (screenWidth / 2 - mod.pixDistanceToBorderWest)) && (target.Left >= (screenWidth / 2 - mod.pixDistanceToBorderWest - squareSize)))
-                {
-                    bitmap = cc.offScreenTrans;
-                }
-            }
-            
-
-            if (NearestNeighbourInterpolation)
-            {
-                renderTarget2D.DrawBitmap(bitmap, trg, opac, BitmapInterpolationMode.NearestNeighbor, src);
-            }
-            else
-            {
-                renderTarget2D.DrawBitmap(bitmap, trg, opac, BitmapInterpolationMode.Linear, src);
-            }
-            renderTarget2D.Transform = Matrix3x2.Identity;
-        }
-    */
         //INPUT STUFF
         private void GameView_MouseWheel(object sender, MouseEventArgs e)
         {

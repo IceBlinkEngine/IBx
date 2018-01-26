@@ -8072,11 +8072,11 @@ namespace IBx
                 //check if target is within attack distance, use green if true, red if false
                 if (isVisibleLineOfSight(new Coordinate(startX2, startY2), new Coordinate(endX2, endY2)))
                 {
-                    drawVisibleLineOfSightTrail(new Coordinate(endX, endY), new Coordinate(startX, startY), Color.Lime, 2);
+                    drawVisibleLineOfSightTrail(new Coordinate(endX, endY), new Coordinate(startX, startY), "green", 2);
                 }
                 else
                 {
-                    drawVisibleLineOfSightTrail(new Coordinate(endX, endY), new Coordinate(startX, startY), Color.Red, 2);
+                    drawVisibleLineOfSightTrail(new Coordinate(endX, endY), new Coordinate(startX, startY), "red", 2);
                 }
             }
         }
@@ -14819,7 +14819,7 @@ namespace IBx
 
             return true;
         }
-        public bool drawVisibleLineOfSightTrail(Coordinate end, Coordinate start, Color penColor, int penWidth)
+        public bool drawVisibleLineOfSightTrail(Coordinate end, Coordinate start, string color, int penWidth)
         {
             // Bresenham Line algorithm
             // Creates a line from Begin to End starting at (x0,y0) and ending at (x1,y1)
@@ -14856,7 +14856,7 @@ namespace IBx
                         //do your checks here for LoS blocking
                         int gridx = getGridX(nextPoint);
                         int gridy = getGridY(nextPoint);
-                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, penColor, penWidth);
+                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, color, penWidth);
                         if (gv.mod.currentEncounter.encounterTiles[gridy * gv.mod.currentEncounter.MapSizeX + gridx].LoSBlocked)
                         {
                             return false;
@@ -14881,7 +14881,7 @@ namespace IBx
                         //do your checks here for LoS blocking
                         int gridx = getGridX(nextPoint);
                         int gridy = getGridY(nextPoint);
-                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, penColor, penWidth);
+                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, color, penWidth);
                         if (gv.mod.currentEncounter.encounterTiles[gridy * gv.mod.currentEncounter.MapSizeX + gridx].LoSBlocked)
                         {
                             return false;
@@ -14915,7 +14915,7 @@ namespace IBx
                         //do your checks here for LoS blocking
                         int gridx = getGridX(nextPoint);
                         int gridy = getGridY(nextPoint);
-                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, penColor, penWidth);
+                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, color, penWidth);
                         if (gv.mod.currentEncounter.encounterTiles[gridy * gv.mod.currentEncounter.MapSizeX + gridx].LoSBlocked)
                         {
                             return false;
@@ -14940,7 +14940,7 @@ namespace IBx
                         //do your checks here for LoS blocking
                         int gridx = getGridX(nextPoint);
                         int gridy = getGridY(nextPoint);
-                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, penColor, penWidth);
+                        gv.DrawLine(lastX + gv.oXshift, lastY, nextPoint.X + gv.oXshift, nextPoint.Y, color, penWidth);
                         if (gv.mod.currentEncounter.encounterTiles[gridy * gv.mod.currentEncounter.MapSizeX + gridx].LoSBlocked)
                         {
                             return false;

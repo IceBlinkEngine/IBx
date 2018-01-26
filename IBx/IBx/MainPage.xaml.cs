@@ -36,7 +36,7 @@ namespace IBx
 
             //SetUpBitmap();
 
-            Device.StartTimer(TimeSpan.FromSeconds(1f / 30), () =>
+            Device.StartTimer(TimeSpan.FromSeconds(1f / 60), () =>
             {
                 gv.gameTimer_Tick(canvasView);
                 return true;

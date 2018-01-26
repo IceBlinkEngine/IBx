@@ -124,6 +124,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)WeatherTypeListItem.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Metamorphous-Regular.ttf" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)metamorphous_regular.ttf" />
   </ItemGroup>
 </Project>
