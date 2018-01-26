@@ -218,13 +218,13 @@ namespace IBx
 
             pS = squareSize / 10; //used for small UI and text location adjustments based on squaresize for consistent look on all devices/screen resolutions
 
-            InitializeRenderer(); //uncomment this for DIRECT2D ADDITIONS
+            //InitializeRenderer(); //uncomment this for DIRECT2D ADDITIONS
 
             //CREATES A FONTFAMILY
-            ResetGDIFont();
-            ResetDirect2DFont();
+            ResetFont();
+            //ResetDirect2DFont();
             
-            animationTimer.Tick += new System.EventHandler(this.AnimationTimer_Tick);
+            //TODO animationTimer.Tick += new System.EventHandler(this.AnimationTimer_Tick);
 
             log = new IB2HtmlLogBox(this);
             log.numberOfLinesToShow = 20;
@@ -238,9 +238,9 @@ namespace IBx
             cc.addLogText("red", "Welcome to IceBlink 2");
             cc.addLogText("fuchsia", "You can scroll this message log box, use mouse wheel or scroll bar");
             
-            //TODOinitializeMusic();
-            setupMusicPlayers();
-            //TODOinitializeCombatMusic();
+            //TODO initializeMusic();
+            //TODO setupMusicPlayers();
+            //TODO initializeCombatMusic();
             
 
             if (fixedModule.Equals("")) //this is the IceBlink Engine app
@@ -256,21 +256,11 @@ namespace IBx
                 cc.LoadSaveListItems();
                 screenType = "title";
             }
-            gameTimer.Interval = 16; //~60 fps
-            gameTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
+            //gameTimer.Interval = 16; //~60 fps
+            //gameTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
             gameTimerStopwatch.Start();
             previousTime = gameTimerStopwatch.ElapsedMilliseconds;
-            gameTimer.Start();
-
-            //moveTimer.Interval = 375;
-            //moveTimer.Enabled = false;
-            //moveTimer.Tick += new System.EventHandler(this.moveTimer_Tick);
-            //moveTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
-            //moveTimerStopwatch.Start();
-            //previousTime = gameTimerStopwatch.ElapsedMilliseconds;
-            //moveTimer.Start();
-
-
+            //gameTimer.Start();
         }
 
         public void createScreens()
@@ -407,7 +397,7 @@ namespace IBx
             bool foundArea = mod.setCurrentArea(mod.startingArea, this);
             if (!foundArea)
             {
-                MessageBox.Show("Area: " + mod.startingArea + " does not exist in the module...check the spelling or make sure your are pointing to the correct starting area that you intended");
+                sf.MessageBoxHtml("Area: " + mod.startingArea + " does not exist in the module...check the spelling or make sure your are pointing to the correct starting area that you intended");
             }
 
             mod.PlayerLocationX = mod.startingPlayerPositionX;
@@ -508,7 +498,7 @@ namespace IBx
         #region Area Music/Sounds
         public void setupMusicPlayers()
         {
-            try
+            /*try
             {
                 areaMusic = new WMPLib.WindowsMediaPlayer();
                 areaMusic.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(AreaMusic_PlayStateChange);
@@ -546,11 +536,11 @@ namespace IBx
             {
                 cc.addLogText("red","Failed to setup Music Player...Audio will be disabled. Most likely due to not having Windows Media Player installed or having an incompatible version.");
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         public void startMusic()
         {
-            try
+            /*try
             {
                 if ((currentMainMusic.Equals(mod.currentArea.AreaMusic)) && (areaMusic != null))
                 {
@@ -598,11 +588,11 @@ namespace IBx
             {
                 cc.addLogText("red", "Failed on startMusic(): " + ex.ToString());
                 errorLog(ex.ToString());
-            }        
+            }*/        
         }
         public void startAmbient()
         {
-            try
+            /*try
             {
                 if ((currentAmbientMusic.Equals(mod.currentArea.AreaSounds)) && (areaSounds != null))
                 {
@@ -650,11 +640,11 @@ namespace IBx
             {
                 cc.addLogText("red", "Failed on startAmbient(): " + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         public void startCombatMusic()
         {
-            try
+            /*try
             {
                 if ((currentCombatMusic.Equals(mod.currentEncounter.AreaMusic)) && (areaMusic != null))
                 {
@@ -702,11 +692,11 @@ namespace IBx
             {
                 cc.addLogText("red", "Failed on playCombatAreaMusicSounds()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         private void AreaMusic_PlayStateChange(int NewState)
         {
-            try
+            /*try
             {
                 if ((WMPLib.WMPPlayState)NewState == WMPLib.WMPPlayState.wmppsStopped)
                 {
@@ -717,11 +707,11 @@ namespace IBx
             {
                 cc.addLogText("Failed on AreaMusic_PlayStateChange()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         private void AreaSounds_PlayStateChange(int NewState)
         {
-            try
+            /*try
             {
                 if ((WMPLib.WMPPlayState)NewState == WMPLib.WMPPlayState.wmppsStopped)
                 {
@@ -732,7 +722,7 @@ namespace IBx
             {
                 cc.addLogText("Failed on AreaSounds_PlayStateChange()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         private void Player_MediaError(object pMediaObject)
         {
@@ -740,7 +730,7 @@ namespace IBx
         }
         private void delayMusic()
         {
-            try
+            /*try
             {
                 int rand = sf.RandInt(mod.currentArea.AreaMusicDelayRandomAdder);
                 areaMusicTimer.Enabled = false;
@@ -752,11 +742,11 @@ namespace IBx
             {
                 cc.addLogText("Failed on delayMusic()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         private void areaMusicTimer_Tick(object sender, EventArgs e)
         {
-            try
+            /*try
             {
                 if (areaMusic.URL != "")
                 {
@@ -768,11 +758,11 @@ namespace IBx
             {
                 cc.addLogText("Failed on areaMusicTimer_Tick()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         private void delaySounds()
         {
-            try
+            /*try
             {
                 int rand = sf.RandInt(mod.currentArea.AreaSoundsDelayRandomAdder);
                 areaSoundsTimer.Enabled = false;
@@ -784,11 +774,11 @@ namespace IBx
             {
                 cc.addLogText("Failed on delaySounds()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         private void areaSoundsTimer_Tick(object sender, EventArgs e)
         {
-            try
+            /*try
             {
                 if (areaSounds.URL != "")
                 {
@@ -800,35 +790,35 @@ namespace IBx
             {
                 cc.addLogText("Failed on areaSoundsTimer_Tick()" + ex.ToString());
                 errorLog(ex.ToString());
-            }
+            }*/
         }
         #endregion
         
 	    public void stopMusic()
 	    {
-            areaMusic.controls.pause();
+            //areaMusic.controls.pause();
 	    }
 	    public void stopAmbient()
 	    {
-            areaSounds.controls.pause();
+            //areaSounds.controls.pause();
 	    }
 	    public void stopCombatMusic()
 	    {
-            areaMusic.controls.pause();
+            //areaMusic.controls.pause();
 	    }
 	    public void initializeSounds()
 	    {
-            oSoundStreams.Clear();
+            /*oSoundStreams.Clear();
             string jobDir = "";
             jobDir = this.mainDirectory + "\\modules\\" + mod.moduleName + "\\sounds";
             foreach (string f in Directory.GetFiles(jobDir, "*.*", SearchOption.AllDirectories))
             {
                 oSoundStreams.Add(Path.GetFileNameWithoutExtension(f), File.OpenRead(Path.GetFullPath(f)));
-            }
+            }*/
 	    }
 	    public void PlaySound(string filenameNoExtension)
 	    {            
-            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!mod.playSoundFx))
+            /*if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!mod.playSoundFx))
             {
                 //play nothing
                 return;
@@ -849,13 +839,13 @@ namespace IBx
                     }
                     initializeSounds();
                 }
-            }            
+            } */           
 	    }
 
         //Animation Timer Stuff
         public void postDelayed(string type, int delay)
         {
-            if (type.Equals("doAnimation"))
+            /*if (type.Equals("doAnimation"))
             {
                 animationTimer.Enabled = true;
                 if (delay < 1)
@@ -865,115 +855,17 @@ namespace IBx
                 animationTimer.Interval = delay;
                 //animationTimer.Interval = 1;
                 animationTimer.Start();
-            }
+            }*/
         }
         private void AnimationTimer_Tick(object sender, EventArgs e)
         {
-            if ((!screenCombat.blockAnimationBridge) || (!mod.useCombatSmoothMovement))
+            /*if ((!screenCombat.blockAnimationBridge) || (!mod.useCombatSmoothMovement))
             {
                 animationTimer.Enabled = false;
                 animationTimer.Stop();
                 screenCombat.doAnimationController();
-            }
+            }*/
         }
-        /*
-        private void moveTimer_Tick(object sender, EventArgs e)
-        {
-            int x = mousePositionX - (int)(squareSize*4f/10f);
-            int y = mousePositionY - (int)(squareSize*55f/100f);
-            int gridX = x / squareSize;
-            int gridY = y / squareSize;
-            int actualx = mod.PlayerLocationX + (gridX - playerOffsetX);
-            int actualy = mod.PlayerLocationY + (gridY - playerOffsetY);
-
-            if (mod.PlayerLocationX == actualx && mod.PlayerLocationY - 1 == actualy)
-            {
-                bool isTransition = cc.goNorth();
-                if (!isTransition)
-                {
-                    if (mod.PlayerLocationY > 0)
-                    {
-                        if (mod.currentArea.GetBlocked(mod.PlayerLocationX, mod.PlayerLocationY - 1) == false)
-                        {
-                            mod.PlayerLastLocationX = mod.PlayerLocationX;
-                            mod.PlayerLastLocationY = mod.PlayerLocationY;
-                            mod.PlayerLocationY--;
-                            cc.doUpdate();
-                        }
-                    }
-                }
-            }
-            else if (mod.PlayerLocationX == actualx && mod.PlayerLocationY + 1 == actualy)
-            {
-
-                bool isTransition = cc.goSouth();
-                if (!isTransition)
-                {
-                    int mapheight = mod.currentArea.MapSizeY;
-                    if (mod.PlayerLocationY < (mapheight - 1))
-                    {
-                        if (mod.currentArea.GetBlocked(mod.PlayerLocationX, mod.PlayerLocationY + 1) == false)
-                        {
-                            mod.PlayerLastLocationX = mod.PlayerLocationX;
-                            mod.PlayerLastLocationY = mod.PlayerLocationY;
-                            mod.PlayerLocationY++;
-                            cc.doUpdate();
-                        }
-                    }
-                }
-            }
-            else if (mod.PlayerLocationX - 1 == actualx && mod.PlayerLocationY == actualy)
-            {
-                bool isTransition = cc.goWest();
-                if (!isTransition)
-                {
-                    if (mod.PlayerLocationX > 0)
-                    {
-                        if (mod.currentArea.GetBlocked(mod.PlayerLocationX - 1, mod.PlayerLocationY) == false)
-                        {
-                            mod.PlayerLastLocationX = mod.PlayerLocationX;
-                            mod.PlayerLastLocationY = mod.PlayerLocationY;
-                            mod.PlayerLocationX--;
-                            foreach (Player pc in mod.playerList)
-                            {
-                                if (!pc.combatFacingLeft)
-                                {
-                                    pc.combatFacingLeft = true;
-                                }
-                            }
-                            cc.doUpdate();
-                        }
-                    }
-                }
-            }
-            else if (mod.PlayerLocationX + 1 == actualx && mod.PlayerLocationY == actualy)
-            {
-                bool isTransition = cc.goEast();
-                if (!isTransition)
-                {
-                    int mapwidth = mod.currentArea.MapSizeX;
-                    if (mod.PlayerLocationX < (mapwidth - 1))
-                    {
-                        if (mod.currentArea.GetBlocked(mod.PlayerLocationX + 1, mod.PlayerLocationY) == false)
-                        {
-                            mod.PlayerLastLocationX = mod.PlayerLocationX;
-                            mod.PlayerLastLocationY = mod.PlayerLocationY;
-                            mod.PlayerLocationX++;
-                            foreach (Player pc in mod.playerList)
-                            {
-                                if (pc.combatFacingLeft)
-                                {
-                                    pc.combatFacingLeft = false;
-                                }
-                            }
-                            cc.doUpdate();
-                        }
-                    }
-                }
-            }
-
-        }
-        */
         
         public void gameTimer_Tick(SKCanvasView sk_canvas)
         {
@@ -996,8 +888,7 @@ namespace IBx
             }
         }
         private void Update(int elapsed)
-        {
-            
+        {            
             //iterate through spriteList and handle any sprite location and animation frame calculations
             if (screenType.Equals("main"))
             {
@@ -1404,10 +1295,10 @@ namespace IBx
                 {
                     for (int y = -2; y <= 2; y++)
                     {
-                        DrawText("FPS:" + fps.ToString(), new IbRect(x + 5, screenHeight - txtH - 5 + y - oYshift, 100, 100), 1.0f, SharpDX.Color.Black);
+                        DrawText("FPS:" + fps.ToString(), x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
                     }
                 }
-                DrawText("FPS:" + fps.ToString(), new IbRect(5, screenHeight - txtH - 5 - oYshift, 100, 100), 1.0f, SharpDX.Color.White);
+                DrawText("FPS:" + fps.ToString(), 5, screenHeight - txtH - 5 - oYshift, "white");
             }
 
             //EndDraw(); //uncomment this for DIRECT2D ADDITIONS
@@ -1417,7 +1308,7 @@ namespace IBx
         {
             try
             {
-                IbRect src = new IbRect(0, 0, cc.ui_bg_fullscreen.PixelSize.Width, cc.ui_bg_fullscreen.PixelSize.Height);
+                IbRect src = new IbRect(0, 0, cc.ui_bg_fullscreen.Width, cc.ui_bg_fullscreen.Height);
                 IbRect dst = new IbRect(0, 0, screenWidth, screenHeight - oYshift);
                 DrawBitmap(cc.ui_bg_fullscreen, src, dst);
             }
@@ -1426,31 +1317,31 @@ namespace IBx
         }
 
         //INPUT STUFF
-        private void GameView_MouseWheel(object sender, MouseEventArgs e)
+        /*private void GameView_MouseWheel(object sender, MouseEventArgs e)
         {
             if ((screenType.Equals("main")) || (screenType.Equals("combat")))
             {
                 log.onMouseWheel(sender, e);
             }
             onMouseEvent(sender, e, MouseEventType.EventType.MouseWheel);
-        }
-        private void GameView_MouseDown(object sender, MouseEventArgs e)
+        }*/
+        /*private void GameView_MouseDown(object sender, MouseEventArgs e)
         {
             if ((screenType.Equals("main")) || (screenType.Equals("combat")))
             {
                 //TODO log.onMouseDown(sender, e);
             }
             onMouseEvent(sender, e, MouseEventType.EventType.MouseDown);
-        }
-        private void GameView_MouseUp(object sender, MouseEventArgs e)
+        }*/
+        /*private void GameView_MouseUp(object sender, MouseEventArgs e)
         {
             if ((screenType.Equals("main")) || (screenType.Equals("combat")))
             {
                 //TODO log.onMouseUp(sender, e);
             }
             onMouseEvent(sender, e, MouseEventType.EventType.MouseUp);
-        }
-        private void GameView_MouseMove(object sender, MouseEventArgs e)
+        }*/
+        /*private void GameView_MouseMove(object sender, MouseEventArgs e)
         {
             if ((screenType.Equals("main")) || (screenType.Equals("combat")))
             {
@@ -1460,11 +1351,12 @@ namespace IBx
                 //TODO log.onMouseMove(sender, e);
             }
             onMouseEvent(sender, e, MouseEventType.EventType.MouseMove);
-        }
-        private void GameView_MouseClick(object sender, MouseEventArgs e)
+        }*/
+        /*private void GameView_MouseClick(object sender, MouseEventArgs e)
         {
             onMouseEvent(sender, e, MouseEventType.EventType.MouseClick);
-        }
+        }*/
+
         public void onMouseEvent(object sender, SKTouchEventArgs e)
         {
             MouseEventType.EventType eventType = MouseEventType.EventType.MouseMove;
@@ -1505,115 +1397,115 @@ namespace IBx
                     //GAME SCREENS
                     if (screenType.Equals("main"))
                     {
-                        screenMainMap.onTouchMain(e, eventType);	
+                        screenMainMap.onTouchMain(eX, eY, eventType);	
                     }
                     else if (screenType.Equals("launcher"))
                     {
-                        screenLauncher.onTouchLauncher(e, eventType);
+                        screenLauncher.onTouchLauncher(eX, eY, eventType);
                     }
                     else if (screenType.Equals("pcCreation"))
                     {
-                        screenPcCreation.onTouchPcCreation(e, eventType);
+                        screenPcCreation.onTouchPcCreation(eX, eY, eventType);
                     }
                     else if (screenType.Equals("learnSpellCreation"))
                     {
-                        screenSpellLevelUp.onTouchSpellLevelUp(e, eventType, true, false);   	
+                        screenSpellLevelUp.onTouchSpellLevelUp(eX, eY, eventType, true, false);   	
                     }
                     else if (screenType.Equals("learnSpellLevelUp"))
                     {
-                        screenSpellLevelUp.onTouchSpellLevelUp(e, eventType, false, false);     	
+                        screenSpellLevelUp.onTouchSpellLevelUp(eX, eY, eventType, false, false);     	
                     }
                     else if (screenType.Equals("learnSpellLevelUpCombat"))
                     {
-                        screenSpellLevelUp.onTouchSpellLevelUp(e, eventType, false, true);
+                        screenSpellLevelUp.onTouchSpellLevelUp(eX, eY, eventType, false, true);
                     }
                     else if (screenType.Equals("learnTraitCreation"))
                     {
-                        screenTraitLevelUp.onTouchTraitLevelUp(e, eventType, true, false);   	
+                        screenTraitLevelUp.onTouchTraitLevelUp(eX, eY, eventType, true, false);   	
                     }
                     else if (screenType.Equals("learnTraitLevelUp"))
                     {
-                        screenTraitLevelUp.onTouchTraitLevelUp(e, eventType, false, false);     	
+                        screenTraitLevelUp.onTouchTraitLevelUp(eX, eY, eventType, false, false);     	
                     }
                     else if (screenType.Equals("learnTraitLevelUpCombat"))
                     {
-                        screenTraitLevelUp.onTouchTraitLevelUp(e, eventType, false, true);
+                        screenTraitLevelUp.onTouchTraitLevelUp(eX, eY, eventType, false, true);
                     }
                     else if (screenType.Equals("title"))
                     {
-                        screenTitle.onTouchTitle(e, eventType);
+                        screenTitle.onTouchTitle(eX, eY, eventType);
                     }
                     else if (screenType.Equals("party"))
                     {
-                        screenParty.onTouchParty(e, eventType, false);
+                        screenParty.onTouchParty(eX, eY, eventType, false);
                     }
                     else if (screenType.Equals("combatParty"))
                     {
-                        screenParty.onTouchParty(e, eventType, true);
+                        screenParty.onTouchParty(eX, eY, eventType, true);
                     }
                     else if (screenType.Equals("inventory"))
                     {
-                        screenInventory.onTouchInventory(e, eventType, false);
+                        screenInventory.onTouchInventory(eX, eY, eventType, false);
                     }
                     else if (screenType.Equals("combatInventory"))
                     {
-                        screenInventory.onTouchInventory(e, eventType, true);
+                        screenInventory.onTouchInventory(eX, eY, eventType, true);
                     }
                     else if (screenType.Equals("itemSelector"))
                     {
-                        screenItemSelector.onTouchItemSelector(e, eventType);
+                        screenItemSelector.onTouchItemSelector(eX, eY, eventType);
                     }
                     else if (screenType.Equals("portraitSelector"))
                     {
-                        screenPortraitSelector.onTouchPortraitSelector(e, eventType);
+                        screenPortraitSelector.onTouchPortraitSelector(eX, eY, eventType);
                     }
                     else if (screenType.Equals("tokenSelector"))
                     {
-                        screenTokenSelector.onTouchTokenSelector(e, eventType);
+                        screenTokenSelector.onTouchTokenSelector(eX, eY, eventType);
                     }
                     else if (screenType.Equals("pcSelector"))
                     {
-                        screenPcSelector.onTouchPcSelector(e, eventType);
+                        screenPcSelector.onTouchPcSelector(eX, eY, eventType);
                     }
                     else if (screenType.Equals("journal"))
                     {
-                        screenJournal.onTouchJournal(e, eventType);
+                        screenJournal.onTouchJournal(eX, eY, eventType);
                     }
                     else if (screenType.Equals("shop"))
                     {
-                        screenShop.onTouchShop(e, eventType);
+                        screenShop.onTouchShop(eX, eY, eventType);
                     }
                     else if (screenType.Equals("combat"))
                     {
-                        screenCombat.onTouchCombat(e, eventType);
+                        screenCombat.onTouchCombat(eX, eY, eventType);
                     }
                     else if (screenType.Equals("combatCast"))
                     {
-                        screenCastSelector.onTouchCastSelector(e, eventType, true);
+                        screenCastSelector.onTouchCastSelector(eX, eY, eventType, true);
                     }
                     else if (screenType.Equals("mainMapCast"))
                     {
-                        screenCastSelector.onTouchCastSelector(e, eventType, false);
+                        screenCastSelector.onTouchCastSelector(eX, eY, eventType, false);
                     }
                     else if (screenType.Equals("combatTraitUse"))
                     {
-                        screenTraitUseSelector.onTouchCastSelector(e, eventType, true);
+                        screenTraitUseSelector.onTouchCastSelector(eX, eY, eventType, true);
                     }
                     else if (screenType.Equals("mainMapTraitUse"))
                     {
-                        screenTraitUseSelector.onTouchCastSelector(e, eventType, false);
+                        screenTraitUseSelector.onTouchCastSelector(eX, eY, eventType, false);
                     }
                     else if (screenType.Equals("convo"))
                     {
-                        screenConvo.onTouchConvo(e, eventType);
+                        screenConvo.onTouchConvo(eX, eY, eventType);
                     }
                     else if (screenType.Equals("partyBuild"))
                     {
-                        screenPartyBuild.onTouchPartyBuild(e, eventType);
+                        screenPartyBuild.onTouchPartyBuild(eX, eY, eventType);
                     }
                     else if (screenType.Equals("partyRoster"))
                     {
-                        screenPartyRoster.onTouchPartyRoster(e, eventType);
+                        screenPartyRoster.onTouchPartyRoster(eX, eY, eventType);
                     }
                 }
             }
@@ -1623,7 +1515,7 @@ namespace IBx
             }		
         }
         
-        public void onKeyboardEvent(Keys keyData)
+        /*public void onKeyboardEvent(Keys keyData)
         {
             try
             {
@@ -1646,40 +1538,22 @@ namespace IBx
                     {
                         screenConvo.onKeyUp(keyData);
                     }
-                    /*
-                    else
-                    {
-                        if (keyData == Keys.Up | keyData == Keys.D8)
-                        {
-                            int i = 1;
-                            //IBHtmlMessageBox.SetCurrentTopLineIndex(-12);
-                            //this.Invalidate();
-                        }
-
-                        if (keyData == Keys.Down | keyData == Keys.D2)
-                        {
-                            //SetCurrentTopLineIndex(12);
-                            //this.Invalidate();
-                        }
-                    }
-                    */
-                    
                 }
             }
             catch (Exception ex)
             {
                 errorLog(ex.ToString());
             }
-        }        
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        }*/        
+        /*protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             onKeyboardEvent(keyData);
                 
             return base.ProcessCmdKey(ref msg, keyData);
-        }
+        }*/
 
         //ON FORM CLOSING
-        private void GameView_FormClosing(object sender, FormClosingEventArgs e)
+        /*private void GameView_FormClosing(object sender, FormClosingEventArgs e)
         {
             DialogResult dlg = IBMessageBox.Show(this, "Are you sure you wish to exit?", enumMessageButton.YesNo);
             if (dlg == DialogResult.Yes)
@@ -1690,11 +1564,11 @@ namespace IBx
             {
                 e.Cancel = true;
             }
-        }
-        private void GameView_FormClosed(object sender, FormClosedEventArgs e)
+        }*/
+        /*private void GameView_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
-        }
+        }*/
 
         public void errorLog(string text)
         {
@@ -1707,11 +1581,6 @@ namespace IBx
                 writer.Write(DateTime.Now + ": ");
                 writer.WriteLine(text);
             }
-        }
-
-        private void GameView_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

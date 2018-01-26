@@ -59,41 +59,12 @@ namespace IBx
         private void OnTouch(object sender, SKTouchEventArgs e)
         {
             gv.onMouseEvent(sender, e);
-            switch (e.ActionType)
-            {
-                case SKTouchAction.Pressed:
-                    // start of a stroke
-                    var p = new SKPath();
-                    p.MoveTo(e.Location);
-                    //temporaryPaths[e.Id] = p;
-                    //string file = LoadTextAndroid("test3d.mod");
-                    break;
-                case SKTouchAction.Moved:
-                    // the stroke, while pressed
-                    actionType = e.ActionType.ToString();
-                    locX = (int)e.Location.X;
-                    locY = (int)e.Location.Y;
-                    //if (e.InContact)
-                    //temporaryPaths[e.Id].LineTo(e.Location);
-                    break;
-                case SKTouchAction.Released:
-                    // end of a stroke
-                    int x = 0;
-                    //paths.Add(temporaryPaths[e.Id]);
-                    //temporaryPaths.Remove(e.Id);
-                    break;
-                case SKTouchAction.Cancelled:
-                    // we don't want that stroke
-                    x = 0;
-                    //temporaryPaths.Remove(e.Id);
-                    break;
-            }
-
+            
             // we have handled these events
             e.Handled = true;
 
             // update the UI
-            ((SKCanvasView)sender).InvalidateSurface();
+            //((SKCanvasView)sender).InvalidateSurface();
         }
     }
 }

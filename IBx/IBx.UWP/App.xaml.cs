@@ -54,6 +54,9 @@ namespace IBx.UWP
 
                 Xamarin.Forms.Forms.Init(e);
 
+                IBx.App.ScreenWidth = (int)Window.Current.Bounds.Width;
+                IBx.App.ScreenHeight = (int)Window.Current.Bounds.Height;
+
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: Load state from previously suspended application

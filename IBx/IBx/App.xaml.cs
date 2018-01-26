@@ -9,7 +9,10 @@ namespace IBx
 {
 	public partial class App : Application
 	{
-		public App ()
+        static public int ScreenWidth;
+        static public int ScreenHeight;
+
+        public App ()
 		{
 			InitializeComponent();
 

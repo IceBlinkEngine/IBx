@@ -23,6 +23,21 @@ namespace IBx.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
+
+            int dim1 = (int)UIScreen.MainScreen.NativeBounds.Width;
+            int dim2 = (int)UIScreen.MainScreen.NativeBounds.Height;
+
+            if (dim1 >= dim2)
+            {
+                App.ScreenWidth = dim1;
+                App.ScreenHeight = dim2;
+            }
+            else
+            {
+                App.ScreenWidth = dim2;
+                App.ScreenHeight = dim1;
+            }
+
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
