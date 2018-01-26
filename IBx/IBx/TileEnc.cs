@@ -57,12 +57,6 @@ namespace IBx
         public bool Walkable = true;
          //[JsonIgnore]
 	    public bool LoSBlocked = false;
-        [JsonIgnore]
-        public Bitmap tileBitmap1;
-        [JsonIgnore]
-        public Bitmap tileBitmap2;
-        [JsonIgnore]
-        public Bitmap tileBitmap3;
 
         public TileEnc()
 	    {

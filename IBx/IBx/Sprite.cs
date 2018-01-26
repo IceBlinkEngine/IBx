@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -8,8 +9,8 @@ namespace IBx
     public class Sprite
     {
         public string bitmap = "blank";               // filename of bitmap, do NOT include filename extension
-        public Vector2 position = new Vector2(0, 0);  // The current position of the sprite        
-        public Vector2 velocity = new Vector2(0, 0);  // The speed of the sprite at the current instance
+        public PointF position = new PointF(0, 0);  // The current position of the sprite        
+        public PointF velocity = new PointF(0, 0);  // The speed of the sprite at the current instance
         public float angle = 0;                       // The current angle of rotation of the sprite
         public float angularVelocity = 0;             // The speed that the angle is changing
         public float scaleX = 1.0f;                    // The X-scale of the sprite
@@ -46,8 +47,8 @@ namespace IBx
         public Sprite(GameView gv, string bitmap, float positionX, float positionY, float velocityX, float velocityY, float angle, float angularVelocity, float scaleX, float scaleY, int timeToLiveInMilliseconds, bool permanent, int msPerFrame, float opacity, float mass, string movementMethod, bool movesIndependentlyFromPlayerPosition, int numberOFFramesForAnimationsMadeFromSeveralBitmaps)
         {
             this.bitmap = bitmap;
-            this.position = new Vector2(positionX, positionY);
-            this.velocity = new Vector2(velocityX, velocityY);
+            this.position = new PointF(positionX, positionY);
+            this.velocity = new PointF(velocityX, velocityY);
             this.angle = angle;
             this.angularVelocity = angularVelocity;
             this.scaleX = scaleX;
@@ -67,16 +68,16 @@ namespace IBx
             this.numberOFFramesForAnimationsMadeFromSeveralBitmaps = numberOFFramesForAnimationsMadeFromSeveralBitmaps;
 
             if (millisecondsPerFrame == 0) { millisecondsPerFrame = 100; }
-            frameHeight = gv.cc.GetFromBitmapList(bitmap).PixelSize.Height;
-            numberOfFrames = gv.cc.GetFromBitmapList(bitmap).PixelSize.Width / frameHeight;
+            frameHeight = gv.cc.GetFromBitmapList(bitmap).Height;
+            numberOfFrames = gv.cc.GetFromBitmapList(bitmap).Width / frameHeight;
         }
 
         //lean constructor: normal Sprite
         public Sprite(GameView gv, string bitmap, float positionX, float positionY, float velocityX, float velocityY, float angle, float angularVelocity, float scale, int timeToLiveInMilliseconds, bool permanent, int msPerFrame)
         {
             this.bitmap = bitmap;
-            this.position = new Vector2(positionX, positionY);
-            this.velocity = new Vector2(velocityX, velocityY);
+            this.position = new PointF(positionX, positionY);
+            this.velocity = new PointF(velocityX, velocityY);
             this.angle = angle;
             this.angularVelocity = angularVelocity;
             this.scaleX = scale;
@@ -87,8 +88,8 @@ namespace IBx
             this.spriteType = "normalSprite";
 
             if (millisecondsPerFrame == 0) { millisecondsPerFrame = 100; }
-            frameHeight = gv.cc.GetFromBitmapList(bitmap).PixelSize.Height;
-            numberOfFrames = gv.cc.GetFromBitmapList(bitmap).PixelSize.Width / frameHeight;
+            frameHeight = gv.cc.GetFromBitmapList(bitmap).Height;
+            numberOfFrames = gv.cc.GetFromBitmapList(bitmap).Width / frameHeight;
         }
 
         public void Update(int elapsed, GameView gv)
@@ -97,31 +98,36 @@ namespace IBx
             totalElapsedTime += elapsed;
             if (movementMethod == "linear")
             {
-                position += velocity * elapsed;
+                position.X += velocity.X * elapsed;
+                position.Y += velocity.Y * elapsed;
                 angle += angularVelocity * elapsed;
             }
             else if (movementMethod == "clouds")
             {
-                position += velocity * elapsed * 0.9f;
+                position.X += velocity.X * elapsed * 0.9f;
+                position.Y += velocity.Y * elapsed * 0.9f;
                 gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 1, true, false, 0);
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
 
             }
             else if (movementMethod == "fog")
             {
-                position += velocity * elapsed;
+                position.X += velocity.X * elapsed;
+                position.Y += velocity.Y * elapsed;
                 gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 0.5f, false, true, 0);
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
            
             }
             else if (movementMethod == "rain")
             {
-                position += velocity * elapsed * 1.275f;
+                position.X += velocity.X * elapsed * 1.275f;
+                position.Y += velocity.Y * elapsed * 1.275f;
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
             }
             else if (movementMethod == "snow")
             {
-                position += velocity * elapsed * 1.1f;
+                position.X += velocity.X * elapsed * 1.1f;
+                position.Y += velocity.Y * elapsed * 1.1f;
                 float shiftAdder = gv.sf.RandInt(300);
                 float limitAdder = gv.sf.RandInt(300);
 
@@ -149,7 +155,8 @@ namespace IBx
             }
             else if (movementMethod == "sandstorm")
             {
-                position += velocity * elapsed * 1.4f;
+                position.X += velocity.X * elapsed * 1.4f;
+                position.Y += velocity.Y * elapsed * 1.4f;
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
             }
 

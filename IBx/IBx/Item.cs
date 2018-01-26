@@ -18,7 +18,7 @@ namespace IBx
         public bool isLightSource = false;
         public string itemImage = "blank";
         [JsonIgnore]
-	    public Bitmap token;
+	    //public Bitmap token;
         public string ArmorWeightType = "Light"; //Light, Medium, Heavy 
         public string tag = "none"; //item unique tag name    
         public string resref = "none"; //item unique tag name    

@@ -58,7 +58,7 @@ namespace IBx
                         if (!playedHoverSound)
                         {
                             playedHoverSound = true;
-                            gv.playerButtonEnter.Play();
+                            //TODO gv.playerButtonEnter.Play();
                         }
                         glowOn = true;
                     }
@@ -80,7 +80,7 @@ namespace IBx
                         if (!playedHoverSound)
                         {
                             playedHoverSound = true;
-                            gv.playerButtonEnter.Play();
+                            //TODO gv.playerButtonEnter.Play();
                         }
                         return true;
                     }
@@ -100,15 +100,15 @@ namespace IBx
                 //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
                 //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
 
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width, gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height);
-                IbRect srcBG = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgBGFilename).PixelSize.Width, gv.cc.GetFromBitmapList(ImgBGFilename).PixelSize.Height);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgFilename).Width, gv.cc.GetFromBitmapList(ImgFilename).Height);
+                IbRect srcBG = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgBGFilename).Width, gv.cc.GetFromBitmapList(ImgBGFilename).Height);
                 IbRect dst = new IbRect((int)((parentPanel.currentLocX + this.X) * gv.screenDensity), (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity), (int)((float)Width * gv.screenDensity), (int)((float)Height * gv.screenDensity));
                 IbRect dstBG = new IbRect((int)((parentPanel.currentLocX + this.X) * gv.screenDensity) - (int)(3 * gv.screenDensity),
                                             (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity) - (int)(3 * gv.screenDensity),
                                             (int)((float)Width * gv.screenDensity) + (int)(6 * gv.screenDensity),
                                             (int)((float)Height * gv.screenDensity) + (int)(6 * gv.screenDensity));
 
-                IbRect srcGlow = new IbRect(0, 0, gv.cc.GetFromBitmapList(GlowFilename).PixelSize.Width, gv.cc.GetFromBitmapList(GlowFilename).PixelSize.Height);
+                IbRect srcGlow = new IbRect(0, 0, gv.cc.GetFromBitmapList(GlowFilename).Width, gv.cc.GetFromBitmapList(GlowFilename).Height);
                 IbRect dstGlow = new IbRect((int)((parentPanel.currentLocX + this.X) * gv.screenDensity) - (int)(7 * gv.screenDensity),
                                             (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity) - (int)(7 * gv.screenDensity),
                                             (int)((float)Width * gv.screenDensity) + (int)(15 * gv.screenDensity),
@@ -136,7 +136,7 @@ namespace IBx
 
                 if (gv.mod.useUIBackground)
                 {
-                    IbRect srcFrame = new IbRect(0, 0, gv.cc.ui_portrait_frame.PixelSize.Width, gv.cc.ui_portrait_frame.PixelSize.Height);
+                    IbRect srcFrame = new IbRect(0, 0, gv.cc.ui_portrait_frame.Width, gv.cc.ui_portrait_frame.Height);
                     IbRect dstFrame = new IbRect((int)((parentPanel.currentLocX + this.X) * gv.screenDensity) - (int)(5 * gv.screenDensity),
                                             (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity) - (int)(5 * gv.screenDensity),
                                             (int)((float)Width * gv.screenDensity) + (int)(10 * gv.screenDensity),
@@ -145,13 +145,16 @@ namespace IBx
                 }
 
                 float thisFontHeight = gv.drawFontRegHeight;
+                string fontHeightInString = "regular";
                 if (scaler > 1.05f)
                 {
                     thisFontHeight = gv.drawFontLargeHeight;
+                    fontHeightInString = "large";
                 }
                 else if (scaler < 0.95f)
                 {
                     thisFontHeight = gv.drawFontSmallHeight;
+                    fontHeightInString = "regular";
                 }
 
                 //DRAW HP/HPmax
@@ -170,12 +173,12 @@ namespace IBx
                     {
                         int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
                         int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY - pH + y);
-                        gv.DrawText(TextHP, xLoc, yLoc, scaler, Color.Black);
+                        gv.DrawText(TextHP, xLoc, yLoc, fontHeightInString, "black");
                     }
                 }
                 int xLoc1 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
                 int yLoc1 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY - pH);
-                gv.DrawText(TextHP, xLoc1, yLoc1, scaler, Color.Lime);
+                gv.DrawText(TextHP, xLoc1, yLoc1, fontHeightInString, "lime");
 
                 //DRAW SP/SPmax
                 // Measure string.
@@ -193,12 +196,12 @@ namespace IBx
                     {
                         int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX - pW + x);
                         int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY - pH + y);
-                        gv.DrawText(TextSP, xLoc, yLoc, scaler, Color.Black);
+                        gv.DrawText(TextSP, xLoc, yLoc, fontHeightInString, "black");
                     }
                 }
                 int xLoc2 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX - pW);
                 int yLoc2 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY - pH);
-                gv.DrawText(TextSP, xLoc2, yLoc2, scaler, Color.Yellow);
+                gv.DrawText(TextSP, xLoc2, yLoc2, fontHeightInString, "yellow");
 
 
                 //draw level up symbol
@@ -211,12 +214,12 @@ namespace IBx
                     {
                         int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX - pW + x);
                         int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY - pH + y);
-                        gv.DrawText(levelUpSymbol, xLoc, yLoc, scaler*1.2f, Color.Black);
+                        gv.DrawText(levelUpSymbol, xLoc, yLoc, fontHeightInString, "black");
                     }
                 }
                 int xLoc3 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX - pW);
                 int yLoc3 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY - pH);
-                gv.DrawText(levelUpSymbol, xLoc3, yLoc3, scaler*1.2f, Color.Azure);
+                gv.DrawText(levelUpSymbol, xLoc3, yLoc3, fontHeightInString, "azure");
             }
 
             //draw level up symbol

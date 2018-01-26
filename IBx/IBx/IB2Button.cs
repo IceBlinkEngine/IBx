@@ -65,7 +65,7 @@ namespace IBx
                         if (!playedHoverSound)
                         {
                             playedHoverSound = true;
-                            gv.playerButtonEnter.Play();
+                            //TODO gv.playerButtonEnter.Play();
                         }
                         glowOn = true;
                     }
@@ -87,7 +87,7 @@ namespace IBx
                         if (!playedHoverSound)
                         {
                             playedHoverSound = true;
-                            gv.playerButtonEnter.Play();
+                            //TODO gv.playerButtonEnter.Play();
                         }
                         return true;
                     }
@@ -151,17 +151,20 @@ namespace IBx
                 }
 
                 float thisFontHeight = gv.drawFontRegHeight;
+                string fontHeightInString = "regular";
                 if (scaler > 1.05f)
                 {
                     thisFontHeight = gv.drawFontLargeHeight;
+                    fontHeightInString = "large";
                 }
                 else if (scaler < 0.95f)
                 {
                     thisFontHeight = gv.drawFontSmallHeight;
+                    fontHeightInString = "regular";
                 }
 
                 // DRAW TEXT
-                float stringSize = gv.cc.MeasureString(Text, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
+                float stringSize = gv.MeasureString(Text, fontHeightInString, "normal");
 
                 //place in the center
                 float ulX = ((Width * gv.screenDensity) - stringSize) / 2;
@@ -173,15 +176,15 @@ namespace IBx
                     {
                         int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
                         int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
-                        gv.DrawText(Text, xLoc, yLoc, scaler, Color.Black);
+                        gv.DrawText(Text, xLoc, yLoc, fontHeightInString, "black");
                     }
                 }
                 int xLoc1 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
                 int yLoc1 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
-                gv.DrawText(Text, xLoc1, yLoc1, scaler, Color.White);
+                gv.DrawText(Text, xLoc1, yLoc1, fontHeightInString, "white");
 
                 // DRAW QUANTITY
-                stringSize = gv.cc.MeasureString(Quantity, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
+                stringSize = gv.MeasureString(Quantity, fontHeightInString, "normal");
 
                 //place in the bottom right quadrant
                 ulX = (((Width * gv.screenDensity) - stringSize) / 8) * 7;
@@ -193,17 +196,17 @@ namespace IBx
                     {
                         int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
                         int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
-                        gv.DrawText(Quantity, xLoc, yLoc, scaler, Color.Black);
+                        gv.DrawText(Quantity, xLoc, yLoc, fontHeightInString, "black");
                     }
                 }
                 int xLoc2 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
                 int yLoc2 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
-                gv.DrawText(Quantity, xLoc2, yLoc2, scaler, Color.White);
+                gv.DrawText(Quantity, xLoc2, yLoc2, fontHeightInString, "white");
 
                 // DRAW HOTKEY
                 if (gv.showHotKeys)
                 {
-                    stringSize = gv.cc.MeasureString(HotKey, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
+                    stringSize = gv.MeasureString(HotKey, fontHeightInString, "normal");
 
                     //place in the bottom center
                     ulX = ((Width * gv.screenDensity) - stringSize) / 2;
@@ -215,12 +218,12 @@ namespace IBx
                         {
                             int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
                             int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
-                            gv.DrawText(HotKey, xLoc, yLoc, scaler, Color.Black);
+                            gv.DrawText(HotKey, xLoc, yLoc, fontHeightInString, "black");
                         }
                     }
                     int xLoc3 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
                     int yLoc3 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
-                    gv.DrawText(HotKey, xLoc3, yLoc3, scaler, Color.Red);
+                    gv.DrawText(HotKey, xLoc3, yLoc3, fontHeightInString, "red");
                 }
             }
         }

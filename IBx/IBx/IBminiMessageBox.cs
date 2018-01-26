@@ -8,10 +8,11 @@ namespace IBx
 {
     public class IBminiMessageBox
     {
+        /*
         public GameView gv;
         public string tag = "";
         public List<string> tagStack = new List<string>();
-        public List<IBminiFormattedLine> logLinesList = new List<IBminiFormattedLine>();
+        public List<FormattedLine> logLinesList = new List<FormattedLine>();
         public int currentTopLineIndex = 0;
         public int numberOfLinesToShow = 17;
         public int currentLocX = 0;
@@ -80,16 +81,16 @@ namespace IBx
 
             if ((htmlText.EndsWith("<br>")) || (htmlText.EndsWith("<BR>")))
             {
-                List<IBminiFormattedLine> lnList = gv.cc.ProcessHtmlString(htmlText, (int)(tbWidth * gv.scaler), tagStack, true);
-                foreach (IBminiFormattedLine fl in lnList)
+                List<FormattedLine> lnList = gv.cc.ProcessHtmlString(htmlText, (int)(tbWidth * gv.scaler), tagStack, true);
+                foreach (FormattedLine fl in lnList)
                 {
                     logLinesList.Add(fl);
                 }
             }
             else
             {
-                List<IBminiFormattedLine> lnList = gv.cc.ProcessHtmlString(htmlText + "<br>", (int)(tbWidth * gv.scaler), tagStack, true);
-                foreach (IBminiFormattedLine fl in lnList)
+                List<FormattedLine> lnList = gv.cc.ProcessHtmlString(htmlText + "<br>", (int)(tbWidth * gv.scaler), tagStack, true);
+                foreach (FormattedLine fl in lnList)
                 {
                     logLinesList.Add(fl);
                 }
@@ -121,7 +122,7 @@ namespace IBx
             for (int i = currentTopLineIndex; i < maxLines; i++)
             {
                 //loop through each line and print each word
-                foreach (IBminiFormattedWord word in logLinesList[i].wordsList)
+                foreach (FormattedWord word in logLinesList[i].wordsList)
                 {
                     int xLoc2 = (int)((currentLocX * gv.scaler + xLoc));
                     int yLoc2 = (int)((currentLocY * gv.scaler + yLoc));
@@ -214,26 +215,6 @@ namespace IBx
                 }
             }
         }
-        /*private bool isMouseWithinTextBox(MouseEventArgs e)
-        {
-            if ((e.X > (int)(currentLocX * gv.scaler)) && (e.X < (int)(tbWidth * gv.scaler) + (int)(currentLocX * gv.scaler)) && (e.Y > (int)(currentLocY * gv.scaler)) && (e.Y < (int)(tbHeight * gv.scaler) + (int)(currentLocY * gv.scaler)))
-            {
-                return true;
-            }
-            return false;
-        }*/
-        /*public void onMouseWheel(object sender, MouseEventArgs e)
-        {
-            if (isMouseWithinTextBox(e))
-            {
-                // Update the drawing based upon the mouse wheel scrolling. 
-                int numberOfTextLinesToMove = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
-
-                if (numberOfTextLinesToMove != 0)
-                {
-                    SetCurrentTopLineIndex(-numberOfTextLinesToMove);
-                }
-            }
-        }*/
+        */
     }
 }

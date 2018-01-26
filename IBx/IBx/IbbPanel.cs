@@ -8,7 +8,7 @@ namespace IBx
     public class IbbPanel
     {
         //this class is handled differently than Android version
-        public Bitmap ImgBG = null;
+        public string ImgBG = "";
         public int LocX = 0;
         public int LocY = 0;
         public int Width = 0;
@@ -22,9 +22,9 @@ namespace IBx
 
         public void Draw()
         {
-            IbRect src = new IbRect(0, 0, this.ImgBG.PixelSize.Width, this.ImgBG.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgBG).Width, gv.cc.GetFromBitmapList(ImgBG).Height);
             IbRect dst = new IbRect(this.LocX, this.LocY, Width, Height);            
-            gv.DrawBitmap(this.ImgBG, src, dst);
+            gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgBG), src, dst);
         }
     }
 }

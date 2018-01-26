@@ -12,11 +12,13 @@ namespace IBx
     public class FormattedWord
     {
         public string text = "";
+        public string color = "white";
+        public string style = "normal";
         //public Color color = Color.White;
         //public FontStyle fontStyle = FontStyle.Normal;
         //public FontWeight fontWeight = FontWeight.Normal;
         public bool underlined = false;
-        public float fontSize = 10.0f;
+        public string fontSize = "regular";
 
         public FormattedWord()
         {

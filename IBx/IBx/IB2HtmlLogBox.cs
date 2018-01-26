@@ -23,6 +23,9 @@ namespace IBx
         public int tbXloc = 10;
         public int tbYloc = 10;
         public float fontHeightToWidthRatio = 1.0f;
+        public bool touchIsDown = false;
+        public int touchMoveDeltaY = 0;
+        public int lastTouchMoveLocationY = 0;
 
         public IB2HtmlLogBox()
         {
@@ -39,18 +42,31 @@ namespace IBx
             gv = g;
         }
 
-        public void DrawString(string text, float x, float y, FontWeight fw, SharpDX.DirectWrite.FontStyle fs, SharpDX.Color fontColor, float fontHeight, bool isUnderlined)
+        public void DrawString(string text, float x, float y, string style, string fontColor, string fontHeight, byte opacity, bool isUnderlined)
         {
-            if ((y > -2) && (y <= (int)(tbHeight * gv.screenDensity) - fontHeight))
+            float fontH = 0;
+            if (fontHeight.Equals("small"))
+            {
+                fontH = gv.drawFontSmallHeight;
+            }
+            else if (fontHeight.Equals("large"))
+            {
+                fontH = gv.drawFontLargeHeight;
+            }
+            else
+            {
+                fontH = gv.drawFontRegHeight;
+            }
+            if ((y > -2) && (y <= (int)(tbHeight * gv.screenDensity) - fontH))
             {
                 //hurgh21
                 if (gv.mod.useMinimalisticUI)
                 {
-                    gv.DrawText(text, x + (int)(tbXloc * gv.screenDensity) + 2 * gv.pS, y, fw, fs, 1.0f, fontColor, isUnderlined);
+                    gv.DrawText(text, x + (int)(tbXloc * gv.screenDensity) + 2 * gv.pS, y, fontHeight, fontColor, style, opacity, isUnderlined);
                 }
                 else 
                 {
-                    gv.DrawText(text, x + (int)(tbXloc * gv.screenDensity) + gv.pS, y, fw, fs, 1.0f, fontColor, isUnderlined);
+                    gv.DrawText(text, x + (int)(tbXloc * gv.screenDensity) + gv.pS, y, fontHeight, fontColor, style, opacity, isUnderlined);
                 }
             }
         }
@@ -118,36 +134,18 @@ namespace IBx
                 //loop through each line and print each word
                 foreach (FormattedWord word in logLinesList[i].wordsList)
                 {
-                    if (gv.textFormat != null)
-                    {
-                        gv.textFormat.Dispose();
-                        gv.textFormat = null;
-                    }
-
-                    if (gv.textLayout != null)
-                    {
-                        gv.textLayout.Dispose();
-                        gv.textLayout = null;
-                    }
-                    gv.textFormat = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, word.fontWeight, word.fontStyle, FontStretch.Normal, word.fontSize) { TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-                    gv.textLayout = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, word.text + " ", gv.textFormat, gv.Width, gv.Height);
-                    int difYheight = logLinesList[i].lineHeight - (int)word.fontSize;
-                    if (word.underlined)
-                    {
-                        gv.textLayout.SetUnderline(true, new TextRange(0, word.text.Length - 1));
-                    }
+                    int difYheight = logLinesList[i].lineHeight - (int)gv.drawFontRegHeight;
                     int xLoc2 = (int)((parentPanel.currentLocX * gv.screenDensity + xLoc));
                     int yLoc2 = (int)((parentPanel.currentLocY * gv.screenDensity + yLoc + difYheight));
-                    int logOpac = (int)(255f * gv.mod.logOpacity);
-                    word.color.A = (byte)(logOpac);
+                    byte logOpac = (byte)(255f * gv.mod.logOpacity);
                     int yPositionModifier = 0;
                     if (gv.screenType.Equals("combat") && (!gv.mod.useMinimalisticUI) && (gv.screenCombat.showIniBar))
                     {
                         yPositionModifier = gv.squareSize + 4 * gv.pS;
                     }
                    
-                    DrawString(word.text + " ", xLoc2, yLoc2 + yPositionModifier, word.fontWeight, word.fontStyle, word.color, word.fontSize, word.underlined);
-                    xLoc += gv.textLayout.Metrics.WidthIncludingTrailingWhitespace;
+                    DrawString(word.text + " ", xLoc2, yLoc2 + yPositionModifier, word.style, word.color, word.fontSize, logOpac, word.underlined);
+                    xLoc += gv.MeasureString(word.text + " ", word.fontSize, word.style);
                 }
                 xLoc = 0;
                 yLoc += logLinesList[i].lineHeight;
@@ -185,15 +183,15 @@ namespace IBx
                 currentTopLineIndex = 0;
             }
         }        
-        private bool isMouseWithinTextBox(MouseEventArgs e)
+        /*private bool isMouseWithinTextBox(MouseEventArgs e)
         {
             if ((e.X > (int)(tbXloc * gv.screenDensity)) && (e.X < (int)(tbWidth * gv.screenDensity) + (int)(tbXloc * gv.screenDensity)) && (e.Y > (int)(tbYloc * gv.screenDensity)) && (e.Y < (int)(tbHeight * gv.screenDensity) + (int)(tbYloc * gv.screenDensity)))
             {
                 return true;
             }
             return false;
-        }        
-        public void onMouseWheel(object sender, MouseEventArgs e)
+        }*/        
+        /*public void onMouseWheel(object sender, MouseEventArgs e)
         {
             if (isMouseWithinTextBox(e))
             {
@@ -207,6 +205,65 @@ namespace IBx
                     gv.Render(0);
                 }
             }
-        }        
+        }*/
+        private bool isTouchWithinTextBox(int eX, int eY)
+        {
+            if ((eX > (int)((tbXloc)))
+                    && (eX < (int)(tbWidth) + (int)((tbXloc)))
+                    && (eY > (int)((tbYloc)))
+                    && (eY < (int)(tbHeight) + (int)((tbYloc))))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public void onTouchSwipe(int eX, int eY, MouseEventType.EventType eventType)
+        {
+            switch (eventType)
+            {
+                case MouseEventType.EventType.MouseDown:
+
+                    if (isTouchWithinTextBox(eX, eY))
+                    {
+                        touchIsDown = true;
+                        lastTouchMoveLocationY = eY;
+                        touchMoveDeltaY = 0;
+                    }
+                    break;
+
+                case MouseEventType.EventType.MouseMove:
+
+                    if (touchIsDown)
+                    {
+                        if (isTouchWithinTextBox(eX, eY))
+                        {
+                            touchMoveDeltaY = lastTouchMoveLocationY - eY;
+                            if (touchMoveDeltaY > gv.drawFontRegHeight)
+                            {
+                                SetCurrentTopLineIndex(1);
+                                touchMoveDeltaY = 0;
+                                lastTouchMoveLocationY = eY;
+                            }
+                            else if (touchMoveDeltaY < -1 * gv.drawFontRegHeight)
+                            {
+                                SetCurrentTopLineIndex(-1);
+                                touchMoveDeltaY = 0;
+                                lastTouchMoveLocationY = eY;
+                            }
+                        }
+                    }
+                    break;
+
+                case MouseEventType.EventType.MouseUp:
+
+                    touchIsDown = false;
+                    touchMoveDeltaY = 0;
+                    break;
+            }
+        }
+
     }
 }

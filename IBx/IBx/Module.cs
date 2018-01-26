@@ -153,7 +153,7 @@ namespace IBx
         public bool showPartyToken = false;
         public string partyTokenFilename = "prp_party";
         [JsonIgnore]
-        public Bitmap partyTokenBitmap;
+        //public Bitmap partyTokenBitmap;
         public List<Player> playerList = new List<Player>();
         public List<Player> partyRosterList = new List<Player>();
         public List<ItemRefs> partyInventoryRefsList = new List<ItemRefs>();
@@ -294,11 +294,11 @@ namespace IBx
 
         public int borderAreaSize = 0;
         public bool allowImmediateRetransition = false;
-        [JsonIgnore]
-        public List<Bitmap> loadedTileBitmaps = new List<Bitmap>();
-        public List<String> loadedTileBitmapsNames = new List<String>();
-        [JsonIgnore]
-        public List<System.Drawing.Bitmap> loadedMinimapTileBitmaps = new List<System.Drawing.Bitmap>();
+        //[JsonIgnore]
+        //public List<Bitmap> loadedTileBitmaps = new List<Bitmap>();
+        //public List<String> loadedTileBitmapsNames = new List<String>();
+        //[JsonIgnore]
+        //public List<System.Drawing.Bitmap> loadedMinimapTileBitmaps = new List<System.Drawing.Bitmap>();
         public List<String> loadedMinimapTileBitmapsNames = new List<String>();
         
         public string partyLightColor = "yellow";
@@ -454,6 +454,7 @@ namespace IBx
                 }
             }
         }
+
         public bool setCurrentArea(string filename, GameView gv)
         {
             try
@@ -463,7 +464,7 @@ namespace IBx
                     if (area.Filename.Equals(filename))
                     {
                         this.currentArea = area;
-                        gv.cc.DisposeOfBitmap(ref gv.cc.bmpMap);
+                        //gv.cc.DisposeOfBitmap(ref gv.cc.bmpMap);
                         gv.cc.bmpMap = gv.cc.LoadBitmap(this.currentArea.ImageFileName);
                         //TODO gv.cc.LoadTileBitmapList();
                         foreach (Prop p in this.currentArea.Props)
@@ -483,6 +484,106 @@ namespace IBx
             }
 
         }
+        public bool setCurrentArea(string areaFilename, GameView gv)
+        {
+            try
+            {
+                foreach (Area area in this.moduleAreasObjects)
+                {
+                    if (area.Filename.Equals(areaFilename))
+                    {
+                        this.currentArea = area;
+                        return true;
+                    }
+                }
+                //didn't find the area in the mod list so try and load it
+                string s = gv.GetModuleAssetFileString(this.moduleName, areaFilename + ".are");
+                using (StringReader sr = new StringReader(s))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    Area are = (Area)serializer.Deserialize(sr, typeof(Area));
+                    if (are != null)
+                    {
+                        this.moduleAreasObjects.Add(are);
+                        this.currentArea = are;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                gv.errorLog(ex.ToString());
+                return false;
+            }
+        }
+        public bool setCurrentEncounter(string EncFilename, GameView gv)
+        {
+            try
+            {
+                foreach (Encounter enc in this.moduleEncountersList)
+                {
+                    if (enc.encounterName.Equals(EncFilename))
+                    {
+                        this.currentEncounter = enc;
+                        return true;
+                    }
+                }
+                //didn't find the area in the mod list so try and load it
+                string s = gv.GetModuleAssetFileString(this.moduleName, EncFilename + ".enc");
+                using (StringReader sr = new StringReader(s))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    Encounter enc = (Encounter)serializer.Deserialize(sr, typeof(Encounter));
+                    if (enc != null)
+                    {
+                        this.moduleEncountersList.Add(enc);
+                        this.currentEncounter = enc;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                gv.errorLog(ex.ToString());
+                return false;
+            }
+        }
+        public bool setCurrentConvo(string ConvoFilename, GameView gv)
+        {
+            try
+            {
+                foreach (Convo cnv in this.moduleConvoList)
+                {
+                    if (cnv.ConvoFileName.Equals(ConvoFilename))
+                    {
+                        gv.screenConvo.currentConvo = cnv;
+                        return true;
+                    }
+                }
+                //didn't find the area in the mod list so try and load it
+                string s = gv.GetModuleAssetFileString(this.moduleName, ConvoFilename + ".dlg");
+                using (StringReader sr = new StringReader(s))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    Convo cnv = (Convo)serializer.Deserialize(sr, typeof(Convo));
+                    if (cnv != null)
+                    {
+                        this.moduleConvoList.Add(cnv);
+                        gv.screenConvo.currentConvo = cnv;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                gv.errorLog(ex.ToString());
+                return false;
+            }
+        }
+
 
         public int getNextIdNumber()
         {

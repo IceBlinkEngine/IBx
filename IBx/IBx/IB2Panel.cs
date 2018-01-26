@@ -128,7 +128,7 @@ namespace IBx
         {
             if (!gv.mod.useMinimalisticUI)
             {
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(backgroundImageFilename).PixelSize.Width, gv.cc.GetFromBitmapList(backgroundImageFilename).PixelSize.Height);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(backgroundImageFilename).Width, gv.cc.GetFromBitmapList(backgroundImageFilename).Height);
                 IbRect dst = new IbRect((int)(currentLocX * gv.screenDensity), (int)(currentLocY * gv.screenDensity), (int)(Width * gv.screenDensity), (int)(Height * gv.screenDensity));
                 if ((this.tag != "InitiativePanel") && (this.tag != "logPanel"))
                 {
@@ -189,7 +189,7 @@ namespace IBx
             //}
             //else
             //{
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(backgroundImageFilename).PixelSize.Width, gv.cc.GetFromBitmapList(backgroundImageFilename).PixelSize.Height);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(backgroundImageFilename).Width, gv.cc.GetFromBitmapList(backgroundImageFilename).Height);
                 IbRect dst = new IbRect((int)(currentLocX * gv.screenDensity + gv.oXshift - 2.5 * gv.pS), (int)(currentLocY * gv.screenDensity) - 4 * gv.pS, (int)(Width * gv.screenDensity + 6.5 * gv.pS), (int)(Height * gv.screenDensity - gv.squareSize + 18 * gv.pS));
                 gv.DrawBitmap(gv.cc.GetFromBitmapList(backgroundImageFilename), src, dst, 0, false, 0.575f * gv.mod.logOpacity);
             //}

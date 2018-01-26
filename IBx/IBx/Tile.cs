@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Bitmap = SharpDX.Direct2D1.Bitmap;
 
 namespace IBx
 {
@@ -68,18 +67,6 @@ namespace IBx
         public float opacity5 = 1;
         public float opacity6 = 1;
         public float opacity7 = 1;
-        [JsonIgnore]
-        public Bitmap tileBitmap0;
-        [JsonIgnore]
-        public Bitmap tileBitmap1;
-        [JsonIgnore]
-        public Bitmap tileBitmap2;
-        [JsonIgnore]
-        public Bitmap tileBitmap3;
-        [JsonIgnore]
-        public Bitmap tileBitmap4;
-        [JsonIgnore]
-        public Bitmap tileBitmap5;
         public bool isCentreOfLightCircle = false;
         public bool isOtherPartOfLightCircle = false;
         public bool isFocalPoint = false;

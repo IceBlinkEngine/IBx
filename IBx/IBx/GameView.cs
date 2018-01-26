@@ -47,6 +47,7 @@ namespace IBx
         public SKRect dstRect = new SKRect();
         public SKPaint drawPaint = new SKPaint();
         public SKPaint textPaint = new SKPaint();
+        public SKRect textBounds = new SKRect();
 
 
         //public Graphics gCanvas;
@@ -237,11 +238,31 @@ namespace IBx
             cc.addLogText("yellow", "");
             cc.addLogText("red", "Welcome to IceBlink 2");
             cc.addLogText("fuchsia", "You can scroll this message log box, use mouse wheel or scroll bar");
-            
+
+            /*TODO
+            //setup messageBox defaults
+            messageBox = new IBminiMessageBox(this);
+            messageBox.currentLocX = 20;
+            messageBox.currentLocY = 10;
+            messageBox.numberOfLinesToShow = 17;
+            messageBox.tbWidth = 344;
+            messageBox.Width = 344;
+            messageBox.Height = 220;
+            messageBox.tbHeight = 212;
+            messageBox.setupIBminiMessageBox();
+
+            //setup itemListSelector defaults   
+            itemListSelector = new IBminiItemListSelector();
+            itemListSelector.currentLocX = 20;
+            itemListSelector.currentLocY = 10;
+            itemListSelector.Width = 344;
+            itemListSelector.Height = 220;
+            */
+
             //TODO initializeMusic();
             //TODO setupMusicPlayers();
             //TODO initializeCombatMusic();
-            
+
 
             if (fixedModule.Equals("")) //this is the IceBlink Engine app
             {
@@ -903,21 +924,21 @@ namespace IBx
         //DRAW ROUTINES
         public void DrawText(string text, float xLoc, float yLoc)
         {
-            DrawText(text, xLoc, yLoc, "regular", "white", "normal", false);
+            DrawText(text, xLoc, yLoc, "regular", "white", "normal", 255, false);
         }
         public void DrawText(string text, float xLoc, float yLoc, string color)
         {
-            DrawText(text, xLoc, yLoc, "regular", color, "normal", false);
+            DrawText(text, xLoc, yLoc, "regular", color, "normal", 255, false);
         }
         public void DrawText(string text, float xLoc, float yLoc, string size, string color)
         {
-            DrawText(text, xLoc, yLoc, size, color, "normal", false);
+            DrawText(text, xLoc, yLoc, size, color, "normal", 255, false);
         }
         public void DrawText(string text, float xLoc, float yLoc, string size, string color, string style)
         {
-            DrawText(text, xLoc, yLoc, size, color, style, false);
+            DrawText(text, xLoc, yLoc, size, color, style, 255, false);
         }
-        public void DrawText(string text, float xLoc, float yLoc, string size, string color, string style, bool isUnderlined)
+        public void DrawText(string text, float xLoc, float yLoc, string size, string color, string style, byte opacity, bool isUnderlined)
         {
             //underline is no longer available in skiaSharp. Google removed it from skia
             //From Google: "In Skia the text decorations(underline and strike - through) only affect drawText calls,
@@ -925,7 +946,7 @@ namespace IBx
             //Text decoration can get quite complex with layout, and since different users will disagree 
             //about what the behavior should be it's best that the user do the drawing."
             
-            //So we in IB will need to create our own underlining function by drawing a line under text after getting text bounds
+            //TODO So we in IB will need to create our own underlining function by drawing a line under text after getting text bounds
 
             //Font size  (small, regular, large)          
             if (size.Equals("small"))
@@ -962,58 +983,132 @@ namespace IBx
             //color            
             if (color.Equals("red"))
             {
-                textPaint.Color = SKColors.Red;
+                textPaint.Color = SKColors.Red.WithAlpha(opacity);
             }
             else if (color.Equals("lime"))
             {
-                textPaint.Color = SKColors.Lime;
+                textPaint.Color = SKColors.Lime.WithAlpha(opacity);
             }
             else if (color.Equals("black"))
             {
-                textPaint.Color = SKColors.Black;
+                textPaint.Color = SKColors.Black.WithAlpha(opacity);
             }
             else if (color.Equals("white"))
             {
-                textPaint.Color = SKColors.White;
+                textPaint.Color = SKColors.White.WithAlpha(opacity);
             }
             else if (color.Equals("silver"))
             {
-                textPaint.Color = SKColors.Silver;
+                textPaint.Color = SKColors.Silver.WithAlpha(opacity);
             }
             else if (color.Equals("grey"))
             {
-                textPaint.Color = SKColors.DimGray;
+                textPaint.Color = SKColors.DimGray.WithAlpha(opacity);
             }
             else if (color.Equals("aqua"))
             {
-                textPaint.Color = SKColors.Aqua;
+                textPaint.Color = SKColors.Aqua.WithAlpha(opacity);
             }
             else if (color.Equals("fuchsia"))
             {
-                textPaint.Color = SKColors.Fuchsia;
+                textPaint.Color = SKColors.Fuchsia.WithAlpha(opacity);
             }
             else if (color.Equals("yellow"))
             {
-                textPaint.Color = SKColors.Yellow;
+                textPaint.Color = SKColors.Yellow.WithAlpha(opacity);
             }
             else if (color.Equals("magenta"))
             {
-                textPaint.Color = SKColors.Magenta;
+                textPaint.Color = SKColors.Magenta.WithAlpha(opacity);
             }
             else if (color.Equals("green"))
             {
-                textPaint.Color = SKColors.Green;
+                textPaint.Color = SKColors.Green.WithAlpha(opacity);
             }
             else if (color.Equals("gray"))
             {
-                textPaint.Color = SKColors.Gray;
+                textPaint.Color = SKColors.Gray.WithAlpha(opacity);
             }            
             else
             {
-                textPaint.Color = SKColors.White;
+                textPaint.Color = SKColors.White.WithAlpha(opacity);
             }
 
             canvas.DrawText(text, xLoc, yLoc, textPaint);
+        }
+        public float MeasureString(string text, string size, string style)
+        {
+            // Measure string width.
+            //Font size  (small, regular, large)          
+            if (size.Equals("small"))
+            {
+                textPaint.TextSize = drawFontSmallHeight;
+            }
+            else if (size.Equals("large"))
+            {
+                textPaint.TextSize = drawFontLargeHeight;
+            }
+            else
+            {
+                textPaint.TextSize = drawFontRegHeight;
+            }
+
+            //Font Style (bold, bolditalic, italic, normal)
+            if (style.Equals("bold"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Bold);
+            }
+            else if (style.Equals("italic"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Italic);
+            }
+            else if (style.Equals("bolditalic"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.BoldItalic);
+            }
+            else
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Normal);
+            }
+            return textPaint.MeasureText(text);
+        }
+        public CoordinateF MeasureStringSize(string text, string size, string style)
+        {
+            // Measure string width.
+            //Font size  (small, regular, large)          
+            if (size.Equals("small"))
+            {
+                textPaint.TextSize = drawFontSmallHeight;
+            }
+            else if (size.Equals("large"))
+            {
+                textPaint.TextSize = drawFontLargeHeight;
+            }
+            else
+            {
+                textPaint.TextSize = drawFontRegHeight;
+            }
+
+            //Font Style (bold, bolditalic, italic, normal)
+            if (style.Equals("bold"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Bold);
+            }
+            else if (style.Equals("italic"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Italic);
+            }
+            else if (style.Equals("bolditalic"))
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.BoldItalic);
+            }
+            else
+            {
+                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Normal);
+            }
+            textPaint.MeasureText(text, ref textBounds);
+            CoordinateF returnSize = new CoordinateF(textBounds.Width, textBounds.Height);
+            return returnSize;
         }
 
         public void DrawRectangle(IbRect rect, SKColor penColor, int penWidth)

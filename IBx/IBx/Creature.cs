@@ -15,7 +15,7 @@ namespace IBx
     {
 	    public string cr_tokenFilename = "blank.png";
         [JsonIgnore]
-	    public SkiaSharp.SKBitmap token;
+	    //public SkiaSharp.SKBitmap token;
         public float roamDistanceX = 0;
         public int percentChanceToCastSpell = 100; //for GeneralCaster, this is the % chance that they will try and cast a spell on each turn (100 = 100%, 80 = 80%, etc.)    	    
         public float roamDistanceY = 0;

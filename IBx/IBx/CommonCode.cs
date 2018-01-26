@@ -1368,7 +1368,7 @@ namespace IBx
             if (pnlLog == null)
             {
                 pnlLog = new IbbPanel(gv);
-                pnlLog.ImgBG = this.LoadBitmap("ui_bg_log");
+                pnlLog.ImgBG = "ui_bg_log";
                 pnlLog.LocX = gv.oXshift - gv.pS;
                 pnlLog.LocY = 0;
                 pnlLog.Height = topPanelHeight * gv.squareSize;
@@ -1379,7 +1379,7 @@ namespace IBx
             if (pnlToggles == null)
             {
                 pnlToggles = new IbbPanel(gv);
-                pnlToggles.ImgBG = this.LoadBitmap("ui_bg_toggles");
+                pnlToggles.ImgBG = "ui_bg_toggles";
                 pnlToggles.LocX = gv.oXshift - gv.pS;
                 pnlToggles.LocY = topPanelHeight * gv.squareSize + gv.pS;
                 pnlToggles.Height = 3 * gv.squareSize + gv.pS + gv.pS;
@@ -1388,7 +1388,7 @@ namespace IBx
             if (pnlPortraits == null)
             {
                 pnlPortraits = new IbbPanel(gv);
-                pnlPortraits.ImgBG = this.LoadBitmap("ui_bg_portraits");
+                pnlPortraits.ImgBG = "ui_bg_portraits";
                 pnlPortraits.LocX = (leftPanelWidth + mapSize) * gv.squareSize + gv.oXshift + gv.pS;
                 pnlPortraits.LocY = 0 * gv.squareSize;
                 pnlPortraits.Height = topPanelHeight * gv.squareSize;
@@ -1397,7 +1397,7 @@ namespace IBx
             if (pnlArrows == null)
             {
                 pnlArrows = new IbbPanel(gv);
-                pnlArrows.ImgBG = this.LoadBitmap("ui_bg_arrows");
+                pnlArrows.ImgBG = "ui_bg_arrows";
                 pnlArrows.LocX = (leftPanelWidth + mapSize) * gv.squareSize + gv.oXshift + gv.pS;
                 pnlArrows.LocY = topPanelHeight * gv.squareSize + gv.pS;
                 pnlArrows.Height = 3 * gv.squareSize + gv.pS + gv.pS;
@@ -1406,7 +1406,7 @@ namespace IBx
             if (pnlHotkeys == null)
             {
                 pnlHotkeys = new IbbPanel(gv);
-                pnlHotkeys.ImgBG = this.LoadBitmap("ui_bg_hotkeys");
+                pnlHotkeys.ImgBG = "ui_bg_hotkeys";
                 pnlHotkeys.LocX = leftPanelWidth * gv.squareSize + gv.oXshift;
                 pnlHotkeys.LocY = mapSize * gv.squareSize + gv.pS;
                 pnlHotkeys.Height = 1 * gv.squareSize + gv.pS + gv.pS;
@@ -11498,42 +11498,7 @@ namespace IBx
             }
             return txt;
         }
-        public float MeasureString(string text, SharpDX.DirectWrite.FontWeight fw, SharpDX.DirectWrite.FontStyle fs, float fontHeight)
-        {
-            // Measure string width.
-            SharpDX.DirectWrite.TextFormat tf = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, fw, fs, SharpDX.DirectWrite.FontStretch.Normal, fontHeight) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
-            SharpDX.DirectWrite.TextLayout tl = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, text, tf, gv.Width, gv.Height);
-            float returnWidth = tl.Metrics.Width;
-            if (tf != null)
-            {
-                tf.Dispose();
-                tf = null;
-            }
-            if (tl != null)
-            {
-                tl.Dispose();
-                tl = null;
-            }
-            return returnWidth;
-        }
-        public CoordinateF MeasureStringSize(string text, SharpDX.DirectWrite.FontWeight fw, SharpDX.DirectWrite.FontStyle fs, float fontHeight)
-        {
-            // Measure string width.
-            SharpDX.DirectWrite.TextFormat tf = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, fw, fs, SharpDX.DirectWrite.FontStretch.Normal, fontHeight) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
-            SharpDX.DirectWrite.TextLayout tl = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, text, tf, gv.Width, gv.Height);
-            CoordinateF returnSize = new CoordinateF(tl.Metrics.Width, tl.Metrics.Height);
-            if (tf != null)
-            {
-                tf.Dispose();
-                tf = null;
-            }
-            if (tl != null)
-            {
-                tl.Dispose();
-                tl = null;
-            }
-            return returnSize;
-        }
+        
         public void MakeDirectoryIfDoesntExist(string filenameAndFullPath)
         {
             System.IO.FileInfo file = new System.IO.FileInfo(filenameAndFullPath);

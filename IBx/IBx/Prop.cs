@@ -46,8 +46,8 @@ namespace IBx
 	    public string ConversationWhenOnPartySquare = "none";
 	    public string EncounterWhenOnPartySquare = "none";
 	    public bool DeletePropWhenThisEncounterIsWon = true;
-        [JsonIgnore]
-	    public Bitmap token;
+        //[JsonIgnore]
+	    //public Bitmap token;
 	    public List<LocalInt> PropLocalInts = new List<LocalInt>();
 	    public List<LocalString> PropLocalStrings = new List<LocalString>();
 	    //All THE PROJECT LIVING WORLD STUFF

@@ -83,9 +83,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)PlayerClass.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Prop.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Race.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ResourceFontFileEnumerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ResourceFontFileStream.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ResourceFontLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Schedule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScreenCastSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScreenCombat.cs" />

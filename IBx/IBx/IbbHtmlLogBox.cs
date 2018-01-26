@@ -8,6 +8,7 @@ namespace IBx
 {
     public class IbbHtmlLogBox
     {
+        /*
         public GameView gv = null;
         public Bitmap btn_up;
         public Bitmap btn_down;
@@ -110,165 +111,10 @@ namespace IBx
                 {
                     logLinesList.Add(fl);
                 }
-            }
-            /*if ((htmlText.EndsWith("<br>")) || (htmlText.EndsWith("<BR>")))
-            {
-                ProcessHtmlString(htmlText, tbWidth - btn_up.PixelSize.Width);
-            }
-            else
-            {
-                ProcessHtmlString(htmlText + "<br>", tbWidth - btn_up.PixelSize.Width);
-            }*/          
+            }        
             scrollToEnd();
         }
-        /*public void ProcessHtmlString(string text, int width)
-        {
-            bool tagMode = false;
-            string tag = "";
-            FormattedWord newWord = new FormattedWord();
-            FormattedLine newLine = new FormattedLine();
-            int lineHeight = 0;
-
-            foreach (char c in text)
-            {
-                #region Start/Stop Tags
-                //start a tag and check for end of word
-                if (c == '<')
-                {
-                    tagMode = true;
-
-                    if (newWord.text != "")
-                    {
-                        newWord.fontStyle = GetFontStyle();
-                        newWord.fontWeight = GetFontWeight();
-                        newWord.fontSize = GetFontSizeInPixels();
-                        newWord.color = GetColor();
-                        gv.textFormat = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, newWord.fontWeight, newWord.fontStyle, FontStretch.Normal, newWord.fontSize) { TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-                        gv.textLayout = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, newWord.text + " ", gv.textFormat, gv.Width, gv.Height);
-                        //font = new Font(gv.family, newWord.fontSize, newWord.fontStyle);
-                        float wordWidth = gv.textLayout.Metrics.WidthIncludingTrailingWhitespace;
-                        float height = gv.textLayout.Metrics.Height;
-                        if (height > lineHeight) { lineHeight = (int)height; }
-
-                        if (xLoc + wordWidth > width) //word wrap
-                        {
-                            //end last line and add it to the log
-                            newLine.lineHeight = lineHeight;
-                            logLinesList.Add(newLine);
-                            //start a new line and add this word
-                            newLine = new FormattedLine();
-                            newLine.wordsList.Add(newWord);
-                            xLoc = 0;
-                        }
-                        else //no word wrap, just add word
-                        {
-                            newLine.wordsList.Add(newWord);
-                        }
-                        //instead of drawing, just add to line list 
-                        //DrawString(g, word, font, brush, xLoc, yLoc);
-                        xLoc += wordWidth;
-                        newWord = new FormattedWord();
-                    }
-                    continue;
-                }
-                //end a tag
-                else if (c == '>')
-                {
-                    //check for ending type tag
-                    if (tag.StartsWith("/"))
-                    {
-                        //if </>, remove corresponding tag from stack
-                        string tagMinusSlash = tag.Substring(1);
-                        if (tag.StartsWith("/font"))
-                        {
-                            for (int i = tagStack.Count - 1; i > 0; i--)
-                            {
-                                if (tagStack[i].StartsWith("font"))
-                                {
-                                    tagStack.RemoveAt(i);
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            tagStack.Remove(tagMinusSlash);
-                        }
-                    }
-                    else
-                    {
-                        //check for line break
-                        if ((tag.ToLower() == "br") || (tag == "BR"))
-                        {
-                            newWord.fontStyle = GetFontStyle();
-                            newWord.fontWeight = GetFontWeight();
-                            newWord.fontSize = GetFontSizeInPixels();
-                            newWord.color = GetColor();
-                            //end last line and add it to the log
-                            newLine.lineHeight = lineHeight;
-                            logLinesList.Add(newLine);
-                            //start a new line and add this word
-                            newLine = new FormattedLine();
-                            //newLine.wordsList.Add(newWord);
-                            xLoc = 0;
-                        }
-                        //else if <>, add this tag to the stack
-                        tagStack.Add(tag);
-                    }
-                    tagMode = false;
-                    tag = "";
-                    continue;
-                }
-                #endregion
-
-                #region Words
-                if (!tagMode)
-                {
-                    if (c != ' ') //keep adding to word until hit a space
-                    {
-                        newWord.text += c;
-                    }
-                    else //hit a space so end word
-                    {
-                        newWord.fontStyle = GetFontStyle();
-                        newWord.fontWeight = GetFontWeight();
-                        newWord.fontSize = GetFontSizeInPixels();
-                        newWord.color = GetColor();
-                        gv.textFormat = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, newWord.fontWeight, newWord.fontStyle, FontStretch.Normal, newWord.fontSize) { TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-                        gv.textLayout = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, newWord.text + " ", gv.textFormat, gv.Width, gv.Height);
-                        //font = new Font(gv.family, newWord.fontSize, newWord.fontStyle);
-                        float wordWidth = gv.textLayout.Metrics.WidthIncludingTrailingWhitespace;
-                        float height = gv.textLayout.Metrics.Height;
-                        if (height > lineHeight) { lineHeight = (int)height; }
-                        
-                        if (xLoc + wordWidth > width) //word wrap
-                        {
-                            //end last line and add it to the log
-                            newLine.lineHeight = lineHeight;
-                            logLinesList.Add(newLine);
-                            //start a new line and add this word
-                            newLine = new FormattedLine();
-                            newLine.wordsList.Add(newWord);
-                            xLoc = 0;
-                        }
-                        else //no word wrap, just add word
-                        {
-                            newLine.wordsList.Add(newWord);
-                        }
-                        //instead of drawing, just add to line list 
-                        //DrawString(g, word, font, brush, xLoc, yLoc);
-                        xLoc += wordWidth;
-                        newWord = new FormattedWord();
-                    }
-                }
-                else if (tagMode)
-                {
-                    tag += c;
-                }
-                #endregion
-            }
-        }*/
-
+        
         public void onDrawLogBox()
         {
             //ratio of #lines to #pixels
@@ -382,101 +228,6 @@ namespace IBx
             }
         }
         
-        /*private Color GetColor()
-        {
-            //will end up using the last color on the stack
-            Color clr = Color.White;
-            foreach (string s in tagStack)
-            {
-                if ((s == "font color='red'") || (s == "font color = 'red'"))
-                {
-                    clr = Color.Red;
-                }
-                else if ((s == "font color='lime'") || (s == "font color = 'lime'"))
-                {
-                    clr = Color.Lime;
-                }
-                else if ((s == "font color='black'") || (s == "font color = 'black'"))
-                {
-                    clr = Color.Black;
-                }
-                else if ((s == "font color='blue'") || (s == "font color = 'blue'"))
-                {
-                    clr = Color.Blue;
-                }
-                else if ((s == "font color='teal'") || (s == "font color = 'teal'"))
-                {
-                    clr = Color.Teal;
-                }
-                else if ((s == "font color='white'") || (s == "font color = 'white'"))
-                {
-                    clr = Color.White;
-                }
-                else if ((s == "font color='silver'") || (s == "font color = 'silver'"))
-                {
-                    clr = Color.Gray;
-                }
-                else if ((s == "font color='grey'") || (s == "font color = 'grey'"))
-                {
-                    clr = Color.DimGray;
-                }
-                else if ((s == "font color='aqua'") || (s == "font color = 'aqua'"))
-                {
-                    clr = Color.Aqua;
-                }
-                else if ((s == "font color='fuchsia'") || (s == "font color = 'fuchsia'"))
-                {
-                    clr = Color.Fuchsia;
-                }
-                else if ((s == "font color='yellow'") || (s == "font color = 'yellow'"))
-                {
-                    clr = Color.Yellow;
-                }
-            }
-            return clr;
-        }
-        private SharpDX.DirectWrite.FontStyle GetFontStyle()
-        {
-            SharpDX.DirectWrite.FontStyle style = SharpDX.DirectWrite.FontStyle.Normal;
-            foreach (string s in tagStack)
-            {
-                if (s == "i")
-                {
-                    style = style | SharpDX.DirectWrite.FontStyle.Italic;
-                }
-            }
-            return style;
-        }
-        private SharpDX.DirectWrite.FontWeight GetFontWeight()
-        {
-            SharpDX.DirectWrite.FontWeight style = SharpDX.DirectWrite.FontWeight.Normal;
-            foreach (string s in tagStack)
-            {
-                if (s == "b")
-                {
-                    style = style | SharpDX.DirectWrite.FontWeight.Bold;
-                }
-            }
-            return style;
-        }
-        private float GetFontSizeInPixels()
-        {
-            //will end up using the last font size on the stack
-            float fSize = gv.drawFontRegHeight * (float)gv.squareSize / 100.0f;
-            foreach (string s in tagStack)
-            {
-                if (s == "big")
-                {
-                    fSize = gv.drawFontLargeHeight * (float)gv.squareSize / 100.0f;
-                }
-                else if (s == "small")
-                {
-                    fSize = gv.drawFontSmallHeight * (float)gv.squareSize / 100.0f;
-                }
-            }
-            return fSize;
-        }*/
-
         private bool isMouseWithinTextBox(MouseEventArgs e)
         {
             if ((e.X > tbXloc) && (e.X < tbWidth + tbXloc) && (e.Y > tbYloc) && (e.Y < tbHeight + tbYloc))
@@ -593,5 +344,6 @@ namespace IBx
                 //gv.Invalidate();
             }
         }
+        */
     }
 }

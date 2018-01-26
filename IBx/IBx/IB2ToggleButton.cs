@@ -58,7 +58,7 @@ namespace IBx
         {
             if (show)
             {
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgOnFilename).PixelSize.Width, gv.cc.GetFromBitmapList(ImgOnFilename).PixelSize.Height);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgOnFilename).Width, gv.cc.GetFromBitmapList(ImgOnFilename).Height);
                 IbRect dst = new IbRect(0, 0, 0, 0);
                 if (gv.mod.useMinimalisticUI)
                 {
