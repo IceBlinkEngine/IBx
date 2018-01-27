@@ -181,7 +181,7 @@ namespace IBx
                 //gv.sf.AddCharacterToParty(gv.mod.defaultPlayerFilename)
             //}
             gv.mod.partyTokenFilename = "prp_party";
-            gv.mod.partyTokenBitmap = this.LoadBitmap(gv.mod.partyTokenFilename);
+            //gv.mod.partyTokenBitmap = this.LoadBitmap(gv.mod.partyTokenFilename);
         }
         public Player LoadPlayer(string filename)
         {
@@ -778,7 +778,7 @@ namespace IBx
             bool foundArea = gv.mod.setCurrentArea(saveMod.currentArea.Filename, gv);
             if (!foundArea)
             {
-                MessageBox.Show("Area: " + saveMod.currentArea.Filename + " does not exist in the module...maybe the area in the module was changed since this save game was made.");
+                gv.sf.MessageBox("Area: " + saveMod.currentArea.Filename + " does not exist in the module...maybe the area in the module was changed since this save game was made.");
             }
 
             //U  "moduleContainersList": [], (have an original containers items tags list and the current tags list to see what to add or delete from the save tags list)
@@ -910,7 +910,7 @@ namespace IBx
             gv.initializeSounds();
 
             gv.mod.partyTokenFilename = "prp_party";
-            gv.mod.partyTokenBitmap = this.LoadBitmap(gv.mod.partyTokenFilename);
+            //gv.mod.partyTokenBitmap = this.LoadBitmap(gv.mod.partyTokenFilename);
 
             this.updatePlayers();
             this.updatePartyRosterPlayers();
@@ -1149,10 +1149,6 @@ namespace IBx
             //load player Bitmap, race, class, known spells, equipped items
             foreach (Player pc in gv.mod.playerList)
             {
-                try { pc.token = LoadBitmap(pc.tokenFilename); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
-                try { pc.portrait = LoadBitmap(pc.portraitFilename); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
                 try { pc.race = gv.mod.getRace(pc.raceTag).DeepCopy(); }
                 catch (Exception ex) { gv.errorLog(ex.ToString()); }
                 try { pc.playerClass = gv.mod.getPlayerClass(pc.classTag).DeepCopy(); }
@@ -1165,10 +1161,6 @@ namespace IBx
             //load player Bitmap, race, class, known spells, equipped items
             foreach (Player pc in gv.mod.partyRosterList)
             {
-                try { pc.token = LoadBitmap(pc.tokenFilename); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
-                try { pc.portrait = LoadBitmap(pc.portraitFilename); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
                 try { pc.race = gv.mod.getRace(pc.raceTag).DeepCopy(); }
                 catch (Exception ex) { gv.errorLog(ex.ToString()); }
                 try { pc.playerClass = gv.mod.getPlayerClass(pc.classTag).DeepCopy(); }
@@ -1426,9 +1418,9 @@ namespace IBx
             if (ctrlUpArrow == null)
             {
                 ctrlUpArrow = new IbbButton(gv, 1.0f);
-                ctrlUpArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlUpArrow.Img2 = this.LoadBitmap("ctrl_up_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_up_arrow);
-                ctrlUpArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlUpArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlUpArrow.Img2 = "ctrl_up_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_up_arrow);
+                ctrlUpArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlUpArrow.X = gv.cc.pnlArrows.LocX + 1 * gv.squareSize + gv.squareSize / 2;
                 ctrlUpArrow.Y = gv.cc.pnlArrows.LocY + 0 * gv.squareSize + gv.pS;
                 ctrlUpArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1437,9 +1429,9 @@ namespace IBx
             if (ctrlLeftArrow == null)
             {
                 ctrlLeftArrow = new IbbButton(gv, 1.0f);
-                ctrlLeftArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlLeftArrow.Img2 = this.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_left_arrow);
-                ctrlLeftArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlLeftArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlLeftArrow.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_left_arrow);
+                ctrlLeftArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlLeftArrow.X = gv.cc.pnlArrows.LocX + 0 * gv.squareSize + gv.squareSize / 2;
                 ctrlLeftArrow.Y = gv.cc.pnlArrows.LocY + 1 * gv.squareSize + gv.pS;
                 ctrlLeftArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1448,9 +1440,9 @@ namespace IBx
             if (ctrlRightArrow == null)
             {
                 ctrlRightArrow = new IbbButton(gv, 1.0f);
-                ctrlRightArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlRightArrow.Img2 = this.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_right_arrow);
-                ctrlRightArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlRightArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlRightArrow.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_right_arrow);
+                ctrlRightArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlRightArrow.X = gv.cc.pnlArrows.LocX + 2 * gv.squareSize + gv.squareSize / 2;
                 ctrlRightArrow.Y = gv.cc.pnlArrows.LocY + 1 * gv.squareSize + gv.pS;
                 ctrlRightArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1459,9 +1451,9 @@ namespace IBx
             if (ctrlDownArrow == null)
             {
                 ctrlDownArrow = new IbbButton(gv, 1.0f);
-                ctrlDownArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlDownArrow.Img2 = this.LoadBitmap("ctrl_down_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_down_arrow);
-                ctrlDownArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlDownArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlDownArrow.Img2 = "ctrl_down_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_down_arrow);
+                ctrlDownArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlDownArrow.X = gv.cc.pnlArrows.LocX + 1 * gv.squareSize + gv.squareSize / 2;
                 ctrlDownArrow.Y = gv.cc.pnlArrows.LocY + 2 * gv.squareSize + gv.pS;
                 ctrlDownArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1470,9 +1462,9 @@ namespace IBx
             if (ctrlUpRightArrow == null)
             {
                 ctrlUpRightArrow = new IbbButton(gv, 1.0f);
-                ctrlUpRightArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlUpRightArrow.Img2 = this.LoadBitmap("ctrl_up_right_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_up_right_arrow);
-                ctrlUpRightArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlUpRightArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlUpRightArrow.Img2 = "ctrl_up_right_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_up_right_arrow);
+                ctrlUpRightArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlUpRightArrow.X = gv.cc.pnlArrows.LocX + 2 * gv.squareSize + gv.squareSize / 2;
                 ctrlUpRightArrow.Y = gv.cc.pnlArrows.LocY + 0 * gv.squareSize + gv.pS;
                 ctrlUpRightArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1481,9 +1473,9 @@ namespace IBx
             if (ctrlUpLeftArrow == null)
             {
                 ctrlUpLeftArrow = new IbbButton(gv, 1.0f);
-                ctrlUpLeftArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlUpLeftArrow.Img2 = this.LoadBitmap("ctrl_up_left_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_up_left_arrow);
-                ctrlUpLeftArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlUpLeftArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlUpLeftArrow.Img2 = "ctrl_up_left_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_up_left_arrow);
+                ctrlUpLeftArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlUpLeftArrow.X = gv.cc.pnlArrows.LocX + 0 * gv.squareSize + gv.squareSize / 2;
                 ctrlUpLeftArrow.Y = gv.cc.pnlArrows.LocY + 0 * gv.squareSize + gv.pS;
                 ctrlUpLeftArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1492,9 +1484,9 @@ namespace IBx
             if (ctrlDownRightArrow == null)
             {
                 ctrlDownRightArrow = new IbbButton(gv, 1.0f);
-                ctrlDownRightArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlDownRightArrow.Img2 = this.LoadBitmap("ctrl_down_right_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_down_right_arrow);
-                ctrlDownRightArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlDownRightArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlDownRightArrow.Img2 = "ctrl_down_right_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_down_right_arrow);
+                ctrlDownRightArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlDownRightArrow.X = gv.cc.pnlArrows.LocX + 2 * gv.squareSize + gv.squareSize / 2;
                 ctrlDownRightArrow.Y = gv.cc.pnlArrows.LocY + 2 * gv.squareSize + gv.pS;
                 ctrlDownRightArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1503,9 +1495,9 @@ namespace IBx
             if (ctrlDownLeftArrow == null)
             {
                 ctrlDownLeftArrow = new IbbButton(gv, 1.0f);
-                ctrlDownLeftArrow.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                ctrlDownLeftArrow.Img2 = this.LoadBitmap("ctrl_down_left_arrow"); // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_down_left_arrow);
-                ctrlDownLeftArrow.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
+                ctrlDownLeftArrow.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                ctrlDownLeftArrow.Img2 = "ctrl_down_left_arrow"; // BitmapFactory.decodeResource(getResources(), R.drawable.ctrl_down_left_arrow);
+                ctrlDownLeftArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.arrow_glow);
                 ctrlDownLeftArrow.X = gv.cc.pnlArrows.LocX + 0 * gv.squareSize + gv.squareSize / 2;
                 ctrlDownLeftArrow.Y = gv.cc.pnlArrows.LocY + 2 * gv.squareSize + gv.pS;
                 ctrlDownLeftArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1515,9 +1507,9 @@ namespace IBx
             {
                 btnInventory = new IbbButton(gv, 0.8f);
                 btnInventory.HotKey = "I";
-                btnInventory.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnInventory.Img2 = this.LoadBitmap("btninventory"); // BitmapFactory.decodeResource(getResources(), R.drawable.btninventory);
-                btnInventory.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
+                btnInventory.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                btnInventory.Img2 = "btninventory"; // BitmapFactory.decodeResource(getResources(), R.drawable.btninventory);
+                btnInventory.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
                 btnInventory.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 1) * gv.squareSize;
                 btnInventory.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
                 btnInventory.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1527,8 +1519,8 @@ namespace IBx
             {
                 btnHelp = new IbbButton(gv, 0.8f);
                 btnHelp.Text = "HELP";
-                btnHelp.Img = this.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnHelp.Glow = this.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
+                btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
                 btnHelp.X = 6 * gv.squareSize + padW * 1 + gv.oXshift;
                 btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1538,8 +1530,8 @@ namespace IBx
             {
                 btnReturn = new IbbButton(gv, 1.0f);
                 btnReturn.Text = "RETURN";
-                btnReturn.Img = this.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_large);
-                btnReturn.Glow = this.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_large_glow);
+                btnReturn.Img = "btn_large"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_large);
+                btnReturn.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_large_glow);
                 btnReturn.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnReturn.Y = 10 * gv.squareSize + pH * 2;
                 btnReturn.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -1569,9 +1561,9 @@ namespace IBx
             if (ptrPc0 == null)
             {
                 ptrPc0 = new IbbPortrait(gv, 0.8f);
-                ptrPc0.ImgBG = gv.cc.LoadBitmap("item_slot");
-                ptrPc0.Glow = gv.cc.LoadBitmap("btn_ptr_glow");
-                ptrPc0.ImgLU = gv.cc.LoadBitmap("btnLevelUpPlus");
+                ptrPc0.ImgBG = "item_slot";
+                ptrPc0.Glow = "btn_ptr_glow";
+                ptrPc0.ImgLU = "btnLevelUpPlus";
                 ptrPc0.X = tabX1;
                 ptrPc0.Y = tabY1;
                 ptrPc0.Height = ptrHeight;
@@ -1580,9 +1572,9 @@ namespace IBx
             if (ptrPc1 == null)
             {
                 ptrPc1 = new IbbPortrait(gv, 0.8f);
-                ptrPc1.ImgBG = gv.cc.LoadBitmap("item_slot");
-                ptrPc1.Glow = gv.cc.LoadBitmap("btn_ptr_glow");
-                ptrPc1.ImgLU = gv.cc.LoadBitmap("btnLevelUpPlus");
+                ptrPc1.ImgBG = "item_slot";
+                ptrPc1.Glow = "btn_ptr_glow";
+                ptrPc1.ImgLU = "btnLevelUpPlus";
                 ptrPc1.X = tabX2;
                 ptrPc1.Y = tabY1;
                 ptrPc1.Height = ptrHeight;
@@ -1591,9 +1583,9 @@ namespace IBx
             if (ptrPc2 == null)
             {
                 ptrPc2 = new IbbPortrait(gv, 0.8f);
-                ptrPc2.ImgBG = gv.cc.LoadBitmap("item_slot");
-                ptrPc2.Glow = gv.cc.LoadBitmap("btn_ptr_glow");
-                ptrPc2.ImgLU = gv.cc.LoadBitmap("btnLevelUpPlus");
+                ptrPc2.ImgBG = "item_slot";
+                ptrPc2.Glow = "btn_ptr_glow";
+                ptrPc2.ImgLU = "btnLevelUpPlus";
                 ptrPc2.X = tabX1;
                 ptrPc2.Y = tabY2;
                 ptrPc2.Height = ptrHeight;
@@ -1602,9 +1594,9 @@ namespace IBx
             if (ptrPc3 == null)
             {
                 ptrPc3 = new IbbPortrait(gv, 0.8f);
-                ptrPc3.ImgBG = gv.cc.LoadBitmap("item_slot");
-                ptrPc3.Glow = gv.cc.LoadBitmap("btn_ptr_glow");
-                ptrPc3.ImgLU = gv.cc.LoadBitmap("btnLevelUpPlus");
+                ptrPc3.ImgBG = "item_slot";
+                ptrPc3.Glow = "btn_ptr_glow";
+                ptrPc3.ImgLU = "btnLevelUpPlus";
                 ptrPc3.X = tabX2;
                 ptrPc3.Y = tabY2;
                 ptrPc3.Height = ptrHeight;
@@ -1613,9 +1605,9 @@ namespace IBx
             if (ptrPc4 == null)
             {
                 ptrPc4 = new IbbPortrait(gv, 0.8f);
-                ptrPc4.ImgBG = gv.cc.LoadBitmap("item_slot");
-                ptrPc4.Glow = gv.cc.LoadBitmap("btn_ptr_glow");
-                ptrPc4.ImgLU = gv.cc.LoadBitmap("btnLevelUpPlus");
+                ptrPc4.ImgBG = "item_slot";
+                ptrPc4.Glow = "btn_ptr_glow";
+                ptrPc4.ImgLU = "btnLevelUpPlus";
                 ptrPc4.X = tabX1;
                 ptrPc4.Y = tabY3;
                 ptrPc4.Height = ptrHeight;
@@ -1624,9 +1616,9 @@ namespace IBx
             if (ptrPc5 == null)
             {
                 ptrPc5 = new IbbPortrait(gv, 0.8f);
-                ptrPc5.ImgBG = gv.cc.LoadBitmap("item_slot");
-                ptrPc5.Glow = gv.cc.LoadBitmap("btn_ptr_glow");
-                ptrPc5.ImgLU = gv.cc.LoadBitmap("btnLevelUpPlus");
+                ptrPc5.ImgBG = "item_slot";
+                ptrPc5.Glow = "btn_ptr_glow";
+                ptrPc5.ImgLU = "btnLevelUpPlus";
                 ptrPc5.X = tabX2;
                 ptrPc5.Y = tabY3;
                 ptrPc5.Height = ptrHeight;
@@ -1638,8 +1630,8 @@ namespace IBx
             if (tglSound == null)
             {
                 tglSound = new IbbToggleButton(gv);
-                tglSound.ImgOn = this.LoadBitmap("tgl_music_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sound_on);
-                tglSound.ImgOff = this.LoadBitmap("tgl_music_off"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sound_off);
+                tglSound.ImgOn = "tgl_music_on"; // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sound_on);
+                tglSound.ImgOff = "tgl_music_off"; // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sound_off);
                 tglSound.X = gv.cc.pnlToggles.LocX + 2 * gv.squareSize + gv.squareSize / 4;
                 tglSound.Y = gv.cc.pnlToggles.LocY + 1 * gv.squareSize + gv.squareSize / 4 + gv.pS;
                 tglSound.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
@@ -1973,21 +1965,11 @@ namespace IBx
             {
                 resetLightAndDarkness();
             }
-#region tile loading on demand
+            #region tile loading on demand
             if (gv.mod.useAllTileSystem)
             {
-                //addLogText("yellow", "Number of tiles, before cull:" + gv.mod.loadedTileBitmaps.Count.ToString());
-                /*
-                if ((gv.mod.PlayerLastLocationX == gv.mod.PlayerLocationX) && (gv.mod.PlayerLastLocationY == gv.mod.PlayerLocationY))
-                {
-                    gv.mod.blockTrigger = true;
-                }
-                else
-                {
-                    gv.mod.blockTrigger = false;
-                }
-                */
                 //cull all down if too high value is reached (last resort)
+                /*
                 if (gv.mod.loadedTileBitmaps.Count > 400)
                 {
                     try
@@ -2010,7 +1992,6 @@ namespace IBx
 
                 if (gv.mod.loadedTileBitmaps.Count > 250)
                 {
-                    //addLogText("yellow", "Disposing tiles.");
                     int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 10) + 2);
                     try
                     {
@@ -2023,12 +2004,9 @@ namespace IBx
                                 gv.mod.loadedTileBitmaps.RemoveAt(i);
                                 gv.mod.loadedTileBitmapsNames.RemoveAt(i);
 
-                                //addLogText("red", "Removal Counter is:" + i.ToString());
-
                             }
 
                         }
-
                         //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
                     }
                     catch
@@ -2036,11 +2014,9 @@ namespace IBx
                         //addLogText("red", "caught error");
                     }
                 }
-
-                //addLogText("red", "number of tiles in cache, after cull:" + gv.mod.loadedTileBitmaps.Count);
-                //normal cleanup while moving
+                */
             }
-#endregion
+            #endregion
 
             //reset the timer interval, important for synching with party move
             if (gv.mod.useRealTimeTimer == true)
@@ -2064,11 +2040,11 @@ namespace IBx
             {
                 gv.resetGame();
                 gv.screenType = "title";
-                IBMessageBox.Show(gv, "Everybody is unconscious and bleeding - your party has been defeated!");
+                gv.sf.MessageBox("Everybody is unconscious and bleeding - your party has been defeated!");
                 return;
             }
 
-#region handling chances for full screen animation effects, edit: for all 10 channels now
+            #region handling chances for full screen animation effects, edit: for all 10 channels now
             if ((gv.mod.currentArea.fullScreenEffectLayerIsActive1 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence1 != 0))
             {
                 if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur1)
@@ -2540,7 +2516,7 @@ namespace IBx
                     }
                 }
             }
-#endregion
+            #endregion
            
             //CLEAN UP START SCREENS IF DONE WITH THEM
             if (gv.screenLauncher != null)
@@ -5993,7 +5969,8 @@ namespace IBx
 
         public void doWeatherSound()
         {
-#region weatherSounds
+            #region weatherSounds
+            /*
             //Note that in doTransitionBasedOnAreaLocation() method another weather code part is located
             //the whole system uses three sound channels, ie three instances of mediaplayer (defined in gameview, set to loop there):
             //sound channel 1 (weatherSounds1 media player) is for different degreees of rain effects
@@ -6139,12 +6116,6 @@ namespace IBx
                     gv.weatherSounds2.settings.volume = (int)(55 * weatherSoundMultiplier);
                     if (((gv.mod.weatherSoundsName2 != "heavyCloud") && (gv.mod.weatherSoundsName2 != "HeavyCloud")) || (gv.mod.resetWeatherSound))
                     {
-                        /*
-                        if (gv.mod.resetWeatherSound)
-                        {
-                            gv.mod.resetWeatherSound = false;
-                        }
-                        */
                         gv.mod.weatherSoundsName2 = "heavyCloud";
                         soundName = gv.mod.weatherSoundsName2;
 
@@ -6183,13 +6154,6 @@ namespace IBx
                     gv.weatherSounds2.settings.volume = (int)(23 * weatherSoundMultiplier);
                     if (((gv.mod.weatherSoundsName2 != "lightCloud") && (gv.mod.weatherSoundsName2 != "LightCloud")) || (gv.mod.resetWeatherSound))
                     {
-                        /*
-                        if (gv.mod.resetWeatherSound)
-                        {
-                            gv.mod.resetWeatherSound = false;
-                        }
-                        */
-
                         gv.mod.weatherSoundsName2 = "lightCloud";
                         soundName = gv.mod.weatherSoundsName2;
 
@@ -6228,13 +6192,6 @@ namespace IBx
                     gv.weatherSounds2.settings.volume = (int)(30 * weatherSoundMultiplier);
                     if (((gv.mod.weatherSoundsName2 != "cloud") && (gv.mod.weatherSoundsName2 != "Cloud")) || (gv.mod.resetWeatherSound))
                     {
-                        /*
-                        if (gv.mod.resetWeatherSound)
-                        {
-                            gv.mod.resetWeatherSound = false;
-                        }
-                        */
-
                         gv.mod.weatherSoundsName2 = "cloud";
                         soundName = gv.mod.weatherSoundsName2;
 
@@ -6378,46 +6335,7 @@ namespace IBx
                         }
                     }
                 }
-
-                /*
-                //set up lightning
-                if ((gv.mod.currentWeatherName.Contains("lightning")) || (gv.mod.currentWeatherName.Contains("Lightning")))
-                {
-                    isLightning = true;
-                    gv.weatherSounds3.settings.volume = (int)(50 * weatherSoundMultiplier);
-                    if (gv.mod.weatherSoundsName3 != "lightning")
-                    {
-                        gv.mod.weatherSoundsName3 = "lightning";
-                        soundName = gv.mod.weatherSoundsName3;
-
-                        if (File.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName))
-                        {
-                            gv.weatherSounds3.URL = gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName;
-                        }
-                        else if (File.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName + ".mp3"))
-                        {
-                            gv.weatherSounds3.URL = gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName + ".mp3";
-                        }
-                        else if (File.Exists(gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName))
-                        {
-                            gv.weatherSounds3.URL = gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName;
-                        }
-                        else if (File.Exists(gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName + ".mp3"))
-                        {
-                            gv.weatherSounds3.URL = gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName + ".mp3";
-                        }
-                        else
-                        {
-                            gv.weatherSounds3.URL = "";
-                        }
-                        if ((gv.weatherSounds3.URL != "") && (gv.weatherSounds3 != null))
-                        {
-                            gv.weatherSounds3.controls.play();
-                        }
-                    }
-                }
-                */
-
+                                
                 //mute the not used channels
                 if (isRaining == false)
                 {
@@ -6448,31 +6366,16 @@ namespace IBx
                     gv.weatherSounds2.controls.play();
                     //}
                 }
-                /*
-                if (isLightning == false)
-                {
-                    //if ((gv.weatherSounds3.URL != "") && (gv.weatherSounds3 != null))
-                    //{
-                    gv.weatherSounds3.controls.stop();
-                    //}
-                }
-                else
-                {
-                    //if ((gv.weatherSounds3.URL != "") && (gv.weatherSounds3 != null))
-                    //{
-                    gv.weatherSounds3.controls.play();
-                    //}
-                }
-                */
-                
+                                
                 if (!gv.mod.playMusic || gv.mod.currentArea.areaWeatherName == "" || gv.mod.currentArea.areaWeatherName == "none")
                 {
                     gv.weatherSounds1.controls.stop();
                     gv.weatherSounds2.controls.stop();
                     gv.weatherSounds3.controls.stop();
-                }
-#endregion
+                }            
             }
+            */
+            #endregion
         }
         public void doPropHeartBeat()
         {
@@ -6663,16 +6566,16 @@ namespace IBx
                     gv.mod.fullScreenEffectOpacityWeather = 1f * (gv.mod.currentWeatherDuration / changeThreshold);
                 }
 
-#region weather duration has ended, setup new weather
+                #region weather duration has ended, setup new weather
                 //weather duration has ended 
                 if (gv.mod.currentWeatherDuration <= 0)
                 {
                     gv.mod.oldWeatherName = "";
                     gv.mod.currentWeatherName = "";
 
-                    gv.weatherSounds1.controls.stop();
-                    gv.weatherSounds2.controls.stop();
-                    gv.weatherSounds3.controls.stop();
+                    //TODO gv.weatherSounds1.controls.stop();
+                    //TODO gv.weatherSounds2.controls.stop();
+                    //TODO gv.weatherSounds3.controls.stop();
 
                     gv.mod.howLongWeatherHasRun = 0;
                     gv.mod.fullScreenEffectOpacityWeather = 0;
@@ -6764,7 +6667,7 @@ namespace IBx
                     }
 
                 }
-#endregion
+                #endregion
 
                 gv.mod.isRaining = false;
                 gv.mod.isCloudy = false;
@@ -10590,7 +10493,7 @@ namespace IBx
                     bool foundArea = gv.mod.setCurrentArea(areaFilename, gv);
                     if (!foundArea)
                     {
-                        MessageBox.Show("Area: " + areaFilename + " does not exist in the module...check the spelling of the 'area.Filename'");
+                        gv.sf.MessageBox("Area: " + areaFilename + " does not exist in the module...check the spelling of the 'area.Filename'");
                         return;
                     }
                     //gv.mod.setCurrentArea(areaFilename, gv);
@@ -10620,9 +10523,9 @@ namespace IBx
                     
                     if (gv.mod.currentArea.areaWeatherName == "")
                     {
-                        gv.weatherSounds1.controls.pause();
-                        gv.weatherSounds2.controls.pause();
-                        gv.weatherSounds3.controls.pause();
+                        //TODO gv.weatherSounds1.controls.pause();
+                        //TODO gv.weatherSounds2.controls.pause();
+                        //TODO gv.weatherSounds3.controls.pause();
                     }
 
                     resetLightAndDarkness();
@@ -11242,6 +11145,7 @@ namespace IBx
 
         public void createLightning(string lightningType, float posX, float posY, float scaleMod)
         {
+            /*TODO
             Sprite spr = new Sprite(gv, lightningType, posX, posY, 0, 0, 0, 0, 5.0f * scaleMod, 5.0f * scaleMod, 4000, false, 45, 1.0f, 0, "lightning", false, 8);
             gv.screenMainMap.spriteList.Add(spr);
 
@@ -11276,9 +11180,9 @@ namespace IBx
                     gv.weatherSounds3.controls.stop();
                     gv.weatherSounds3.controls.play();
                 }
-
             }
-            }
+            */
+        }
 
         //MISC FUNCTIONS
         public int getDistance(Coordinate start, Coordinate end)
@@ -11292,48 +11196,18 @@ namespace IBx
                 dist = deltaY;
             return dist;
         }
-
-        /*
-        public int getCreatureSize(string tokenfilename)
-        {  
-             
-            //1=normal, 2=wide, 3=tall, 4=large  
-             int width = gv.cc.GetFromBitmapList(tokenfilename).PixelSize.Width;  
-             int height = gv.cc.GetFromBitmapList(tokenfilename).PixelSize.Height;  
-             //normal  
-             if ((width == gv.standardTokenSize) && (height == gv.standardTokenSize* 2))  
-             {  
-                 return 1;  
-             }  
-             //wide  
-             else if ((width == gv.standardTokenSize* 2) && (height == gv.standardTokenSize* 2))  
-             {  
-                 return 2;  
-             }  
-             //tall  
-             else if ((width == gv.standardTokenSize) && (height == gv.standardTokenSize* 4))  
-             {  
-                 return 3;  
-             }  
-             //large  
-             else if ((width == gv.standardTokenSize* 2) && (height == gv.standardTokenSize* 4))  
-             {  
-                 return 4;  
-             }  
-             return 1;  
-        }
-        */
-
-    public System.Drawing.Bitmap LoadBitmapGDI(string filename) //change this to LoadBitmapGDI
+               
+        public SKBitmap LoadBitmap(string filename) //change this to LoadBitmapGDI
         {
-            System.Drawing.Bitmap bm = null;
-            bm = LoadBitmapGDI(filename, gv.mod); //change this to LoadBitmapGDI
+            SKBitmap bm = null;
+            bm = LoadBitmap(filename, gv.mod); //change this to LoadBitmapGDI
             return bm;
         }
-        public System.Drawing.Bitmap LoadBitmapGDI(string filename, Module mdl) //change this to LoadBitmapGDI
+        public SKBitmap LoadBitmap(string filename, Module mdl) //change this to LoadBitmapGDI
         {
-            System.Drawing.Bitmap bm = null;
-
+            SKBitmap bm = null;
+            bm = gv.LoadBitmap(filename);
+            /*
             try
             {
                 //hurghy
@@ -11473,7 +11347,7 @@ namespace IBx
                 }
                 gv.errorLog(ex.ToString());
             }
-
+            */
             return bm;
         }
 
@@ -11504,16 +11378,6 @@ namespace IBx
             System.IO.FileInfo file = new System.IO.FileInfo(filenameAndFullPath);
             file.Directory.Create(); // If the directory already exists, this method does nothing.
         }
-        /*public System.Drawing.Bitmap flip(System.Drawing.Bitmap src)
-        {
-            src.RotateFlip(RotateFlipType.RotateNoneFlipX);
-            return src;
-        }*/
-        /*public System.Drawing.Bitmap FlipHorz(System.Drawing.Bitmap src)
-        {
-            src.RotateFlip(RotateFlipType.RotateNoneFlipY);
-            return src;
-        }*/
 
         //DIRECT2D STUFF
         public SKBitmap GetFromBitmapList(string fileNameWithOutExt)
@@ -11530,21 +11394,7 @@ namespace IBx
                 return commonBitmapList[fileNameWithOutExt];
             }
         }
-        /*public SKBitmap GetFromTileBitmapList(string fileNameWithOutExt)
-        {
-            //check to see if in list already and return bitmap it if found
-            if (tileBitmapList.ContainsKey(fileNameWithOutExt))
-            {
-                return tileBitmapList[fileNameWithOutExt];
-            }
-            //try loading and adding to list and return bitmap
-            else
-            {
-                tileBitmapList.Add(fileNameWithOutExt, LoadBitmap(fileNameWithOutExt));
-                return tileBitmapList[fileNameWithOutExt];
-            }
-        }*/
-        public System.Drawing.Bitmap GetFromTileGDIBitmapList(string fileNameWithOutExt)
+        /*public System.Drawing.Bitmap GetFromTileGDIBitmapList(string fileNameWithOutExt)
         {
             //check to see if in list already and return bitmap it if found
             if (tileGDIBitmapList.ContainsKey(fileNameWithOutExt))
@@ -11557,122 +11407,7 @@ namespace IBx
                 tileGDIBitmapList.Add(fileNameWithOutExt, LoadBitmapGDI(fileNameWithOutExt));
                 return tileGDIBitmapList[fileNameWithOutExt];
             }
-        }
-        public void DisposeOfBitmap(ref SharpDX.Direct2D1.Bitmap bmp)
-        {
-            if (bmp != null)
-            {
-                bmp.Dispose();
-                bmp = null;
-            }
-        }
-        public SharpDX.Direct2D1.Bitmap LoadBitmap(string file, Module mdl) //change this to LoadBitmap
-        {
-            // Loads from file using System.Drawing.Image
-            using (var bitmap = LoadBitmapGDI(file, mdl)) //change this to LoadBitmapGDI
-            {
-                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-                var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
-                var size = new Size2(bitmap.Width, bitmap.Height);
-
-                // Transform pixels from BGRA to RGBA
-                int stride = bitmap.Width * sizeof(int);
-                using (var tempStream = new DataStream(bitmap.Height * stride, true, true))
-                {
-                    // Lock System.Drawing.Bitmap
-                    var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-
-                    // Convert all pixels 
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        int offset = bitmapData.Stride * y;
-                        for (int x = 0; x < bitmap.Width; x++)
-                        {
-                            // Not optimized 
-                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
-                            tempStream.Write(rgba);
-                        }
-                    }
-                    bitmap.UnlockBits(bitmapData);
-                    tempStream.Position = 0;
-                    return new SharpDX.Direct2D1.Bitmap(gv.renderTarget2D, size, tempStream, stride, bitmapProperties);
-                }
-            }
-        }
-        public SharpDX.Direct2D1.Bitmap LoadBitmap(string file) //change this to LoadBitmap
-        {
-            // Loads from file using System.Drawing.Image
-            using (var bitmap = LoadBitmapGDI(file)) //change this to LoadBitmapGDI
-            {
-                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-                var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
-                var size = new Size2(bitmap.Width, bitmap.Height);
-
-                // Transform pixels from BGRA to RGBA
-                int stride = bitmap.Width * sizeof(int);
-                using (var tempStream = new DataStream(bitmap.Height * stride, true, true))
-                {
-                    // Lock System.Drawing.Bitmap
-                    var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-
-                    // Convert all pixels 
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        int offset = bitmapData.Stride * y;
-                        for (int x = 0; x < bitmap.Width; x++)
-                        {
-                            // Not optimized 
-                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
-                            tempStream.Write(rgba);
-                        }
-                    }
-                    bitmap.UnlockBits(bitmapData);
-                    tempStream.Position = 0;
-                    return new SharpDX.Direct2D1.Bitmap(gv.renderTarget2D, size, tempStream, stride, bitmapProperties);
-                }
-            }
-        }
-        public SharpDX.Direct2D1.Bitmap ConvertGDIBitmapToD2D(System.Drawing.Bitmap gdibitmap)
-        {
-            var sourceArea = new System.Drawing.Rectangle(0, 0, gdibitmap.Width, gdibitmap.Height);
-            var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
-            var size = new Size2(gdibitmap.Width, gdibitmap.Height);
-
-            // Transform pixels from BGRA to RGBA
-            int stride = gdibitmap.Width * sizeof(int);
-            using (var tempStream = new DataStream(gdibitmap.Height * stride, true, true))
-            {
-                // Lock System.Drawing.Bitmap
-                var bitmapData = gdibitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-
-                // Convert all pixels 
-                for (int y = 0; y < gdibitmap.Height; y++)
-                {
-                    int offset = bitmapData.Stride * y;
-                    for (int x = 0; x < gdibitmap.Width; x++)
-                    {
-                        // Not optimized 
-                        byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        int rgba = R | (G << 8) | (B << 16) | (A << 24);
-                        tempStream.Write(rgba);
-                    }
-                }
-                gdibitmap.UnlockBits(bitmapData);
-                tempStream.Position = 0;
-                return new SharpDX.Direct2D1.Bitmap(gv.renderTarget2D, size, tempStream, stride, bitmapProperties);
-            }
-        }
+        }*/
         public List<FormattedLine> ProcessHtmlString(string text, int width, List<string> tagStack)
         {
             bool tagMode = false;
@@ -11701,7 +11436,7 @@ namespace IBx
                 }
                 string combinedChars = previousChar.ToString() + c.ToString() + nextChar.ToString();
 
-#region Start/Stop Tags
+                #region Start/Stop Tags
                 //start a tag and check for end of word
                 if ((c == '<') && (!combinedChars.Contains("<=")) && (!combinedChars.Equals(" < ")))
                 {
@@ -11709,29 +11444,13 @@ namespace IBx
 
                     if (newWord.text != "")
                     {
-                        newWord.fontStyle = GetFontStyle(tagStack);
-                        newWord.fontWeight = GetFontWeight(tagStack);
+                        newWord.style = GetFontStyle(tagStack);
                         newWord.underlined = GetIsUnderlined(tagStack);
                         newWord.fontSize = GetFontSizeInPixels(tagStack);
                         newWord.color = GetColor(tagStack);
-                        if (gv.textFormat != null)
-                        {
-                            gv.textFormat.Dispose();
-                            gv.textFormat = null;
-                        }
-
-                        if (gv.textLayout != null)
-                        {
-                            gv.textLayout.Dispose();
-                            gv.textLayout = null;
-                        }
-                        gv.textFormat = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, newWord.fontWeight, newWord.fontStyle, SharpDX.DirectWrite.FontStretch.Normal, newWord.fontSize) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
-                        gv.textLayout = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, newWord.text + " ", gv.textFormat, gv.Width, gv.Height);
-                        //font = new Font(gv.family, newWord.fontSize, newWord.fontStyle);
-                        float height = gv.textLayout.Metrics.Height;
-                        float wordWidth = gv.textLayout.Metrics.WidthIncludingTrailingWhitespace * 1.2f;
+                        float height = gv.MeasureStringSize(newWord.text, newWord.fontSize, newWord.style).Y;
+                        float wordWidth = gv.MeasureStringSize(newWord.text + " ", newWord.fontSize, newWord.style).X * 1.2f;
                         if (height > lineHeight) { lineHeight = (int)height; }
-                        //int wordWidth = (int)(frm.gCanvas.MeasureString(newWord.word, font)).Width;
                         float modifiedWidth = 0;
                         if (gv.mod.useMinimalisticUI)
                         {
@@ -11795,8 +11514,7 @@ namespace IBx
                         //check for line break
                         if ((tag.ToLower() == "br") || (tag == "BR"))
                         {
-                            newWord.fontStyle = GetFontStyle(tagStack);
-                            newWord.fontWeight = GetFontWeight(tagStack);
+                            newWord.style = GetFontStyle(tagStack);
                             newWord.underlined = GetIsUnderlined(tagStack);
                             newWord.fontSize = GetFontSizeInPixels(tagStack);
                             newWord.color = GetColor(tagStack);
@@ -11815,9 +11533,9 @@ namespace IBx
                     tag = "";
                     continue;
                 }
-#endregion
+                #endregion
 
-#region Words
+                #region Words
                 if (!tagMode)
                 {
                     if (c != ' ') //keep adding to word until hit a space
@@ -11826,31 +11544,15 @@ namespace IBx
                     }
                     else //hit a space so end word
                     {
-                        newWord.fontStyle = GetFontStyle(tagStack);
-                        newWord.fontWeight = GetFontWeight(tagStack);
+                        newWord.style = GetFontStyle(tagStack);
                         newWord.underlined = GetIsUnderlined(tagStack);
                         newWord.fontSize = GetFontSizeInPixels(tagStack);
                         newWord.color = GetColor(tagStack);
-                        if (gv.textFormat != null)
-                        {
-                            gv.textFormat.Dispose();
-                            gv.textFormat = null;
-                        }
+                        float adjustedWordWidthForScreenDensity = (1920f / gv.screenWidth);
+                        float adjustedWordHeightForScreenDensity = (1080f / gv.screenHeight);
 
-                        if (gv.textLayout != null)
-                        {
-                            gv.textLayout.Dispose();
-                            gv.textLayout = null;
-                        }
-                        gv.textFormat = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, newWord.fontWeight, newWord.fontStyle, SharpDX.DirectWrite.FontStretch.Normal, newWord.fontSize) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
-                        gv.textLayout = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, newWord.text + " ", gv.textFormat, gv.Width, gv.Height);
-                        //font = new Font(gv.family, newWord.fontSize, newWord.fontStyle);
-                        //float adjustedWordDimensionsForScreenDensity = (100f / gv.squareSize);
-                        float adjustedWordWidthForScreenDensity = (1920f / gv.Width);
-                        float adjustedWordHeightForScreenDensity = (1080f / gv.Height);
-
-                        float wordWidth = (gv.textLayout.Metrics.WidthIncludingTrailingWhitespace) * adjustedWordWidthForScreenDensity;
-                        float height = gv.textLayout.Metrics.Height * adjustedWordHeightForScreenDensity;
+                        float height = gv.MeasureStringSize(newWord.text, newWord.fontSize, newWord.style).Y * adjustedWordHeightForScreenDensity;
+                        float wordWidth = gv.MeasureStringSize(newWord.text + " ", newWord.fontSize, newWord.style).X * adjustedWordWidthForScreenDensity;
                         if (height > lineHeight) { lineHeight = (int)height; }
 
                         if (xLoc + wordWidth > width) //word wrap
@@ -11881,88 +11583,94 @@ namespace IBx
                 {
                     tag += c;
                 }
-#endregion
+            #endregion
             }
             tagStack.Clear();
             return logLinesList;
         }
-        private SharpDX.Color GetColor(List<string> tagStack)
+        private string GetColor(List<string> tagStack)
         {
             //will end up using the last color on the stack
-            SharpDX.Color clr = SharpDX.Color.White;
+            string clr = "white";
             foreach (string s in tagStack)
             {
                 if ((s == "font color='red'") || (s == "font color = 'red'"))
                 {
-                    clr = SharpDX.Color.Red;
+                    clr = "red";
                 }
                 else if ((s == "font color='lime'") || (s == "font color = 'lime'"))
                 {
-                    clr = SharpDX.Color.Lime;
+                    clr = "lime";
                 }
                 else if ((s == "font color='black'") || (s == "font color = 'black'"))
                 {
-                    clr = SharpDX.Color.Black;
+                    clr = "black";
                 }
                 else if ((s == "font color='white'") || (s == "font color = 'white'"))
                 {
-                    clr = SharpDX.Color.White;
+                    clr = "white";
                 }
                 else if ((s == "font color='silver'") || (s == "font color = 'silver'"))
                 {
-                    clr = SharpDX.Color.Gray;
+                    clr = "silver";
                 }
                 else if ((s == "font color='grey'") || (s == "font color = 'grey'"))
                 {
-                    clr = SharpDX.Color.DimGray;
+                    clr = "grey";
                 }
                 else if ((s == "font color='aqua'") || (s == "font color = 'aqua'"))
                 {
-                    clr = SharpDX.Color.Aqua;
+                    clr = "aqua";
                 }
                 else if ((s == "font color='fuchsia'") || (s == "font color = 'fuchsia'"))
                 {
-                    clr = SharpDX.Color.Fuchsia;
+                    clr = "fuchsia";
                 }
                 else if ((s == "font color='yellow'") || (s == "font color = 'yellow'"))
                 {
-                    clr = SharpDX.Color.Yellow;
+                    clr = "yellow";
                 }
                 else if ((s == "font color='magenta'") || (s == "font color = 'magenta'"))
                 {
-                    clr = SharpDX.Color.Magenta;
+                    clr = "magenta";
                 }
                 else if ((s == "font color='green'") || (s == "font color = 'mgreen'"))
                 {
-                    clr = SharpDX.Color.Green;
+                    clr = "green";
                 }
                 else if ((s == "font color='gray'") || (s == "font color = 'gray'"))
                 {
-                    clr = SharpDX.Color.Gray;
+                    clr = "gray";
                 }
             }
             return clr;
         }
-        private SharpDX.DirectWrite.FontStyle GetFontStyle(List<string> tagStack)
+        private string GetFontStyle(List<string> tagStack)
         {
-            SharpDX.DirectWrite.FontStyle style = SharpDX.DirectWrite.FontStyle.Normal;
+            string style = "normal";
             foreach (string s in tagStack)
             {
                 if (s == "i")
                 {
-                    style = style | SharpDX.DirectWrite.FontStyle.Italic;
+                    if (style.Equals("bold"))
+                    {
+                        style = "bolditalic";
+                    }
+                    else
+                    {
+                        style = "italic";
+                    }                    
                 }
-            }
-            return style;
-        }
-        private SharpDX.DirectWrite.FontWeight GetFontWeight(List<string> tagStack)
-        {
-            SharpDX.DirectWrite.FontWeight style = SharpDX.DirectWrite.FontWeight.Normal;
-            foreach (string s in tagStack)
-            {
                 if (s == "b")
                 {
-                    style = style | SharpDX.DirectWrite.FontWeight.Bold;
+                    if (style.Equals("italic"))
+                    {
+                        style = "bolditalic";
+                    }
+                    else
+                    {
+                        style = "bold";
+                    }
                 }
             }
             return style;
@@ -11979,18 +11687,18 @@ namespace IBx
             }
             return isUnderlined;
         }
-        private float GetFontSizeInPixels(List<string> tagStack)
+        private string GetFontSizeInPixels(List<string> tagStack)
         {
-            float fSize = gv.drawFontRegHeight * (float)gv.squareSize / 100.0f;
+            string fSize = "regular";
             foreach (string s in tagStack)
             {
                 if (s == "big")
                 {
-                    fSize = gv.drawFontLargeHeight * (float)gv.squareSize / 100.0f;
+                    fSize = "large";
                 }
                 else if (s == "small")
                 {
-                    fSize = gv.drawFontSmallHeight * (float)gv.squareSize / 100.0f;
+                    fSize = "small";
                 }
             }
             return fSize;

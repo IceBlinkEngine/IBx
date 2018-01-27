@@ -63,6 +63,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IbRect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IbRectF.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBScriptEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ISaveAndLoad.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Item.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemRefs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JournalEntry.cs" />

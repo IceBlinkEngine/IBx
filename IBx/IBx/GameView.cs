@@ -1609,7 +1609,7 @@ namespace IBx
                 errorLog(ex.ToString());   		
             }		
         }
-        
+
         /*public void onKeyboardEvent(Keys keyData)
         {
             try
@@ -1639,7 +1639,7 @@ namespace IBx
             {
                 errorLog(ex.ToString());
             }
-        }*/        
+        }*/
         /*protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             onKeyboardEvent(keyData);
@@ -1664,6 +1664,76 @@ namespace IBx
         {
             Application.Exit();
         }*/
+
+        /*public void SaveSettings(Settings tglSettings)
+        {
+            DependencyService.Get<ISaveAndLoad>().SaveSettings(tglSettings);
+        }*/
+        /*public void SaveSaveGame(string modName, string filename, SaveGame save)
+        {
+            DependencyService.Get<ISaveAndLoad>().SaveSaveGame(modName, filename, save);
+        }*/
+        public void SaveCharacter(string modName, string filename, Player pc)
+        {
+            DependencyService.Get<ISaveAndLoad>().SaveCharacter(modName, filename, pc);
+        }
+        public void SaveModuleAsset(string modFolder, string assetFilenameWithExtension, string json)
+        {
+            DependencyService.Get<ISaveAndLoad>().SaveModuleAssetFile(modFolder, assetFilenameWithExtension, json);
+        }
+        public List<string> GetTileFiles(string modFolder, string endsWith)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetTileFiles(modFolder, endsWith);
+        }
+        public List<string> GetGraphicsFiles(string modFolder, string endsWith)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetGraphicsFiles(modFolder, endsWith);
+        }
+        public List<string> GetCharacterFiles(string modFolder, string endsWith)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetCharacterFiles(modFolder, endsWith);
+        }
+        public string GetModuleFileString(string modFilename)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetModuleFileString(modFilename);
+        }
+        public string GetModuleAssetFileString(string modFolder, string assetFilename)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetModuleAssetFileString(modFolder, assetFilename);
+        }
+        public string GetDataAssetFileString(string assetFilename)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetDataAssetFileString(assetFilename);
+        }
+        public SKBitmap LoadBitmap(string filename)
+        {
+            return DependencyService.Get<ISaveAndLoad>().LoadBitmap(filename);
+        }
+        public List<string> GetAllModuleFiles()
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllModuleFiles();
+        }
+        public List<string> GetAllAreaFilenames()
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllAreaFilenames(mod.moduleName);
+        }
+        public List<string> GetAllConvoFilenames()
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllConvoFilenames(mod.moduleName);
+        }
+        public List<string> GetAllEncounterFilenames()
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllEncounterFilenames(mod.moduleName);
+        }
+        public string GetSettingsString()
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetSettingsString();
+        }
+        public string GetSaveFileString(string modName, string filename)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetSaveFileString(modName, filename);
+        }
+
 
         public void errorLog(string text)
         {

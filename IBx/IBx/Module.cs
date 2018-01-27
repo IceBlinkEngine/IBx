@@ -484,7 +484,7 @@ namespace IBx
             }
 
         }
-        public bool setCurrentArea(string areaFilename, GameView gv)
+        public bool setCurrentAreaNew(string areaFilename, GameView gv)
         {
             try
             {
@@ -554,7 +554,7 @@ namespace IBx
         {
             try
             {
-                foreach (Convo cnv in this.moduleConvoList)
+                foreach (Convo cnv in this.moduleConvosList)
                 {
                     if (cnv.ConvoFileName.Equals(ConvoFilename))
                     {
@@ -570,7 +570,7 @@ namespace IBx
                     Convo cnv = (Convo)serializer.Deserialize(sr, typeof(Convo));
                     if (cnv != null)
                     {
-                        this.moduleConvoList.Add(cnv);
+                        this.moduleConvosList.Add(cnv);
                         gv.screenConvo.currentConvo = cnv;
                         return true;
                     }
