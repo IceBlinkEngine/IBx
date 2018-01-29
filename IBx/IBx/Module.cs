@@ -296,7 +296,7 @@ namespace IBx
         public bool allowImmediateRetransition = false;
         //[JsonIgnore]
         //public List<Bitmap> loadedTileBitmaps = new List<Bitmap>();
-        //public List<String> loadedTileBitmapsNames = new List<String>();
+        public List<string> loadedTileBitmapsNames = new List<string>();
         //[JsonIgnore]
         //public List<System.Drawing.Bitmap> loadedMinimapTileBitmaps = new List<System.Drawing.Bitmap>();
         public List<String> loadedMinimapTileBitmapsNames = new List<String>();
@@ -464,14 +464,8 @@ namespace IBx
                     if (area.Filename.Equals(filename))
                     {
                         this.currentArea = area;
-                        //gv.cc.DisposeOfBitmap(ref gv.cc.bmpMap);
-                        gv.cc.bmpMap = gv.cc.LoadBitmap(this.currentArea.ImageFileName);
-                        //TODO gv.cc.LoadTileBitmapList();
-                        foreach (Prop p in this.currentArea.Props)
-                        {
-                            gv.cc.DisposeOfBitmap(ref p.token);
-                            p.token = gv.cc.LoadBitmap(p.ImageFileName);
-                        }
+                        //gv.cc.bmpMap = this.currentArea.ImageFileName;
+                        //TODO gv.cc.LoadTileBitmapList();                        
                         return true;
                     }
                 }
@@ -554,14 +548,14 @@ namespace IBx
         {
             try
             {
-                foreach (Convo cnv in this.moduleConvosList)
+                /*TODO foreach (Convo cnv in this.moduleConvosList)
                 {
                     if (cnv.ConvoFileName.Equals(ConvoFilename))
                     {
                         gv.screenConvo.currentConvo = cnv;
                         return true;
                     }
-                }
+                }*/
                 //didn't find the area in the mod list so try and load it
                 string s = gv.GetModuleAssetFileString(this.moduleName, ConvoFilename + ".dlg");
                 using (StringReader sr = new StringReader(s))
@@ -570,7 +564,7 @@ namespace IBx
                     Convo cnv = (Convo)serializer.Deserialize(sr, typeof(Convo));
                     if (cnv != null)
                     {
-                        this.moduleConvosList.Add(cnv);
+                        //TODO this.moduleConvosList.Add(cnv);
                         gv.screenConvo.currentConvo = cnv;
                         return true;
                     }
@@ -582,6 +576,7 @@ namespace IBx
                 gv.errorLog(ex.ToString());
                 return false;
             }
+
         }
 
 

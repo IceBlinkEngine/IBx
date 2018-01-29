@@ -30,8 +30,8 @@ namespace IBx
     	    if (btnNewGame == null)
 		    {
 			    btnNewGame = new IbbButton(gv, 1.0f);	
-			    btnNewGame.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnNewGame.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnNewGame.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnNewGame.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
 			    btnNewGame.Text = "New Game";
                 btnNewGame.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnNewGame.Y = (1 * gv.squareSize) + (2 * pH);
@@ -41,8 +41,8 @@ namespace IBx
 		    if (btnLoadSavedGame == null)
 		    {
 			    btnLoadSavedGame = new IbbButton(gv, 1.0f);	
-			    btnLoadSavedGame.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnLoadSavedGame.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnLoadSavedGame.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnLoadSavedGame.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
 			    btnLoadSavedGame.Text = "Load Saved Game";
                 btnLoadSavedGame.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnLoadSavedGame.Y = (2 * gv.squareSize) + (4 * pH);
@@ -52,8 +52,8 @@ namespace IBx
 		    if (btnPlayerGuide == null)
 		    {
 			    btnPlayerGuide = new IbbButton(gv, 1.0f);	
-			    btnPlayerGuide.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnPlayerGuide.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnPlayerGuide.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnPlayerGuide.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
 			    btnPlayerGuide.Text = "Player's Guide";
                 btnPlayerGuide.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnPlayerGuide.Y = (3 * gv.squareSize) + (6 * pH);
@@ -63,8 +63,8 @@ namespace IBx
 		    if (btnBeginnerGuide == null)
 		    {
 			    btnBeginnerGuide = new IbbButton(gv, 1.0f);	
-			    btnBeginnerGuide.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnBeginnerGuide.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnBeginnerGuide.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnBeginnerGuide.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
 			    btnBeginnerGuide.Text = "Beginner's Guide";
                 btnBeginnerGuide.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnBeginnerGuide.Y = (4 * gv.squareSize) + (8 * pH);
@@ -74,8 +74,8 @@ namespace IBx
 		    if (btnAbout == null)
 		    {
 			    btnAbout = new IbbButton(gv, 1.0f);	
-			    btnAbout.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnAbout.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnAbout.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnAbout.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
 			    btnAbout.Text = "Credits";
                 btnAbout.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnAbout.Y = (5 * gv.squareSize) + (10 * pH);
@@ -88,9 +88,9 @@ namespace IBx
         public void redrawTitle()
         {            
     	    //DRAW TITLE SCREEN
-            float dstHeight = ((float)gv.screenWidth / (float)gv.cc.title.PixelSize.Width) * (float)gv.cc.title.PixelSize.Height;
+            float dstHeight = ((float)gv.screenWidth / (float)gv.cc.title.Width) * (float)gv.cc.title.Height;
             //do narration with image setup    	
-            IbRect src = new IbRect(0, 0, gv.cc.title.PixelSize.Width, gv.cc.title.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.title.Width, gv.cc.title.Height);
             IbRect dst = new IbRect(0, 0, gv.screenWidth, (int)dstHeight);
             gv.DrawBitmap(gv.cc.title, src, dst);
 
@@ -109,7 +109,7 @@ namespace IBx
 		    btnBeginnerGuide.Draw();           
 		    btnAbout.Draw();
 	    }
-        public void onTouchTitle(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchTitle(int eX, int eY, MouseEventType.EventType eventType)
         {
             try
             {
@@ -122,8 +122,8 @@ namespace IBx
                 switch (eventType)
                 {
                     case MouseEventType.EventType.MouseUp:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
 
                         btnNewGame.glowOn = false;
                         btnLoadSavedGame.glowOn = false;
@@ -178,8 +178,8 @@ namespace IBx
 
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         if (btnNewGame.getImpact(x, y))
                         {

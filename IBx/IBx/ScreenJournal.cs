@@ -13,7 +13,7 @@ namespace IBx
 	    public GameView gv;
 	    private int journalScreenQuestIndex = 0;
 	    private int journalScreenEntryIndex = 0;	
-	    private Bitmap journalBack;
+	    private string journalBack;
 	    private IbbButton btnReturnJournal = null;
 	    public IbbButton ctrlUpArrow = null;
 	    public IbbButton ctrlDownArrow = null;
@@ -40,9 +40,9 @@ namespace IBx
 		    if (ctrlUpArrow == null)
 		    {
 			    ctrlUpArrow = new IbbButton(gv, 1.0f);
-			    ctrlUpArrow.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    ctrlUpArrow.Img2 = gv.cc.LoadBitmap("ctrl_up_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_up_arrow);
-			    ctrlUpArrow.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
+			    ctrlUpArrow.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    ctrlUpArrow.Img2 = "ctrl_up_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_up_arrow);
+			    ctrlUpArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
 			    ctrlUpArrow.X = 12 * gv.squareSize;
 			    ctrlUpArrow.Y = 1 * gv.squareSize + pH * 2;
                 ctrlUpArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -51,9 +51,9 @@ namespace IBx
 		    if (ctrlDownArrow == null)
 		    {
 			    ctrlDownArrow = new IbbButton(gv, 1.0f);	
-			    ctrlDownArrow.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    ctrlDownArrow.Img2 = gv.cc.LoadBitmap("ctrl_down_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_down_arrow);
-			    ctrlDownArrow.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
+			    ctrlDownArrow.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    ctrlDownArrow.Img2 = "ctrl_down_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_down_arrow);
+			    ctrlDownArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
 			    ctrlDownArrow.X = 12 * gv.squareSize;
 			    ctrlDownArrow.Y = 2 * gv.squareSize + pH * 3;
                 ctrlDownArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -62,9 +62,9 @@ namespace IBx
 		    if (ctrlLeftArrow == null)
 		    {
 			    ctrlLeftArrow = new IbbButton(gv, 1.0f);
-			    ctrlLeftArrow.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    ctrlLeftArrow.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-			    ctrlLeftArrow.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
+			    ctrlLeftArrow.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    ctrlLeftArrow.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+			    ctrlLeftArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
 			    ctrlLeftArrow.X = 10 * gv.squareSize + xShift;
 			    ctrlLeftArrow.Y = pH * 34;
                 ctrlLeftArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -73,9 +73,9 @@ namespace IBx
 		    if (ctrlRightArrow == null)
 		    {
 			    ctrlRightArrow = new IbbButton(gv, 1.0f);
-			    ctrlRightArrow.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    ctrlRightArrow.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-			    ctrlRightArrow.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
+			    ctrlRightArrow.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    ctrlRightArrow.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+			    ctrlRightArrow.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.arrow_glow);
 			    ctrlRightArrow.X = 11 * gv.squareSize + pW * 2 + xShift;
 			    ctrlRightArrow.Y = pH * 34;
                 ctrlRightArrow.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -85,8 +85,8 @@ namespace IBx
 		    {
 			    btnReturnJournal = new IbbButton(gv, 1.2f);	
 			    btnReturnJournal.Text = "RETURN";
-			    btnReturnJournal.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnReturnJournal.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnReturnJournal.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnReturnJournal.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnReturnJournal.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
 			    btnReturnJournal.Y = 9 * gv.squareSize + pH * 2;
                 btnReturnJournal.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -109,8 +109,7 @@ namespace IBx
     	    //IF BACKGROUND IS NULL, LOAD IMAGE
     	    if (journalBack == null)
     	    {
-                gv.cc.DisposeOfBitmap(ref journalBack);
-                journalBack = gv.cc.LoadBitmap("journalback");
+                journalBack = "journalback";
     	    }
     	    //IF BUTTONS ARE NULL, LOAD BUTTONS
     	    if (btnReturnJournal == null)
@@ -119,9 +118,9 @@ namespace IBx
     	    }
     	
     	    //DRAW BACKGROUND IMAGE
-            IbRect src = new IbRect(0, 0, journalBack.PixelSize.Width, journalBack.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(journalBack).Width, gv.cc.GetFromBitmapList(journalBack).Height);
             IbRect dst = new IbRect(2 * gv.squareSize, 0, (gv.squaresInWidth - 4) * gv.squareSize, (gv.squaresInHeight - 1) * gv.squareSize);
-            gv.DrawBitmap(journalBack, src, dst);
+            gv.DrawBitmap(gv.cc.GetFromBitmapList(journalBack), src, dst);
         
             //MAKE SURE NO OUT OF INDEX ERRORS
     	    if (gv.mod.partyJournalQuests.Count > 0)
@@ -137,25 +136,25 @@ namespace IBx
     	    }
 			
     	    //DRAW QUESTS
-            Color color = Color.Black;
-		    gv.DrawText("Active Quests:", locX, locY += leftStartY, 1.0f, color);
-		    gv.DrawText("--------------", locX, locY += spacing, 1.0f, color);
+            string color = "black";
+		    gv.DrawText("Active Quests:", locX, locY += leftStartY, "black");
+		    gv.DrawText("--------------", locX, locY += spacing, "black");
 		    if (gv.mod.partyJournalQuests.Count > 0)
     	    {
 			    int cnt = 0;
 			    foreach (JournalQuest jq in gv.mod.partyJournalQuests)
 			    {
-                    if (journalScreenQuestIndex == cnt) { color = Color.Lime; }
-				    else { color = Color.Black; }	
-                    gv.DrawText(jq.Name, locX, locY += spacing, 1.0f, color);
+                    if (journalScreenQuestIndex == cnt) { color = "lime"; }
+				    else { color = "black"; }	
+                    gv.DrawText(jq.Name, locX, locY += spacing, color);
 				    cnt++;
 			    }
     	    }
 		
 		    //DRAW QUEST ENTRIES
 		    locY = tabStartY;
-		    gv.DrawText("Quest Entry:", locX, locY, 1.0f, Color.Black);
-		    gv.DrawText("--------------", locX, locY += spacing, 1.0f, Color.Black);	
+		    gv.DrawText("Quest Entry:", locX, locY, "black");
+		    gv.DrawText("--------------", locX, locY += spacing, "black");	
 		    if (gv.mod.partyJournalQuests.Count > 0)
     	    {
                 //Description
@@ -181,7 +180,7 @@ namespace IBx
 		    btnReturnJournal.Draw();
         }
 
-        public void onTouchJournal(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchJournal(int eX, int eY, MouseEventType.EventType eventType)
         {//1
             try
             {//2 
@@ -195,8 +194,8 @@ namespace IBx
                 {//3
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
                         if (ctrlUpArrow.getImpact(x, y))
                         {
                             ctrlUpArrow.glowOn = true;
@@ -221,8 +220,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         ctrlUpArrow.glowOn = false;
                         ctrlDownArrow.glowOn = false;

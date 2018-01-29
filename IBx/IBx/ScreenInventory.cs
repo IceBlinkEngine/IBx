@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Xamarin.Forms;
 
 namespace IBx
 {
@@ -41,9 +42,9 @@ namespace IBx
 		    if (btnInventoryLeft == null)
 		    {
 			    btnInventoryLeft = new IbbButton(gv, 1.0f);
-			    btnInventoryLeft.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInventoryLeft.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-			    btnInventoryLeft.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnInventoryLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnInventoryLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+			    btnInventoryLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnInventoryLeft.X = 8 * gv.squareSize;
 			    btnInventoryLeft.Y = (1 * gv.squareSize) - (pH * 2);
                 btnInventoryLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -52,8 +53,8 @@ namespace IBx
 		    if (btnPageIndex == null)
 		    {
 			    btnPageIndex = new IbbButton(gv, 1.0f);
-			    btnPageIndex.Img = gv.cc.LoadBitmap("btn_small_off"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-			    btnPageIndex.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+			    btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnPageIndex.Text = "1/10";
 			    btnPageIndex.X = 9 * gv.squareSize;
 			    btnPageIndex.Y = (1 * gv.squareSize) - (pH * 2);
@@ -63,9 +64,9 @@ namespace IBx
 		    if (btnInventoryRight == null)
 		    {
 			    btnInventoryRight = new IbbButton(gv, 1.0f);
-			    btnInventoryRight.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInventoryRight.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-			    btnInventoryRight.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnInventoryRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnInventoryRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+			    btnInventoryRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnInventoryRight.X = 10 * gv.squareSize;
 			    btnInventoryRight.Y = (1 * gv.squareSize) - (pH * 2);
                 btnInventoryRight.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -76,8 +77,8 @@ namespace IBx
 		    {
 			    btnReturn = new IbbButton(gv, 1.2f);	
 			    btnReturn.Text = "RETURN";
-			    btnReturn.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnReturn.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnReturn.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnReturn.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnReturn.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
 			    btnReturn.Y = 9 * gv.squareSize + pH * 2;
                 btnReturn.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -87,8 +88,8 @@ namespace IBx
 		    {
 			    btnHelp = new IbbButton(gv, 0.8f);	
 			    btnHelp.Text = "HELP";
-			    btnHelp.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnHelp.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnHelp.X = 0 * gv.squareSize + padW * 1 + gv.oXshift;
 			    btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -98,8 +99,8 @@ namespace IBx
 		    {
 			    btnInfo = new IbbButton(gv, 0.8f);	
 			    btnInfo.Text = "INFO";
-			    btnInfo.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInfo.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnInfo.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnInfo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnInfo.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
 			    btnInfo.Y = 9 * gv.squareSize + pH * 2;
                 btnInfo.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -108,8 +109,8 @@ namespace IBx
 		    for (int y = 0; y < slotsPerPage; y++)
 		    {
 			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = gv.cc.LoadBitmap("item_slot"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-			    btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+			    btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			
 			    if (y < 5)
 			    {
@@ -156,7 +157,7 @@ namespace IBx
                         //krahn
                         gv.mod.partyInventoryRefsList.RemoveAt(j);
                         //btnInventorySlot
-                        //btn.Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                        //btn.Img3 = ""mandatory_conversation_indicator");
                         //btnInventorySlot[i].Img3 = null;
                         break;
                     }
@@ -203,7 +204,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.BodyRefs);
                     gv.mod.addedItemsRefs.Add(pc.BodyRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -212,7 +213,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.MainHandRefs);
                     gv.mod.addedItemsRefs.Add(pc.MainHandRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -221,7 +222,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.OffHandRefs);
                     gv.mod.addedItemsRefs.Add(pc.OffHandRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -230,7 +231,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.HeadRefs);
                     gv.mod.addedItemsRefs.Add(pc.HeadRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -239,7 +240,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.RingRefs);
                     gv.mod.addedItemsRefs.Add(pc.RingRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -249,7 +250,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.Ring2Refs);
                     gv.mod.addedItemsRefs.Add(pc.Ring2Refs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -258,7 +259,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.GlovesRefs);
                     gv.mod.addedItemsRefs.Add(pc.GlovesRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -267,7 +268,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.NeckRefs);
                     gv.mod.addedItemsRefs.Add(pc.NeckRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
 
@@ -276,7 +277,7 @@ namespace IBx
                 {
                     gv.mod.partyInventoryRefsList.Insert(insertCounter, pc.FeetRefs);
                     gv.mod.addedItemsRefs.Add(pc.FeetRefs.tag);
-                    btnInventorySlot[insertCounter].Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                    btnInventorySlot[insertCounter].Img3 = "mandatory_conversation_indicator";
                     insertCounter++;
                 }
             }
@@ -295,8 +296,7 @@ namespace IBx
                 if ((cntSlot + (inventoryPageIndex * slotsPerPage)) < gv.mod.partyInventoryRefsList.Count)
                 {
                     Item it = gv.mod.getItemByResRefForInfo(gv.mod.partyInventoryRefsList[cntSlot + (inventoryPageIndex * slotsPerPage)].resref);
-                    gv.cc.DisposeOfBitmap(ref btnInventorySlot[i].Img2);
-                    btnInventorySlot[i].Img2 = gv.cc.LoadBitmap(it.itemImage);
+                    btnInventorySlot[i].Img2 = it.itemImage;
                     ItemRefs itr = gv.mod.partyInventoryRefsList[cntSlot + (inventoryPageIndex * slotsPerPage)];
 
                     //if ()
@@ -462,7 +462,7 @@ namespace IBx
     	    }
     	    return strg;
         }
-        public void onTouchInventory(MouseEventArgs e, MouseEventType.EventType eventType, bool inCombat)
+        public void onTouchInventory(int eX, int eY, MouseEventType.EventType eventType, bool inCombat)
         {
             try
             {
@@ -477,8 +477,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
                         if (btnInventoryLeft.getImpact(x, y))
                         {
                             btnInventoryLeft.glowOn = true;
@@ -502,8 +502,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnInventoryLeft.glowOn = false;
                         btnInventoryRight.glowOn = false;
@@ -595,9 +595,9 @@ namespace IBx
             catch
             {
             }
-         }
-	
-	    public void doCleanUp()
+        }
+                
+        public void doCleanUp()
 	    {
 		    btnInventorySlot.Clear();
 		    btnInventoryLeft = null;
@@ -608,7 +608,7 @@ namespace IBx
 		    btnReturn = null;
 	    }
 	
-	    public void doItemAction(bool inCombat)
+	    public async void doItemAction(bool inCombat)
 	    {
 
             ItemRefs itRef = GetCurrentlySelectedItemRefs();
@@ -635,23 +635,29 @@ namespace IBx
 
                     //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                     List<string> actionList = new List<string> { "View Item Description", "Drop Item"};
-                    using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
-                    {
-                        itSel.IceBlinkButtonClose.Enabled = true;
-                        itSel.IceBlinkButtonClose.Visible = true;
-                        itSel.setupAll(gv);
-                        var ret = itSel.ShowDialog();
+
+                    string selected = await gv.ListViewPage(actionList, "Item Action");
+                    int selectedIndex = gv.GetSelectedIndex(selected, actionList);
+
+                    //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
+                    //{
+                        //itSel.IceBlinkButtonClose.Enabled = true;
+                        //itSel.IceBlinkButtonClose.Visible = true;
+                        //itSel.setupAll(gv);
+                        //var ret = itSel.ShowDialog();
                         //ItemRefs itRef = GetCurrentlySelectedItemRefs();
                         it = gv.mod.getItemByResRefForInfo(itRef.resref);
 
-                        if (itSel.selectedIndex == 0) // selected to VIEW ITEM
+                        if (selectedIndex == 0) // selected to VIEW ITEM
                         {
                             gv.cc.buildItemInfoText(it, -100);
                         }
-                        else if (itSel.selectedIndex == 1) // selected to DROP ITEM
+                        else if (selectedIndex == 1) // selected to DROP ITEM
                         {
-                            DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to drop this item forever?", enumMessageButton.YesNo);
-                            if (dlg == DialogResult.Yes)
+                            //DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to drop this item forever?", enumMessageButton.YesNo);
+                            bool answer = await gv.cp.DisplayAlert("Question?", "Do you wish to drop this item forever?", "Yes", "No");
+
+                            if (answer)
                             {
                                 //drop item
                                 itRef = GetCurrentlySelectedItemRefs();
@@ -667,23 +673,25 @@ namespace IBx
                             }
                         }
 
-                    }
+                    //}
+
                     resetInventory(inCombat);
                     //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 }
                 else
                 {
                     List<string> actionList = new List<string> { "Use Item", "Drop Item", "View Item Description" };
-
-                    using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
-                    {
-                        itSel.IceBlinkButtonClose.Enabled = true;
-                        itSel.IceBlinkButtonClose.Visible = true;
-                        itSel.setupAll(gv);
-                        var ret = itSel.ShowDialog();
+                    string selected = await gv.ListViewPage(actionList, "Item Action");
+                    int selectedIndex = gv.GetSelectedIndex(selected, actionList);
+                    //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
+                    //{
+                        //itSel.IceBlinkButtonClose.Enabled = true;
+                        //itSel.IceBlinkButtonClose.Visible = true;
+                        //itSel.setupAll(gv);
+                        //var ret = itSel.ShowDialog();
                         //ItemRefs itRef = GetCurrentlySelectedItemRefs();
                         it = gv.mod.getItemByResRefForInfo(itRef.resref);
-                        if ((itSel.selectedIndex == 0) && (((!it.onUseItem.Equals("none") && itRef.quantity != 0)) || ((!it.onUseItemIBScript.Equals("none")) && itRef.quantity != 0) || ((!it.onUseItemCastSpellTag.Equals("none") && itRef.quantity != 0))))
+                        if ((selectedIndex == 0) && (((!it.onUseItem.Equals("none") && itRef.quantity != 0)) || ((!it.onUseItemIBScript.Equals("none")) && itRef.quantity != 0) || ((!it.onUseItemCastSpellTag.Equals("none") && itRef.quantity != 0))))
                         {
                             // selected to USE ITEM
                             List<string> pcNames = new List<string>();
@@ -765,20 +773,20 @@ namespace IBx
                                     if (!pc.playerClass.containsItemRefsWithResRef(itRef.resref) && isClassBound)
                                     {
                                         //add message that this class cannot use this time
-                                        IBMessageBox.Show(gv, "The item cannot be used by this player's class.");
+                                        gv.sf.MessageBox("The item cannot be used by this player's class.");
                                     }
                                     else if (it.requiredLevel > pc.classLevel)
                                     {
-                                        IBMessageBox.Show(gv, "Player level is not high enough to use this item.");
+                                        gv.sf.MessageBox("Player level is not high enough to use this item.");
                                     }
                                     else if (!gv.cc.checkRequirmentsMet(pc, it))
                                     {
-                                        IBMessageBox.Show(gv, "Item requirements not met.");
+                                        gv.sf.MessageBox("Item requirements not met.");
                                     }
                                     else
                                     {
                                         //or can only be used while equipped
-                                        IBMessageBox.Show(gv, "The item can only be used while equipped.");
+                                        gv.sf.MessageBox("The item can only be used while equipped.");
                                     }
                                 }
 
@@ -797,14 +805,16 @@ namespace IBx
                                 {
                                     pcNames.Add(pc.name);
                                 }
-                                //}
-                                using (ItemListSelector itSel2 = new ItemListSelector(gv, pcNames, "Selected PC to Use Item"))
-                                {
-                                    itSel2.IceBlinkButtonClose.Enabled = true;
-                                    itSel2.IceBlinkButtonClose.Visible = true;
-                                    itSel2.setupAll(gv);
-                                    var ret2 = itSel2.ShowDialog();
-                                    if (itSel2.selectedIndex > 0)
+                            //}
+                                string pcselected = await gv.ListViewPage(pcNames, "Selected PC to Use Item");
+                                int pcselectedIndex = gv.GetSelectedIndex(pcselected, actionList);
+                                //using (ItemListSelector itSel2 = new ItemListSelector(gv, pcNames, "Selected PC to Use Item"))
+                                //{
+                                    //itSel2.IceBlinkButtonClose.Enabled = true;
+                                    //itSel2.IceBlinkButtonClose.Visible = true;
+                                    //itSel2.setupAll(gv);
+                                    //var ret2 = itSel2.ShowDialog();
+                                    if (pcselectedIndex > 0)
                                     {
                                         try
                                         {
@@ -865,17 +875,17 @@ namespace IBx
                                                     //check to see if use IBScript first
                                                     if (!it.onUseItem.Equals("none"))
                                                     {
-                                                        pc = gv.mod.playerList[itSel2.selectedIndex - 1];
+                                                        pc = gv.mod.playerList[pcselectedIndex - 1];
                                                         doItemInventoryScriptBasedOnFilename(pc);
                                                     }
                                                     else if (!it.onUseItemIBScript.Equals("none"))
                                                     {
-                                                        doItemInventoryIBScript(itSel2.selectedIndex - 1);
+                                                        doItemInventoryIBScript(pcselectedIndex - 1);
                                                     }
                                                     else if (!it.onUseItemCastSpellTag.Equals("none"))
                                                     {
                                                         bool outsideCombat = !inCombat;
-                                                        doItemInventoryCastSpell(itSel2.selectedIndex - 1, outsideCombat);
+                                                        doItemInventoryCastSpell(pcselectedIndex - 1, outsideCombat);
                                                     }
                                                 }
                                             }
@@ -884,15 +894,15 @@ namespace IBx
                                                 //item not allowed for class
                                                 if (!pc.playerClass.containsItemRefsWithResRef(itRef.resref) && isClassBound)
                                                 {
-                                                    IBMessageBox.Show(gv, "The item cannot be used by this player's class.");
+                                                    gv.sf.MessageBox("The item cannot be used by this player's class.");
                                                 }
                                                 else if (it.requiredLevel > pc.classLevel)
                                                 {
-                                                    IBMessageBox.Show(gv, "Player level is not high enough to use this item.");
+                                                    gv.sf.MessageBox("Player level is not high enough to use this item.");
                                                 }
                                                 else if (!gv.cc.checkRequirmentsMet(pc, it))
                                                 {
-                                                    IBMessageBox.Show(gv, "Item requirements not met.");
+                                                    gv.sf.MessageBox("Item requirements not met.");
                                                 }
                                             }
                                         }
@@ -901,13 +911,14 @@ namespace IBx
                                             gv.errorLog(ex.ToString());
                                         }
                                     }
-                                }
+                                //}
                             }
                         }
-                        else if (itSel.selectedIndex == 1) // selected to DROP ITEM
+                        else if (selectedIndex == 1) // selected to DROP ITEM
                         {
-                            DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to drop this item forever?", enumMessageButton.YesNo);
-                            if (dlg == DialogResult.Yes)
+                            bool answer = await gv.cp.DisplayAlert("Question?", "Do you wish to drop this item forever?", "Yes", "No");
+                            //DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to drop this item forever?", enumMessageButton.YesNo);
+                            if (answer)
                             {
                                 //drop item
                                 itRef = GetCurrentlySelectedItemRefs();
@@ -922,11 +933,11 @@ namespace IBx
                                 }
                             }
                         }
-                        else if (itSel.selectedIndex == 2) // selected to VIEW ITEM
+                        else if (selectedIndex == 2) // selected to VIEW ITEM
                         {
                             gv.cc.buildItemInfoText(it, -100);
                         }
-                    }
+                    //}
                     resetInventory(inCombat);
                 }
             }
@@ -942,20 +953,22 @@ namespace IBx
 
                     //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                     List<string> actionList = new List<string> { "View Item Description" };
-                    using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
-                    {
-                        itSel.IceBlinkButtonClose.Enabled = true;
-                        itSel.IceBlinkButtonClose.Visible = true;
-                        itSel.setupAll(gv);
-                        var ret = itSel.ShowDialog();
+                    string selected = await gv.ListViewPage(actionList, "Item Action");
+                    int selectedIndex = gv.GetSelectedIndex(selected, actionList);
+                    //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
+                    //{
+                        //itSel.IceBlinkButtonClose.Enabled = true;
+                        //itSel.IceBlinkButtonClose.Visible = true;
+                        //itSel.setupAll(gv);
+                        //var ret = itSel.ShowDialog();
                         //ItemRefs itRef = GetCurrentlySelectedItemRefs();
                         it = gv.mod.getItemByResRefForInfo(itRef.resref);
                         
-                        if (itSel.selectedIndex == 0) // selected to VIEW ITEM
+                        if (selectedIndex == 0) // selected to VIEW ITEM
                         {
                             gv.cc.buildItemInfoText(it, -100);
                         }
-                    }
+                    //}
                     resetInventory(inCombat);
                     //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 }
@@ -963,12 +976,14 @@ namespace IBx
                 {
 
                     List<string> actionList = new List<string> { "Use Item", "View Item Description" };
-                    using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
-                    {
-                        itSel.IceBlinkButtonClose.Enabled = true;
-                        itSel.IceBlinkButtonClose.Visible = true;
-                        itSel.setupAll(gv);
-                        var ret = itSel.ShowDialog();
+                    string selected = await gv.ListViewPage(actionList, "Item Action");
+                    int selectedIndex = gv.GetSelectedIndex(selected, actionList);
+                    //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Item Action"))
+                    //{
+                        //itSel.IceBlinkButtonClose.Enabled = true;
+                        //itSel.IceBlinkButtonClose.Visible = true;
+                        //itSel.setupAll(gv);
+                        //var ret = itSel.ShowDialog();
                         //ItemRefs itRef = GetCurrentlySelectedItemRefs();
                         it = gv.mod.getItemByResRefForInfo(itRef.resref);
 
@@ -994,7 +1009,7 @@ namespace IBx
                             attribueRequirementsMet = gv.cc.checkRequirmentsMet(pc, it);
                         }
 
-                        if ((itSel.selectedIndex == 0) && (((!it.onUseItem.Equals("none") && itRef.quantity != 0)) || ((!it.onUseItemIBScript.Equals("none")) && itRef.quantity != 0) || ((!it.onUseItemCastSpellTag.Equals("none") && itRef.quantity != 0))) && classLevelRequirementMet && attribueRequirementsMet)
+                        if ((selectedIndex == 0) && (((!it.onUseItem.Equals("none") && itRef.quantity != 0)) || ((!it.onUseItemIBScript.Equals("none")) && itRef.quantity != 0) || ((!it.onUseItemCastSpellTag.Equals("none") && itRef.quantity != 0))) && classLevelRequirementMet && attribueRequirementsMet)
                         {
                             // selected to USE ITEM
                             List<string> pcNames = new List<string>();
@@ -1076,7 +1091,7 @@ namespace IBx
                                 }
                             }
                         }
-                        else if (itSel.selectedIndex == 1) // selected to VIEW ITEM
+                        else if (selectedIndex == 1) // selected to VIEW ITEM
                         {
                             gv.cc.buildItemInfoText(it, -100);
                         }
@@ -1088,7 +1103,7 @@ namespace IBx
                         {
                             gv.sf.MessageBoxHtml("Item requirements not met.");
                         }
-                    }
+                    //}
                     resetInventory(inCombat);
                 }
             }

@@ -23,8 +23,8 @@ namespace IBx
 	    public int npcNodeEndY = 0;
 	    public int originalSelectedPartyLeader = 0;
 	    public int parentIdNum = 0;    
-        public Bitmap convoBitmap;
-        public Bitmap convoPlusBitmap;
+        public string convoBitmap;
+        public string convoPlusBitmap;
         private bool doActions = true;
         public List<int> nodeIndexList = new List<int>();
         private IbbHtmlTextBox htmltext;
@@ -48,8 +48,8 @@ namespace IBx
 		    for (int x = 0; x < 6; x++)
 		    {
 			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = gv.cc.LoadBitmap("item_slot"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-			    btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+			    btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnNew.X = ((x+5) * gv.squareSize) + (padW * (x+1)) + gv.oXshift;
 			    btnNew.Y = 9 * gv.squareSize + (pH * 2);
                 btnNew.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -87,10 +87,10 @@ namespace IBx
             int pH = (int)((float)gv.screenHeight / 100.0f);
 		    int sX = gv.squareSize * 1;
 		    int sY = pH * 4;
-            IbRect src = new IbRect(0, 0, convoBitmap.PixelSize.Width, convoBitmap.PixelSize.Height);
-            IbRect dst = new IbRect(sX, sY, (int)(convoBitmap.PixelSize.Width * 2 * gv.screenDensity), (int)(convoBitmap.PixelSize.Height * 2 * gv.screenDensity));
+            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(convoBitmap).Width, gv.cc.GetFromBitmapList(convoBitmap).Height);
+            IbRect dst = new IbRect(sX, sY, (int)(gv.cc.GetFromBitmapList(convoBitmap).Width * 2 * gv.screenDensity), (int)(gv.cc.GetFromBitmapList(convoBitmap).Height * 2 * gv.screenDensity));
 
-            if (convoBitmap.PixelSize.Width == convoBitmap.PixelSize.Height)
+            if (gv.cc.GetFromBitmapList(convoBitmap).Width == gv.cc.GetFromBitmapList(convoBitmap).Height)
             {
                 dst = new IbRect(sX, sY, (int)(gv.squareSize * 2), (int)(gv.squareSize * 2));
             }
@@ -107,10 +107,10 @@ namespace IBx
             }
 		    if (convoBitmap != null)
 		    {
-			    gv.DrawBitmap(convoBitmap, src, dst);
+			    gv.DrawBitmap(gv.cc.GetFromBitmapList(convoBitmap), src, dst);
                 if ((gv.mod.useUIBackground) && (!currentConvo.Narration))
                 {
-                    IbRect srcFrame = new IbRect(0, 0, gv.cc.ui_portrait_frame.PixelSize.Width, gv.cc.ui_portrait_frame.PixelSize.Height);
+                    IbRect srcFrame = new IbRect(0, 0, gv.cc.ui_portrait_frame.Width, gv.cc.ui_portrait_frame.Height);
                     IbRect dstFrame = new IbRect(dst.Left - (int)(10 * gv.screenDensity),
                                             dst.Top - (int)(10 * gv.screenDensity),
                                             (int)((float)dst.Width) + (int)(20 * gv.screenDensity),
@@ -221,7 +221,7 @@ namespace IBx
             }
 	    }
 
-	    public void onTouchConvo(MouseEventArgs e, MouseEventType.EventType eventType)
+	    public void onTouchConvo(int eX, int eY, MouseEventType.EventType eventType)
 	    {
 		    pcNodeGlow = -1;
 		
@@ -229,8 +229,8 @@ namespace IBx
 		    {
 		    case MouseEventType.EventType.MouseDown:
 		    case MouseEventType.EventType.MouseMove:
-			    int x = (int) e.X;
-			    int y = (int) e.Y;
+			    int x = (int) eX;
+			    int y = (int) eY;
 				
 			    int cnt = 1;
 			    foreach (IbRect r in currentPcNodeRectList)
@@ -248,8 +248,8 @@ namespace IBx
 			    break;
 			
 		    case MouseEventType.EventType.MouseUp:
-			    x = (int) e.X;
-			    y = (int) e.Y;
+			    x = (int) eX;
+			    y = (int) eY;
 				
 			    pcNodeGlow = -1;
 			
@@ -282,8 +282,9 @@ namespace IBx
 			    break;	
 		    }
 	    }
-        public void onKeyUp(Keys KeyCode)
+        public void onKeyUp()
         {
+            /*
             if (((KeyCode == Keys.D1) || (KeyCode == Keys.NumPad1)) && (1 <= nodeIndexList.Count))
             {
                 selectedLine(0);
@@ -320,6 +321,7 @@ namespace IBx
             {
                 selectedLine(8);
             }
+            */
         }
 
 	    //methods
@@ -348,8 +350,7 @@ namespace IBx
 		    {
 			    if (cntPCs <gv.mod.playerList.Count)
 			    {
-                    gv.cc.DisposeOfBitmap(ref btn.Img2);
-                    btn.Img2 = gv.cc.LoadBitmap(gv.mod.playerList[cntPCs].tokenFilename);						
+                    btn.Img2 = gv.mod.playerList[cntPCs].tokenFilename;						
 			    }
 			    cntPCs++;
 		    }
@@ -385,7 +386,7 @@ namespace IBx
                 {
                     if (currentConvo.NpcPortraitBitmap.Equals(""))
                     {
-                        convoBitmap = gv.cc.GetFromBitmapList("npc_blob_portrait");
+                        convoBitmap = "npc_blob_portrait";
                     }
                     else
                     {
@@ -397,13 +398,13 @@ namespace IBx
                             filenameNoExt = filename.Substring(0, lastPeriodPos);
                         }
                         //gv.cc.DisposeOfBitmap(ref convoBitmap);
-                        //convoBitmap = gv.cc.LoadBitmap(filenameNoExt);
+                        //convoBitmap = "filenameNoExt);
                         //if (convoBitmap == null)
                         //{
                         //    gv.cc.DisposeOfBitmap(ref convoBitmap);
-                        //    convoBitmap = gv.cc.LoadBitmap("npc_blob_portrait");
+                        //    convoBitmap = ""npc_blob_portrait");
                         //}
-                        convoBitmap = gv.cc.GetFromBitmapList(filenameNoExt);
+                        convoBitmap = filenameNoExt;
                     }
                 }
                 else
@@ -416,20 +417,20 @@ namespace IBx
                         filenameNoExt = filename.Substring(0, lastPeriodPos);
                     }
                     //gv.cc.DisposeOfBitmap(ref convoBitmap);
-                    //convoBitmap = gv.cc.LoadBitmap(filenameNoExt);
+                    //convoBitmap = "filenameNoExt);
                     //if (convoBitmap == null)
                     //{
                     //    gv.cc.DisposeOfBitmap(ref convoBitmap);
-                    //    convoBitmap = gv.cc.LoadBitmap("npc_blob_portrait");
+                    //    convoBitmap = ""npc_blob_portrait");
                     //}
-                    convoBitmap = gv.cc.GetFromBitmapList(filenameNoExt);
+                    convoBitmap = filenameNoExt;
                 }
             }
             catch (Exception ex)
             {
                 //gv.cc.DisposeOfBitmap(ref convoBitmap);
-                //convoBitmap = gv.cc.LoadBitmap("npc_blob_portrait");
-                convoBitmap = gv.cc.GetFromBitmapList("npc_blob_portrait");
+                //convoBitmap = ""npc_blob_portrait");
+                convoBitmap = "npc_blob_portrait";
                 gv.errorLog(ex.ToString());
             }
         }
@@ -615,8 +616,7 @@ namespace IBx
                     else //new options available so show bubble plus marker
                     {
                         btnPartyIndex[PcIndx].btnNotificationOn = true;
-                        gv.cc.DisposeOfBitmap(ref btnPartyIndex[PcIndx].Img3);
-                        btnPartyIndex[PcIndx].Img3 = gv.cc.LoadBitmap("convoplus");
+                        btnPartyIndex[PcIndx].Img3 = "convoplus";
                     }
                 }
                 PcIndx++;

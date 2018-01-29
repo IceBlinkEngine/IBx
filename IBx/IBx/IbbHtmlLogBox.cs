@@ -40,10 +40,10 @@ namespace IBx
         public IbbHtmlLogBox(GameView g, int locX, int locY, int width, int height)
         {
             gv = g;
-            btn_up = gv.cc.LoadBitmap("btn_up.png");
-            btn_down = gv.cc.LoadBitmap("btn_down.png");
-            btn_scroll = gv.cc.LoadBitmap("btn_scroll.png");
-            bg_scroll = gv.cc.LoadBitmap("bg_scroll.png");
+            btn_up = ""btn_up.png");
+            btn_down = ""btn_down.png");
+            btn_scroll = ""btn_scroll.png");
+            bg_scroll = ""bg_scroll.png");
             //fontfamily = gv.family;
             //font = new Font(fontfamily, 20.0f * (float)gv.squareSize / 100.0f);
             tbXloc = locX;
@@ -60,24 +60,24 @@ namespace IBx
         public void setupIbbHtmlLogBox(GameView g)
         {
             gv = g;
-            btn_up = gv.cc.LoadBitmap("btn_up.png");
-            btn_down = gv.cc.LoadBitmap("btn_down.png");
-            btn_scroll = gv.cc.LoadBitmap("btn_scroll.png");
-            bg_scroll = gv.cc.LoadBitmap("bg_scroll.png");
+            btn_up = ""btn_up.png");
+            btn_down = ""btn_down.png");
+            btn_scroll = ""btn_scroll.png");
+            bg_scroll = ""bg_scroll.png");
         }
 
         public void ResetLogBoxUiBitmaps()
         {
-            btn_up = gv.cc.LoadBitmap("btn_up.png");
-            btn_down = gv.cc.LoadBitmap("btn_down.png");
-            btn_scroll = gv.cc.LoadBitmap("btn_scroll.png");
-            bg_scroll = gv.cc.LoadBitmap("bg_scroll.png");
+            btn_up = ""btn_up.png");
+            btn_down = ""btn_down.png");
+            btn_scroll = ""btn_scroll.png");
+            bg_scroll = ""bg_scroll.png");
         }
         
         public void DrawBitmap(Bitmap bmp, int x, int y)
         {
-            IbRect src = new IbRect(0, 0, bmp.PixelSize.Width, bmp.PixelSize.Height);
-            IbRect dst = new IbRect(x + tbXloc, y + tbYloc - gv.oYshift, bmp.PixelSize.Width, bmp.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, bmp.Width, bmp.Height);
+            IbRect dst = new IbRect(x + tbXloc, y + tbYloc - gv.oYshift, bmp.Width, bmp.Height);
             gv.DrawBitmap(bmp, src, dst);
         }
         public void DrawString(string text, float x, float y, FontWeight fw, SharpDX.DirectWrite.FontStyle fs, SharpDX.Color fontColor, float fontHeight, bool isUnderlined)
@@ -98,7 +98,7 @@ namespace IBx
 
             if ((htmlText.EndsWith("<br>")) || (htmlText.EndsWith("<BR>")))
             {
-                List<FormattedLine> linesList = gv.cc.ProcessHtmlString(htmlText, tbWidth - btn_up.PixelSize.Width, tagStack);
+                List<FormattedLine> linesList = gv.cc.ProcessHtmlString(htmlText, tbWidth - btn_up.Width, tagStack);
                 foreach (FormattedLine fl in linesList)
                 {
                     logLinesList.Add(fl);
@@ -106,7 +106,7 @@ namespace IBx
             }
             else
             {
-                List<FormattedLine> linesList = gv.cc.ProcessHtmlString(htmlText + "<br>", tbWidth - btn_up.PixelSize.Width, tagStack);
+                List<FormattedLine> linesList = gv.cc.ProcessHtmlString(htmlText + "<br>", tbWidth - btn_up.Width, tagStack);
                 foreach (FormattedLine fl in linesList)
                 {
                     logLinesList.Add(fl);
@@ -118,7 +118,7 @@ namespace IBx
         public void onDrawLogBox()
         {
             //ratio of #lines to #pixels
-            float ratio = (float)(logLinesList.Count) / (float)(tbHeight - btn_down.PixelSize.Height - btn_up.PixelSize.Height - btn_scroll.PixelSize.Height);
+            float ratio = (float)(logLinesList.Count) / (float)(tbHeight - btn_down.Height - btn_up.Height - btn_scroll.Height);
             if (ratio < 1.0f) { ratio = 1.0f; }
             if (moveDeltaY != 0)
             {
@@ -172,23 +172,23 @@ namespace IBx
 
             //determine the scrollbutton location            
             scrollButtonYLoc = (currentTopLineIndex / (int)ratio);
-            if (scrollButtonYLoc > tbHeight - btn_down.PixelSize.Height - btn_scroll.PixelSize.Height)
+            if (scrollButtonYLoc > tbHeight - btn_down.Height - btn_scroll.Height)
             {
-                scrollButtonYLoc = tbHeight - btn_down.PixelSize.Height - btn_scroll.PixelSize.Height;
+                scrollButtonYLoc = tbHeight - btn_down.Height - btn_scroll.Height;
             }
-            if (scrollButtonYLoc < 0 + btn_up.PixelSize.Height)
+            if (scrollButtonYLoc < 0 + btn_up.Height)
             {
-                scrollButtonYLoc = 0 + btn_up.PixelSize.Height;
+                scrollButtonYLoc = 0 + btn_up.Height;
             }
 
             //draw scrollbar
             for (int y = 0; y < tbHeight - 10; y += 10)
             {
-                DrawBitmap(bg_scroll, tbWidth - bg_scroll.PixelSize.Width - 5, y);
+                DrawBitmap(bg_scroll, tbWidth - bg_scroll.Width - 5, y);
             }
-            DrawBitmap(btn_up, tbWidth - btn_up.PixelSize.Width, 0);
-            DrawBitmap(btn_down, tbWidth - btn_down.PixelSize.Width, tbHeight - btn_down.PixelSize.Height);
-            DrawBitmap(btn_scroll, tbWidth - btn_scroll.PixelSize.Width - 1, scrollButtonYLoc);
+            DrawBitmap(btn_up, tbWidth - btn_up.Width, 0);
+            DrawBitmap(btn_down, tbWidth - btn_down.Width, tbHeight - btn_down.Height);
+            DrawBitmap(btn_scroll, tbWidth - btn_scroll.Width - 1, scrollButtonYLoc);
 
             //draw border for debug info
             gv.DrawRectangle(new IbRect(tbXloc, tbYloc - gv.oYshift, tbWidth, tbHeight), Color.DimGray, 1);
@@ -238,7 +238,7 @@ namespace IBx
         }
         private bool isMouseWithinScrollBar(MouseEventArgs e)
         {
-            if ((e.X > tbWidth + tbXloc - btn_up.PixelSize.Width) && (e.X < tbWidth + tbXloc) && (e.Y > tbYloc) && (e.Y < tbHeight + tbYloc))
+            if ((e.X > tbWidth + tbXloc - btn_up.Width) && (e.X < tbWidth + tbXloc) && (e.Y > tbYloc) && (e.Y < tbHeight + tbYloc))
             {
                 return true;
             }
@@ -270,7 +270,7 @@ namespace IBx
                     //if mouse is above scroll button, move up a bit
                     xLoc = 0;
                 }
-                else if (e.Y - tbYloc > scrollButtonYLoc + btn_scroll.PixelSize.Height)
+                else if (e.Y - tbYloc > scrollButtonYLoc + btn_scroll.Height)
                 {
                     //if mouse is below scroll button, move down a bit
                     xLoc = 0;
@@ -320,7 +320,7 @@ namespace IBx
             if (isMouseWithinScrollBar(e))
             {
                 //if click on top button, move 5 lines up
-                if (e.Y < tbYloc + btn_up.PixelSize.Height)
+                if (e.Y < tbYloc + btn_up.Height)
                 {
                     SetCurrentTopLineIndex(-5);
                     //currentTopLineIndex -= 5;
@@ -329,7 +329,7 @@ namespace IBx
                     //gv.Invalidate();
                     gv.Render(0);
                 }
-                else if (e.Y > tbYloc + tbHeight - btn_down.PixelSize.Height)
+                else if (e.Y > tbYloc + tbHeight - btn_down.Height)
                 {
                     SetCurrentTopLineIndex(5);
                     //currentTopLineIndex += 5;

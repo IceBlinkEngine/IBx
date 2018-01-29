@@ -67,6 +67,14 @@ namespace IBx
         public float opacity5 = 1;
         public float opacity6 = 1;
         public float opacity7 = 1;
+
+        public string tileBitmap0;
+        public string tileBitmap1;
+        public string tileBitmap2;
+        public string tileBitmap3;
+        public string tileBitmap4;
+        public string tileBitmap5;
+
         public bool isCentreOfLightCircle = false;
         public bool isOtherPartOfLightCircle = false;
         public bool isFocalPoint = false;

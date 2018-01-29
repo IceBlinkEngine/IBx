@@ -50,17 +50,17 @@ namespace IBx
         public int movementDelayInMiliseconds = 100;
         private long timeStamp = 0;
         private bool finishedMove = true;
-        public Bitmap minimap = null;
-        public Bitmap fullScreenEffect1 = null;
-        public Bitmap fullScreenEffect2 = null;
-        public Bitmap fullScreenEffect3 = null;
-        public Bitmap fullScreenEffect4 = null;
-        public Bitmap fullScreenEffect5 = null;
-        public Bitmap fullScreenEffect6 = null;
-        public Bitmap fullScreenEffect7 = null;
-        public Bitmap fullScreenEffect8 = null;
-        public Bitmap fullScreenEffect9 = null;
-        public Bitmap fullScreenEffect10 = null;
+        public string minimap = "";
+        public string fullScreenEffect1 = "";
+        public string fullScreenEffect2 = "";
+        public string fullScreenEffect3 = "";
+        public string fullScreenEffect4 = "";
+        public string fullScreenEffect5 = "";
+        public string fullScreenEffect6 = "";
+        public string fullScreenEffect7 = "";
+        public string fullScreenEffect8 = "";
+        public string fullScreenEffect9 = "";
+        public string fullScreenEffect10 = "";
         public List<Sprite> spriteList = new List<Sprite>();
 
         public ScreenMainMap(Module m, GameView g)
@@ -143,7 +143,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error Loading MainUILayout.json: " + ex.ToString());
+                //MessageBox.Show("Error Loading MainUILayout.json: " + ex.ToString());
                 gv.errorLog(ex.ToString());
             }
         }
@@ -161,189 +161,9 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
             }
         }
-        /*public void setControlsStart()
-        {
-            int pW = (int)((float)gv.screenWidth / 100.0f);
-            int pH = (int)((float)gv.screenHeight / 100.0f);
-            int padW = gv.squareSize / 6;
-            int hotkeyShift = 0;
-            if (gv.useLargeLayout)
-            {
-                hotkeyShift = 1;
-            }
-
-
-            if (btnWait == null)
-            {
-                btnWait = new IbbButton(gv, 0.8f);
-                btnWait.Text = "WAIT";
-                btnWait.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnWait.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                //btnWait.X = 17 * gv.squareSize - 3*gv.oXshift;
-                //btnWait.Y = 8 * gv.squareSize + pH * 2;
-                btnWait.X = gv.cc.pnlArrows.LocX + 1 * gv.squareSize + gv.squareSize / 2;
-                btnWait.Y = gv.cc.pnlArrows.LocY + 1 * gv.squareSize + gv.pS;
-                btnWait.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnWait.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-            if (btnParty == null)
-            {
-                btnParty = new IbbButton(gv, 0.8f);
-                btnParty.HotKey = "P";
-                btnParty.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnParty.Img2 = gv.cc.LoadBitmap("btnparty"); // BitmapFactory.decodeResource(getResources(), R.drawable.btnparty);
-                btnParty.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                //btnParty.X = 7 * gv.squareSize + padW * 0 + gv.oXshift;
-                //btnParty.Y = 9 * gv.squareSize + +(int)(1.75 * pH);
-                btnParty.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 0) * gv.squareSize;
-                btnParty.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnParty.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnParty.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-            if (btnJournal == null)
-            {
-                btnJournal = new IbbButton(gv, 0.8f);
-                btnJournal.HotKey = "J";
-                btnJournal.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnJournal.Img2 = gv.cc.LoadBitmap("btnjournal"); // BitmapFactory.decodeResource(getResources(), R.drawable.btnjournal);
-                btnJournal.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                //btnJournal.X = 9 * gv.squareSize + padW * 0 + gv.oXshift;
-                //btnJournal.Y = 9 * gv.squareSize + +(int)(1.75 * pH);
-                btnJournal.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 2) * gv.squareSize;
-                btnJournal.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnJournal.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnJournal.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-            if (btnSettings == null)
-            {
-                btnSettings = new IbbButton(gv, 1.0f);
-                btnSettings.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnSettings.Img2 = gv.cc.LoadBitmap("btnsettings"); // BitmapFactory.decodeResource(getResources(), R.drawable.btnsettings);
-                btnSettings.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                //btnSettings.X = 10 * gv.squareSize + padW * 0 + gv.oXshift;
-                //btnSettings.Y = 9 * gv.squareSize + +(int)(1.75 * pH);
-                btnSettings.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 3) * gv.squareSize;
-                btnSettings.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnSettings.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSettings.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-            if (btnCastOnMainMap == null)
-            {
-                btnCastOnMainMap = new IbbButton(gv, 0.8f);
-                btnCastOnMainMap.HotKey = "C";
-                btnCastOnMainMap.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnCastOnMainMap.Img2 = gv.cc.LoadBitmap("btnspell"); // BitmapFactory.decodeResource(getResources(), R.drawable.btnspell);
-                btnCastOnMainMap.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                //btnCastOnMainMap.X = 11 * gv.squareSize + padW * 0 + gv.oXshift;
-                //btnCastOnMainMap.Y = 9 * gv.squareSize + +(int)(1.75 * pH);
-                btnCastOnMainMap.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 4) * gv.squareSize;
-                btnCastOnMainMap.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnCastOnMainMap.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnCastOnMainMap.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-            if (btnSave == null)
-            {
-                btnSave = new IbbButton(gv, 0.8f);
-                btnSave.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnSave.ImgOff = gv.cc.LoadBitmap("btn_small_off");
-                btnSave.Img2 = gv.cc.LoadBitmap("btndisk"); // BitmapFactory.decodeResource(getResources(), R.drawable.btndisk);
-                btnSave.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                //btnSave.X = 12 * gv.squareSize + padW * 0 + gv.oXshift;
-                //btnSave.Y = 9 * gv.squareSize + +(int)(1.75 * pH);
-                btnSave.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 5) * gv.squareSize;
-                btnSave.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnSave.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSave.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-        }*/
-        /*public void setToggleButtonsStart()
-        {
-            int pW = (int)((float)gv.screenWidth / 100.0f);
-            int pH = (int)((float)gv.screenHeight / 100.0f);
-            int padW = gv.squareSize / 6;
-
-            if (tglFullParty == null)
-            {
-                tglFullParty = new IbbToggleButton(gv);
-                tglFullParty.ImgOn = gv.cc.LoadBitmap("tgl_fullparty_on");
-                tglFullParty.ImgOff = gv.cc.LoadBitmap("tgl_fullparty_off");
-                //tglFullParty.X = 0 * gv.squareSize + gv.oXshift + (gv.squareSize / 2);
-                //tglFullParty.Y = 9 * (gv.squareSize) + (gv.squareSize / 2);
-                tglFullParty.X = gv.cc.pnlToggles.LocX + 1 * gv.squareSize + gv.squareSize / 4;
-                tglFullParty.Y = gv.cc.pnlToggles.LocY + 0 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglFullParty.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglFullParty.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-                tglFullParty.toggleOn = true;
-            }
-            if (tglMiniMap == null)
-            {
-                tglMiniMap = new IbbToggleButton(gv);
-                tglMiniMap.ImgOn = gv.cc.LoadBitmap("tgl_minimap_on");
-                tglMiniMap.ImgOff = gv.cc.LoadBitmap("tgl_minimap_off");
-                //tglMiniMap.X = 4 * gv.squareSize + gv.oXshift + (gv.squareSize / 2);
-                //tglMiniMap.Y = 9 * (gv.squareSize) + (gv.squareSize / 2);
-                tglMiniMap.X = gv.cc.pnlToggles.LocX + 2 * gv.squareSize + gv.squareSize / 4;
-                tglMiniMap.Y = gv.cc.pnlToggles.LocY + 2 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglMiniMap.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglMiniMap.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-                tglMiniMap.toggleOn = false;
-            }
-            if (tglGrid == null)
-            {
-                tglGrid = new IbbToggleButton(gv);
-                tglGrid.ImgOn = gv.cc.LoadBitmap("tgl_grid_on");
-                tglGrid.ImgOff = gv.cc.LoadBitmap("tgl_grid_off");
-                //tglGrid.X = 1 * gv.squareSize + gv.oXshift + (gv.squareSize / 2);
-                //tglGrid.Y = 9 * (gv.squareSize) + (gv.squareSize / 2);
-                tglGrid.X = gv.cc.pnlToggles.LocX + 1 * gv.squareSize + gv.squareSize / 4;
-                tglGrid.Y = gv.cc.pnlToggles.LocY + 1 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglGrid.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglGrid.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-                tglGrid.toggleOn = true;
-            }
-            if (tglClock == null)
-            {
-                tglClock = new IbbToggleButton(gv);
-                tglClock.ImgOn = gv.cc.LoadBitmap("tgl_clock_on");
-                tglClock.ImgOff = gv.cc.LoadBitmap("tgl_clock_off");
-                //tglClock.X = 2 * gv.squareSize + gv.oXshift + (gv.squareSize / 2);
-                //tglClock.Y = 9 * (gv.squareSize) + (gv.squareSize / 2);
-                tglClock.X = gv.cc.pnlToggles.LocX + 3 * gv.squareSize + gv.squareSize / 4;
-                tglClock.Y = gv.cc.pnlToggles.LocY + 2 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglClock.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglClock.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-                tglClock.toggleOn = true;
-            }
-            if (tglInteractionState == null)
-            {
-                tglInteractionState = new IbbToggleButton(gv);
-                tglInteractionState.ImgOn = gv.cc.LoadBitmap("tgl_state_on");
-                tglInteractionState.ImgOff = gv.cc.LoadBitmap("tgl_state_off");
-                //tglInteractionState.X = 1 * gv.squareSize + gv.oXshift + (gv.squareSize / 2);
-                //tglInteractionState.Y = 8 * (gv.squareSize) + (gv.squareSize / 2);
-                tglInteractionState.X = gv.cc.pnlToggles.LocX + 3 * gv.squareSize + gv.squareSize / 4;
-                tglInteractionState.Y = gv.cc.pnlToggles.LocY + 0 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglInteractionState.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglInteractionState.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-                tglInteractionState.toggleOn = false;
-            }
-            if (tglAvoidConversation == null)
-            {
-                tglAvoidConversation = new IbbToggleButton(gv);
-                tglAvoidConversation.ImgOn = gv.cc.LoadBitmap("tgl_avoidConvo_on");
-                tglAvoidConversation.ImgOff = gv.cc.LoadBitmap("tgl_avoidConvo_off");
-                //tglAvoidConversation.X = 0 * gv.squareSize + gv.oXshift + (gv.squareSize / 2);
-                //tglAvoidConversation.Y = 8 * (gv.squareSize) + (gv.squareSize / 2);
-                tglAvoidConversation.X = gv.cc.pnlToggles.LocX + 2 * gv.squareSize + gv.squareSize / 4;
-                tglAvoidConversation.Y = gv.cc.pnlToggles.LocY + 0 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglAvoidConversation.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglAvoidConversation.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-                tglAvoidConversation.toggleOn = false;
-            }
-        }*/
         //MAIN SCREEN UPDATE
         public void Update(int elapsed)
         {
@@ -1369,9 +1189,9 @@ namespace IBx
         //MAIN SCREEN DRAW
         public void resetMiniMapBitmap()
         {
-            if (gv.mod.useAllTileSystem)
+            /*TODO if (gv.mod.useAllTileSystem)
             {
-                minimap = gv.cc.LoadBitmap(gv.mod.currentArea.Filename + "Minimap");
+                minimap = gv.mod.currentArea.Filename + "Minimap";
             }
             else
             {
@@ -1401,9 +1221,9 @@ namespace IBx
                             for (int y = 0; y < gv.mod.currentArea.MapSizeY; y++)
                             {
                                 Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
-                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height);
-                                float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width / 100;
-                                float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height / 100;
+                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromBitmapList(tile.Layer1Filename).Width, gv.cc.GetFromBitmapList(tile.Layer1Filename).Height);
+                                float scalerX = gv.cc.GetFromBitmapList(tile.Layer1Filename).Width / 100;
+                                float scalerY = gv.cc.GetFromBitmapList(tile.Layer1Filename).Height / 100;
                                 int brX = (int)(minimapSquareSizeInPixels * scalerX);
                                 int brY = (int)(minimapSquareSizeInPixels * scalerY);
                                 Rectangle dst = new Rectangle(x * minimapSquareSizeInPixels, y * minimapSquareSizeInPixels, brX, brY);
@@ -1417,9 +1237,9 @@ namespace IBx
                             for (int y = 0; y < gv.mod.currentArea.MapSizeY; y++)
                             {
                                 Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
-                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height);
-                                float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width / 100;
-                                float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height / 100;
+                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromBitmapList(tile.Layer2Filename).Width, gv.cc.GetFromBitmapList(tile.Layer2Filename).Height);
+                                float scalerX = gv.cc.GetFromBitmapList(tile.Layer2Filename).Width / 100;
+                                float scalerY = gv.cc.GetFromBitmapList(tile.Layer2Filename).Height / 100;
                                 int brX = (int)(minimapSquareSizeInPixels * scalerX);
                                 int brY = (int)(minimapSquareSizeInPixels * scalerY);
                                 Rectangle dst = new Rectangle(x * minimapSquareSizeInPixels, y * minimapSquareSizeInPixels, brX, brY);
@@ -1433,9 +1253,9 @@ namespace IBx
                             for (int y = 0; y < gv.mod.currentArea.MapSizeY; y++)
                             {
                                 Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
-                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height);
-                                float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width / 100;
-                                float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height / 100;
+                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromBitmapList(tile.Layer3Filename).Width, gv.cc.GetFromBitmapList(tile.Layer3Filename).Height);
+                                float scalerX = gv.cc.GetFromBitmapList(tile.Layer3Filename).Width / 100;
+                                float scalerY = gv.cc.GetFromBitmapList(tile.Layer3Filename).Height / 100;
                                 int brX = (int)(minimapSquareSizeInPixels * scalerX);
                                 int brY = (int)(minimapSquareSizeInPixels * scalerY);
                                 Rectangle dst = new Rectangle(x * minimapSquareSizeInPixels, y * minimapSquareSizeInPixels, brX, brY);
@@ -1449,9 +1269,9 @@ namespace IBx
                             for (int y = 0; y < gv.mod.currentArea.MapSizeY; y++)
                             {
                                 Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
-                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Height);
-                                float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Width / 100;
-                                float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Height / 100;
+                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromBitmapList(tile.Layer4Filename).Width, gv.cc.GetFromBitmapList(tile.Layer4Filename).Height);
+                                float scalerX = gv.cc.GetFromBitmapList(tile.Layer4Filename).Width / 100;
+                                float scalerY = gv.cc.GetFromBitmapList(tile.Layer4Filename).Height / 100;
                                 int brX = (int)(minimapSquareSizeInPixels * scalerX);
                                 int brY = (int)(minimapSquareSizeInPixels * scalerY);
                                 Rectangle dst = new Rectangle(x * minimapSquareSizeInPixels, y * minimapSquareSizeInPixels, brX, brY);
@@ -1465,9 +1285,9 @@ namespace IBx
                             for (int y = 0; y < gv.mod.currentArea.MapSizeY; y++)
                             {
                                 Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
-                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Height);
-                                float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Width / 100;
-                                float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Height / 100;
+                                Rectangle src = new Rectangle(0, 0, gv.cc.GetFromBitmapList(tile.Layer5Filename).Width, gv.cc.GetFromBitmapList(tile.Layer5Filename).Height);
+                                float scalerX = gv.cc.GetFromBitmapList(tile.Layer5Filename).Width / 100;
+                                float scalerY = gv.cc.GetFromBitmapList(tile.Layer5Filename).Height / 100;
                                 int brX = (int)(minimapSquareSizeInPixels * scalerX);
                                 int brY = (int)(minimapSquareSizeInPixels * scalerY);
                                 Rectangle dst = new Rectangle(x * minimapSquareSizeInPixels, y * minimapSquareSizeInPixels, brX, brY);
@@ -1479,6 +1299,7 @@ namespace IBx
                     }
                 }
             }
+            */
         }
 
         public void drawHeightShadows()
@@ -1725,7 +1546,7 @@ namespace IBx
             int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
             int brX = gv.squareSize;
             int brY = gv.squareSize;
-            IbRect src = new IbRect(0, 0, gv.cc.walkBlocked.PixelSize.Width, gv.cc.walkBlocked.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.walkBlocked.Width, gv.cc.walkBlocked.Height);
             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
             if (gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x].LoSBlocked)
             {
@@ -1906,12 +1727,12 @@ namespace IBx
                         
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.longShadow.PixelSize.Width / 100;
-                        float scalerY = gv.cc.longShadow.PixelSize.Height / 100;
+                        float scalerX = gv.cc.longShadow.Width / 100;
+                        float scalerY = gv.cc.longShadow.Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
-                        IbRect src = new IbRect(0, 0, gv.cc.longShadow.PixelSize.Width, gv.cc.longShadow.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.longShadow.Width, gv.cc.longShadow.Height);
                         //amitee
                         IbRect dstNorth = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY - gv.squareSize, brX, brY);
                         IbRect dstEast = new IbRect(tlX + gv.squareSize + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
@@ -1923,7 +1744,7 @@ namespace IBx
                         IbRect dst4 = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                         //Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
-                        //IbRect src = new IbRect(0, 0, gv.cc.longShadow.PixelSize.Width, gv.cc.longShadow.PixelSize.Height);
+                        //IbRect src = new IbRect(0, 0, gv.cc.longShadow.Width, gv.cc.longShadow.Height);
                         /*
                         IbRect dst = new IbRect(x * (gv.squareSize), y * gv.squareSize, (gv.squareSize), (gv.squareSize));
                         IbRect dst2 = new IbRect(x * (gv.squareSize), y * gv.squareSize, (gv.squareSize), (gv.squareSize));
@@ -2670,9 +2491,9 @@ namespace IBx
 
             if (gv.mod.currentArea.areaWeatherName == "")
             {
-                gv.weatherSounds1.controls.stop();
-                gv.weatherSounds2.controls.stop();
-                gv.weatherSounds3.controls.stop();
+                //TODO gv.weatherSounds1.controls.stop();
+                //gv.weatherSounds2.controls.stop();
+                //gv.weatherSounds3.controls.stop();
             }
             setBridgeStateForMovingProps();
             setExplored();
@@ -3187,14 +3008,14 @@ namespace IBx
 
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                        //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                        //float scalerX = tile.tileBitmap0.Width / 100;
+                        //float scalerY = tile.tileBitmap0.Height / 100;
                         //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                         float scalerX = 1;
                         float scalerY = 1;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
-                        //IbRect src = new IbRect(0, 0, tile.tileBitmap0.PixelSize.Width, tile.tileBitmap0.PixelSize.Height);
+                        //IbRect src = new IbRect(0, 0, tile.tileBitmap0.Width, tile.tileBitmap0.Height);
                         //IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                         //for (int x = minX; x < maxX; x++)
@@ -3204,7 +3025,7 @@ namespace IBx
                         //Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         if (tile.linkedToMasterMap)
                         {
-                            IbRect srcBlackTile = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                            IbRect srcBlackTile = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                             //IbRect dst = new IbRect(x * gv.squareSize + gv.oXshift, y * gv.squareSize, gv.squareSize, gv.squareSize);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                             gv.DrawBitmap(gv.cc.black_tile, srcBlackTile, dst, false, 0.75f);
@@ -3602,32 +3423,32 @@ namespace IBx
                                         {
                                             gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                         }
-                                        tile.tileBitmap0 = gv.cc.LoadBitmap(tile.Layer0Filename);
+                                        tile.tileBitmap0 = tile.Layer0Filename;
                                         //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                         gv.mod.currentArea.sourceBitmapName = backup;
 
                                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                        //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                                        //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                                        //float scalerX = tile.tileBitmap0.Width / 100;
+                                        //float scalerY = tile.tileBitmap0.Height / 100;
                                         //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                                         float scalerX = 1;
                                         float scalerY = 1;
                                         int brX = (int)(gv.squareSize * scalerX);
                                         int brY = (int)(gv.squareSize * scalerY);
-                                        IbRect src = new IbRect(0, 0, tile.tileBitmap0.PixelSize.Width, tile.tileBitmap0.PixelSize.Height);
+                                        IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.tileBitmap0).Width, gv.cc.GetFromBitmapList(tile.tileBitmap0).Height);
                                         IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.mod.loadedTileBitmaps.Add(tile.tileBitmap0);
+                                        //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap0);
                                         //gv.DrawBitmap(tile.tileBitmap0, src, dst); 
 
                                         //gv.mod.currentArea.drawWithLessVisibleSeamsButMorePixelated = true;
                                         if (gv.mod.currentArea.drawWithLessVisibleSeamsButMorePixelated)
                                         {
-                                            gv.DrawBitmap(tile.tileBitmap0, src, dst, false, 1f, true);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap0), src, dst);
                                         }
                                         else
                                         {
-                                            gv.DrawBitmap(tile.tileBitmap0, src, dst, false, 1f, false);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap0), src, dst);
                                         }
 
                                     }
@@ -3635,25 +3456,25 @@ namespace IBx
                                     {
                                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                        //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                                        //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                                        //float scalerX = tile.tileBitmap0.Width / 100;
+                                        //float scalerY = tile.tileBitmap0.Height / 100;
                                         //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                                         float scalerX = 1;
                                         float scalerY = 1;
                                         int brX = (int)(gv.squareSize * scalerX);
                                         int brY = (int)(gv.squareSize * scalerY);
-                                        IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                        IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                         IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                                         //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
 
                                         //gv.mod.currentArea.drawWithLessVisibleSeamsButMorePixelated = true;
                                         if (gv.mod.currentArea.drawWithLessVisibleSeamsButMorePixelated)
                                         {
-                                            gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, false, 1f, true);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst);
                                         }
                                         else
                                         {
-                                            gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, false, 1f, false);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst);
                                         }
 
 
@@ -3842,38 +3663,38 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                     }
-                                    tile.tileBitmap1 = gv.cc.LoadBitmap(tile.Layer1Filename);
+                                    tile.tileBitmap1 = tile.Layer1Filename;
                                     //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                     gv.mod.currentArea.sourceBitmapName = backup;
 
-                                    //tile.tileBitmap1 = gv.cc.LoadBitmap(tile.Layer1Filename);
+                                    //tile.tileBitmap1 = "tile.Layer1Filename);
 
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = tile.tileBitmap1.PixelSize.Width / 100;
-                                    float scalerY = tile.tileBitmap1.PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(tile.tileBitmap1).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(tile.tileBitmap1).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, tile.tileBitmap1.PixelSize.Width, tile.tileBitmap1.PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.tileBitmap1).Width, gv.cc.GetFromBitmapList(tile.tileBitmap1).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap1);
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap1);
                                     //gv.DrawBitmap(tile.tileBitmap1, src, dst);
-                                    gv.DrawBitmap(tile.tileBitmap1, src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale, tile.Layer1Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap1), src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale, tile.Layer1Opacity);
                                 }
                                 else
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / 100;
-                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
-                                    gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale, tile.Layer1Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale, tile.Layer1Opacity);
 
                                 }
 
@@ -4056,38 +3877,38 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                     }
-                                    tile.tileBitmap2 = gv.cc.LoadBitmap(tile.Layer2Filename);
+                                    tile.tileBitmap2 = tile.Layer2Filename;
                                     //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                     gv.mod.currentArea.sourceBitmapName = backup;
-                                    //tile.tileBitmap2 = gv.cc.LoadBitmap(tile.Layer2Filename);
+                                    //tile.tileBitmap2 = "tile.Layer2Filename);
 
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = tile.tileBitmap2.PixelSize.Width / 100;
-                                    float scalerY = tile.tileBitmap2.PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(tile.tileBitmap2).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(tile.tileBitmap2).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, tile.tileBitmap2.PixelSize.Width, tile.tileBitmap2.PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.tileBitmap2).Width, gv.cc.GetFromBitmapList(tile.tileBitmap2).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap2);
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap2);
                                     //gv.DrawBitmap(tile.tileBitmap2, src, dst);
-                                    gv.DrawBitmap(tile.tileBitmap2, src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale, tile.Layer2Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap2), src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale, tile.Layer2Opacity);
 
                                 }
                                 else
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / 100;
-                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
-                                    gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale, tile.Layer2Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale, tile.Layer2Opacity);
 
                                 }
 
@@ -4270,38 +4091,38 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                     }
-                                    tile.tileBitmap3 = gv.cc.LoadBitmap(tile.Layer3Filename);
+                                    tile.tileBitmap3 = tile.Layer3Filename;
                                     //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                     gv.mod.currentArea.sourceBitmapName = backup;
-                                    //tile.tileBitmap3 = gv.cc.LoadBitmap(tile.Layer3Filename);
+                                    //tile.tileBitmap3 = "tile.Layer3Filename);
 
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = tile.tileBitmap3.PixelSize.Width / 100;
-                                    float scalerY = tile.tileBitmap3.PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(tile.tileBitmap3).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(tile.tileBitmap3).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, tile.tileBitmap3.PixelSize.Width, tile.tileBitmap3.PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.tileBitmap3).Width, gv.cc.GetFromBitmapList(tile.tileBitmap3).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap3);
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap3);
                                     //gv.DrawBitmap(tile.tileBitmap3, src, dst);
-                                    gv.DrawBitmap(tile.tileBitmap3, src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale, tile.Layer3Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap3), src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale, tile.Layer3Opacity);
 
                                 }
                                 else
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / 100;
-                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
-                                    gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale, tile.Layer3Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale, tile.Layer3Opacity);
                                 }
 
                                 //gv.DrawBitmap(gv.cc.tileBitmapList[tile.Layer1Filename], src, dst);
@@ -4483,38 +4304,38 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                     }
-                                    tile.tileBitmap4 = gv.cc.LoadBitmap(tile.Layer4Filename);
+                                    tile.tileBitmap4 = tile.Layer4Filename;
                                     //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                     gv.mod.currentArea.sourceBitmapName = backup;
-                                    //tile.tileBitmap4 = gv.cc.LoadBitmap(tile.Layer4Filename);
+                                    //tile.tileBitmap4 = "tile.Layer4Filename);
 
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = tile.tileBitmap4.PixelSize.Width / 100;
-                                    float scalerY = tile.tileBitmap4.PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(tile.tileBitmap4).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(tile.tileBitmap4).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, tile.tileBitmap4.PixelSize.Width, tile.tileBitmap4.PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.tileBitmap4).Width, gv.cc.GetFromBitmapList(tile.tileBitmap4).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap4);
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap4);
                                     //gv.DrawBitmap(tile.tileBitmap4, src, dst);
-                                    gv.DrawBitmap(tile.tileBitmap4, src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale, tile.Layer4Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap4), src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale, tile.Layer4Opacity);
 
                                 }
                                 else
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / 100;
-                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
-                                    gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale, tile.Layer4Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale, tile.Layer4Opacity);
 
                                 }
 
@@ -4677,21 +4498,21 @@ namespace IBx
                             /*
                             int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                             int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                            float scalerX = tile.tileBitmap5.PixelSize.Width / 100;
-                            float scalerY = tile.tileBitmap5.PixelSize.Height / 100;
+                            float scalerX = tile.tileBitmap5.Width / 100;
+                            float scalerY = tile.tileBitmap5.Height / 100;
                             int brX = (int)(gv.squareSize * scalerX);
                             int brY = (int)(gv.squareSize * scalerY);
-                            IbRect src = new IbRect(0, 0, tile.tileBitmap5.PixelSize.Width, tile.tileBitmap5.PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, tile.tileBitmap5.Width, tile.tileBitmap5.Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                             */
                             int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                             int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                            float scalerX = gv.cc.longShadow.PixelSize.Width / 100;
-                            float scalerY = gv.cc.longShadow.PixelSize.Height / 100;
+                            float scalerX = gv.cc.longShadow.Width / 100;
+                            float scalerY = gv.cc.longShadow.Height / 100;
                             int brX = (int)(gv.squareSize * scalerX);
                             int brY = (int)(gv.squareSize * scalerY);
 
-                            IbRect src = new IbRect(0, 0, gv.cc.longShadow.PixelSize.Width, gv.cc.longShadow.PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.longShadow.Width, gv.cc.longShadow.Height);
 
                             IbRect dstNorth = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY - gv.squareSize, brX, brY);
                             IbRect dstEast = new IbRect(tlX + gv.squareSize + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
@@ -4975,38 +4796,38 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                     }
-                                    tile.tileBitmap5 = gv.cc.LoadBitmap(tile.Layer5Filename);
+                                    tile.tileBitmap5 = tile.Layer5Filename;
                                     //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                     gv.mod.currentArea.sourceBitmapName = backup;
-                                    //tile.tileBitmap5 = gv.cc.LoadBitmap(tile.Layer5Filename);
+                                    //tile.tileBitmap5 = "tile.Layer5Filename);
 
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = tile.tileBitmap5.PixelSize.Width / 100;
-                                    float scalerY = tile.tileBitmap5.PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(tile.tileBitmap5).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(tile.tileBitmap5).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, tile.tileBitmap5.PixelSize.Width, tile.tileBitmap5.PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.tileBitmap5).Width, gv.cc.GetFromBitmapList(tile.tileBitmap5).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap5);
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap5);
                                     //gv.DrawBitmap(tile.tileBitmap5, src, dst);
-                                    gv.DrawBitmap(tile.tileBitmap5, src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale, tile.Layer5Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap5), src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale, tile.Layer5Opacity);
 
                                 }
                                 else
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / 100;
-                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / 100;
+                                    float scalerX = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / 100;
+                                    float scalerY = gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
-                                    gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale, tile.Layer5Opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale, tile.Layer5Opacity);
                                 }
 
                                 //gv.DrawBitmap(gv.cc.tileBitmapList[tile.Layer1Filename], src, dst);
@@ -5025,7 +4846,7 @@ namespace IBx
                 int mapSizeInSquares = gv.playerOffset + gv.playerOffset + 1;
                 int mapRightEndSquare = mapStartLocationInSquares + mapSizeInSquares;
                 if (!gv.useLargeLayout) { mapStartLocationInSquares = 4; }
-                IbRect srcBlackTile = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                IbRect srcBlackTile = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
 
                 //draw left side squares
                 for (int x = mapStartLocationInSquares - 2; x < mapStartLocationInSquares; x++)
@@ -5087,16 +4908,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer1Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer1Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer1Filename).Width, gv.cc.GetFromBitmapList(tile.Layer1Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer1Filename), src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer1Filename), src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
                         }
                         catch { }
                     }
@@ -5110,16 +4931,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer2Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer2Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer2Filename).Width, gv.cc.GetFromBitmapList(tile.Layer2Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer2Filename), src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer2Filename), src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
                         }
                         catch { }
                     }
@@ -5133,16 +4954,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer3Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer3Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer3Filename).Width, gv.cc.GetFromBitmapList(tile.Layer3Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer3Filename), src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer3Filename), src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
                         }
                         catch { }
                     }
@@ -5156,16 +4977,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer4Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer4Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer4Filename).Width, gv.cc.GetFromBitmapList(tile.Layer4Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer4Filename), src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer4Filename), src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale);
                         }
                         catch { }
                     }
@@ -5179,16 +5000,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer5Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer5Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer5Filename).Width, gv.cc.GetFromBitmapList(tile.Layer5Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer5Filename), src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer5Filename), src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale);
                         }
                         catch { }
                     }
@@ -5597,19 +5418,19 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.sourceBitmapName = gv.mod.moduleAreasObjects[index].sourceBitmapName;
                                     }
-                                    tile.tileBitmap1 = gv.cc.LoadBitmap(tile.Layer1Filename);
+                                    tile.tileBitmap1 = "tile.Layer1Filename);
                                     //tile.tileBitmap0 = gv.cc.LoadBitmapSubdirectory(tile.Layer0Filename, gv.mod.currentArea);
                                     gv.mod.currentArea.sourceBitmapName = backup;
 
-                                    //tile.tileBitmap1 = gv.cc.LoadBitmap(tile.Layer1Filename);
+                                    //tile.tileBitmap1 = "tile.Layer1Filename);
 
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = tile.tileBitmap1.PixelSize.Width / 100;
-                                    float scalerY = tile.tileBitmap1.PixelSize.Height / 100;
+                                    float scalerX = tile.tileBitmap1.Width / 100;
+                                    float scalerY = tile.tileBitmap1.Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, tile.tileBitmap1.PixelSize.Width, tile.tileBitmap1.PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, tile.tileBitmap1.Width, tile.tileBitmap1.Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     gv.mod.loadedTileBitmaps.Add(tile.tileBitmap1);
@@ -5619,11 +5440,11 @@ namespace IBx
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / 100;
-                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / 100;
+                                    float scalerX = gv.mod.loadedTileBitmaps[indexOfLoadedTile].Width / 100;
+                                    float scalerY = gv.mod.loadedTileBitmaps[indexOfLoadedTile].Height / 100;
                                     int brX = (int)(gv.squareSize * scalerX);
                                     int brY = (int)(gv.squareSize * scalerY);
-                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    IbRect src = new IbRect(0, 0, gv.mod.loadedTileBitmaps[indexOfLoadedTile].Width, gv.mod.loadedTileBitmaps[indexOfLoadedTile].Height);
                                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
 
                                     gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst);
@@ -5660,16 +5481,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer1Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer1Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer1Filename).Width, gv.cc.GetFromBitmapList(tile.Layer1Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer1Filename), src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer1Filename), src, dst, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
                         }
                         catch { }
                     }
@@ -5683,16 +5504,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer2Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer2Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer2Filename).Width, gv.cc.GetFromBitmapList(tile.Layer2Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer2Filename), src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer2Filename), src, dst, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
                         }
                         catch { }
                     }
@@ -5706,16 +5527,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer3Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer3Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer3Filename).Width, gv.cc.GetFromBitmapList(tile.Layer3Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer3Filename), src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer3Filename), src, dst, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
                         }
                         catch { }
                     }
@@ -5729,16 +5550,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer4Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer4Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer4Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer4Filename).Width, gv.cc.GetFromBitmapList(tile.Layer4Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer4Filename), src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer4Filename), src, dst, tile.Layer4Rotate, tile.Layer4Mirror, tile.Layer4Xshift, tile.Layer4Yshift, tile.Layer4Xscale, tile.Layer4Yscale);
                         }
                         catch { }
                     }
@@ -5752,16 +5573,16 @@ namespace IBx
                         Tile tile = gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x];
                         int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * gv.squareSize;
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
-                        float scalerX = gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Width / 100;
-                        float scalerY = gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Height / 100;
+                        float scalerX = gv.cc.GetFromBitmapList(tile.Layer5Filename).Width / 100;
+                        float scalerY = gv.cc.GetFromBitmapList(tile.Layer5Filename).Height / 100;
                         int brX = (int)(gv.squareSize * scalerX);
                         int brY = (int)(gv.squareSize * scalerY);
 
                         try
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Width, gv.cc.GetFromTileBitmapList(tile.Layer5Filename).PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(tile.Layer5Filename).Width, gv.cc.GetFromBitmapList(tile.Layer5Filename).Height);
                             IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer5Filename), src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer5Filename), src, dst, tile.Layer5Rotate, tile.Layer5Mirror, tile.Layer5Xshift, tile.Layer5Yshift, tile.Layer5Xscale, tile.Layer5Yscale);
                         }
                         catch { }
                     }
@@ -5950,7 +5771,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer1) && (gv.mod.currentArea.FullScreenEffectLayer1IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive1))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect1);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect1);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -6392,18 +6213,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter1 = 1;
                             }
                         }
-                        fullScreenEffect1 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName1 + gv.mod.currentArea.changeFrameCounter1.ToString());
+                        fullScreenEffect1 = gv.mod.currentArea.fullScreenEffectLayerName1 + gv.mod.currentArea.changeFrameCounter1.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect1 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName1);
+                        fullScreenEffect1 = gv.mod.currentArea.fullScreenEffectLayerName1;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect1.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect1).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX1;
@@ -6822,7 +6643,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -6838,7 +6659,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -6854,7 +6675,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -6871,7 +6692,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -6899,7 +6720,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -6915,7 +6736,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -6942,7 +6763,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -6959,7 +6780,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -6991,7 +6812,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -7017,7 +6838,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer2) && (gv.mod.currentArea.FullScreenEffectLayer2IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive2))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect2);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect2);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -7458,18 +7279,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter2 = 1;
                             }
                         }
-                        fullScreenEffect2 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName2 + gv.mod.currentArea.changeFrameCounter2.ToString());
+                        fullScreenEffect2 = gv.mod.currentArea.fullScreenEffectLayerName2 + gv.mod.currentArea.changeFrameCounter2.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect2 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName2);
+                        fullScreenEffect2 = gv.mod.currentArea.fullScreenEffectLayerName2;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect2.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect2).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX2;
@@ -7885,7 +7706,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -7901,7 +7722,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -7917,7 +7738,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -7934,7 +7755,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -7962,7 +7783,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -7978,7 +7799,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -8005,7 +7826,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -8022,7 +7843,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -8053,7 +7874,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -8078,7 +7899,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer3) && (gv.mod.currentArea.FullScreenEffectLayer3IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive3))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect3);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect3);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -8520,18 +8341,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter3 = 1;
                             }
                         }
-                        fullScreenEffect3 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName3 + gv.mod.currentArea.changeFrameCounter3.ToString());
+                        fullScreenEffect3 = gv.mod.currentArea.fullScreenEffectLayerName3 + gv.mod.currentArea.changeFrameCounter3.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect3 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName3);
+                        fullScreenEffect3 = gv.mod.currentArea.fullScreenEffectLayerName3;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect3.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect3).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX3;
@@ -8947,7 +8768,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -8963,7 +8784,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -8979,7 +8800,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -8996,7 +8817,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -9024,7 +8845,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -9040,7 +8861,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -9067,7 +8888,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -9084,7 +8905,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -9115,7 +8936,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -9141,7 +8962,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer4) && (gv.mod.currentArea.FullScreenEffectLayer4IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive4))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect4);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect4);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -9584,18 +9405,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter4 = 1;
                             }
                         }
-                        fullScreenEffect4 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName4 + gv.mod.currentArea.changeFrameCounter4.ToString());
+                        fullScreenEffect4 = gv.mod.currentArea.fullScreenEffectLayerName4 + gv.mod.currentArea.changeFrameCounter4.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect4 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName4);
+                        fullScreenEffect4 = gv.mod.currentArea.fullScreenEffectLayerName4;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect4.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect4).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX4;
@@ -10011,7 +9832,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10027,7 +9848,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10043,7 +9864,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10060,7 +9881,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10088,7 +9909,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10104,7 +9925,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -10131,7 +9952,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10148,7 +9969,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -10179,7 +10000,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -10205,7 +10026,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer5) && (gv.mod.currentArea.FullScreenEffectLayer5IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive5) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect5);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect5);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -10652,18 +10473,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter5 = 1;
                             }
                         }
-                        fullScreenEffect5 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName5 + gv.mod.currentArea.changeFrameCounter5.ToString());
+                        fullScreenEffect5 = gv.mod.currentArea.fullScreenEffectLayerName5 + gv.mod.currentArea.changeFrameCounter5.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect5 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName5);
+                        fullScreenEffect5 = gv.mod.currentArea.fullScreenEffectLayerName5;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect5.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect5).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX5;
@@ -11079,7 +10900,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11095,7 +10916,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11111,7 +10932,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11128,7 +10949,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11156,7 +10977,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11172,7 +10993,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -11199,7 +11020,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11216,7 +11037,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -11247,7 +11068,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -11273,7 +11094,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer6) && (gv.mod.currentArea.FullScreenEffectLayer6IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive6) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect6);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect6);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -11719,18 +11540,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter6 = 1;
                             }
                         }
-                        fullScreenEffect6 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName6 + gv.mod.currentArea.changeFrameCounter6.ToString());
+                        fullScreenEffect6 = gv.mod.currentArea.fullScreenEffectLayerName6 + gv.mod.currentArea.changeFrameCounter6.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect6 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName6);
+                        fullScreenEffect6 = gv.mod.currentArea.fullScreenEffectLayerName6;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect6.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect6).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX6;
@@ -12146,7 +11967,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12162,7 +11983,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12178,7 +11999,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12195,7 +12016,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12223,7 +12044,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12239,7 +12060,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -12266,7 +12087,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12283,7 +12104,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -12313,7 +12134,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -12338,7 +12159,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer7) && (gv.mod.currentArea.FullScreenEffectLayer7IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive7) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect7);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect7);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -12784,18 +12605,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter7 = 1;
                             }
                         }
-                        fullScreenEffect7 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName7 + gv.mod.currentArea.changeFrameCounter7.ToString());
+                        fullScreenEffect7 = gv.mod.currentArea.fullScreenEffectLayerName7 + gv.mod.currentArea.changeFrameCounter7.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect7 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName7);
+                        fullScreenEffect7 = gv.mod.currentArea.fullScreenEffectLayerName7;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect7.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect7).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX7;
@@ -13211,7 +13032,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13227,7 +13048,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13243,7 +13064,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13260,7 +13081,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13288,7 +13109,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13304,7 +13125,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -13331,7 +13152,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13348,7 +13169,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -13379,7 +13200,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -13405,7 +13226,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer8) && (gv.mod.currentArea.FullScreenEffectLayer8IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive8) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect8);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect8);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -13852,18 +13673,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter8 = 1;
                             }
                         }
-                        fullScreenEffect8 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName8 + gv.mod.currentArea.changeFrameCounter8.ToString());
+                        fullScreenEffect8 = gv.mod.currentArea.fullScreenEffectLayerName8 + gv.mod.currentArea.changeFrameCounter8.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect8 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName8);
+                        fullScreenEffect8 = gv.mod.currentArea.fullScreenEffectLayerName8;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect8.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect8).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX8;
@@ -14279,7 +14100,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14295,7 +14116,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14311,7 +14132,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14328,7 +14149,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14356,7 +14177,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14372,7 +14193,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -14399,7 +14220,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14416,7 +14237,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -14446,7 +14267,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -14471,7 +14292,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer9) && (gv.mod.currentArea.FullScreenEffectLayer9IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive9) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect9);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect9);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -14918,18 +14739,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter9 = 1;
                             }
                         }
-                        fullScreenEffect9 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName9 + gv.mod.currentArea.changeFrameCounter9.ToString());
+                        fullScreenEffect9 = gv.mod.currentArea.fullScreenEffectLayerName9 + gv.mod.currentArea.changeFrameCounter9.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect9 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName9);
+                        fullScreenEffect9 = gv.mod.currentArea.fullScreenEffectLayerName9;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect9.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect9).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX9;
@@ -15345,7 +15166,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15361,7 +15182,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15377,7 +15198,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15394,7 +15215,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15422,7 +15243,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15438,7 +15259,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -15465,7 +15286,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15482,7 +15303,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -15514,7 +15335,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -15539,7 +15360,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer10) && (gv.mod.currentArea.FullScreenEffectLayer10IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive10) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect10);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect10);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -15986,18 +15807,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter10 = 1;
                             }
                         }
-                        fullScreenEffect10 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName10 + gv.mod.currentArea.changeFrameCounter10.ToString());
+                        fullScreenEffect10 = gv.mod.currentArea.fullScreenEffectLayerName10 + gv.mod.currentArea.changeFrameCounter10.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect10 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName10);
+                        fullScreenEffect10 = gv.mod.currentArea.fullScreenEffectLayerName10;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect10.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect10).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX10;
@@ -16413,7 +16234,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16429,7 +16250,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16445,7 +16266,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16462,7 +16283,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16490,7 +16311,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16506,7 +16327,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -16533,7 +16354,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16550,7 +16371,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -16582,7 +16403,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -16777,7 +16598,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer1) && (!gv.mod.currentArea.FullScreenEffectLayer1IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive1))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect1);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect1);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -17219,18 +17040,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter1 = 1;
                             }
                         }
-                        fullScreenEffect1 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName1 + gv.mod.currentArea.changeFrameCounter1.ToString());
+                        fullScreenEffect1 = gv.mod.currentArea.fullScreenEffectLayerName1 + gv.mod.currentArea.changeFrameCounter1.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect1 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName1);
+                        fullScreenEffect1 = gv.mod.currentArea.fullScreenEffectLayerName1;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect1.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect1).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX1;
@@ -17649,7 +17470,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17665,7 +17486,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17681,7 +17502,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17698,7 +17519,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17726,7 +17547,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17742,7 +17563,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -17769,7 +17590,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17786,7 +17607,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -17818,7 +17639,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect1, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect1), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -17844,7 +17665,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer2) && (!gv.mod.currentArea.FullScreenEffectLayer2IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive2))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect2);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect2);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -18285,18 +18106,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter2 = 1;
                             }
                         }
-                        fullScreenEffect2 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName2 + gv.mod.currentArea.changeFrameCounter2.ToString());
+                        fullScreenEffect2 = gv.mod.currentArea.fullScreenEffectLayerName2 + gv.mod.currentArea.changeFrameCounter2.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect2 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName2);
+                        fullScreenEffect2 = gv.mod.currentArea.fullScreenEffectLayerName2;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect2.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect2).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX2;
@@ -18712,7 +18533,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18728,7 +18549,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18744,7 +18565,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18761,7 +18582,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18789,7 +18610,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18805,7 +18626,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -18832,7 +18653,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18849,7 +18670,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -18880,7 +18701,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -18905,7 +18726,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer3) && (!gv.mod.currentArea.FullScreenEffectLayer3IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive3))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect3);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect3);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -19347,18 +19168,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter3 = 1;
                             }
                         }
-                        fullScreenEffect3 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName3 + gv.mod.currentArea.changeFrameCounter3.ToString());
+                        fullScreenEffect3 = gv.mod.currentArea.fullScreenEffectLayerName3 + gv.mod.currentArea.changeFrameCounter3.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect3 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName3);
+                        fullScreenEffect3 = gv.mod.currentArea.fullScreenEffectLayerName3;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect3.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect3).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX3;
@@ -19774,7 +19595,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19790,7 +19611,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19806,7 +19627,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19823,7 +19644,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19851,7 +19672,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19867,7 +19688,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -19894,7 +19715,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19911,7 +19732,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -19942,7 +19763,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect3, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect3), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -19968,7 +19789,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer4) && (!gv.mod.currentArea.FullScreenEffectLayer4IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive4))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect4);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect4);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -20411,18 +20232,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter4 = 1;
                             }
                         }
-                        fullScreenEffect4 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName4 + gv.mod.currentArea.changeFrameCounter4.ToString());
+                        fullScreenEffect4 = gv.mod.currentArea.fullScreenEffectLayerName4 + gv.mod.currentArea.changeFrameCounter4.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect4 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName4);
+                        fullScreenEffect4 = gv.mod.currentArea.fullScreenEffectLayerName4;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect4.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect4).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX4;
@@ -20838,7 +20659,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -20854,7 +20675,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -20870,7 +20691,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -20887,7 +20708,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -20915,7 +20736,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -20931,7 +20752,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -20958,7 +20779,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -20975,7 +20796,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect2, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect2), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -21006,7 +20827,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect4, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect4), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -21032,7 +20853,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer5) && (!gv.mod.currentArea.FullScreenEffectLayer5IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive5) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect5);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect5);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -21479,18 +21300,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter5 = 1;
                             }
                         }
-                        fullScreenEffect5 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName5 + gv.mod.currentArea.changeFrameCounter5.ToString());
+                        fullScreenEffect5 = gv.mod.currentArea.fullScreenEffectLayerName5 + gv.mod.currentArea.changeFrameCounter5.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect5 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName5);
+                        fullScreenEffect5 = gv.mod.currentArea.fullScreenEffectLayerName5;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect5.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect5).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX5;
@@ -21906,7 +21727,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -21922,7 +21743,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -21938,7 +21759,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -21955,7 +21776,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -21983,7 +21804,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -21999,7 +21820,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -22026,7 +21847,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -22043,7 +21864,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -22074,7 +21895,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect5, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect5), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -22100,7 +21921,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer6) && (!gv.mod.currentArea.FullScreenEffectLayer6IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive6) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect6);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect6);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -22546,18 +22367,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter6 = 1;
                             }
                         }
-                        fullScreenEffect6 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName6 + gv.mod.currentArea.changeFrameCounter6.ToString());
+                        fullScreenEffect6 = gv.mod.currentArea.fullScreenEffectLayerName6 + gv.mod.currentArea.changeFrameCounter6.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect6 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName6);
+                        fullScreenEffect6 = gv.mod.currentArea.fullScreenEffectLayerName6;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect6.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect6).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX6;
@@ -22973,7 +22794,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -22989,7 +22810,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -23005,7 +22826,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -23022,7 +22843,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -23050,7 +22871,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -23066,7 +22887,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -23093,7 +22914,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -23110,7 +22931,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -23140,7 +22961,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect6, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect6), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -23165,7 +22986,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer7) && (!gv.mod.currentArea.FullScreenEffectLayer7IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive7) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect7);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect7);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -23611,18 +23432,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter7 = 1;
                             }
                         }
-                        fullScreenEffect7 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName7 + gv.mod.currentArea.changeFrameCounter7.ToString());
+                        fullScreenEffect7 = gv.mod.currentArea.fullScreenEffectLayerName7 + gv.mod.currentArea.changeFrameCounter7.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect7 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName7);
+                        fullScreenEffect7 = gv.mod.currentArea.fullScreenEffectLayerName7;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect7.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect7).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX7;
@@ -24038,7 +23859,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24054,7 +23875,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24070,7 +23891,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24087,7 +23908,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24115,7 +23936,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24131,7 +23952,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -24158,7 +23979,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24175,7 +23996,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -24206,7 +24027,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect7, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect7), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -24232,7 +24053,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer8) && (!gv.mod.currentArea.FullScreenEffectLayer8IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive8) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect8);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect8);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -24679,18 +24500,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter8 = 1;
                             }
                         }
-                        fullScreenEffect8 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName8 + gv.mod.currentArea.changeFrameCounter8.ToString());
+                        fullScreenEffect8 = gv.mod.currentArea.fullScreenEffectLayerName8 + gv.mod.currentArea.changeFrameCounter8.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect8 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName8);
+                        fullScreenEffect8 = gv.mod.currentArea.fullScreenEffectLayerName8;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect8.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect8).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX8;
@@ -25106,7 +24927,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25122,7 +24943,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25138,7 +24959,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25155,7 +24976,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25183,7 +25004,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25199,7 +25020,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -25226,7 +25047,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25243,7 +25064,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -25273,7 +25094,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect8, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect8), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -25298,7 +25119,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer9) && (!gv.mod.currentArea.FullScreenEffectLayer9IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive9) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect9);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect9);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -25745,18 +25566,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter9 = 1;
                             }
                         }
-                        fullScreenEffect9 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName9 + gv.mod.currentArea.changeFrameCounter9.ToString());
+                        fullScreenEffect9 = gv.mod.currentArea.fullScreenEffectLayerName9 + gv.mod.currentArea.changeFrameCounter9.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect9 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName9);
+                        fullScreenEffect9 = gv.mod.currentArea.fullScreenEffectLayerName9;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect9.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect9).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX9;
@@ -26172,7 +25993,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26188,7 +26009,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26204,7 +26025,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26221,7 +26042,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26249,7 +26070,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26265,7 +26086,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -26292,7 +26113,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26309,7 +26130,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -26341,7 +26162,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect9, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect9), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -26366,7 +26187,7 @@ namespace IBx
             if ((gv.mod.currentArea.useFullScreenEffectLayer10) && (!gv.mod.currentArea.FullScreenEffectLayer10IsTop) && (gv.mod.currentArea.fullScreenEffectLayerIsActive10) && (gv.mod.currentArea.areaWeatherName != ""))
             {
 
-                gv.cc.DisposeOfBitmap(ref fullScreenEffect10);
+                //gv.cc.DisposeOfBitmap(ref fullScreenEffect10);
 
                 //these replace the normal, linear scroll in direction of vector x,y pattern
                 //in the toolset different values for overrides can be set than the defaults they come with
@@ -26813,18 +26634,18 @@ namespace IBx
                                 gv.mod.currentArea.changeFrameCounter10 = 1;
                             }
                         }
-                        fullScreenEffect10 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName10 + gv.mod.currentArea.changeFrameCounter10.ToString());
+                        fullScreenEffect10 = gv.mod.currentArea.fullScreenEffectLayerName10 + gv.mod.currentArea.changeFrameCounter10.ToString();
                     }
                     #endregion
 
                     else
                     {
-                        fullScreenEffect10 = gv.cc.LoadBitmap(gv.mod.currentArea.fullScreenEffectLayerName10);
+                        fullScreenEffect10 = gv.mod.currentArea.fullScreenEffectLayerName10;
                     }
 
                     #region handle framecounter
                     //assuming a square shaped source here
-                    float sizeOfWholeSource = fullScreenEffect10.PixelSize.Width;
+                    float sizeOfWholeSource = gv.cc.GetFromBitmapList(fullScreenEffect10).Width;
 
                     //reading the frames moved and added up in the last seconds
                     float pixShiftOnThisFrameX = gv.mod.currentArea.fullScreenAnimationFrameCounterX10;
@@ -27240,7 +27061,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27256,7 +27077,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * dstScalerX)), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27272,7 +27093,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldHeight, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27289,7 +27110,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY + oldHeight, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27317,7 +27138,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27333,7 +27154,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels + oldWidth, tlY, (brX - (brX * (dstScalerX))), (brY * (dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -27360,7 +27181,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, (brX * dstScalerX), (brY * dstScalerY));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27377,7 +27198,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, availableLengthX, availableLengthY);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY + oldLength, (brX * dstScalerX), (brY - (brY * dstScalerY)));
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
                                     continue;
@@ -27409,7 +27230,7 @@ namespace IBx
                                     {
                                         IbRectF src = new IbRectF(srcCoordX2, srcCoordY2, sizeOfSourceChunk2X, sizeOfSourceChunk2Y);
                                         IbRectF dst = new IbRectF(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
-                                        gv.DrawBitmap(fullScreenEffect10, src, dst, false, fullScreenEffectOpacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fullScreenEffect10), src, dst, false, fullScreenEffectOpacity);
                                     }
                                     catch { }
 
@@ -27429,8 +27250,8 @@ namespace IBx
 
         public void drawMap()
         {
-            int bmpWidth = gv.cc.bmpMap.PixelSize.Width;
-            int bmpHeight = gv.cc.bmpMap.PixelSize.Height;
+            int bmpWidth = gv.cc.bmpMap.Width;
+            int bmpHeight = gv.cc.bmpMap.Height;
             int dstX = (gv.playerOffsetX - gv.mod.PlayerLocationX) * gv.squareSize;
             int dstY = (gv.playerOffsetY - gv.mod.PlayerLocationY) * gv.squareSize;
             int dstWidth = (int)(bmpWidth * 2 * gv.screenDensity); //assumes squares are 50x50 in this image
@@ -27713,7 +27534,7 @@ namespace IBx
                             //}
                             //catch { }
 
-                            //p.token = gv.cc.LoadBitmap(p.ImageFileName);
+                            //p.token = "p.ImageFileName);
 
                             try
                             {
@@ -27722,7 +27543,7 @@ namespace IBx
                                 //int indexOfLoadedTile = -1;
                                 for (int j = 0; j < gv.mod.loadedTileBitmapsNames.Count; j++)
                                 {
-                                    if ((gv.mod.loadedTileBitmapsNames[j] == p.ImageFileName) && (!gv.mod.loadedTileBitmaps[j].IsDisposed))
+                                    if (gv.mod.loadedTileBitmapsNames[j] == p.ImageFileName)
                                     {
                                         tileBitmapIsLoadedAlready = true;
                                         indexOfLoadedTile = j;
@@ -27734,9 +27555,8 @@ namespace IBx
                                 if (!tileBitmapIsLoadedAlready)
                                 {
                                     gv.mod.loadedTileBitmapsNames.Add(p.ImageFileName);
-                                    p.token = gv.cc.LoadBitmap(p.ImageFileName);
-                                    gv.mod.loadedTileBitmaps.Add(p.token);
-                                    indexOfLoadedTile = gv.mod.loadedTileBitmaps.Count - 1;
+                                    //gv.mod.loadedTileBitmaps.Add(p.token);
+                                    indexOfLoadedTile = gv.mod.loadedTileBitmapsNames.Count - 1;
 
                                 }
                             }
@@ -27866,8 +27686,8 @@ namespace IBx
                              //get dst rct based on distance of prop to  palyer
                                 int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                                 int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                                int dstW = (int)((((float)gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                                int dstH = (int)((((float)(gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstW = (int)((((float)gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstH = (int)((((float)(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                                 int dstXshift = (dstW - gv.squareSize) / 2;
                                 int dstYshift = (dstH - gv.squareSize) / 2;
                                 int framePosition = p.currentFrameNumber;
@@ -27875,7 +27695,7 @@ namespace IBx
                                 {
                                     framePosition = (p.maxNumberOfFrames-1) - p.currentFrameNumber;
                                 }
-                                IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, p.propFrameHeight);
+                                IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, p.propFrameHeight);
                                 IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
 
                                 //adjust size of props
@@ -27891,7 +27711,7 @@ namespace IBx
                                 //draw the prop
                                 if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                                 {
-                                    gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, !p.PropFacingLeft, p.opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, !p.PropFacingLeft, p.opacity);
                                 }
 
                                 //for shwoign whetehr prop is encounte,r optional or mandatory conversation
@@ -27899,28 +27719,28 @@ namespace IBx
                                 {//6
                                     if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "encounter_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (p.unavoidableConversation)
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "mandatory_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "optional_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
                                 }//6
@@ -27939,7 +27759,7 @@ namespace IBx
                 foreach (Prop p in gv.mod.currentArea.Props)
                 {//3
                  //only for on-movers (the movers use drawMovingProps below)
-                    if ((p.isShown) && (!p.isMover) && (p.token != null))
+                    if ((p.isShown) && (!p.isMover))
                     {//4
 
                         //distance check
@@ -27950,17 +27770,17 @@ namespace IBx
                          //get dst rct based on distance of prop to  palyer
                             int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                             int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                            int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                            int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                             int dstXshift = (dstW - gv.squareSize) / 2;
                             int dstYshift = (dstH - gv.squareSize) / 2;
-                            //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
+                            //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
                             int framePosition = p.currentFrameNumber;
                             if (p.inverseAnimationDirection)
                             {
                                 framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                             }
-                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
+                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
                             IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
 
                             //adjust size of props
@@ -27976,7 +27796,7 @@ namespace IBx
                             //draw the prop
                             if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                             {
-                                gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                             }
 
                             //for shwoign whetehr prop is encounte,r optional or mandatory conversation
@@ -27984,28 +27804,28 @@ namespace IBx
                             {//6
                                 if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "encounter_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (p.unavoidableConversation)
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "mandatory_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "optional_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
                             }//6
@@ -28027,17 +27847,17 @@ namespace IBx
                             //prop X - playerX
                             int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                             int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                            int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                            int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                             int dstXshift = (dstW - gv.squareSize) / 2;
                             int dstYshift = (dstH - gv.squareSize) / 2;
-                            //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
+                            //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
                             int framePosition = p.currentFrameNumber;
                             if (p.inverseAnimationDirection)
                             {
                                 framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                             }
-                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
+                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
                             IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
 
                             if (gv.mod.currentArea.useSuperTinyProps)
@@ -28050,35 +27870,35 @@ namespace IBx
                             }
                             if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                             {
-                                gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                             }
 
                             if (gv.mod.showInteractionState == true)
                             {
                                 if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "encounter_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (p.unavoidableConversation)
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "mandatory_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "optional_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
                             }
@@ -28351,7 +28171,7 @@ namespace IBx
                                 //}
                                 //catch { }
 
-                                //p.token = gv.cc.LoadBitmap(p.ImageFileName);
+                                //p.token = "p.ImageFileName);
 
                                 try
                                 {
@@ -28360,7 +28180,7 @@ namespace IBx
                                     //int indexOfLoadedTile = -1;
                                     for (int j = 0; j < gv.mod.loadedTileBitmapsNames.Count; j++)
                                     {
-                                        if ((gv.mod.loadedTileBitmapsNames[j] == p.ImageFileName) && (!gv.mod.loadedTileBitmaps[j].IsDisposed))
+                                        if ((gv.mod.loadedTileBitmapsNames[j] == p.ImageFileName))
                                         {
                                             tileBitmapIsLoadedAlready = true;
                                             indexOfLoadedTile = j;
@@ -28372,9 +28192,9 @@ namespace IBx
                                     if (!tileBitmapIsLoadedAlready)
                                     {
                                         gv.mod.loadedTileBitmapsNames.Add(p.ImageFileName);
-                                        p.token = gv.cc.LoadBitmap(p.ImageFileName);
-                                        gv.mod.loadedTileBitmaps.Add(p.token);
-                                        indexOfLoadedTile = gv.mod.loadedTileBitmaps.Count - 1;
+                                        //p.token = "p.ImageFileName);
+                                        //gv.mod.loadedTileBitmaps.Add(p.token);
+                                        indexOfLoadedTile = gv.mod.loadedTileBitmapsNames.Count - 1;
 
                                     }
                                 }
@@ -28504,8 +28324,8 @@ namespace IBx
                                  //get dst rct based on distance of prop to  palyer
                                     int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                                     int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                                    int dstW = (int)((((float)gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                                    int dstH = (int)((((float)(gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                    int dstW = (int)((((float)gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                    int dstH = (int)((((float)(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                                     int dstXshift = (dstW - gv.squareSize) / 2;
                                     int dstYshift = (dstH - gv.squareSize) / 2;
                                     int framePosition = p.currentFrameNumber;
@@ -28513,7 +28333,7 @@ namespace IBx
                                     {
                                         framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                                     }
-                                    IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, p.propFrameHeight);
+                                    IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width, p.propFrameHeight);
                                     IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
 
                                     //adjust size of props
@@ -28529,7 +28349,7 @@ namespace IBx
                                     //draw the prop
                                     if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                                     {
-                                        gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], src, dst, !p.PropFacingLeft, p.opacity);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), src, dst, !p.PropFacingLeft, p.opacity);
                                     }
 
                                     //for shwoign whetehr prop is encounte,r optional or mandatory conversation
@@ -28537,28 +28357,28 @@ namespace IBx
                                     {//6
                                         if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                         {
-                                            Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                            src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                            gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                            gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                            string interactionStateIndicator = "encounter_indicator";
+                                            src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                            //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                             continue;
                                         }
 
                                         if (p.unavoidableConversation)
                                         {
-                                            Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                            src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                            gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                            gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                            string interactionStateIndicator = "mandatory_conversation_indicator";
+                                            src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                            //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                             continue;
                                         }
 
                                         if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                         {
-                                            Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                            src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                            gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                            gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                            string interactionStateIndicator = "optional_conversation_indicator";
+                                            src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                            gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                            //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                             continue;
                                         }
                                     }//6
@@ -28577,7 +28397,7 @@ namespace IBx
                     foreach (Prop p in gv.mod.currentArea.Props)
                     {//3
                      //only for on-movers (the movers use drawMovingProps below)
-                        if ((p.isShown) && (!p.isMover) && (p.token != null))
+                        if ((p.isShown) && (!p.isMover))
                         {//4
 
                             //distance check
@@ -28588,17 +28408,17 @@ namespace IBx
                              //get dst rct based on distance of prop to  palyer
                                 int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                                 int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                                int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                                int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                                 int dstXshift = (dstW - gv.squareSize) / 2;
                                 int dstYshift = (dstH - gv.squareSize) / 2;
-                                //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
+                                //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
                                 int framePosition = p.currentFrameNumber;
                                 if (p.inverseAnimationDirection)
                                 {
                                     framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                                 }
-                                IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
+                                IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
                                 IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
 
                                 //adjust size of props
@@ -28614,7 +28434,7 @@ namespace IBx
                                 //draw the prop
                                 if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                                 {
-                                    gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                                 }
 
                                 //for shwoign whetehr prop is encounte,r optional or mandatory conversation
@@ -28622,28 +28442,28 @@ namespace IBx
                                 {//6
                                     if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "encounter_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (p.unavoidableConversation)
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "mandatory_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "optional_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
                                 }//6
@@ -28665,17 +28485,17 @@ namespace IBx
                                 //prop X - playerX
                                 int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                                 int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                                int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                                int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                                 int dstXshift = (dstW - gv.squareSize) / 2;
                                 int dstYshift = (dstH - gv.squareSize) / 2;
-                                //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
+                                //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
                                 int framePosition = p.currentFrameNumber;
                                 if (p.inverseAnimationDirection)
                                 {
                                     framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                                 }
-                                IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
+                                IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
                                 IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
 
                                 if (gv.mod.currentArea.useSuperTinyProps)
@@ -28688,35 +28508,35 @@ namespace IBx
                                 }
                                 if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                                 {
-                                    gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                                 }
 
                                 if (gv.mod.showInteractionState == true)
                                 {
                                     if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "encounter_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (p.unavoidableConversation)
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "mandatory_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "optional_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
                                 }
@@ -28739,15 +28559,15 @@ namespace IBx
                         if ((p.LocationX + 1 >= gv.mod.PlayerLocationX - gv.playerOffsetX) && (p.LocationX - 1 <= gv.mod.PlayerLocationX + gv.playerOffsetX)
                             && (p.LocationY + 1 >= gv.mod.PlayerLocationY - gv.playerOffsetY) && (p.LocationY - 1 <= gv.mod.PlayerLocationY + gv.playerOffsetY))
                         {
-                            //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
-                            //float xDimension = p.token.PixelSize.Width * p.sizeFactor;
+                            //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
+                            //float xDimension = p.token.Width * p.sizeFactor;
                             //float yDimension = p.propFrameHeight * p.sizeFactor;
                             int framePosition = p.currentFrameNumber;
                             if (p.inverseAnimationDirection)
                             {
                                 framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                             }
-                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
+                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
                             if (p.destinationPixelPositionXList.Count > 0)
                             {
                                 if ((p.destinationPixelPositionXList[0] >= (p.currentPixelPositionX - 0)) && (p.destinationPixelPositionXList[0] <= (p.currentPixelPositionX + 0)))
@@ -28852,8 +28672,8 @@ namespace IBx
 
                             if ((pixDistanceOfPropToPlayerX <= ((gv.playerOffsetX + 1) * gv.squareSize)) && (pixDistanceOfPropToPlayerY <= ((gv.playerOffsetY + 1) * gv.squareSize)))
                             {
-                                int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                                int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                                 int dstXshift = (dstW - gv.squareSize) / 2;
                                 int dstYshift = (dstH - gv.squareSize) / 2;
 
@@ -28960,35 +28780,35 @@ namespace IBx
 
                                 if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                                 {
-                                    gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                                 }
 
                                 if (gv.mod.showInteractionState == true)
                                 {
                                     if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "encounter_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (p.unavoidableConversation)
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "mandatory_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "optional_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
                                 }
@@ -29037,8 +28857,8 @@ namespace IBx
                             //prop X - playerX
                             int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                             int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                            int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                            int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                             int dstXshift = (dstW - gv.squareSize) / 2;
                             int dstYshift = (dstH - gv.squareSize) / 2;
                             int framePosition = p.currentFrameNumber;
@@ -29046,40 +28866,40 @@ namespace IBx
                             {
                                 framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                             }
-                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
-                            //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
+                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
+                            //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
                             IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
                             if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                             {
-                                gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                             }
 
                             if (gv.mod.showInteractionState)
                             {
                                 if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "encounter_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (p.unavoidableConversation)
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "mandatory_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "optional_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
                             }
@@ -29127,15 +28947,15 @@ namespace IBx
                         if ((p.LocationX + 1 >= gv.mod.PlayerLocationX - gv.playerOffsetX) && (p.LocationX - 1 <= gv.mod.PlayerLocationX + gv.playerOffsetX)
                             && (p.LocationY + 1 >= gv.mod.PlayerLocationY - gv.playerOffsetY) && (p.LocationY - 1 <= gv.mod.PlayerLocationY + gv.playerOffsetY))
                         {
-                            //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
-                            //float xDimension = p.token.PixelSize.Width * p.sizeFactor;
+                            //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
+                            //float xDimension = p.token.Width * p.sizeFactor;
                             //float yDimension = p.propFrameHeight * p.sizeFactor;
                             int framePosition = p.currentFrameNumber;
                             if (p.inverseAnimationDirection)
                             {
                                 framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                             }
-                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
+                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
                             if (p.destinationPixelPositionXList.Count > 0)
                             {
                                 if ((p.destinationPixelPositionXList[0] >= (p.currentPixelPositionX - 0)) && (p.destinationPixelPositionXList[0] <= (p.currentPixelPositionX + 0)))
@@ -29240,8 +29060,8 @@ namespace IBx
 
                             if ((pixDistanceOfPropToPlayerX <= ((gv.playerOffsetX + 1) * gv.squareSize)) && (pixDistanceOfPropToPlayerY <= ((gv.playerOffsetY + 1) * gv.squareSize)))
                             {
-                                int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                                int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                                int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                                 int dstXshift = (dstW - gv.squareSize) / 2;
                                 int dstYshift = (dstH - gv.squareSize) / 2;
 
@@ -29348,35 +29168,35 @@ namespace IBx
 
                                 if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                                 {
-                                    gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                                 }
 
                                 if (gv.mod.showInteractionState == true)
                                 {
                                     if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "encounter_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (p.unavoidableConversation)
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "mandatory_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
 
                                     if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                     {
-                                        Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                        src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                        gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                        gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                        string interactionStateIndicator = "optional_conversation_indicator";
+                                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                        //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                         continue;
                                     }
                                 }
@@ -29425,8 +29245,8 @@ namespace IBx
                             //prop X - playerX
                             int x = ((p.LocationX - gv.mod.PlayerLocationX) * gv.squareSize) + (gv.playerOffsetX * gv.squareSize);
                             int y = ((p.LocationY - gv.mod.PlayerLocationY) * gv.squareSize) + (gv.playerOffsetY * gv.squareSize);
-                            int dstW = (int)((((float)p.token.PixelSize.Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
-                            int dstH = (int)((((float)(p.token.PixelSize.Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstW = (int)((((float)gv.cc.GetFromBitmapList(p.ImageFileName).Width / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
+                            int dstH = (int)((((float)(gv.cc.GetFromBitmapList(p.ImageFileName).Height / p.maxNumberOfFrames) / (float)gv.squareSizeInPixels) * (float)gv.squareSize) * (p.sizeFactor / 100f));
                             int dstXshift = (dstW - gv.squareSize) / 2;
                             int dstYshift = (dstH - gv.squareSize) / 2;
                             int framePosition = p.currentFrameNumber;
@@ -29434,40 +29254,40 @@ namespace IBx
                             {
                                 framePosition = (p.maxNumberOfFrames - 1) - p.currentFrameNumber;
                             }
-                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, p.token.PixelSize.Width, p.propFrameHeight);
-                            //IbRect src = new IbRect(0, 0, p.token.PixelSize.Width, p.token.PixelSize.Width);
+                            IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.cc.GetFromBitmapList(p.ImageFileName).Width, p.propFrameHeight);
+                            //IbRect src = new IbRect(0, 0, p.token.Width, p.token.Width);
                             IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
                             if ((p.maxNumberOfFrames == 1) || (p.drawAnimatedProp))
                             {
-                                gv.DrawBitmap(p.token, src, dst, !p.PropFacingLeft, p.opacity);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(p.ImageFileName), src, dst, !p.PropFacingLeft, p.opacity);
                             }
 
                             if (gv.mod.showInteractionState)
                             {
                                 if (!p.EncounterWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("encounter_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "encounter_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (p.unavoidableConversation)
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("mandatory_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "mandatory_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
 
                                 if (!p.ConversationWhenOnPartySquare.Equals("none"))
                                 {
-                                    Bitmap interactionStateIndicator = gv.cc.LoadBitmap("optional_conversation_indicator");
-                                    src = new IbRect(0, 0, interactionStateIndicator.PixelSize.Width, interactionStateIndicator.PixelSize.Height);
-                                    gv.DrawBitmap(interactionStateIndicator, src, dst);
-                                    gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
+                                    string interactionStateIndicator = "optional_conversation_indicator";
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(interactionStateIndicator).Width, gv.cc.GetFromBitmapList(interactionStateIndicator).Height);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(interactionStateIndicator), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref interactionStateIndicator);
                                     continue;
                                 }
                             }
@@ -29500,9 +29320,9 @@ namespace IBx
                 */
                 //draw minimap
                 if (minimap == null) { resetMiniMapBitmap(); }
-                IbRect src = new IbRect(0, 0, minimap.PixelSize.Width, minimap.PixelSize.Height);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(minimap).Width, gv.cc.GetFromBitmapList(minimap).Height);
                 IbRect dst = new IbRect(pW, pH, drawW, drawH);
-                gv.DrawBitmap(minimap, src, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(minimap), src, dst);
 
                 //draw Fog of War
                 if (gv.mod.currentArea.UseMiniMapFogOfWar)
@@ -29513,7 +29333,7 @@ namespace IBx
                         {
                             int xx = x * minimapSquareSizeInPixels;
                             int yy = y * minimapSquareSizeInPixels;
-                            src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                            src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                             dst = new IbRect(pW + xx, pH + yy, minimapSquareSizeInPixels, minimapSquareSizeInPixels);
                             if (!gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x].Visible)
                             {
@@ -29526,7 +29346,7 @@ namespace IBx
                 //draw a location marker square RED
                 int x2 = gv.mod.PlayerLocationX * minimapSquareSizeInPixels;
                 int y2 = gv.mod.PlayerLocationY * minimapSquareSizeInPixels;
-                src = new IbRect(0, 0, gv.cc.pc_dead.PixelSize.Width, gv.cc.pc_dead.PixelSize.Height);
+                src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Height);
                 dst = new IbRect(pW + x2, pH + y2, minimapSquareSizeInPixels, minimapSquareSizeInPixels);
                 gv.DrawBitmap(gv.cc.pc_dead, src, dst);
             }
@@ -29551,7 +29371,7 @@ namespace IBx
                 {
                     shift = (int)shift / 4;
                 }
-                IbRect src = new IbRect(0, 0, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(gv.mod.playerList[gv.mod.selectedPartyLeader].tokenFilename).Width, gv.cc.GetFromBitmapList(gv.mod.playerList[gv.mod.selectedPartyLeader].tokenFilename).Width);
                 IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels, y, gv.squareSize, gv.squareSize);
                 if (gv.mod.showPartyToken)
                 {
@@ -29585,7 +29405,7 @@ namespace IBx
                         dst.Width -= (int)(dst.Width * 3 / 4);
                     }
 
-                    gv.DrawBitmap(gv.mod.partyTokenBitmap, src, dst, !gv.mod.playerList[0].combatFacingLeft);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.partyTokenFilename), src, dst, !gv.mod.playerList[0].combatFacingLeft);
                 }
                 else
                 {
@@ -29647,7 +29467,7 @@ namespace IBx
                                     dst.Width -= (int)(dst.Width * 3 / 4);
                                 }
 
-                                gv.DrawBitmap(gv.mod.playerList[i].token, src, dst, !gv.mod.playerList[i].combatFacingLeft);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[i].tokenFilename), src, dst, !gv.mod.playerList[i].combatFacingLeft);
                             }
                             if ((i == 1) && (i != gv.mod.selectedPartyLeader))
                             {
@@ -29685,7 +29505,7 @@ namespace IBx
                                     dst.Width -= (int)(dst.Width * 3 / 4);
                                 }
 
-                                gv.DrawBitmap(gv.mod.playerList[i].token, src, dst, !gv.mod.playerList[i].combatFacingLeft);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[i].tokenFilename), src, dst, !gv.mod.playerList[i].combatFacingLeft);
                             }
                             if ((i == 2) && (i != gv.mod.selectedPartyLeader))
                             {
@@ -29740,7 +29560,7 @@ namespace IBx
                                     dst.Width -= (int)(dst.Width * 3 / 4);
                                 }
 
-                                gv.DrawBitmap(gv.mod.playerList[i].token, src, dst, !gv.mod.playerList[i].combatFacingLeft);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[i].tokenFilename), src, dst, !gv.mod.playerList[i].combatFacingLeft);
                             }
                             if ((i == 3) && (i != gv.mod.selectedPartyLeader))
                             {
@@ -29793,7 +29613,7 @@ namespace IBx
                                     dst.Width -= (int)(dst.Width * 3 / 4);
                                 }
 
-                                gv.DrawBitmap(gv.mod.playerList[i].token, src, dst, !gv.mod.playerList[i].combatFacingLeft);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[i].tokenFilename), src, dst, !gv.mod.playerList[i].combatFacingLeft);
                             }
                             if ((i == 4) && (i != gv.mod.selectedPartyLeader))
                             {
@@ -29849,7 +29669,7 @@ namespace IBx
                                     dst.Width -= (int)(dst.Width * 3 / 4);
                                 }
 
-                                gv.DrawBitmap(gv.mod.playerList[i].token, src, dst, !gv.mod.playerList[i].combatFacingLeft);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[i].tokenFilename), src, dst, !gv.mod.playerList[i].combatFacingLeft);
                             }
 
                             if ((i == 5) && (i != gv.mod.selectedPartyLeader))
@@ -29910,7 +29730,7 @@ namespace IBx
                                     dst.Width -= (int)(dst.Width * 3 / 4);
                                 }
 
-                                gv.DrawBitmap(gv.mod.playerList[i].token, src, dst, !gv.mod.playerList[i].combatFacingLeft);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[i].tokenFilename), src, dst, !gv.mod.playerList[i].combatFacingLeft);
                             }
                         }
 
@@ -30032,7 +29852,7 @@ namespace IBx
                         dst.Height -= (int)(dst.Height * 3 / 4);
                         dst.Width -= (int)(dst.Width * 3 / 4);
                     }
-                    gv.DrawBitmap(gv.mod.playerList[gv.mod.selectedPartyLeader].token, src, dst, !gv.mod.playerList[gv.mod.selectedPartyLeader].combatFacingLeft);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.playerList[gv.mod.selectedPartyLeader].tokenFilename), src, dst, !gv.mod.playerList[gv.mod.selectedPartyLeader].combatFacingLeft);
                     shift = storeShift;
                 }
             }
@@ -30058,7 +29878,7 @@ namespace IBx
                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
                     int brX = gv.squareSize;
                     int brY = gv.squareSize;
-                    IbRect src = new IbRect(0, 0, gv.cc.walkBlocked.PixelSize.Width, gv.cc.walkBlocked.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.walkBlocked.Width, gv.cc.walkBlocked.Height);
                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                     if (gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x].LoSBlocked)
                     {
@@ -30084,15 +29904,15 @@ namespace IBx
             {
                 for (int y = -2; y <= 2; y++)
                 {
-                    gv.DrawText(gv.cc.floatyText, new IbRect(gv.cc.floatyTextLoc.X + x + gv.oXshift + mapStartLocXinPixels, gv.cc.floatyTextLoc.Y + y + txtH, gv.squareSize * 2, 1000), 0.8f, Color.Black);
+                    gv.DrawText(gv.cc.floatyText, new IbRect(gv.cc.floatyTextLoc.X + x + gv.oXshift + mapStartLocXinPixels, gv.cc.floatyTextLoc.Y + y + txtH, gv.squareSize * 2, 1000), "black");
                 }
             }
             
-            gv.DrawText(gv.cc.floatyText, new IbRect(gv.cc.floatyTextLoc.X + gv.oXshift + mapStartLocXinPixels, gv.cc.floatyTextLoc.Y + txtH, gv.squareSize * 2, 1000), 0.8f, Color.White);
+            gv.DrawText(gv.cc.floatyText, new IbRect(gv.cc.floatyTextLoc.X + gv.oXshift + mapStartLocXinPixels, gv.cc.floatyTextLoc.Y + txtH, gv.squareSize * 2, 1000), "white");
         }
         public void drawOverlayTints()
         {
-            IbRect src = new IbRect(0, 0, gv.cc.tint_sunset.PixelSize.Width, gv.cc.tint_sunset.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.tint_sunset.Width, gv.cc.tint_sunset.Height);
             //IbRect dst = new IbRect(gv.oXshift + mapStartLocXinPixels, 0, (gv.squareSize * (gv.playerOffsetX * 2 + 1)), (gv.squareSize * (gv.playerOffsetY * 2 + 2)));
             IbRect dst = new IbRect(mapStartLocXinPixels-gv.oXshift, -gv.oYshift, (gv.squareSize * (gv.playerOffsetX * 2 + 1))+ 2*gv.oXshift + gv.pS, (gv.squareSize * (gv.playerOffsetY * 2 + 2)) + gv.pS);
 
@@ -30173,7 +29993,7 @@ namespace IBx
             //part that scrolls out of lower screen border appears again at top screen border
             //second memo to self: in game settings implement several speed settings for animation speed (pixel move per call multiplier) so that players can adjust prop anim and weatehr anim speed themselves
             //third memo to self: descripe current weather type next to current time in the game ui
-            IbRect src = new IbRect(0, 0, gv.cc.tint_rain.PixelSize.Width, gv.cc.tint_rain.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.tint_rain.Width, gv.cc.tint_rain.Height);
             IbRect dst = new IbRect(gv.oXshift + mapStartLocXinPixels, 0, (gv.squareSize * 9), (gv.squareSize * 9));
             int dawn = 5 * 60;
             int sunrise = 6 * 60;
@@ -30242,50 +30062,50 @@ namespace IBx
                     {
                         if (gv.mod.partyLightOn)
                         {
-                            gv.DrawText(hour + ":" + sMinute +", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 600, 100), 1.0f, Color.Black);
+                            gv.DrawText(hour + ":" + sMinute +", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 600, 100), "black");
                             if ((gv.mod.currentArea.inGameAreaName != "") && (gv.mod.currentArea.inGameAreaName != "newArea"))
                             {
                                 if (gv.mod.useRationSystem)
                                 {
-                                    gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                                 else 
                                 {
-                                    gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                             }
                             else
                             {
                                 if (gv.mod.useRationSystem)
                                 {
-                                    gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                                 else 
                                 {
-                                    gv.DrawText(gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText(gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                             }
                             //gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 600, 100), 1.0f, Color.Black);
                         }
                         else
                         {
-                            gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 600, 100), 1.0f, Color.Black);
+                            gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 600, 100), "black");
                             if ((gv.mod.currentArea.inGameAreaName != "") && (gv.mod.currentArea.inGameAreaName != "newArea"))
                             {
                                 if (gv.mod.useRationSystem)
                                 {
-                                    gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                                 else 
                                 {
-                                    gv.DrawText(gv.mod.currentArea.inGameAreaName, new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText(gv.mod.currentArea.inGameAreaName, new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                             }
                             else
                             {
                                 if (gv.mod.useRationSystem)
                                 {
-                                    gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                                    gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS), 600, 100), "black");
                                 }
                                 else 
                                 {
@@ -30297,16 +30117,16 @@ namespace IBx
                 }
                 if (gv.mod.partyLightOn)
                 {
-                    gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH - gv.pS, 600, 100), 1.0f, Color.White);
+                    gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH - gv.pS, 600, 100), "white");
                     if ((gv.mod.currentArea.inGameAreaName != "") && (gv.mod.currentArea.inGameAreaName != "newArea"))
                     {
                         if (gv.mod.useRationSystem)
                         {
-                            gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), "white");
                         }
                         else 
                         {
-                            gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), "white");
 
                         }
 
@@ -30315,11 +30135,11 @@ namespace IBx
                     {
                         if (gv.mod.useRationSystem)
                         {
-                            gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + "), " + gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), "white");
                         }
                         else 
                         {
-                            gv.DrawText(gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText(gv.mod.partyLightName + "(" + gv.mod.currentLightUnitsLeft.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS), 600, 100), "white");
 
                         }
                     }
@@ -30327,16 +30147,16 @@ namespace IBx
                 }
                 else
                 {
-                    gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH - gv.pS, 600, 100), 1.0f, Color.White);
+                    gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH - gv.pS, 600, 100), "white");
                     if ((gv.mod.currentArea.inGameAreaName != "") && (gv.mod.currentArea.inGameAreaName != "newArea"))
                     {
                         if (gv.mod.useRationSystem)
                         {
-                            gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5f * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText(gv.mod.currentArea.inGameAreaName + ", " + "Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5f * gv.pS), 600, 100), "white");
                         }
                         else 
                         {
-                            gv.DrawText(gv.mod.currentArea.inGameAreaName, new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5f * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText(gv.mod.currentArea.inGameAreaName, new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5f * gv.pS), 600, 100), "white");
 
                         }
                     }
@@ -30344,7 +30164,7 @@ namespace IBx
                     {
                         if (gv.mod.useRationSystem)
                         {
-                            gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5f * gv.pS), 600, 100), 1.0f, Color.White);
+                            gv.DrawText("Rations(" + gv.mod.numberOfRationsRemaining.ToString() + ")", new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5f * gv.pS), 600, 100), "white");
                         }
 
                     }
@@ -30358,10 +30178,10 @@ namespace IBx
                 {
                     for (int y = -2; y <= 2; y++)
                     {
-                        gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 1) * gv.squareSize, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 100, 100), 1.0f, Color.Black);
+                        gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 1) * gv.squareSize, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS, 100, 100), "black");
                     }
                 }
-                gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 1) * gv.squareSize, gv.playerOffsetX * gv.squareSize - txtH - gv.pS, 100, 100), 1.0f, Color.White);
+                gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 1) * gv.squareSize, gv.playerOffsetX * gv.squareSize - txtH - gv.pS, 100, 100), "white");
 
             }
 
@@ -30730,8 +30550,8 @@ namespace IBx
                             {
                                 int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * (int)gv.squareSize;
                                 int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * (int)gv.squareSize;
-                                //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                                //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                                //float scalerX = tile.tileBitmap0.Width / 100;
+                                //float scalerY = tile.tileBitmap0.Height / 100;
                                 //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                                 float scalerX = 1.0f;
                                 float scalerY = 1.0f;
@@ -30754,11 +30574,11 @@ namespace IBx
                                 {
                                     if (gv.mod.useMathGridFade)
                                     {
-                                        gv.DrawBitmap(gv.cc.offScreen, src, dst, false, 1.0f, false);
+                                        gv.DrawBitmap(gv.cc.offScreen, src, dst);
                                     }
                                     else
                                     {
-                                        gv.DrawBitmap(gv.cc.offScreenBlack, src, dst, false, 1.0f * gv.mod.fogOfWarOpacity, false);
+                                        gv.DrawBitmap(gv.cc.offScreenBlack, src, dst, false, 1.0f * gv.mod.fogOfWarOpacity);
                                     }
                                 }
 
@@ -30996,7 +30816,7 @@ namespace IBx
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
-                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                         IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                         if (!gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x].Visible)
                         {
@@ -31043,8 +30863,8 @@ namespace IBx
                         {
                             int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * (gv.squareSize);
                             int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * (gv.squareSize);
-                            //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                            //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                            //float scalerX = tile.tileBitmap0.Width / 100;
+                            //float scalerY = tile.tileBitmap0.Height / 100;
                             //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                             float scalerX = 1;
                             float scalerY = 1;
@@ -31955,8 +31775,8 @@ namespace IBx
                                 {
                                     int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * (gv.squareSize);
                                     int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * (gv.squareSize);
-                                    //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                                    //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                                    //float scalerX = tile.tileBitmap0.Width / 100;
+                                    //float scalerY = tile.tileBitmap0.Height / 100;
                                     //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                                     float scalerX = 1;
                                     float scalerY = 1;
@@ -32328,8 +32148,8 @@ namespace IBx
                             {
                                 int tlX = (x - gv.mod.PlayerLocationX + gv.playerOffsetX) * (gv.squareSize);
                                 int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * (gv.squareSize);
-                                //float scalerX = tile.tileBitmap0.PixelSize.Width / 100;
-                                //float scalerY = tile.tileBitmap0.PixelSize.Height / 100;
+                                //float scalerX = tile.tileBitmap0.Width / 100;
+                                //float scalerY = tile.tileBitmap0.Height / 100;
                                 //the tiles0 arrive as 50x50px but we want to have them 100% square size, therefore scaler to 1, ie 100%
                                 float scalerX = 1;
                                 float scalerY = 1;
@@ -33155,7 +32975,7 @@ namespace IBx
                         int tlY = (y - gv.mod.PlayerLocationY + gv.playerOffsetY) * gv.squareSize;
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
-                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                         IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                         if (!gv.mod.currentArea.Tiles[y * gv.mod.currentArea.MapSizeX + x].Visible)
                         {
@@ -33263,31 +33083,11 @@ namespace IBx
                     {
                         for (int y = -2; y <= 2; y++)
                         {
-                            gv.DrawText(ft.value, new IbRect(xLoc + x + gv.oXshift + mapStartLocXinPixels, yLoc + y + txtH, gv.squareSize * 2, 1000), 0.8f, Color.Black);
+                            gv.DrawText(ft.value, new IbRect(xLoc + x + gv.oXshift + mapStartLocXinPixels, yLoc + y + txtH, gv.squareSize * 2, 1000), "black");
                         }
                     }
-                    Color colr = Color.Yellow;
-                    if (ft.color.Equals("yellow"))
-                    {
-                        colr = Color.Yellow;
-                    }
-                    else if (ft.color.Equals("blue"))
-                    {
-                        colr = Color.Blue;
-                    }
-                    else if (ft.color.Equals("green"))
-                    {
-                        colr = Color.Lime;
-                    }
-                    else if (ft.color.Equals("red"))
-                    {
-                        colr = Color.Red;
-                    }
-                    else
-                    {
-                        colr = Color.White;
-                    }
-                    gv.DrawText(ft.value, new IbRect(xLoc + gv.oXshift + mapStartLocXinPixels, yLoc + txtH, gv.squareSize * 2, 1000), 0.8f, colr);
+                    
+                    gv.DrawText(ft.value, new IbRect(xLoc + gv.oXshift + mapStartLocXinPixels, yLoc + txtH, gv.squareSize * 2, 1000), ft.color);
                 }
             }
         }
@@ -33328,31 +33128,11 @@ namespace IBx
                     {
                         for (int y = -2; y <= 2; y++)
                         {
-                            gv.DrawText(ft.value, new IbRect(xLoc + x, yLoc + y + txtH, gv.squareSize * 2, 1000), 0.8f, Color.Black);
+                            gv.DrawText(ft.value, new IbRect(xLoc + x, yLoc + y + txtH, gv.squareSize * 2, 1000), "black");
                         }
                     }
-                    Color colr = Color.Yellow;
-                    if (ft.color.Equals("yellow"))
-                    {
-                        colr = Color.Yellow;
-                    }
-                    else if (ft.color.Equals("blue"))
-                    {
-                        colr = Color.Blue;
-                    }
-                    else if (ft.color.Equals("green"))
-                    {
-                        colr = Color.Lime;
-                    }
-                    else if (ft.color.Equals("red"))
-                    {
-                        colr = Color.Red;
-                    }
-                    else
-                    {
-                        colr = Color.White;
-                    }
-                    gv.DrawText(ft.value, new IbRect(xLoc, yLoc + txtH, gv.squareSize * 2, 1000), 0.8f, colr);
+                    
+                    gv.DrawText(ft.value, new IbRect(xLoc, yLoc + txtH, gv.squareSize * 2, 1000), ft.color);
                 }
             }
         }
@@ -33404,7 +33184,7 @@ namespace IBx
                     int tlY = y * gv.squareSize;
                     int brX = gv.squareSize;
                     int brY = gv.squareSize;
-                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                     IbRect dst = new IbRect(tlX + mapStartLocXinPixels - (int)(brX * 1.0f), tlY - (int)(brY * 1.1f), (int)(brX * 1.3f), (int)(brY * 1.25f));
                     /*
                     if (col >= (gv.playerOffsetX * 2 + 2))
@@ -33470,7 +33250,7 @@ namespace IBx
                     int tlY = y * gv.squareSize;
                     int brX = gv.squareSize;
                     int brY = gv.squareSize;
-                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                     IbRect dst = new IbRect(tlX + mapStartLocXinPixels + gv.oXshift, tlY, brX, brY);
 
                     gv.DrawBitmap(gv.cc.black_tile, src, dst);
@@ -33525,7 +33305,7 @@ namespace IBx
                     int tlY = row * gv.squareSize;
                     int brX = gv.squareSize;
                     int brY = gv.squareSize;
-                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels - (int)(brX * 0.1f), tlY - (int)(brY * 0.1f), (int)(brX * 1.2f), (int)(brY * 1.25f));
                     bool skipDraw = false;
 
@@ -33581,7 +33361,7 @@ namespace IBx
                     int tlY = row * gv.squareSize;
                     int brX = gv.squareSize;
                     int brY = gv.squareSize;
-                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                     IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                     gv.DrawBitmap(gv.cc.black_tile, src, dst);
                 }
@@ -33797,13 +33577,13 @@ namespace IBx
         }
 
         //to test new layout system, change this to onTouchMain
-        public void onTouchMain(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchMain(int eX, int eY, MouseEventType.EventType eventType)
         {
             switch (eventType)
             {
                 case MouseEventType.EventType.MouseDown:
-                    int x2 = (int)e.X;
-                    int y2 = (int)e.Y;
+                    int x2 = (int)eX;
+                    int y2 = (int)eY;
                     if (y2 < (gv.screenHeight - 2 * gv.squareSize) && x2 < (gv.screenWidth - 2 * gv.squareSize))
                     {
                         gv.moveTimerRuns = true;
@@ -33812,16 +33592,16 @@ namespace IBx
                     break;
 
                 case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
+                    int x = (int)eX;
+                    int y = (int)eY;
 
                     //NEW SYSTEM
                     mainUiLayout.setHover(x, y);
                     
 
                     //Draw Floaty Text On Mouse Over Prop
-                    int gridx = (int)e.X / gv.squareSize;
-                    int gridy = (int)e.Y / gv.squareSize;
+                    int gridx = (int)eX / gv.squareSize;
+                    int gridy = (int)eY / gv.squareSize;
                     int actualX = gv.mod.PlayerLocationX + (gridx - gv.playerOffsetX);
                     int actualY = gv.mod.PlayerLocationY + (gridy - gv.playerOffsetY);
                     gv.cc.floatyText = "";
@@ -33872,8 +33652,8 @@ namespace IBx
                     }
 
                     isMoving = false;
-                    x = (int)e.X;
-                    y = (int)e.Y;
+                    x = (int)eX;
+                    y = (int)eY;
 
 
                     //NEW SYSTEM
@@ -34023,7 +33803,7 @@ namespace IBx
                     }
                     else if ((rtn.Equals("port0")) && (gv.mod.playerList.Count > 0))
                     {
-                        if (e.Button == MouseButtons.Left)
+                        /*if (e.Button == MouseButtons.Left)
                         {
                             gv.mod.selectedPartyLeader = 0;
                             gv.cc.partyScreenPcIndex = 0;
@@ -34032,14 +33812,14 @@ namespace IBx
                             gv.cc.tutorialMessageParty(false);
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
+                        {*/
                             gv.mod.selectedPartyLeader = 0;
                             gv.cc.partyScreenPcIndex = 0;
-                        }
+                        //}
                     }
                     else if ((rtn.Equals("port1")) && (gv.mod.playerList.Count > 1))
                     {
-                        if (e.Button == MouseButtons.Left)
+                        /*if (e.Button == MouseButtons.Left)
                         {
                             gv.mod.selectedPartyLeader = 1;
                             gv.cc.partyScreenPcIndex = 1;
@@ -34048,14 +33828,14 @@ namespace IBx
                             gv.cc.tutorialMessageParty(false);
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
+                        {*/
                             gv.mod.selectedPartyLeader = 1;
                             gv.cc.partyScreenPcIndex = 1;
-                        }
+                        //}
                     }
                     else if ((rtn.Equals("port2")) && (gv.mod.playerList.Count > 2))
                     {
-                        if (e.Button == MouseButtons.Left)
+                        /*if (e.Button == MouseButtons.Left)
                         {
                             gv.mod.selectedPartyLeader = 2;
                             gv.cc.partyScreenPcIndex = 2;
@@ -34064,14 +33844,14 @@ namespace IBx
                             gv.cc.tutorialMessageParty(false);
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
+                        {*/
                             gv.mod.selectedPartyLeader = 2;
                             gv.cc.partyScreenPcIndex = 2;
-                        }
+                        //}
                     }
                     else if ((rtn.Equals("port3")) && (gv.mod.playerList.Count > 3))
                     {
-                        if (e.Button == MouseButtons.Left)
+                        /*if (e.Button == MouseButtons.Left)
                         {
                             gv.mod.selectedPartyLeader = 3;
                             gv.cc.partyScreenPcIndex = 3;
@@ -34080,14 +33860,14 @@ namespace IBx
                             gv.cc.tutorialMessageParty(false);
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
+                        {*/
                             gv.mod.selectedPartyLeader = 3;
                             gv.cc.partyScreenPcIndex = 3;
-                        }
+                        //}
                     }
                     else if ((rtn.Equals("port4")) && (gv.mod.playerList.Count > 4))
                     {
-                        if (e.Button == MouseButtons.Left)
+                        /*if (e.Button == MouseButtons.Left)
                         {
                             gv.mod.selectedPartyLeader = 4;
                             gv.cc.partyScreenPcIndex = 4;
@@ -34096,14 +33876,14 @@ namespace IBx
                             gv.cc.tutorialMessageParty(false);
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
+                        {*/
                             gv.mod.selectedPartyLeader = 4;
                             gv.cc.partyScreenPcIndex = 4;
-                        }
+                        //}
                     }
                     else if ((rtn.Equals("port5")) && (gv.mod.playerList.Count > 5))
                     {
-                        if (e.Button == MouseButtons.Left)
+                        /*if (e.Button == MouseButtons.Left)
                         {
                             gv.mod.selectedPartyLeader = 5;
                             gv.cc.partyScreenPcIndex = 5;
@@ -34112,10 +33892,10 @@ namespace IBx
                             gv.cc.tutorialMessageParty(false);
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
+                        {*/
                             gv.mod.selectedPartyLeader = 5;
                             gv.cc.partyScreenPcIndex = 5;
-                        }
+                        //}
                     }
                     else if (rtn.Equals("btnInventory"))
                     {
@@ -34173,13 +33953,13 @@ namespace IBx
                             catch (Exception ex)
                             {
                                 //print error
-                                IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
+                                //IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
                                 gv.errorLog(ex.ToString());
                                 return;
                             }
                         }
 
-                        using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Caster"))
+                        /*TODO using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Caster"))
                         {
                             pcSel.ShowDialog();
 
@@ -34202,7 +33982,7 @@ namespace IBx
                             {
                                 //do nothing
                             }
-                        }
+                        }*/
                     }
 
                     //adding lines for trait use button on main map
@@ -34240,13 +34020,13 @@ namespace IBx
                             catch (Exception ex)
                             {
                                 //print error
-                                IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
+                                //IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
                                 gv.errorLog(ex.ToString());
                                 return;
                             }
                         }
 
-                        using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Character"))
+                        /*TODO using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Character"))
                         {
                             pcSel.ShowDialog();
 
@@ -34269,7 +34049,7 @@ namespace IBx
                             {
                                 //do nothing
                             }
-                        }
+                        }*/
                     }
 
                     else if (rtn.Equals("btnToggleArrows"))
@@ -34399,855 +34179,9 @@ namespace IBx
             }
         }
         //to test new layout system, change this to onTouchMainOld
-        /*public void onTouchMainOld(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onKeyUp()
         {
-            gv.cc.ctrlUpArrow.glowOn = false;
-            gv.cc.ctrlDownArrow.glowOn = false;
-            gv.cc.ctrlLeftArrow.glowOn = false;
-            gv.cc.ctrlRightArrow.glowOn = false;
-            btnParty.glowOn = false;
-            gv.cc.btnInventory.glowOn = false;
-            btnJournal.glowOn = false;
-            btnSettings.glowOn = false;
-            btnSave.glowOn = false;
-            btnCastOnMainMap.glowOn = false;
-            btnWait.glowOn = false;
-
-            switch (eventType)
-            {
-                case MouseEventType.EventType.MouseDown:
-                case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
-
-                    //Draw Floaty Text On Mouse Over Prop
-                    int gridx = (int)e.X / gv.squareSize;
-                    int gridy = (int)e.Y / gv.squareSize;
-                    int actualX = gv.mod.PlayerLocationX + (gridx - gv.playerOffsetX);
-                    int actualY = gv.mod.PlayerLocationY + (gridy - gv.playerOffsetY);
-                    gv.cc.floatyText = "";
-                    if (IsTouchInMapWindow(gridx, gridy))
-                    {
-                        foreach (Prop p in gv.mod.currentArea.Props)
-                        {
-                            if ((p.LocationX == actualX) && (p.LocationY == actualY))
-                            {
-                                if (!p.MouseOverText.Equals("none"))
-                                {
-                                    gv.cc.floatyText = p.MouseOverText;
-                                    gv.cc.floatyTextLoc = new Coordinate(gridx * gv.squareSize, gridy * gv.squareSize);
-                                }
-                            }
-                        }
-                    }
-
-                    
-
-                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlRightArrow.glowOn = true;
-                    }
-                    else if (btnParty.getImpact(x, y))
-                    {
-                        btnParty.glowOn = true;
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        gv.cc.btnInventory.glowOn = true;
-                    }
-                    else if (btnJournal.getImpact(x, y))
-                    {
-                        btnJournal.glowOn = true;
-                    }
-                    else if (btnSettings.getImpact(x, y))
-                    {
-                        btnSettings.glowOn = true;
-                    }
-                    else if (btnSave.getImpact(x, y))
-                    {
-                        if (gv.mod.allowSave)
-                        {
-                            btnSave.glowOn = true;
-                        }
-                    }
-                    else if (btnCastOnMainMap.getImpact(x, y))
-                    {
-                        btnCastOnMainMap.glowOn = true;
-                    }
-                    else if (btnWait.getImpact(x, y))
-                    {
-                        btnWait.glowOn = true;
-                    }
-                    break;
-
-                case MouseEventType.EventType.MouseUp:
-                    x = (int)e.X;
-                    y = (int)e.Y;
-                    int gridX = (int)e.X / gv.squareSize;
-                    int gridY = (int)e.Y / gv.squareSize;
-                    int actualx = gv.mod.PlayerLocationX + (gridX - gv.playerOffsetX);
-                    int actualy = gv.mod.PlayerLocationY + (gridY - gv.playerOffsetY);
-
-                    gv.cc.ctrlUpArrow.glowOn = false;
-                    gv.cc.ctrlDownArrow.glowOn = false;
-                    gv.cc.ctrlLeftArrow.glowOn = false;
-                    gv.cc.ctrlRightArrow.glowOn = false;
-                    btnParty.glowOn = false;
-                    gv.cc.btnInventory.glowOn = false;
-                    btnJournal.glowOn = false;
-                    btnSettings.glowOn = false;
-                    btnSave.glowOn = false;
-                    btnCastOnMainMap.glowOn = false;
-                    btnWait.glowOn = false;
-
-                    if (tglGrid.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglGrid.toggleOn)
-                        {
-                            tglGrid.toggleOn = false;
-                            gv.mod.map_showGrid = false;
-                        }
-                        else
-                        {
-                            tglGrid.toggleOn = true;
-                            gv.mod.map_showGrid = true;
-                        }
-                    }
-
-                    if (tglInteractionState.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglInteractionState.toggleOn)
-                        {
-                            tglInteractionState.toggleOn = false;
-                            gv.mod.showInteractionState = false;
-                            gv.cc.addLogText("yellow", "Hide info about interaction state of NPC and creatures (encounter = red, mandatory conversation = orange and optional conversation = green");
-                        }
-                        else
-                        {
-                            tglInteractionState.toggleOn = true;
-                            gv.mod.showInteractionState = true;
-                            gv.cc.addLogText("lime", "Show info about interaction state of NPC and creatures (encounter = red, mandatory conversation = orange and optional conversation = green");
-                        }
-                    }
-
-                    if (tglAvoidConversation.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglAvoidConversation.toggleOn)
-                        {
-                            tglAvoidConversation.toggleOn = false;
-                            gv.mod.avoidInteraction = false;
-                            gv.cc.addLogText("lime", "Normal move gv.mode: party does all possible conversations");
-                        }
-                        else
-                        {
-                            tglAvoidConversation.toggleOn = true;
-                            gv.mod.avoidInteraction = true;
-                            gv.cc.addLogText("yellow", "In a hurry: Party is avoiding all conversations that are not mandatory");
-                        }
-                    }
-
-
-                    if (tglClock.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglClock.toggleOn)
-                        {
-                            tglClock.toggleOn = false;
-                        }
-                        else
-                        {
-                            tglClock.toggleOn = true;
-                        }
-                    }
-                    if (gv.cc.tglSound.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (gv.cc.tglSound.toggleOn)
-                        {
-                            gv.cc.tglSound.toggleOn = false;
-                            gv.mod.playMusic = false;
-                            gv.mod.playSoundFx = false;
-                            gv.screenCombat.tglSoundFx.toggleOn = false;
-                            gv.stopMusic();
-                            gv.stopAmbient();
-                            gv.cc.addLogText("lime", "Music Off, SoundFX Off");
-                        }
-                        else
-                        {
-                            gv.cc.tglSound.toggleOn = true;
-                            gv.mod.playMusic = true;
-                            gv.mod.playSoundFx = true;
-                            gv.screenCombat.tglSoundFx.toggleOn = true;
-                            gv.startMusic();
-                            gv.startAmbient();
-                            gv.cc.addLogText("lime", "Music On, SoundFX On");
-                        }
-                    }
-                    if (tglFullParty.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglFullParty.toggleOn)
-                        {
-                            tglFullParty.toggleOn = false;
-                            gv.cc.addLogText("lime", "Show Party Leader");
-                        }
-                        else
-                        {
-                            tglFullParty.toggleOn = true;
-                            gv.cc.addLogText("lime", "Show Full Party");
-                        }
-                    }
-                    //if ((tglMiniMap.getImpact(x, y)) && (gv.mod.currentArea.IsWorldMap))
-                    if (tglMiniMap.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglMiniMap.toggleOn)
-                        {
-                            tglMiniMap.toggleOn = false;
-                            gv.cc.addLogText("lime", "Hide Mini Map");
-                        }
-                        else
-                        {
-                            tglMiniMap.toggleOn = true;
-                            gv.cc.addLogText("lime", "Show Mini Map");
-                        }
-                    }
-                    if ((gv.cc.ctrlUpArrow.getImpact(x, y)) || ((gv.mod.PlayerLocationX == actualx) && ((gv.mod.PlayerLocationY - 1) == actualy)))
-                    {
-                        bool isTransition = gv.cc.goNorth();
-                        if (!isTransition)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            if (gv.mod.PlayerLocationY > 0)
-                            {
-                                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY - 1) == false)
-                                {
-                                    
-                                    //gv.mod.blockTrigger = false;
-                                    //gv.mod.blockTriggerMovingProp = false;
-
-                                    gv.mod.PlayerLastLocationX = gv.mod.PlayerLocationX;
-                                    gv.mod.PlayerLastLocationY = gv.mod.PlayerLocationY;
-                                    gv.mod.PlayerLocationY--;
-                                    gv.cc.doUpdate();
-                                }
-                            }
-                        }
-                        //else
-                        //{
-                            //gv.cc.doUpdate();
-                        //}
-                    }
-                    else if ((gv.cc.ctrlDownArrow.getImpact(x, y)) || ((gv.mod.PlayerLocationX == actualx) && ((gv.mod.PlayerLocationY + 1) == actualy)))
-                    {
-
-                        bool isTransition = gv.cc.goSouth();
-                        if (!isTransition)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            int mapheight = gv.mod.currentArea.MapSizeY;
-                            if (gv.mod.PlayerLocationY < (mapheight - 1))
-                            {
-                                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY + 1) == false)
-                                {
-                                   
-                                        //gv.mod.blockTrigger = false;
-                                    //gv.mod.blockTriggerMovingProp = false;
-
-                                    gv.mod.PlayerLastLocationX = gv.mod.PlayerLocationX;
-                                    gv.mod.PlayerLastLocationY = gv.mod.PlayerLocationY;
-                                    gv.mod.PlayerLocationY++;
-                                    gv.cc.doUpdate();
-                                }
-                            }
-                        }
-                    }
-                    else if ((gv.cc.ctrlLeftArrow.getImpact(x, y)) || (((gv.mod.PlayerLocationX - 1) == actualx) && (gv.mod.PlayerLocationY == actualy)))
-                    {
-                        bool isTransition = gv.cc.goWest();
-                        if (!isTransition)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            if (gv.mod.PlayerLocationX > 0)
-                            {
-                                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX - 1, gv.mod.PlayerLocationY) == false)
-                                {
-
-                                        //gv.mod.blockTrigger = false;
-                                    //gv.mod.blockTriggerMovingProp = false;
-
-                                    gv.mod.PlayerLastLocationX = gv.mod.PlayerLocationX;
-                                    gv.mod.PlayerLastLocationY = gv.mod.PlayerLocationY;
-                                    gv.mod.PlayerLocationX--;
-                                    if (!gv.mod.playerList[0].combatFacingLeft)
-                                    {
-                                        //TODO							    //gv.mod.partyTokenBitmap = gv.cc.flip(gv.mod.partyTokenBitmap);
-                                    }
-                                    foreach (Player pc in gv.mod.playerList)
-                                    {
-                                        if (!pc.combatFacingLeft)
-                                        {
-                                            pc.combatFacingLeft = true;
-                                        }
-                                    }
-                                    gv.cc.doUpdate();
-                                }
-                            }
-                        }
-                    }
-                    else if ((gv.cc.ctrlRightArrow.getImpact(x, y)) || (((gv.mod.PlayerLocationX + 1) == actualx) && (gv.mod.PlayerLocationY == actualy)))
-                    {
-                        bool isTransition = gv.cc.goEast();
-                        if (!isTransition)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            int mapwidth = gv.mod.currentArea.MapSizeX;
-                            if (gv.mod.PlayerLocationX < (mapwidth - 1))
-                            {
-                                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX + 1, gv.mod.PlayerLocationY) == false)
-                                {
-                                    
-                                        //gv.mod.blockTrigger = false;
-                                    //gv.mod.blockTriggerMovingProp = false;
-
-                                    gv.mod.PlayerLastLocationX = gv.mod.PlayerLocationX;
-                                    gv.mod.PlayerLastLocationY = gv.mod.PlayerLocationY;
-                                    gv.mod.PlayerLocationX++;
-                                    if (gv.mod.playerList[0].combatFacingLeft)
-                                    {
-                                        //TODO							    gv.mod.partyTokenBitmap = gv.cc.flip(gv.mod.partyTokenBitmap);
-                                    }
-                                    foreach (Player pc in gv.mod.playerList)
-                                    {
-                                        if (pc.combatFacingLeft)
-                                        {
-                                            pc.combatFacingLeft = false;
-                                        }
-                                    }
-                                    gv.cc.doUpdate();
-                                }
-                            }
-                        }
-                    }
-                    else if (btnParty.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        
-                        /*
-                        //temporary weather effect object creation code
-                        //hurghxxx
-                        gv.cc.doIBScriptBasedOnFilename("cloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("cloudsA", "cloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("cloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("cloudsB", "cloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("cloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("cloudsC", "cloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightCloudsA", "lightCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightCloudsB", "lightCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightCloudsC", "lightCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyCloudsA", "heavyCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyCloudsB", "heavyCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyCloudsC", "heavyCloudsC1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithCloudsA", "lightRainWithCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithCloudsB", "lightRainWithCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithCloudsC", "lightRainWithCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithCloudsA", "rainWithCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithCloudsB", "rainWithCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithCloudsC", "rainWithCloudsC1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithCloudsA", "lightSnowWithCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithCloudsB", "lightSnowWithCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithCloudsC", "lightSnowWithCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithCloudsA", "snowWithCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithCloudsB", "snowWithCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithCloudsC", "snowWithCloudsC1001");
-
-
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithCloudsAShowers", "lightRainWithCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithCloudsBShowers", "lightRainWithCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithCloudsCShowers", "lightRainWithCloudsCShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithCloudsAShowers", "rainWithCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithCloudsBShowers", "rainWithCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithCloudsCShowers", "rainWithCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithCloudsAShowers", "lightSnowWithCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithCloudsBShowers", "lightSnowWithCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithCloudsCShowers", "lightSnowWithCloudsCShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithCloudsAShowers", "snowWithCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithCloudsBShowers", "snowWithCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithCloudsCShowers", "snowWithCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyCloudsA", "rainWithHeavyCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyCloudsB", "rainWithHeavyCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyCloudsC", "rainWithHeavyCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyCloudsAShowers", "rainWithHeavyCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyCloudsBShowers", "rainWithHeavyCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyCloudsCShowers", "rainWithHeavyCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyCloudsA", "snowWithHeavyCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyCloudsB", "snowWithHeavyCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyCloudsC", "snowWithHeavyCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyCloudsAShowers", "snowWithHeavyCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyCloudsBShowers", "snowWithHeavyCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyCloudsCShowers", "snowWithHeavyCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyCloudsA", "heavyRainWithHeavyCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyCloudsB", "heavyRainWithHeavyCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyCloudsC", "heavyRainWithHeavyCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyCloudsAShowers", "heavyRainWithHeavyCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyCloudsBShowers", "heavyRainWithHeavyCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyCloudsCShowers", "heavyRainWithHeavyCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyCloudsA", "heavySnowWithHeavyCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyCloudsB", "heavySnowWithHeavyCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyCloudsC", "heavySnowWithHeavyCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyCloudsAShowers", "heavySnowWithHeavyCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyCloudsBShowers", "heavySnowWithHeavyCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyCloudsCShowers", "heavySnowWithHeavyCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsA", "heavyRainWithCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsB", "heavyRainWithCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsC", "heavyRainWithCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsAShowers", "heavyRainWithCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsBShowers", "heavyRainWithCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsCShowers", "heavyRainWithCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsA", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsA", "heavySnowWithCloudsA1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsB", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsB", "heavySnowWithCloudsB1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsC", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsC", "heavySnowWithCloudsC1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsAShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsAShowers", "heavySnowWithCloudsAShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsBShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsBShowers", "heavySnowWithCloudsBShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsCShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsCShowers", "heavySnowWithCloudsCShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsAAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsAAndLightning", "heavyRainWithCloudsAAndLightning1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsBAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsBAndLightning", "heavyRainWithCloudsBAndLightning1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithCloudsCAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithCloudsCAndLightning", "heavyRainWithCloudsCAndLightning1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsAAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsAAndLightning", "heavySnowWithCloudsAAndLightning1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsBAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsBAndLightning", "heavySnowWithCloudsBAndLightning1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithCloudsCAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithCloudsCAndLightning", "heavySnowWithCloudsCAndLightning1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightFog", "lightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("fog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("fog", "fog1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyFog", "heavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithLightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithLightFog", "lightRainWithLightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithFog", "lightRainWithFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithHeavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithHeavyFog", "lightRainWithHeavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("rainWithLightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithLightFog", "rainWithLightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithFog", "rainWithFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyFog", "rainWithHeavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithLightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithLightFog", "heavyRainWithLightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithFog", "heavyRainWithFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyFog", "heavyRainWithHeavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithLightFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithLightFogShowers", "lightRainWithLightFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithFogShowers", "lightRainWithFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightRainWithHeavyFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightRainWithHeavyFogShowers", "lightRainWithHeavyFogShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("rainWithLightFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithLightFogShowers", "rainWithLightFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithFogShowers", "rainWithFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("rainWithHeavyFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("rainWithHeavyFogShowers", "rainWithHeavyFogShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithLightFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithLightFogShowers", "heavyRainWithLightFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithFogShowers", "heavyRainWithFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyFogShowers", "heavyRainWithHeavyFogShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithLightFogAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithLightFogAndLightning", "heavyRainWithLightFogAndLightning1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithFogAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithFogAndLightning", "heavyRainWithFogAndLightning1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavyRainWithHeavyFogAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavyRainWithHeavyFogAndLightning", "heavyRainWithHeavyFogAndLightning1001");
-
-
-
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithLightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithLightFog", "lightSnowWithLightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithFog", "lightSnowWithFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithHeavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithHeavyFog", "lightSnowWithHeavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("snowWithLightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithLightFog", "snowWithLightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithFog", "snowWithFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyFog", "snowWithHeavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithLightFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithLightFog", "heavySnowWithLightFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithFog", "heavySnowWithFog1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyFog", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyFog", "heavySnowWithHeavyFog1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithLightFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithLightFogShowers", "lightSnowWithLightFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithFogShowers", "lightSnowWithFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("lightSnowWithHeavyFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSnowWithHeavyFogShowers", "lightSnowWithHeavyFogShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("snowWithLightFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithLightFogShowers", "snowWithLightFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithFogShowers", "snowWithFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("snowWithHeavyFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("snowWithHeavyFogShowers", "snowWithHeavyFogShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithLightFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithLightFogShowers", "heavySnowWithLightFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithFogShowers", "heavySnowWithFogShowers1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySnowWithHeavyFogShowers", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySnowWithHeavyFogShowers", "heavySnowWithHeavyFogShowers1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("lightSandStorm", "fullScreenEffectScript");
-                        buildWeatherEffectObject("lightSandStorm", "lightSandStorm1001");
-                        gv.cc.doIBScriptBasedOnFilename("sandStorm", "fullScreenEffectScript");
-                        buildWeatherEffectObject("sandStorm", "sandStorm1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySandStorm", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySandStorm", "heavySandStorm1001");
-                        gv.cc.doIBScriptBasedOnFilename("heavySandStormAndLightning", "fullScreenEffectScript");
-                        buildWeatherEffectObject("heavySandStormAndLightning", "heavySandStormAndLightning1001");
-
-                        gv.cc.doIBScriptBasedOnFilename("clear", "fullScreenEffectScript");
-                        buildWeatherEffectObject("clear", "clear1001");
-                        
-                        //temporara end
-                        */
-        /*
-                                gv.screenParty.resetPartyScreen();
-                                gv.screenType = "party";
-                                gv.cc.tutorialMessageParty(false);
-                            }
-                            else if ((gv.cc.ptrPc0.getImpact(x, y)) && (gv.mod.playerList.Count > 0))
-                            {
-                                if (e.Button == MouseButtons.Left)
-                                {
-                                    gv.mod.selectedPartyLeader = 0;
-                                    gv.cc.partyScreenPcIndex = 0;
-                                    gv.screenParty.resetPartyScreen();
-                                    gv.screenType = "party";
-                                    gv.cc.tutorialMessageParty(false);
-                                }
-                                else if (e.Button == MouseButtons.Right)
-                                {
-                                    gv.mod.selectedPartyLeader = 0;
-                                    gv.cc.partyScreenPcIndex = 0;
-                                }
-                            }
-                            else if ((gv.cc.ptrPc1.getImpact(x, y)) && (gv.mod.playerList.Count > 1))
-                            {
-                                if (e.Button == MouseButtons.Left)
-                                {
-                                    gv.mod.selectedPartyLeader = 1;
-                                    gv.cc.partyScreenPcIndex = 1;
-                                    gv.screenParty.resetPartyScreen();
-                                    gv.screenType = "party";
-                                    gv.cc.tutorialMessageParty(false);
-                                }
-                                else if (e.Button == MouseButtons.Right)
-                                {
-                                    gv.mod.selectedPartyLeader = 1;
-                                    gv.cc.partyScreenPcIndex = 1;
-                                }
-                            }
-                            else if ((gv.cc.ptrPc2.getImpact(x, y)) && (gv.mod.playerList.Count > 2))
-                            {
-                                if (e.Button == MouseButtons.Left)
-                                {
-                                    gv.mod.selectedPartyLeader = 2;
-                                    gv.cc.partyScreenPcIndex = 2;
-                                    gv.screenParty.resetPartyScreen();
-                                    gv.screenType = "party";
-                                    gv.cc.tutorialMessageParty(false);
-                                }
-                                else if (e.Button == MouseButtons.Right)
-                                {
-                                    gv.mod.selectedPartyLeader = 2;
-                                    gv.cc.partyScreenPcIndex = 2;
-                                }
-                            }
-                            else if ((gv.cc.ptrPc3.getImpact(x, y)) && (gv.mod.playerList.Count > 3))
-                            {
-                                if (e.Button == MouseButtons.Left)
-                                {
-                                    gv.mod.selectedPartyLeader = 3;
-                                    gv.cc.partyScreenPcIndex = 3;
-                                    gv.screenParty.resetPartyScreen();
-                                    gv.screenType = "party";
-                                    gv.cc.tutorialMessageParty(false);
-                                }
-                                else if (e.Button == MouseButtons.Right)
-                                {
-                                    gv.mod.selectedPartyLeader = 3;
-                                    gv.cc.partyScreenPcIndex = 3;
-                                }
-                            }
-                            else if ((gv.cc.ptrPc4.getImpact(x, y)) && (gv.mod.playerList.Count > 4))
-                            {
-                                if (e.Button == MouseButtons.Left)
-                                {
-                                    gv.mod.selectedPartyLeader = 4;
-                                    gv.cc.partyScreenPcIndex = 4;
-                                    gv.screenParty.resetPartyScreen();
-                                    gv.screenType = "party";
-                                    gv.cc.tutorialMessageParty(false);
-                                }
-                                else if (e.Button == MouseButtons.Right)
-                                {
-                                    gv.mod.selectedPartyLeader = 4;
-                                    gv.cc.partyScreenPcIndex = 4;
-                                }
-                            }
-                            else if ((gv.cc.ptrPc5.getImpact(x, y)) && (gv.mod.playerList.Count > 5))
-                            {
-                                if (e.Button == MouseButtons.Left)
-                                {
-                                    gv.mod.selectedPartyLeader = 5;
-                                    gv.cc.partyScreenPcIndex = 5;
-                                    gv.screenParty.resetPartyScreen();
-                                    gv.screenType = "party";
-                                    gv.cc.tutorialMessageParty(false);
-                                }
-                                else if (e.Button == MouseButtons.Right)
-                                {
-                                    gv.mod.selectedPartyLeader = 5;
-                                    gv.cc.partyScreenPcIndex = 5;
-                                }
-                            }
-                            else if (gv.cc.btnInventory.getImpact(x, y))
-                            {
-                                //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                                //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                                gv.screenType = "inventory";
-                                gv.screenInventory.resetInventory();
-                                gv.cc.tutorialMessageInventory(false);
-                            }
-                            else if (btnJournal.getImpact(x, y))
-                            {
-                                //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                                //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                                gv.screenType = "journal";
-                            }
-                            else if (btnSettings.getImpact(x, y))
-                            {
-                                //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                                //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                                gv.cc.doSettingsDialogs();
-                            }
-                            else if (btnSave.getImpact(x, y))
-                            {
-                                //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                                //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                                if (gv.mod.allowSave)
-                                {
-                                    gv.cc.doSavesDialog();
-                                }
-                            }
-                            else if (btnWait.getImpact(x, y))
-                            {
-                                //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                                //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                                gv.cc.doUpdate();
-                            }
-                            else if (btnCastOnMainMap.getImpact(x, y))
-                            {
-
-                                //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                                //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-
-                                List<string> pcNames = new List<string>();
-                                List<int> pcIndex = new List<int>();
-                                pcNames.Add("cancel");
-
-                                int cnt = 0;
-                                foreach (Player p in gv.mod.playerList)
-                                {
-                                    if (hasMainMapTypeSpell(p))
-                                    {
-                                        pcNames.Add(p.name);
-                                        pcIndex.Add(cnt);
-                                    }
-                                    cnt++;
-                                }
-
-                                //If only one PC, do not show select PC dialog...just go to cast selector
-                                if (pcIndex.Count == 1)
-                                {
-                                    try
-                                    {
-                                        gv.screenCastSelector.castingPlayerIndex = pcIndex[0];
-                                        gv.screenCombat.spellSelectorIndex = 0;
-                                        gv.screenType = "mainMapCast";
-                                        return;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        //print error
-                                        IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
-                                        gv.errorLog(ex.ToString());
-                                        return;
-                                    }
-                                }
-
-                                using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Caster"))
-                                {
-                                    pcSel.ShowDialog();
-
-                                    if (pcSel.selectedIndex > 0)
-                                    {
-                                        try
-                                        {
-                                            gv.screenCastSelector.castingPlayerIndex = pcIndex[pcSel.selectedIndex - 1]; // pcIndex.get(item - 1);
-                                            gv.screenCombat.spellSelectorIndex = 0;
-                                            gv.screenType = "mainMapCast";
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
-                                            gv.errorLog(ex.ToString());
-                                            //print error
-                                        }
-                                    }
-                                    else if (pcSel.selectedIndex == 0) // selected "cancel"
-                                    {
-                                        //do nothing
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                }*/
-        public void onKeyUp(Keys keyData)
-        {
-            if ((moveDelay()) && (finishedMove))
+            /*TODO if ((moveDelay()) && (finishedMove))
             {
                 if (keyData == Keys.Left | keyData == Keys.D4 | keyData == Keys.NumPad4)
                 {
@@ -35515,7 +34449,7 @@ namespace IBx
                         }
                     }
                 }
-            }
+            }*/
         }
         private bool moveDelay()
         {

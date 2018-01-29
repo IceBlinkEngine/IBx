@@ -52,9 +52,9 @@ namespace IBx
 		    if (btnInventoryLeft == null)
 		    {
 			    btnInventoryLeft = new IbbButton(gv, 1.0f);
-			    btnInventoryLeft.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInventoryLeft.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-			    btnInventoryLeft.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnInventoryLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnInventoryLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+			    btnInventoryLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnInventoryLeft.X = 7 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f*pW);
 			    btnInventoryLeft.Y = (int)(5f * gv.squareSize) - (pH * 2);
                 btnInventoryLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -63,8 +63,8 @@ namespace IBx
 		    if (btnPageIndex == null)
 		    {
 			    btnPageIndex = new IbbButton(gv, 1.0f);
-			    btnPageIndex.Img = gv.cc.LoadBitmap("btn_small_off"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-			    btnPageIndex.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+			    btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnPageIndex.Text = "1/10";
 			    btnPageIndex.X = 8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW);
 			    btnPageIndex.Y = (int)(5f * gv.squareSize) - (pH * 2);
@@ -74,9 +74,9 @@ namespace IBx
 		    if (btnInventoryRight == null)
 		    {
 			    btnInventoryRight = new IbbButton(gv, 1.0f);
-			    btnInventoryRight.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInventoryRight.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-			    btnInventoryRight.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnInventoryRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnInventoryRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+			    btnInventoryRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnInventoryRight.X = 9 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW);
 			    btnInventoryRight.Y = (int)(5f * gv.squareSize) - (pH * 2);
                 btnInventoryRight.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -85,9 +85,9 @@ namespace IBx
 		    if (btnShopLeft == null)
 		    {
 			    btnShopLeft = new IbbButton(gv, 1.0f);
-			    btnShopLeft.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnShopLeft.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-			    btnShopLeft.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnShopLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnShopLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+			    btnShopLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnShopLeft.X = 7 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW);
 			    btnShopLeft.Y = (int)(0.5f * gv.squareSize) - (pH * 2);
                 btnShopLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -96,8 +96,8 @@ namespace IBx
 		    if (btnShopPageIndex == null)
 		    {
 			    btnShopPageIndex = new IbbButton(gv, 1.0f);
-			    btnShopPageIndex.Img = gv.cc.LoadBitmap("btn_small_off"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-			    btnShopPageIndex.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnShopPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+			    btnShopPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnShopPageIndex.Text = "1/10";
 			    btnShopPageIndex.X = 8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW);
 			    btnShopPageIndex.Y = (int)(0.5f * gv.squareSize) - (pH * 2);
@@ -107,9 +107,9 @@ namespace IBx
 		    if (btnShopRight == null)
 		    {
 			    btnShopRight = new IbbButton(gv, 1.0f);
-			    btnShopRight.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnShopRight.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-			    btnShopRight.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnShopRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnShopRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+			    btnShopRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnShopRight.X = 9 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW);
 			    btnShopRight.Y = (int)(0.5f * gv.squareSize) - (pH * 2);
                 btnShopRight.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -119,8 +119,8 @@ namespace IBx
 		    {
 			    btnReturn = new IbbButton(gv, 1.2f);	
 			    btnReturn.Text = "EXIT SHOP";
-			    btnReturn.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnReturn.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnReturn.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnReturn.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnReturn.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f) - (int)(0.5f*gv.squareSize);
 			    btnReturn.Y = 9* gv.squareSize + pH * 2;
                 btnReturn.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -130,8 +130,8 @@ namespace IBx
             {
                 btnHelp = new IbbButton(gv, 0.8f);
                 btnHelp.Text = "HELP";
-                btnHelp.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnHelp.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnHelp.X = 0 * gv.squareSize + padW * 1 + gv.oXshift;
                 btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -141,8 +141,8 @@ namespace IBx
                 {
                     btnInfo = new IbbButton(gv, 0.8f);
                     btnInfo.Text = "INFO";
-                    btnInfo.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                    btnInfo.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                    btnInfo.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                    btnInfo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                     btnInfo.X = (5 * gv.squareSize) - padW * 1 + gv.oXshift;
                     btnInfo.Y = (int)(6.5f * gv.squareSize);
                     btnInfo.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -153,8 +153,8 @@ namespace IBx
             {
                 btnInfoShop = new IbbButton(gv, 0.8f);
                 btnInfoShop.Text = "INFO";
-                btnInfoShop.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnInfoShop.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnInfoShop.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnInfoShop.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnInfoShop.X = (5 * gv.squareSize) - padW * 1 + gv.oXshift;
                 btnInfoShop.Y = (int)(2f * gv.squareSize) + 0*pH;
                 btnInfoShop.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -164,8 +164,8 @@ namespace IBx
             for (int j = 0; j < 10; j++)
 		    {
 			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = gv.cc.LoadBitmap("item_slot"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-			    btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+			    btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    if (j < 5)
 			    {
 				    btnNew.X = ((j+2+4) * gv.squareSize) + (padW * (j+1)) + gv.oXshift;
@@ -184,8 +184,8 @@ namespace IBx
 		    for (int j = 0; j < 10; j++)
 		    {
 			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = gv.cc.LoadBitmap("item_slot"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-			    btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+			    btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    if (j < 5)
 			    {
 				    btnNew.X = ((j+2+4) * gv.squareSize) + (padW * (j+1)) + gv.oXshift;
@@ -220,7 +220,7 @@ namespace IBx
     	    int tabStartY = 9 * gv.squareSize + pH * 2;
     	    int tabShopStartY = 4 * gv.squareSize + pH * 2;
     	
-    	    gv.DrawText(currentShop.shopName, 5 * gv.squareSize, locY + 1.5f*gv.squareSize, 1.0f, Color.DarkGray);
+    	    gv.DrawText(currentShop.shopName, 5 * gv.squareSize, locY + 1.5f*gv.squareSize, "gray");
 
             int adder = 0;
             int highestNonStackable = -99;
@@ -252,7 +252,7 @@ namespace IBx
             if (highestNonStackable > -99) { adder = highestNonStackable; }
             int totalSellPerc = currentShop.sellPercent + currentShop.sellModifier + adder;
 
-            gv.DrawText("Buys at: " + totalBuyPerc + "%, sells at: " + totalSellPerc + "%", 8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW), locY + 1.5f * gv.squareSize, 1.0f, Color.Blue);
+            gv.DrawText("Buys at: " + totalBuyPerc + "%, sells at: " + totalSellPerc + "%", 8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW), locY + 1.5f * gv.squareSize, "blue");
            
             //8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW)
 
@@ -274,8 +274,7 @@ namespace IBx
 			    {
 				    ItemRefs itrs = currentShop.shopItemRefs[cntSlot + (shopPageIndex * 10)];
 				    Item it = gv.mod.getItemByResRefForInfo(itrs.resref);
-                    gv.cc.DisposeOfBitmap(ref btn.Img2);
-                    btn.Img2 = gv.cc.LoadBitmap(it.itemImage);	
+                    btn.Img2 = it.itemImage;	
 				    if (itrs.quantity < it.groupSizeForSellingStackableItems)
     			    {
                         //less than the stack size for selling
@@ -414,12 +413,12 @@ namespace IBx
 		
 		    //DRAW TEXT		
 		    locY = (5 * gv.squareSize) + (pH * 2);
-		    gv.DrawText("Party Inventory", gv.squareSize * 5, locY + gv.squareSize - 2*pH, 1.0f, Color.DarkGray);
+		    gv.DrawText("Party Inventory", gv.squareSize * 5, locY + gv.squareSize - 2*pH, "gray");
             //gv.DrawText("Inventory", locX + gv.squareSize * 4, locY += spacing, 1.0f, Color.DarkGray);
 		    //locY = (5 * gv.squareSize) + (pH * -2);
 		    //gv.DrawText("Party", tabX2 + gv.squareSize * 5.5f - 0*pW, locY+pH, 1.0f, Color.Gold);
             //gv.DrawText(gv.mod.goldLabelPlural + ": " + gv.mod.partyGold, tabX2 + gv.squareSize * 5.5f - 0*pW, locY += (int)2*spacing, 1.0f, Color.Gold);
-            gv.DrawText(gv.mod.goldLabelPlural + ": " + gv.mod.partyGold, 8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW), locY + gv.squareSize - 2 * pH, 1.0f, Color.Gold);
+            gv.DrawText(gv.mod.goldLabelPlural + ": " + gv.mod.partyGold, 8 * gv.squareSize + (int)(0.5f * gv.squareSize) + (int)(0.75f * pW), locY + gv.squareSize - 2 * pH, "yellow");
             //gv.DrawText(gv.mod.goldLabelPlural + ": " + gv.mod.partyGold, 12 * gv.squareSize, locY += (int)2 * spacing, 1.0f, Color.Gold);
             //locY = (5 * gv.squareSize) + (pH * -2);
 
@@ -439,8 +438,7 @@ namespace IBx
 			    {
 				    ItemRefs itr = gv.mod.partyInventoryRefsList[cntSlot + (inventoryPageIndex * 10)];
 				    Item it = gv.mod.getItemByResRefForInfo(itr.resref);
-                    gv.cc.DisposeOfBitmap(ref btn.Img2);
-                    btn.Img2 = gv.cc.LoadBitmap(it.itemImage);	
+                    btn.Img2 = it.itemImage;	
 				    if (itr.quantity < it.groupSizeForSellingStackableItems)
     			    {
                         //less than the stack size for selling
@@ -713,7 +711,7 @@ namespace IBx
 		    }
 	    }
     
-        public void onTouchShop(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchShop(int eX, int eY, MouseEventType.EventType eventType)
 	    {
             try
             {
@@ -730,8 +728,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
                         if (btnInventoryLeft.getImpact(x, y))
                         {
                             btnInventoryLeft.glowOn = true;
@@ -767,8 +765,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnInventoryLeft.glowOn = false;
                         btnInventoryRight.glowOn = false;
@@ -878,12 +876,13 @@ namespace IBx
             { }
 	    }
 	
-	    public void doInventoryActions()
+	    public async void doInventoryActions()
 	    {
 		    if ((inventorySlotIndex + (inventoryPageIndex * 10)) < gv.mod.partyInventoryRefsList.Count)
 		    {
-                DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to sell this item?", enumMessageButton.YesNo);
-                if (dlg == DialogResult.Yes)
+                //DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to sell this item?", enumMessageButton.YesNo);
+                bool answer = await gv.cp.DisplayAlert("Question?", "Do you wish to sell this item?", "Yes", "No");
+                if (answer)
                 {
                     //sell item
                     ItemRefs itr = gv.mod.partyInventoryRefsList[inventorySlotIndex + (inventoryPageIndex * 10)];
@@ -978,14 +977,14 @@ namespace IBx
                         }
                     }
                 }
-                if (dlg == DialogResult.No)
+                else
                 {
                     //do nothing
                 }
 		    }
 	    }
 	
-	    public void doShopActions()
+	    public async void doShopActions()
 	    {
 		    if ((shopSlotIndex + (shopPageIndex * 10)) < currentShop.shopItemRefs.Count)
 		    {
@@ -1039,8 +1038,9 @@ namespace IBx
                     }
                     */
                 }
-                DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to buy this item?", enumMessageButton.YesNo);
-                if (dlg == DialogResult.Yes)
+                bool answer = await gv.cp.DisplayAlert("Question?", "Do you wish to buy this item?", "Yes", "No");
+                //DialogResult dlg = IBMessageBox.Show(gv, "Do you wish to buy this item?", enumMessageButton.YesNo);
+                if (answer)
                 {
                     //buy item
                     ItemRefs itr = currentShop.shopItemRefs[shopSlotIndex + (shopPageIndex * 10)];
@@ -1082,7 +1082,7 @@ namespace IBx
                         }
                     }
                 }
-                if (dlg == DialogResult.No)
+                else
                 {
                     //do nothing
                 }

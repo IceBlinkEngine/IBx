@@ -68,6 +68,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)ItemRefs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JournalEntry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JournalQuest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ListViewPageIBx.xaml.cs">
+      <DependentUpon>ListViewPageIBx.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)LocalImmunityString.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocalInt.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocalString.cs" />
@@ -123,5 +127,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)metamorphous_regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)ListViewPageIBx.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

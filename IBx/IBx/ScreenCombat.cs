@@ -128,7 +128,7 @@ namespace IBx
         //private Bitmap projectile;
         //private bool projectileFacingUp = true;
         //private Bitmap ending_fx;
-        private Bitmap mapBitmap;
+        private string mapBitmap;
 
         /*private IbbButton btnSelect = null;
 	    private IbbButton btnMove = null;
@@ -178,7 +178,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
             }
         }
 
@@ -241,242 +241,11 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error Loading CombatUILayout.json: " + ex.ToString());
+                //MessageBox.Show("Error Loading CombatUILayout.json: " + ex.ToString());
                 gv.errorLog(ex.ToString());
             }
         }
 
-        /*public void setControlsStart()
-	    {		
-		    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		    int padW = gv.squareSize/6;
-            int hotkeyShift = 0;
-            if (gv.useLargeLayout)
-            {
-                hotkeyShift = 1;
-            }
-
-
-            if (btnSelect == null)
-		    {
-			    btnSelect = new IbbButton(gv, 0.8f);	
-			    btnSelect.Text = "SELECT";
-			    btnSelect.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-			    btnSelect.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                btnSelect.X = gv.cc.pnlArrows.LocX + 1 * gv.squareSize + gv.squareSize / 2;
-                btnSelect.Y = gv.cc.pnlArrows.LocY + 1 * gv.squareSize + gv.pS;
-                btnSelect.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSelect.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }			
-		    if (btnMove == null)
-		    {
-			    btnMove = new IbbButton(gv, 0.8f);
-			    btnMove.Img = gv.cc.LoadBitmap("btn_small");
-                btnMove.ImgOn = gv.cc.LoadBitmap("btn_small_on");
-                btnMove.ImgOff = gv.cc.LoadBitmap("btn_small_off");
-			    btnMove.Glow = gv.cc.LoadBitmap("btn_small_glow");
-			    btnMove.Text = "MOVE";
-                btnMove.HotKey = "M";
-                btnMove.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 3) * gv.squareSize;
-                btnMove.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnMove.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnMove.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-            if (btnMoveCounter == null)
-            {
-                btnMoveCounter = new IbbButton(gv, 1.2f);
-                btnMoveCounter.Img = gv.cc.LoadBitmap("btn_small_off"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnMoveCounter.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                btnMoveCounter.Text = "0";
-                btnMoveCounter.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 6) * gv.squareSize;
-                btnMoveCounter.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnMoveCounter.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnMoveCounter.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-            }
-		    if (btnAttack == null)
-		    {
-			    btnAttack = new IbbButton(gv, 0.8f);
-			    btnAttack.Img = gv.cc.LoadBitmap("btn_small");
-                btnAttack.ImgOn = gv.cc.LoadBitmap("btn_small_on");
-                btnAttack.ImgOff = gv.cc.LoadBitmap("btn_small_off");
-			    btnAttack.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-			    btnAttack.Text = "ATTACK";
-                btnAttack.HotKey = "A";
-                btnAttack.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 4) * gv.squareSize;
-                btnAttack.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnAttack.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnAttack.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    if (btnCast == null)
-		    {
-			    btnCast = new IbbButton(gv, 0.8f);
-			    btnCast.Img = gv.cc.LoadBitmap("btn_small");
-                btnCast.ImgOn = gv.cc.LoadBitmap("btn_small_on");
-                btnCast.ImgOff = gv.cc.LoadBitmap("btn_small_off");
-			    btnCast.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-			    btnCast.Text = "CAST";
-                btnCast.HotKey = "C";
-                btnCast.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 5) * gv.squareSize;
-                btnCast.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnCast.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnCast.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    if (btnSkipTurn == null)
-		    {
-			    btnSkipTurn = new IbbButton(gv, 0.8f);
-			    btnSkipTurn.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-			    btnSkipTurn.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-			    btnSkipTurn.Text = "SKIP";
-                btnSkipTurn.HotKey = "S";
-                btnSkipTurn.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 2) * gv.squareSize;
-                btnSkipTurn.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnSkipTurn.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSkipTurn.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    if (btnSwitchWeapon == null)
-		    {
-			    btnSwitchWeapon = new IbbButton(gv, 0.8f);
-                btnSwitchWeapon.HotKey = "P";
-			    btnSwitchWeapon.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-			    btnSwitchWeapon.Img2 = gv.cc.LoadBitmap("btnparty"); // BitmapFactory.decodeResource(getResources(), R.drawable.btnparty);
-			    btnSwitchWeapon.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
-                btnSwitchWeapon.X = gv.cc.pnlHotkeys.LocX + (hotkeyShift + 0) * gv.squareSize;
-                btnSwitchWeapon.Y = gv.cc.pnlHotkeys.LocY + 0 * gv.squareSize + gv.pS;
-                btnSwitchWeapon.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSwitchWeapon.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-					
-		    }
-	    }*/
-        /*public void setToggleButtonsStart()
-        {
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		    int padW = gv.squareSize/6;
-			
-		    if (tglGrid == null)
-		    {
-			    tglGrid = new IbbToggleButton(gv);
-			    tglGrid.ImgOn = gv.cc.LoadBitmap("tgl_grid_on");
-			    tglGrid.ImgOff = gv.cc.LoadBitmap("tgl_grid_off");
-                tglGrid.X = gv.cc.pnlToggles.LocX + 1 * gv.squareSize + gv.squareSize / 4;
-                tglGrid.Y = gv.cc.pnlToggles.LocY + 1 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglGrid.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglGrid.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-			    tglGrid.toggleOn = true;
-		    }
-		    if (tglHP == null)
-		    {
-			    tglHP = new IbbToggleButton(gv);
-			    tglHP.ImgOn = gv.cc.LoadBitmap("tgl_hp_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_hp_on);
-			    tglHP.ImgOff = gv.cc.LoadBitmap("tgl_hp_off"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_hp_off);
-                tglHP.X = gv.cc.pnlToggles.LocX + 1 * gv.squareSize + gv.squareSize / 4;
-                tglHP.Y = gv.cc.pnlToggles.LocY + 0 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglHP.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglHP.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-		    }
-		    if (tglSP == null)
-		    {
-			    tglSP = new IbbToggleButton(gv);
-			    tglSP.ImgOn = gv.cc.LoadBitmap("tgl_sp_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_on);
-			    tglSP.ImgOff = gv.cc.LoadBitmap("tgl_sp_off"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_off);
-                tglSP.X = gv.cc.pnlToggles.LocX + 2 * gv.squareSize + gv.squareSize / 4;
-                tglSP.Y = gv.cc.pnlToggles.LocY + 0 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglSP.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglSP.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-		    }
-            if (tglMoveOrder == null)
-            {
-                tglMoveOrder = new IbbToggleButton(gv);
-                tglMoveOrder.ImgOn = gv.cc.LoadBitmap("tgl_mo_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_on);
-                tglMoveOrder.ImgOff = gv.cc.LoadBitmap("tgl_mo_off"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_off);
-                tglMoveOrder.X = gv.cc.pnlToggles.LocX + 3 * gv.squareSize + gv.squareSize / 4;
-                tglMoveOrder.Y = gv.cc.pnlToggles.LocY + 0 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglMoveOrder.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglMoveOrder.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-            }
-		    if (tglSpeed == null)
-		    {
-			    tglSpeed = new IbbToggleButton(gv);
-			    tglSpeed.ImgOn = gv.cc.LoadBitmap("tgl_speed_4"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_on);
-			    tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_4"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_off);
-                tglSpeed.X = gv.cc.pnlToggles.LocX + 3 * gv.squareSize + gv.squareSize / 4;
-                tglSpeed.Y = gv.cc.pnlToggles.LocY + 2 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglSpeed.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglSpeed.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-		    }
-		    if (tglSoundFx == null)
-		    {
-			    tglSoundFx = new IbbToggleButton(gv);
-			    tglSoundFx.ImgOn = gv.cc.LoadBitmap("tgl_sound_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_on);
-			    tglSoundFx.ImgOff = gv.cc.LoadBitmap("tgl_sound_off"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_off);
-                tglSoundFx.X = gv.cc.pnlToggles.LocX + 3 * gv.squareSize + gv.squareSize / 4;
-                tglSoundFx.Y = gv.cc.pnlToggles.LocY + 1 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglSoundFx.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglSoundFx.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-		    }
-		    if (tglHelp == null)
-		    {
-			    tglHelp = new IbbToggleButton(gv);
-			    tglHelp.ImgOn = gv.cc.LoadBitmap("tgl_help_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_on);
-			    tglHelp.ImgOff = gv.cc.LoadBitmap("tgl_help_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_off);
-                tglHelp.X = gv.cc.pnlToggles.LocX + 2 * gv.squareSize + gv.squareSize / 4;
-                tglHelp.Y = gv.cc.pnlToggles.LocY + 2 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglHelp.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglHelp.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-		    }
-		    if (tglKill == null)
-		    {
-			    tglKill = new IbbToggleButton(gv);
-			    tglKill.ImgOn = gv.cc.LoadBitmap("tgl_kill_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_on);
-			    tglKill.ImgOff = gv.cc.LoadBitmap("tgl_kill_on"); // BitmapFactory.decodeResource(getResources(), R.drawable.tgl_sp_off);
-                tglKill.X = gv.cc.pnlToggles.LocX + 1 * gv.squareSize + gv.squareSize / 4;
-                tglKill.Y = gv.cc.pnlToggles.LocY + 2 * gv.squareSize + gv.squareSize / 4 + gv.pS;
-                tglKill.Height = (int)(gv.ibbheight / 2 * gv.screenDensity);
-                tglKill.Width = (int)(gv.ibbwidthR / 2 * gv.screenDensity);
-		    }
-        }*/
-        /*public void resetToggleButtons()
-        {
-            if (gv.mod.combatAnimationSpeed == 100)
-            {
-                gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_1");
-            }
-            else if (gv.mod.combatAnimationSpeed == 50)
-            {
-                gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_2");
-            }
-            else if (gv.mod.combatAnimationSpeed == 25)
-            {
-                gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_4");
-            }
-            else if (gv.mod.combatAnimationSpeed == 10)
-            {
-                gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_10");
-            }
-
-            if (gv.mod.playMusic)
-            {
-                gv.cc.tglSound.toggleOn = true;
-            }
-            else
-            {
-                gv.cc.tglSound.toggleOn = false;
-            }
-
-            if (gv.mod.playSoundFx)
-            {
-                tglSoundFx.toggleOn = true;
-            }
-            else
-            {
-                tglSoundFx.toggleOn = false;
-            }
-        }*/
         public void tutorialMessageCombat(bool helpCall)
         {
             if ((gv.mod.showTutorialCombat) || (helpCall))
@@ -562,8 +331,7 @@ namespace IBx
             //Load map if used
             if (gv.mod.currentEncounter.UseMapImage)
             {
-                gv.cc.DisposeOfBitmap(ref mapBitmap);
-                mapBitmap = gv.cc.LoadBitmap(gv.mod.currentEncounter.MapImage);
+                mapBitmap = gv.mod.currentEncounter.MapImage;
             }
             else //loads only the tiles that are used on this encounter map
             {
@@ -582,8 +350,6 @@ namespace IBx
                         {
                             Creature copy = c.DeepCopy();
                             copy.cr_tag = crf.creatureTag;
-                            gv.cc.DisposeOfBitmap(ref copy.token);
-                            copy.token = gv.cc.LoadBitmap(copy.cr_tokenFilename);
                             copy.combatLocX = crf.creatureStartLocationX;
                             copy.combatLocY = crf.creatureStartLocationY;
                             gv.mod.currentEncounter.encounterCreatureList.Add(copy);
@@ -1695,7 +1461,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                IBMessageBox.Show(gv, ex.ToString());
+                //IBMessageBox.Show(gv, ex.ToString());
                 gv.errorLog(ex.ToString());
             }
             checkEndEncounter();
@@ -1795,7 +1561,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                IBMessageBox.Show(gv, ex.ToString());
+                //IBMessageBox.Show(gv, ex.ToString());
                 gv.errorLog(ex.ToString());
             }
             checkEndEncounter();
@@ -3491,9 +3257,9 @@ namespace IBx
                         creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
                         //set attack animation and do a delay
                         attackAnimationTimeElapsed = 0;
-                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f) );
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f) );
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
 
                         //add projectile animation
                         startX = getPixelLocX(crt.combatLocX);
@@ -3569,8 +3335,8 @@ namespace IBx
 
                         attackAnimationTimeElapsed = 0;
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
 
                         //do melee attack stuff and animations  
                         AnimationSequence newSeq = new AnimationSequence();
@@ -3666,9 +3432,9 @@ namespace IBx
                         creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
                         //set attack animation and do a delay
                         attackAnimationTimeElapsed = 0;
-                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f) );
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f) );
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
 
                         //add projectile animation
                         startX = getPixelLocX(crt.combatLocX);
@@ -3743,8 +3509,8 @@ namespace IBx
 
                         attackAnimationTimeElapsed = 0;
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
 
                         //do melee attack stuff and animations  
                         AnimationSequence newSeq = new AnimationSequence();
@@ -3855,8 +3621,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f));
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -5904,8 +5670,8 @@ namespace IBx
                 //add normal creature size square location first...add other sizes as needed  
                 crt.tokenCoveredSquares.Add(new Coordinate(crt.combatLocX, crt.combatLocY));
 
-                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Width;
-                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Height;
+                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width;
+                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height;
                 //1=normal, 2=wide, 3=tall, 4=large  
                 int crtSize = crt.creatureSize;
 
@@ -5939,8 +5705,8 @@ namespace IBx
                 //add normal creature size square location first...add other sizes as needed  
                 crt.tokenCoveredSquares.Add(new Coordinate(crt.combatLocX, crt.combatLocY));
 
-                int width = gv.cc.GetFromBitmapList(crt.tokenFilename).PixelSize.Width;
-                int height = gv.cc.GetFromBitmapList(crt.tokenFilename).PixelSize.Height;
+                int width = gv.cc.GetFromBitmapList(crt.tokenFilename).Width;
+                int height = gv.cc.GetFromBitmapList(crt.tokenFilename).Height;
                 //1=normal, 2=wide, 3=tall, 4=large  
                 int crtSize = crt.playerSize;
 
@@ -6018,7 +5784,7 @@ namespace IBx
         {
             foreach (Prop prp in gv.mod.currentEncounter.propsList)
             {
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(prp.ImageFileName).PixelSize.Width, gv.cc.GetFromBitmapList(prp.ImageFileName).PixelSize.Width);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(prp.ImageFileName).Width, gv.cc.GetFromBitmapList(prp.ImageFileName).Width);
                 IbRect dst = new IbRect(getPixelLocX(prp.LocationX), getPixelLocY(prp.LocationY), gv.squareSize, gv.squareSize);
                 gv.DrawBitmap(gv.cc.GetFromBitmapList(prp.ImageFileName), src, dst);
             }
@@ -6028,7 +5794,7 @@ namespace IBx
         {
             foreach (Effect ef in gv.mod.currentEncounter.effectsList)
             {
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ef.spriteFilename).PixelSize.Width, gv.cc.GetFromBitmapList(ef.spriteFilename).PixelSize.Width);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ef.spriteFilename).Width, gv.cc.GetFromBitmapList(ef.spriteFilename).Width);
                 IbRect dst = new IbRect(getPixelLocX(ef.combatLocX), getPixelLocY(ef.combatLocY), gv.squareSize, gv.squareSize);
                 gv.DrawBitmap(gv.cc.GetFromBitmapList(ef.spriteFilename), src, dst);
             }
@@ -6083,7 +5849,7 @@ namespace IBx
                     Player crt = (Player)m.PcOrCreature;
                     if (crt.hp <= 0)
                     {
-                        if (crt.token.PixelSize.Width > 100)
+                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                         {
                             moverOrdersOfLargeFallenCreatures.Add(crt.moveOrder);
                         }
@@ -6095,7 +5861,7 @@ namespace IBx
                     else
                     {
                         moverOrdersOfAllLivingCreatures.Add(crt.moveOrder);
-                        if (crt.token.PixelSize.Width > 100)
+                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                         {
                             moverOrdersOfLargeLivingCreatures.Add(crt.moveOrder);
                         }
@@ -6110,7 +5876,7 @@ namespace IBx
                     Creature crt = (Creature)m.PcOrCreature;
                     if (crt.hp <= 0)
                     {
-                        if (crt.token.PixelSize.Width > 100)
+                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                         {
                             moverOrdersOfLargeFallenCreatures.Add(crt.moveOrder);
                         }
@@ -6122,7 +5888,7 @@ namespace IBx
                     else
                     {
                         moverOrdersOfAllLivingCreatures.Add(crt.moveOrder);
-                        if (crt.token.PixelSize.Width > 100)
+                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                         {
                             moverOrdersOfLargeLivingCreatures.Add(crt.moveOrder);
                         }
@@ -6517,13 +6283,13 @@ namespace IBx
                     {
                         if (isCreature)
                         {
-                            IbRect src = new IbRect(0, 0, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
                             int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2 * gv.pS;
                             int startBarY = 0 * gv.squareSize + 2 * gv.pS;
                             int targetSizeX = gv.squareSize / 2;
                             int targetSizeY = gv.squareSize / 2;
                             int marchingLineHeight = gv.squareSize / 2;
-                            if (crt.token.PixelSize.Width > 100)
+                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                             {
                                 targetSizeX = gv.squareSize;
                                 targetSizeY = gv.squareSize;
@@ -6535,31 +6301,31 @@ namespace IBx
                                 gv.DrawBitmap(gv.cc.turn_marker, src, dst, false);
                             }
 
-                            gv.DrawBitmap(crt.token, src, dst, false);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, false);
                             int mo = crt.moveOrder + 1;
-                            if (crt.token.PixelSize.Width <= 100)
+                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width <= 100)
                             {
                                 creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
-                                drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), Color.Red);
+                                drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
+                                drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), "red");
                             }
                             else
                             {
                                 creatureSpacesUsed++;
                                 creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), Color.White);
-                                drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, crt.hp.ToString(), Color.Red);
+                                drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
+                                drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, crt.hp.ToString(), "red");
                             }
                         }
                         else
                         {
-                            IbRect src = new IbRect(0, 0, ply.token.PixelSize.Width, ply.token.PixelSize.Width);
+                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ply.tokenFilename).Width, gv.cc.GetFromBitmapList(ply.tokenFilename).Width);
                             int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2 * gv.pS;
                             int startBarY = 0 * gv.squareSize + 2 * gv.pS;
                             int targetSizeX = gv.squareSize / 2;
                             int targetSizeY = gv.squareSize / 2;
                             int marchingLineHeight = gv.squareSize / 2;
-                            if (ply.token.PixelSize.Width > 100)
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width > 100)
                             {
                                 targetSizeX = gv.squareSize;
                                 targetSizeY = gv.squareSize;
@@ -6571,20 +6337,20 @@ namespace IBx
                                 gv.DrawBitmap(gv.cc.turn_marker, src, dst, false);
                             }
 
-                            gv.DrawBitmap(ply.token, src, dst, false);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(ply.tokenFilename), src, dst, false);
                             int mo = ply.moveOrder + 1;
-                            if (ply.token.PixelSize.Width <= 100)
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width <= 100)
                             {
                                 creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
-                                drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, ply.hp.ToString(), Color.Lime);
+                                drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
+                                drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, ply.hp.ToString(), "lime");
                             }
                             else
                             {
                                 creatureSpacesUsed++;
                                 creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), Color.White);
-                                drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, ply.hp.ToString(), Color.Lime);
+                                drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
+                                drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, ply.hp.ToString(), "lime");
                             }
                         }
 
@@ -6655,7 +6421,7 @@ namespace IBx
              {
                  continue;
              }
-             if (crt.token.PixelSize.Width > 100)
+             if (crt.token.Width > 100)
              {
                  numberOfBackgroundTiles++;
              }
@@ -6672,7 +6438,7 @@ namespace IBx
              {
                  continue;
              }
-             if (crt.token.PixelSize.Width > 100)
+             if (crt.token.Width > 100)
              {
                  numberOfBackgroundTiles++;
              }
@@ -6751,7 +6517,7 @@ namespace IBx
              if (crt.hp <= 0)
              {
                  adderForTheFallen++;
-                 if (crt.token.PixelSize.Width > 100)
+                 if (crt.token.Width > 100)
                  {
                      adderForTheFallen++;
                  }
@@ -6765,7 +6531,7 @@ namespace IBx
              if (crt.hp <= 0)
              {
                  adderForTheFallen++;
-                 if (crt.token.PixelSize.Width > 100)
+                 if (crt.token.Width > 100)
                  {
                      adderForTheFallen++;
                  }
@@ -6858,13 +6624,13 @@ namespace IBx
              {
                  continue;
              }
-             IbRect src = new IbRect(0, 0, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+             IbRect src = new IbRect(0, 0, crt.token.Width, crt.token.Width);
              int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2*gv.pS;
              int startBarY = 0 * gv.squareSize + 2*gv.pS;
              int targetSizeX = gv.squareSize / 2;
              int targetSizeY = gv.squareSize / 2;
              int marchingLineHeight = gv.squareSize / 2;
-             if (crt.token.PixelSize.Width > 100)
+             if (crt.token.Width > 100)
              {
                  targetSizeX = gv.squareSize;
                  targetSizeY = gv.squareSize;
@@ -6880,7 +6646,7 @@ namespace IBx
              {
                  gv.DrawBitmap(crt.token, src, dst, false);
                  int mo = crt.moveOrder + 1;
-                 if (crt.token.PixelSize.Width <= 100)
+                 if (crt.token.Width <= 100)
                  {
                      drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
                      drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), Color.Lime);
@@ -6897,7 +6663,7 @@ namespace IBx
              {
                  creatureCounter2++;
              }
-                 if (crt.token.PixelSize.Width > 100)
+                 if (crt.token.Width > 100)
              {
                  creatureCounter++;
                  if (crt.moveOrder + 1 <= currentMoveOrderIndex)
@@ -6915,13 +6681,13 @@ namespace IBx
              {
                  continue;
              }
-             IbRect src = new IbRect(0, 0, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+             IbRect src = new IbRect(0, 0, crt.token.Width, crt.token.Width);
              int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2*gv.pS;
              int startBarY = 0 * gv.squareSize + 2*gv.pS;
              int targetSizeX = gv.squareSize / 2;
              int targetSizeY = gv.squareSize / 2;
              int marchingLineHeight = gv.squareSize / 2; ;
-             if (crt.token.PixelSize.Width > 100)
+             if (crt.token.Width > 100)
              {
                  targetSizeX = gv.squareSize;
                  targetSizeY = gv.squareSize;
@@ -6937,7 +6703,7 @@ namespace IBx
              {
                  gv.DrawBitmap(crt.token, src, dst, false);
                  int mo = crt.moveOrder + 1;
-                 if (crt.token.PixelSize.Width <= 100)
+                 if (crt.token.Width <= 100)
                  {
                      drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
                      drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), Color.Red);
@@ -6953,7 +6719,7 @@ namespace IBx
              {
                  creatureCounter2++;
              }
-             if (crt.token.PixelSize.Width > 100)
+             if (crt.token.Width > 100)
              {
                  largeCreaturesInBand++;
                  creatureCounter++;
@@ -7178,19 +6944,19 @@ namespace IBx
                 if (gv.mod.currentEncounter.UseMapImage)
                 {
                     /*
-                    int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
-                    int sqrsizeH = mapBitmap.PixelSize.Height / gv.mod.currentEncounter.MapSizeY;
+                    int sqrsizeW = mapBitmap.Width / gv.mod.currentEncounter.MapSizeX;
+                    int sqrsizeH = mapBitmap.Height / gv.mod.currentEncounter.MapSizeY;
                     IbRect src = new IbRect(UpperLeftSquare.X * sqrsizeW, UpperLeftSquare.Y * sqrsizeH, sqrsizeW * 9, sqrsizeH * 9);
                     IbRect dst = new IbRect(0 + gv.oXshift + mapStartLocXinPixels, 0, gv.squareSize * 9, gv.squareSize * 9);
                     gv.DrawBitmap(mapBitmap, src, dst);
                     */
-                    int bmpWidth = mapBitmap.PixelSize.Width;
-                    int bmpHeight = mapBitmap.PixelSize.Height;
-                    int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
-                    int sqrsizeH = mapBitmap.PixelSize.Height / gv.mod.currentEncounter.MapSizeY;
+                    int bmpWidth = gv.cc.GetFromBitmapList(mapBitmap).Width;
+                    int bmpHeight = gv.cc.GetFromBitmapList(mapBitmap).Height;
+                    int sqrsizeW = gv.cc.GetFromBitmapList(mapBitmap).Width / gv.mod.currentEncounter.MapSizeX;
+                    int sqrsizeH = gv.cc.GetFromBitmapList(mapBitmap).Height / gv.mod.currentEncounter.MapSizeY;
                     int dstX = -(UpperLeftSquare.X * gv.squareSize);
                     int dstY = -(UpperLeftSquare.Y * gv.squareSize);
-                    float singleImageTileSizeProxy = 100f / ((float)mapBitmap.PixelSize.Width/ (float)gv.mod.currentEncounter.MapSizeX);
+                    float singleImageTileSizeProxy = 100f / ((float)gv.cc.GetFromBitmapList(mapBitmap).Width/ (float)gv.mod.currentEncounter.MapSizeX);
                     if (!gv.mod.encounterSingleImageAutoScale)
                     {
                         singleImageTileSizeProxy = 2;
@@ -7201,7 +6967,7 @@ namespace IBx
                     IbRect src = new IbRect(0, 0, bmpWidth, bmpHeight);
                     //IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
                     IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
-                    gv.DrawBitmap(mapBitmap, src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(mapBitmap), src, dst);
 
                     /*
                     //draw grid
@@ -7295,16 +7061,16 @@ namespace IBx
                                 if (!tileBitmapIsLoadedAlready)
                                 {
                                     gv.mod.loadedTileBitmapsNames.Add(tile.Layer1Filename);
-                                    tile.tileBitmap1 = gv.cc.LoadBitmap(tile.Layer1Filename);
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap1);
+                                    tile.tileBitmap1 = tile.Layer1Filename;
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap1);
 
                                     IbRect srcLyr = getSourceIbRect(
                                     x,
                                     y,
                                     UpperLeftSquare.X,
                                     UpperLeftSquare.Y,
-                                    tile.tileBitmap1.PixelSize.Width,
-                                    tile.tileBitmap1.PixelSize.Height);
+                                    gv.cc.GetFromBitmapList(tile.tileBitmap1).Width,
+                                    gv.cc.GetFromBitmapList(tile.tileBitmap1).Height);
 
                                     if (srcLyr != null)
                                     {
@@ -7317,8 +7083,8 @@ namespace IBx
                                         int brX = (int)(gv.squareSize * scalerX);
                                         int brY = (int)(gv.squareSize * scalerY);
                                         IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
-                                        gv.DrawBitmap(tile.tileBitmap1, srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
-                                        //gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer1Filename), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap1), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                                        //gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer1Filename), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
                                     }
                                 }
                                 else
@@ -7328,8 +7094,8 @@ namespace IBx
                                     y,
                                     UpperLeftSquare.X,
                                     UpperLeftSquare.Y,
-                                    gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width,
-                                    gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width,
+                                    gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     if (srcLyr != null)
                                     {
                                         int shiftY = srcLyr.Top / gv.squareSizeInPixels;
@@ -7341,8 +7107,8 @@ namespace IBx
                                         int brX = (int)(gv.squareSize * scalerX);
                                         int brY = (int)(gv.squareSize * scalerY);
                                         IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
-                                        gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
-                                        //gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer1Filename), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                                        //gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer1Filename), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
 
                                     }
 
@@ -7384,16 +7150,16 @@ namespace IBx
                                 if (!tileBitmapIsLoadedAlready)
                                 {
                                     gv.mod.loadedTileBitmapsNames.Add(tile.Layer2Filename);
-                                    tile.tileBitmap2 = gv.cc.LoadBitmap(tile.Layer2Filename);
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap2);
+                                    tile.tileBitmap2 = tile.Layer2Filename;
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap2);
 
                                     IbRect srcLyr = getSourceIbRect(
                                     x,
                                     y,
                                     UpperLeftSquare.X,
                                     UpperLeftSquare.Y,
-                                    tile.tileBitmap2.PixelSize.Width,
-                                    tile.tileBitmap2.PixelSize.Height);
+                                    gv.cc.GetFromBitmapList(tile.tileBitmap2).Width,
+                                    gv.cc.GetFromBitmapList(tile.tileBitmap2).Height);
                                     if (srcLyr != null)
                                     {
                                         int shiftY = srcLyr.Top / gv.squareSizeInPixels;
@@ -7406,7 +7172,7 @@ namespace IBx
                                         int brY = (int)(gv.squareSize * scalerY);
                                         IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
                                         //gv.DrawBitmap(tile.tileBitmap2, srcLyr, dstLyr);
-                                        gv.DrawBitmap(tile.tileBitmap2, srcLyr, dstLyr, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap2), srcLyr, dstLyr, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
 
                                     }
                                 }
@@ -7417,8 +7183,8 @@ namespace IBx
                                     y,
                                     UpperLeftSquare.X,
                                     UpperLeftSquare.Y,
-                                    gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width,
-                                    gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width,
+                                    gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     if (srcLyr != null)
                                     {
                                         int shiftY = srcLyr.Top / gv.squareSizeInPixels;
@@ -7431,7 +7197,7 @@ namespace IBx
                                         int brY = (int)(gv.squareSize * scalerY);
                                         IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
                                         //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], srcLyr, dstLyr);
-                                        gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], srcLyr, dstLyr, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), srcLyr, dstLyr, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
 
                                     }
 
@@ -7473,16 +7239,16 @@ namespace IBx
                                 if (!tileBitmapIsLoadedAlready)
                                 {
                                     gv.mod.loadedTileBitmapsNames.Add(tile.Layer3Filename);
-                                    tile.tileBitmap3 = gv.cc.LoadBitmap(tile.Layer3Filename);
-                                    gv.mod.loadedTileBitmaps.Add(tile.tileBitmap3);
+                                    tile.tileBitmap3 = tile.Layer3Filename;
+                                    //gv.mod.loadedTileBitmaps.Add(tile.tileBitmap3);
 
                                     IbRect srcLyr = getSourceIbRect(
                                     x,
                                     y,
                                     UpperLeftSquare.X,
                                     UpperLeftSquare.Y,
-                                    tile.tileBitmap3.PixelSize.Width,
-                                    tile.tileBitmap3.PixelSize.Height);
+                                    gv.cc.GetFromBitmapList(tile.tileBitmap3).Width,
+                                    gv.cc.GetFromBitmapList(tile.tileBitmap3).Height);
                                     if (srcLyr != null)
                                     {
                                         int shiftY = srcLyr.Top / gv.squareSizeInPixels;
@@ -7495,7 +7261,7 @@ namespace IBx
                                         int brY = (int)(gv.squareSize * scalerY);
                                         IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
                                         //gv.DrawBitmap(tile.tileBitmap3, srcLyr, dstLyr);
-                                        gv.DrawBitmap(tile.tileBitmap3, srcLyr, dstLyr, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.tileBitmap3), srcLyr, dstLyr, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
 
                                     }
                                 }
@@ -7506,8 +7272,8 @@ namespace IBx
                                     y,
                                     UpperLeftSquare.X,
                                     UpperLeftSquare.Y,
-                                    gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width,
-                                    gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Height);
+                                    gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Width,
+                                    gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]).Height);
                                     if (srcLyr != null)
                                     {
                                         int shiftY = srcLyr.Top / gv.squareSizeInPixels;
@@ -7520,7 +7286,7 @@ namespace IBx
                                         int brY = (int)(gv.squareSize * scalerY);
                                         IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
                                         //gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], srcLyr, dstLyr);
-                                        gv.DrawBitmap(gv.mod.loadedTileBitmaps[indexOfLoadedTile], srcLyr, dstLyr, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
+                                        gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.loadedTileBitmapsNames[indexOfLoadedTile]), srcLyr, dstLyr, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
 
                                     }
 
@@ -7626,10 +7392,10 @@ namespace IBx
                 if (gv.mod.currentEncounter.UseMapImage)
                 {
                     #region background image
-                    int bmpWidth = mapBitmap.PixelSize.Width;
-                    int bmpHeight = mapBitmap.PixelSize.Height;
-                    int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
-                    int sqrsizeH = mapBitmap.PixelSize.Height / gv.mod.currentEncounter.MapSizeY;
+                    int bmpWidth = gv.cc.GetFromBitmapList(mapBitmap).Width;
+                    int bmpHeight = gv.cc.GetFromBitmapList(mapBitmap).Height;
+                    int sqrsizeW = gv.cc.GetFromBitmapList(mapBitmap).Width / gv.mod.currentEncounter.MapSizeX;
+                    int sqrsizeH = gv.cc.GetFromBitmapList(mapBitmap).Height / gv.mod.currentEncounter.MapSizeY;
                     int dstX = -(UpperLeftSquare.X * gv.squareSize);
                     int dstY = -(UpperLeftSquare.Y * gv.squareSize);
                     int dstWidth = (int)(bmpWidth * 2 * gv.screenDensity); //assumes squares are 50x50 in this image
@@ -7637,10 +7403,10 @@ namespace IBx
 
                     IbRect src = new IbRect(0, 0, bmpWidth, bmpHeight);
                     IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
-                    gv.DrawBitmap(mapBitmap, src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(mapBitmap), src, dst);
 
-                    //int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
-                    //int sqrsizeH = mapBitmap.PixelSize.Height / gv.mod.currentEncounter.MapSizeY;
+                    //int sqrsizeW = mapBitmap.Width / gv.mod.currentEncounter.MapSizeX;
+                    //int sqrsizeH = mapBitmap.Height / gv.mod.currentEncounter.MapSizeY;
                     //IbRect src = new IbRect(UpperLeftSquare.X * sqrsizeW, UpperLeftSquare.Y * sqrsizeH, sqrsizeW * (gv.playerOffsetX + gv.playerOffsetX + 1), sqrsizeH * (gv.playerOffsetY + gv.playerOffsetY + 1));
                     //IbRect dst = new IbRect(0 + gv.oXshift + mapStartLocXinPixels, 0, gv.squareSize * (gv.playerOffsetX + gv.playerOffsetX + 1), gv.squareSize * (gv.playerOffsetY + gv.playerOffsetY + 1));
                     //gv.DrawBitmap(mapBitmap, src, dst);                    
@@ -7672,8 +7438,8 @@ namespace IBx
                             y,
                             UpperLeftSquare.X,
                             UpperLeftSquare.Y,
-                            gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Width,
-                            gv.cc.GetFromTileBitmapList(tile.Layer1Filename).PixelSize.Height);
+                            gv.cc.GetFromBitmapList(tile.Layer1Filename).Width,
+                            gv.cc.GetFromBitmapList(tile.Layer1Filename).Height);
 
                         if (srcLyr != null)
                         {
@@ -7686,7 +7452,7 @@ namespace IBx
                             int brX = (int)(gv.squareSize * scalerX);
                             int brY = (int)(gv.squareSize * scalerY);
                             IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer1Filename), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer1Filename), srcLyr, dstLyr, tile.Layer1Rotate, tile.Layer1Mirror, tile.Layer1Xshift, tile.Layer1Yshift, tile.Layer1Xscale, tile.Layer1Yscale);
                         }
                     }
                 }
@@ -7707,8 +7473,8 @@ namespace IBx
                             y,
                             UpperLeftSquare.X,
                             UpperLeftSquare.Y,
-                            gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Width,
-                            gv.cc.GetFromTileBitmapList(tile.Layer2Filename).PixelSize.Height);
+                            gv.cc.GetFromBitmapList(tile.Layer2Filename).Width,
+                            gv.cc.GetFromBitmapList(tile.Layer2Filename).Height);
 
                         if (srcLyr != null)
                         {
@@ -7721,7 +7487,7 @@ namespace IBx
                             int brX = (int)(gv.squareSize * scalerX);
                             int brY = (int)(gv.squareSize * scalerY);
                             IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer2Filename), srcLyr, dstLyr, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer2Filename), srcLyr, dstLyr, tile.Layer2Rotate, tile.Layer2Mirror, tile.Layer2Xshift, tile.Layer2Yshift, tile.Layer2Xscale, tile.Layer2Yscale);
                         }
                     }
                 }
@@ -7742,8 +7508,8 @@ namespace IBx
                             y,
                             UpperLeftSquare.X,
                             UpperLeftSquare.Y,
-                            gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Width,
-                            gv.cc.GetFromTileBitmapList(tile.Layer3Filename).PixelSize.Height);
+                            gv.cc.GetFromBitmapList(tile.Layer3Filename).Width,
+                            gv.cc.GetFromBitmapList(tile.Layer3Filename).Height);
 
                         if (srcLyr != null)
                         {
@@ -7756,7 +7522,7 @@ namespace IBx
                             int brX = (int)(gv.squareSize * scalerX);
                             int brY = (int)(gv.squareSize * scalerY);
                             IbRect dstLyr = new IbRect(tlX, tlY, brX, brY);
-                            gv.DrawBitmap(gv.cc.GetFromTileBitmapList(tile.Layer3Filename), srcLyr, dstLyr, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(tile.Layer3Filename), srcLyr, dstLyr, tile.Layer3Rotate, tile.Layer3Mirror, tile.Layer3Xshift, tile.Layer3Yshift, tile.Layer3Xscale, tile.Layer3Yscale);
                         }
                     }
                 }
@@ -7855,7 +7621,7 @@ namespace IBx
                         int tlY = y * gv.squareSize;
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
-                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                         IbRect dst = new IbRect(tlX + mapStartLocXinPixels - (int)(brX * 0.1f), tlY - (int)(brY * 0.1f), (int)(brX * 1.4f), (int)(brY * 1.3f));
                         gv.DrawBitmap(gv.cc.black_tile2, src, dst);
                     }
@@ -7871,7 +7637,7 @@ namespace IBx
                         int tlY = y * gv.squareSize;
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
-                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                         IbRect dst = new IbRect(tlX + mapStartLocXinPixels - (int)(brX * 0.1f), tlY - (int)(brY * 0.1f), (int)(brX * 1.4f), (int)(brY * 1.3f));
                         gv.DrawBitmap(gv.cc.black_tile2, src, dst);
                     }
@@ -7893,7 +7659,7 @@ namespace IBx
                         int tlY = -offset * gv.squareSize;
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
-                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                         IbRect dst = new IbRect(tlX + mapStartLocXinPixels - (int)(brX * 0.1f), tlY - (int)(brY * 0.1f), (int)(brX * 1.4f), (int)(brY * 1.3f));
 
                         gv.DrawBitmap(gv.cc.black_tile2, src, dst);
@@ -7910,7 +7676,7 @@ namespace IBx
                         int tlY = -offset * gv.squareSize;
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
-                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.PixelSize.Width, gv.cc.black_tile.PixelSize.Height);
+                        IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
                         IbRect dst = new IbRect(tlX + mapStartLocXinPixels - (int)(brX * 0.1f), tlY - (int)(brY * 0.1f), (int)(brX * 1.4f), (int)(brY * 1.3f));
 
                         gv.DrawBitmap(gv.cc.black_tile2, src, dst);
@@ -7963,7 +7729,7 @@ namespace IBx
                 Player p = gv.mod.playerList[currentPlayerIndex];
                 if (IsInVisibleCombatWindow(p.combatLocX, p.combatLocY))
                 {
-                    IbRect src = new IbRect(0, 0, gv.cc.turn_marker.PixelSize.Width, gv.cc.turn_marker.PixelSize.Width);
+                    IbRect src = new IbRect(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Width);
                     IbRect dst = new IbRect(getPixelLocX(p.combatLocX), getPixelLocY(p.combatLocY), gv.squareSize, gv.squareSize);
                     if (isPlayerTurn)
                     {
@@ -7975,53 +7741,53 @@ namespace IBx
             {
                 if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                 {
-                    IbRect src = new IbRect(0, 0, pc.token.PixelSize.Width, pc.token.PixelSize.Width);
+                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                     //check if drawing animation of player
                     if ((playerToAnimate != null) && (playerToAnimate == pc))
                     {
                         attackAnimationDelayCounter++;
-                        if (attackAnimationDelayCounter >= (int)(pc.token.PixelSize.Height / 100f - 1))
+                        if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(pc.tokenFilename).Height / 100f - 1))
                         {
                             attackAnimationFrameCounter++;
                             attackAnimationDelayCounter = 0;
                         }
-                        //maxUsableCounterValue = (int)(pc.token.PixelSize.Height / 100f - 1);
+                        //maxUsableCounterValue = (int)(pc.token.Height / 100f - 1);
                         maxUsableCounterValue = 1;
                         if (attackAnimationFrameCounter >= maxUsableCounterValue)
                         {
                             attackAnimationFrameCounter = maxUsableCounterValue;
                             blockAnimationBridge = false;
                         }
-                        src = new IbRect(0, pc.token.PixelSize.Width * attackAnimationFrameCounter, pc.token.PixelSize.Width, pc.token.PixelSize.Width);
+                        src = new IbRect(0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                     }
                     IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
-                    gv.DrawBitmap(pc.token, src, dst, !pc.combatFacingLeft);
-                    src = new IbRect(0, 0, pc.token.PixelSize.Width, pc.token.PixelSize.Width);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft);
+                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                     if (!animationsOn)
                     {
                         foreach (Effect ef in pc.effectsList)
                         {
                             if ((!ef.isPermanent) && (ef.spriteFilename != "none") && (ef.spriteFilename != ""))
                             {
-                                Bitmap fx = gv.cc.LoadBitmap(ef.spriteFilename);
-                                src = new IbRect(0, 0, fx.PixelSize.Width, fx.PixelSize.Width);
-                                gv.DrawBitmap(fx, src, dst);
-                                gv.cc.DisposeOfBitmap(ref fx);
+                                string fx = ef.spriteFilename;
+                                src = new IbRect(0, 0, gv.cc.GetFromBitmapList(fx).Width, gv.cc.GetFromBitmapList(fx).Width);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(fx), src, dst);
+                                //gv.cc.DisposeOfBitmap(ref fx);
                             }
                         }
                     }
                     if ((pc.isDead()) || (pc.isUnconcious()))
                     {
-                        src = new IbRect(0, 0, gv.cc.pc_dead.PixelSize.Width, gv.cc.pc_dead.PixelSize.Width);
+                        src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Width);
                         gv.DrawBitmap(gv.cc.pc_dead, src, dst);
                     }
                     if (pc.steathModeOn)
                     {
-                        src = new IbRect(0, 0, gv.cc.pc_stealth.PixelSize.Width, gv.cc.pc_stealth.PixelSize.Width);
+                        src = new IbRect(0, 0, gv.cc.pc_stealth.Width, gv.cc.pc_stealth.Width);
                         gv.DrawBitmap(gv.cc.pc_stealth, src, dst);
                     }
                     //PLAYER FACING
-                    src = new IbRect(0, 0, gv.cc.facing1.PixelSize.Width, gv.cc.facing1.PixelSize.Height);
+                    src = new IbRect(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
                     if (pc.hp > 0)
                     {
                         if (pc.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
@@ -8039,7 +7805,7 @@ namespace IBx
                     if (showMoveOrder)
                     {
                         int mo = pc.moveOrder + 1;
-                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), Color.White);
+                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
                     }
                 }
             }
@@ -8097,24 +7863,24 @@ namespace IBx
                 UpperLeftSquare.Y = gv.mod.currentEncounter.MapSizeY;
                 if (framesInFastForwardCounter <= 5)
                 {
-                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark", Color.White);
+                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark", "white");
                 }
                 else if (framesInFastForwardCounter <= 10)
                 {
-                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark.", Color.White);
+                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark.", "white");
                 }
                 else if (framesInFastForwardCounter <= 15)
                 {
-                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark..", Color.White);
+                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark..", "white");
                 }
                 else if (framesInFastForwardCounter <= 20)
                 {
-                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark...", Color.White);
+                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark...", "white");
                 }
                 else if (framesInFastForwardCounter > 20)
                 {
                     framesInFastForwardCounter = 0;
-                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark", Color.White);
+                    drawText(gv.screenWidth / 2 - 2 * gv.squareSize, gv.screenHeight / 2 - gv.squareSize, "Manoeuvres in the Dark", "white");
                 }
             }
 
@@ -8351,8 +8117,8 @@ namespace IBx
                 }
                 //IbRect dst = new IbRect((int)this.position.X, (int)(this.position.Y + randY), (int)((gv.squareSize * this.scaleX) + randX), (int)(gv.squareSize * this.scaleY));
 
-                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Width;
-                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Height;
+                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width;
+                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height;
                 //1=normal, 2=wide, 3=tall, 4=large  
                 int crtSize = crt.creatureSize;
                 IbRectF src = new IbRectF(0, 0, width, height / 2);
@@ -8362,22 +8128,22 @@ namespace IBx
                     {
                     //blockAnimationBridge = true;
                     attackAnimationDelayCounter++;
-                    if (attackAnimationDelayCounter >= (int)(crt.token.PixelSize.Height / 100f - 1))
+                    if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 100f - 1))
                     {
                         attackAnimationFrameCounter++;
                         attackAnimationDelayCounter = 0;
                     }
-                    int maxUsableCounterValue = (int)(crt.token.PixelSize.Height / 100f - 1);
+                    int maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 100f - 1);
                     if ((crtSize == 3) || (crtSize == 4))
                     {
-                        maxUsableCounterValue = (int)(crt.token.PixelSize.Height / 200f - 1);
+                        maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 200f - 1);
                     }
                     if (attackAnimationFrameCounter > maxUsableCounterValue)
                     {
                         attackAnimationFrameCounter = maxUsableCounterValue;
                         blockAnimationBridge = false;
                     }
-                    src = new IbRectF(0, crt.token.PixelSize.Width * attackAnimationFrameCounter, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                    src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
                     //src = new IbRect(0, height / 2, width, height / 2);
                 }
 
@@ -8403,46 +8169,46 @@ namespace IBx
                     dst = new IbRectF(getPixelLocX(crt.combatLocX) + crt.roamDistanceX + crt.glideAdderX, getPixelLocY(crt.combatLocY) + crt.roamDistanceY + crt.glideAdderY, gv.squareSize * 2, gv.squareSize * 2);
                 }
 
-                //if (crt.token.PixelSize.Width > 100)
+                //if (crt.token.Width > 100)
                 //{
                 //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
                 //}
 
-                gv.DrawBitmap(crt.token, src, dst, !crt.combatFacingLeft);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
 
                 /*
                 //start
                 IbRectF dst = new IbRectF(getPixelLocX(crt.combatLocX) + crt.roamDistanceX + crt.glideAdderX, getPixelLocY(crt.combatLocY) + crt.roamDistanceY + crt.glideAdderY, gv.squareSize, gv.squareSize);
-                if (crt.token.PixelSize.Width > 100)
+                if (crt.token.Width > 100)
                 {
                     dst = new IbRectF(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2) + crt.roamDistanceX + crt.glideAdderX, getPixelLocY(crt.combatLocY) - (gv.squareSize / 2) + crt.roamDistanceY + crt.glideAdderY, gv.squareSize * 2, gv.squareSize * 2);
                 }
 
-                IbRectF src = new IbRectF(0, 0, gv.cc.turn_marker.PixelSize.Width, gv.cc.turn_marker.PixelSize.Height);
+                IbRectF src = new IbRectF(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Height);
                 //if ((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (!isPlayerTurn))
                 //{
                 //gv.DrawBitmap(gv.cc.turn_marker, src, dst);
                 //}
-                src = new IbRectF(0, 0, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                src = new IbRectF(0, 0, crt.token.Width, crt.token.Width);
                 //for 100x100px per frame creatures
-                if (crt.token.PixelSize.Width <= 100)
+                if (crt.token.Width <= 100)
                 {
                     if ((creatureToAnimate != null) && (creatureToAnimate == crt))
                     {
                         //blockAnimationBridge = true;
                         attackAnimationDelayCounter++;
-                        if (attackAnimationDelayCounter >= (int)(crt.token.PixelSize.Height / 100f - 1))
+                        if (attackAnimationDelayCounter >= (int)(crt.token.Height / 100f - 1))
                         {
                             attackAnimationFrameCounter++;
                             attackAnimationDelayCounter = 0;
                         }
-                        maxUsableCounterValue = (int)(crt.token.PixelSize.Height / 100f - 1);
+                        maxUsableCounterValue = (int)(crt.token.Height / 100f - 1);
                         if (attackAnimationFrameCounter >= maxUsableCounterValue)
                         {
                             attackAnimationFrameCounter = maxUsableCounterValue;
                             blockAnimationBridge = false;
                         }
-                        src = new IbRectF(0, crt.token.PixelSize.Width * attackAnimationFrameCounter, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                        src = new IbRectF(0, crt.token.Width * attackAnimationFrameCounter, crt.token.Width, crt.token.Width);
                     }
                 }
                 //for 200x200 per frame creatures
@@ -8452,18 +8218,18 @@ namespace IBx
                     {
                         //blockAnimationBridge = true;
                         attackAnimationDelayCounter++;
-                        if (attackAnimationDelayCounter >= (int)(crt.token.PixelSize.Height / 200f - 1))
+                        if (attackAnimationDelayCounter >= (int)(crt.token.Height / 200f - 1))
                         {
                             attackAnimationFrameCounter++;
                             attackAnimationDelayCounter = 0;
                         }
-                        maxUsableCounterValue = (int)(crt.token.PixelSize.Height / 200f - 1);
+                        maxUsableCounterValue = (int)(crt.token.Height / 200f - 1);
                         if (attackAnimationFrameCounter >= maxUsableCounterValue)
                         {
                             attackAnimationFrameCounter = maxUsableCounterValue;
                             blockAnimationBridge = false;
                         }
-                        src = new IbRectF(0, crt.token.PixelSize.Width * attackAnimationFrameCounter, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                        src = new IbRectF(0, crt.token.Width * attackAnimationFrameCounter, crt.token.Width, crt.token.Width);
                     }
                 }
                 if (attackAnimationFrameCounter > 2)
@@ -8479,14 +8245,14 @@ namespace IBx
                 {
                     foreach (Effect ef in crt.cr_effectsList)
                     {
-                        Bitmap fx = gv.cc.LoadBitmap(ef.spriteFilename);
-                        src = new IbRectF(0, 0, fx.PixelSize.Width, fx.PixelSize.Width);
-                        gv.DrawBitmap(fx, src, dst);
-                        gv.cc.DisposeOfBitmap(ref fx);
+                        string fx = ef.spriteFilename;
+                        src = new IbRectF(0, 0, gv.cc.GetFromBitmapList(fx).Width, gv.cc.GetFromBitmapList(fx).Width);
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fx), src, dst);
+                        //gv.cc.DisposeOfBitmap(ref fx);
                     }
                 }
                 //CREATURE FACING
-                src = new IbRectF(0, 0, gv.cc.facing1.PixelSize.Width, gv.cc.facing1.PixelSize.Height);
+                src = new IbRectF(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
 
                 if (crt.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
                 else if (crt.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
@@ -8501,7 +8267,7 @@ namespace IBx
                 if (showMoveOrder)
                 {
                     int mo = crt.moveOrder + 1;
-                    drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY + (int)crt.glideAdderY, mo.ToString(), Color.White);
+                    drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY + (int)crt.glideAdderY, mo.ToString(), "white");
                 }
             }
         }
@@ -8516,7 +8282,7 @@ namespace IBx
                         Creature cr = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
                         if (IsInVisibleCombatWindow(cr.combatLocX, cr.combatLocY))
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.turn_marker.PixelSize.Width, gv.cc.turn_marker.PixelSize.Height);
+                            IbRect src = new IbRect(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Height);
                             //IbRect dst = new IbRect(getPixelLocX(cr.combatLocX), getPixelLocY(cr.combatLocY), gv.squareSize, gv.squareSize);
                             //gv.DrawBitmap(gv.cc.turn_marker, src, dst);
                             foreach (Coordinate coor in cr.tokenCoveredSquares)
@@ -8549,10 +8315,10 @@ namespace IBx
                 //continue;
                 //}
 
-                //IbRect src = new IbRect(0, 0, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                //IbRect src = new IbRect(0, 0, crt.token.Width, crt.token.Width);
 
-                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Width;
-                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Height;
+                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width;
+                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height;
                 //1=normal, 2=wide, 3=tall, 4=large  
                 int crtSize = crt.creatureSize;
                 IbRect src = new IbRect(0, 0, width, height / 2);
@@ -8562,18 +8328,18 @@ namespace IBx
                 {
                     //blockAnimationBridge = true;
                     attackAnimationDelayCounter++;
-                    if (attackAnimationDelayCounter >= (int)(crt.token.PixelSize.Height / 100f - 1))
+                    if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 100f - 1))
                     {
                         attackAnimationFrameCounter++;
                         attackAnimationDelayCounter = 0;
                     }
-                    int maxUsableCounterValue = (int)(crt.token.PixelSize.Height / 100f - 1);
+                    int maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 100f - 1);
                     if (attackAnimationFrameCounter > maxUsableCounterValue)
                     {
                         attackAnimationFrameCounter = maxUsableCounterValue;
                         blockAnimationBridge = false;
                     }
-                    src = new IbRect(0, crt.token.PixelSize.Width * attackAnimationFrameCounter, crt.token.PixelSize.Width, crt.token.PixelSize.Width);
+                    src = new IbRect(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
                     //src = new IbRect(0, height / 2, width, height / 2);
                 }
 
@@ -8599,24 +8365,24 @@ namespace IBx
                     dst = new IbRect(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize * 2);
                 }
 
-                //if (crt.token.PixelSize.Width > 100)
+                //if (crt.token.Width > 100)
                 //{
                 //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
                 //}
 
-                gv.DrawBitmap(crt.token, src, dst, !crt.combatFacingLeft);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
                 if (!animationsOn)
                 {
                     foreach (Effect ef in crt.cr_effectsList)
                     {
-                        Bitmap fx = gv.cc.LoadBitmap(ef.spriteFilename);
-                        src = new IbRect(0, 0, fx.PixelSize.Width, fx.PixelSize.Width);
-                        gv.DrawBitmap(fx, src, dst);
-                        gv.cc.DisposeOfBitmap(ref fx);
+                        string fx = ef.spriteFilename;
+                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(fx).Width, gv.cc.GetFromBitmapList(fx).Width);
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList(fx), src, dst);
+                        //gv.cc.DisposeOfBitmap(ref fx);
                     }
                 }
                 //CREATURE FACING
-                src = new IbRect(0, 0, gv.cc.facing1.PixelSize.Width, gv.cc.facing1.PixelSize.Height);
+                src = new IbRect(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
                 if (crt.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
                 else if (crt.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
                 else if (crt.combatFacing == 6) { gv.DrawBitmap(gv.cc.facing6, src, dst); }
@@ -8630,7 +8396,7 @@ namespace IBx
                 if (showMoveOrder)
                 {
                     int mo = crt.moveOrder + 1;
-                    drawText(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), Color.White);
+                    drawText(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
                 }
             }
         }
@@ -8724,7 +8490,7 @@ namespace IBx
 
                     int x = getPixelLocX(coor.X);
                     int y = getPixelLocY(coor.Y);
-                    IbRect src = new IbRect(0, 0, gv.cc.highlight_green.PixelSize.Width, gv.cc.highlight_green.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.highlight_green.Width, gv.cc.highlight_green.Height);
                     IbRect dst = new IbRect(x, y, gv.squareSize, gv.squareSize);
                     if (hl_green)
                     {
@@ -8776,7 +8542,7 @@ namespace IBx
 
                     int x = getPixelLocX(coor.X);
                     int y = getPixelLocY(coor.Y);
-                    IbRect src = new IbRect(0, 0, gv.cc.highlight_green.PixelSize.Width, gv.cc.highlight_green.PixelSize.Height);
+                    IbRect src = new IbRect(0, 0, gv.cc.highlight_green.Width, gv.cc.highlight_green.Height);
                     IbRect dst = new IbRect(x, y, gv.squareSize, gv.squareSize);
                     if (hl_green)
                     {
@@ -8797,14 +8563,14 @@ namespace IBx
             {
                 for (int y = -2; y <= 2; y++)
                 {
-                    gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + txtH + y, 1.0f, Color.Black);
-                    gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 2) + y, 1.0f, Color.Black);
-                    gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 3) + y, 1.0f, Color.Black);
+                    gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + txtH + y, "black");
+                    gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 2) + y, "black");
+                    gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 3) + y, "black");
                 }
             }
-            gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, 1.0f, Color.Yellow);
-            gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, 1.0f, Color.Yellow);
-            gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 3, 1.0f, Color.Yellow);
+            gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, "yellow");
+            gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, "yellow");
+            gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 3, "yellow");
         }
         public void drawHPText()
         {
@@ -8814,14 +8580,14 @@ namespace IBx
                 {
                     if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
                     {
-                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY + (int)crt.glideAdderY, crt.hp + "/" + crt.hpMax, Color.Red);
+                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY + (int)crt.glideAdderY, crt.hp + "/" + crt.hpMax, "red");
                     }
                 }
                 foreach (Player pc in gv.mod.playerList)
                 {
                     if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                     {
-                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), pc.hp + "/" + pc.hpMax, Color.Red);
+                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), pc.hp + "/" + pc.hpMax, "red");
                     }
                 }
             }
@@ -8835,19 +8601,19 @@ namespace IBx
                 {
                     if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
                     {
-                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) + txtH + (int)crt.roamDistanceY + (int)crt.glideAdderY, crt.sp + "/" + crt.spMax, Color.Yellow);
+                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) + txtH + (int)crt.roamDistanceY + (int)crt.glideAdderY, crt.sp + "/" + crt.spMax, "yellow");
                     }
                 }
                 foreach (Player pc in gv.mod.playerList)
                 {
                     if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                     {
-                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) + txtH, pc.sp + "/" + pc.spMax, Color.Yellow);
+                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) + txtH, pc.sp + "/" + pc.spMax, "yellow");
                     }
                 }
             }
         }
-        public void drawText(int xLoc, int yLoc, string text, Color colr)
+        public void drawText(int xLoc, int yLoc, string text, string colr)
         {
             int txtH = (int)gv.drawFontRegHeight;
 
@@ -8855,12 +8621,12 @@ namespace IBx
             {
                 for (int y = -2; y <= 2; y++)
                 {
-                    gv.DrawText(text, xLoc + x, yLoc + txtH + y, 1.0f, Color.Black);
+                    gv.DrawText(text, xLoc + x, yLoc + txtH + y, "black");
                 }
             }
-            gv.DrawText(text, xLoc, yLoc + txtH, 1.0f, colr);
+            gv.DrawText(text, xLoc, yLoc + txtH, colr);
         }
-        public void drawMiniText(int xLoc, int yLoc, string text, Color colr)
+        public void drawMiniText(int xLoc, int yLoc, string text, string colr)
         {
             int txtH = (int)gv.drawFontRegHeight;
 
@@ -8868,10 +8634,10 @@ namespace IBx
             {
                 for (int y = -2; y <= 2; y++)
                 {
-                    gv.DrawText(text, xLoc + x, yLoc + txtH + y, 0.5f, Color.Black);
+                    gv.DrawText(text, xLoc + x, yLoc + txtH + y, "small", "black");
                 }
             }
-            gv.DrawText(text, xLoc, yLoc + txtH, 0.5f, colr);
+            gv.DrawText(text, xLoc, yLoc + txtH, "small", colr);
         }
         public void drawFloatyTextList()
         {
@@ -8885,33 +8651,33 @@ namespace IBx
                     {
                         for (int y = -2; y <= 2; y++)
                         {
-                            gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + x + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize) + y, 1.0f, Color.Black);
+                            gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + x + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize) + y, "black");
                         }
                     }
-                    Color colr = Color.Yellow;
+                    string colr = "yellow";
                     if (ft.color.Equals("yellow"))
                     {
-                        colr = Color.Yellow;
+                        colr = "yellow";
                     }
                     else if (ft.color.Equals("blue"))
                     {
-                        colr = Color.Blue;
+                        colr = "blue";
                     }
                     else if (ft.color.Equals("green"))
                     {
-                        colr = Color.Lime;
+                        colr = "lime";
                     }
                     else
                     {
-                        colr = Color.Red;
+                        colr = "red";
                     }
-                    gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize), 1.0f, colr);
+                    gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize), colr);
                 }
             }
         }
         public void drawOverlayTints()
         {
-            IbRect src = new IbRect(0, 0, gv.cc.tint_sunset.PixelSize.Width, gv.cc.tint_sunset.PixelSize.Height);
+            IbRect src = new IbRect(0, 0, gv.cc.tint_sunset.Width, gv.cc.tint_sunset.Height);
             IbRect dst = new IbRect(gv.oXshift + mapStartLocXinPixels, 0, gv.squareSize * (gv.playerOffsetX + gv.playerOffsetX + 1), gv.squareSize * (gv.playerOffsetY + gv.playerOffsetY + 2));
             int dawn = 5 * 60;
             int sunrise = 6 * 60;
@@ -8978,10 +8744,9 @@ namespace IBx
         #endregion
 
         #region Keyboard Input
-        public void onKeyUp(Keys keyData)
+        public void onKeyUp()
         {
-            
-            if (keyData == Keys.M)
+            /*TODO if (keyData == Keys.M)
             {
                 if (canMove)
                 {
@@ -9364,1048 +9129,25 @@ namespace IBx
                 return;
             }
             #endregion
+            */
         }
         #endregion
 
-        #region Mouse Input
-        /*public void onTouchCombatOld(MouseEventArgs e, MouseEventType.EventType eventType)
-        {
-            switch (eventType)
-            {
-                case MouseEventType.EventType.MouseDown:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
-
-                    int gridx = (int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
-                    int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
-
-                    #region FloatyText
-                    gv.cc.floatyText = "";
-                    gv.cc.floatyText2 = "";
-                    gv.cc.floatyText3 = "";
-                    foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
-                    {
-                        if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
-                        {
-                            gv.cc.floatyText = crt.cr_name;
-                            gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
-                            gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
-                            gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
-                        }
-                    }
-                    foreach (Player pc in gv.mod.playerList)
-                    {
-                        if ((pc.combatLocX == gridx + UpperLeftSquare.X) && (pc.combatLocY == gridy + UpperLeftSquare.Y))
-                        {
-                            string am = "";
-                            ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc.AmmoRefs.resref);
-                            if (itr != null)
-                            {
-                                am = itr.quantity + "";
-                            }
-                            else
-                            {
-                                am = "";
-                            }
-
-                            gv.cc.floatyText = pc.name;
-                            int actext = 0;
-                            if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
-                            else { actext = 20 - pc.AC; }
-                            gv.cc.floatyText2 = "AC:" + actext + " " + pc.charStatus;
-                            gv.cc.floatyText3 = "Ammo: " + am;
-                            gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY));
-
-                        }
-                    }
-                    #endregion
-                    #region Toggles
-                    if (tglHP.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglHP.toggleOn)
-                        {
-                            tglHP.toggleOn = false;
-                        }
-                        else
-                        {
-                            tglHP.toggleOn = true;
-                        }
-                    }
-                    if (tglSP.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglSP.toggleOn)
-                        {
-                            tglSP.toggleOn = false;
-                        }
-                        else
-                        {
-                            tglSP.toggleOn = true;
-                        }
-                    }
-                    if (tglMoveOrder.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglMoveOrder.toggleOn)
-                        {
-                            tglMoveOrder.toggleOn = false;
-                        }
-                        else
-                        {
-                            tglMoveOrder.toggleOn = true;
-                        }
-                    }
-                    if (tglSpeed.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        
-                        if (gv.mod.combatAnimationSpeed == 100)
-                        {
-                            gv.mod.combatAnimationSpeed = 50;
-                            gv.cc.addLogText("lime", "combat speed: 2x");
-                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_2");
-                        }
-                        else if (gv.mod.combatAnimationSpeed == 50)
-                        {
-                            gv.mod.combatAnimationSpeed = 25;
-                            gv.cc.addLogText("lime", "combat speed: 4x");
-                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_4");
-                        }
-                        else if (gv.mod.combatAnimationSpeed == 25)
-                        {
-                            gv.mod.combatAnimationSpeed = 10;
-                            gv.cc.addLogText("lime", "combat speed: 10x");
-                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_10");
-                        }
-                        else if (gv.mod.combatAnimationSpeed == 10)
-                        {
-                            gv.mod.combatAnimationSpeed = 100;
-                            gv.cc.addLogText("lime", "combat speed: 1x");
-                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
-                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_1");
-                        }
-                    }
-                    if (gv.cc.tglSound.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (gv.cc.tglSound.toggleOn)
-                        {
-                            gv.cc.tglSound.toggleOn = false;
-                            gv.mod.playMusic = false;
-                            gv.stopCombatMusic();
-                            //addLogText("lime","Music Off");
-                        }
-                        else
-                        {
-                            gv.cc.tglSound.toggleOn = true;
-                            gv.mod.playMusic = true;
-                            gv.startCombatMusic();
-                            //addLogText("lime","Music On");
-                        }
-                    }
-                    if (tglSoundFx.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglSoundFx.toggleOn)
-                        {
-                            tglSoundFx.toggleOn = false;
-                            gv.mod.playSoundFx = false;
-                            //gv.stopCombatMusic();
-                            //addLogText("lime","Music Off");
-                        }
-                        else
-                        {
-                            tglSoundFx.toggleOn = true;
-                            gv.mod.playSoundFx = true;
-                            //gv.startCombatMusic();
-                            //addLogText("lime","Music On");
-                        }
-                    }
-                    if (tglGrid.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        if (tglGrid.toggleOn)
-                        {
-                            tglGrid.toggleOn = false;
-                            gv.mod.com_showGrid = false;
-                        }
-                        else
-                        {
-                            tglGrid.toggleOn = true;
-                            gv.mod.com_showGrid = true;
-                        }
-                    }
-                    if (tglHelp.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        tutorialMessageCombat(true);
-                    }
-                    if ((tglKill.getImpact(x, y)) && (gv.mod.debugMode))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.mod.currentEncounter.encounterCreatureList.Clear();
-                        gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
-                        checkEndEncounter();
-                    }
-                    #endregion
-
-                    if (btnSwitchWeapon.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-
-                        if (currentPlayerIndex > gv.mod.playerList.Count - 1)
-                        {
-                            return;
-                        }
-                        gv.cc.partyScreenPcIndex = currentPlayerIndex;
-                        gv.screenParty.resetPartyScreen();
-                        gv.screenType = "combatParty";
-                    }
-                    break;
-            }
-            //if MoveMode(move), AttackMode(attack), CastMode(cast), or InfoMode(info)
-            if (currentCombatMode.Equals("info"))
-            {
-                onTouchCombatInfo(e, eventType);
-            }
-            else if (currentCombatMode.Equals("move"))
-            {
-                onTouchCombatMove(e, eventType);
-            }
-            else if (currentCombatMode.Equals("attack"))
-            {
-                onTouchCombatAttack(e, eventType);
-            }
-            else if (currentCombatMode.Equals("castSelector"))
-            {
-                //onTouchCombatCastSelector(event);
-            }
-            else if (currentCombatMode.Equals("cast"))
-            {
-                onTouchCombatCast(e, eventType);
-            }
-            else
-            {
-                //info gv.mode
-            }
-        }*/
-        /*public void onTouchCombatInfo(MouseEventArgs e, MouseEventType.EventType eventType)
-        {
-            //TODOgv.cc.onTouchLog();
-            Player pc = gv.mod.playerList[currentPlayerIndex];
-
-            btnMove.glowOn = false;
-            gv.cc.btnInventory.glowOn = false;
-            btnAttack.glowOn = false;
-            btnCast.glowOn = false;
-            btnSkipTurn.glowOn = false;
-            //btnKill.glowOn = false;
-            //btnCombatHelp.glowOn = false;
-
-            //int eventAction = event.getAction();
-            switch (eventType)
-            {
-                case MouseEventType.EventType.MouseDown:
-                case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
-                    if (btnMove.getImpact(x, y))
-                    {
-                        btnMove.glowOn = true;
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        gv.cc.btnInventory.glowOn = true;
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        btnAttack.glowOn = true;
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        btnCast.glowOn = true;
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        btnSkipTurn.glowOn = true;
-                    }
-                    break;
-
-                case MouseEventType.EventType.MouseUp:
-                    x = (int)e.X;
-                    y = (int)e.Y;
-
-                    btnMove.glowOn = false;
-                    gv.cc.btnInventory.glowOn = false;
-                    btnAttack.glowOn = false;
-                    btnCast.glowOn = false;
-                    btnSkipTurn.glowOn = false;
-
-                    //BUTTONS			
-                    if (btnMove.getImpact(x, y))
-                    {
-                        if (canMove)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "move";
-                            gv.screenType = "combat";
-                        }
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.screenType = "combatInventory";
-                        gv.screenInventory.resetInventory();
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        currentCombatMode = "attack";
-                        gv.screenType = "combat";
-                        setTargetHighlightStartLocation(pc);
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        if (pc.knownSpellsTags.Count > 0)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "castSelector";
-                            gv.screenType = "combatCast";
-                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                            spellSelectorIndex = 0;
-                            setTargetHighlightStartLocation(pc);
-                        }
-                        else
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.screenType = "combat";
-                        endPcTurn(false);
-                    }
-                    break;
-            }
-        }*/
-        /*public void onTouchCombatMove(MouseEventArgs e, MouseEventType.EventType eventType)
-        {
-            //gv.cc.onTouchLog();
-            Player pc = gv.mod.playerList[currentPlayerIndex];
-
-            gv.cc.ctrlUpArrow.glowOn = false;
-            gv.cc.ctrlDownArrow.glowOn = false;
-            gv.cc.ctrlLeftArrow.glowOn = false;
-            gv.cc.ctrlRightArrow.glowOn = false;
-            gv.cc.ctrlUpRightArrow.glowOn = false;
-            gv.cc.ctrlDownRightArrow.glowOn = false;
-            gv.cc.ctrlUpLeftArrow.glowOn = false;
-            gv.cc.ctrlDownLeftArrow.glowOn = false;
-            btnMove.glowOn = false;
-            gv.cc.btnInventory.glowOn = false;
-            btnAttack.glowOn = false;
-            btnCast.glowOn = false;
-            btnSkipTurn.glowOn = false;
-
-            //int eventAction = event.getAction();
-            switch (eventType)
-            {
-                case MouseEventType.EventType.MouseDown:
-                case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
-                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownLeftArrow.glowOn = true;
-                    }
-                    else if (btnMove.getImpact(x, y))
-                    {
-                        btnMove.glowOn = true;
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        gv.cc.btnInventory.glowOn = true;
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        btnAttack.glowOn = true;
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        btnCast.glowOn = true;
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        btnSkipTurn.glowOn = true;
-                    }
-                    break;
-
-                case MouseEventType.EventType.MouseUp:
-                    x = (int)e.X;
-                    y = (int)e.Y;
-
-                    gv.cc.ctrlUpArrow.glowOn = false;
-                    gv.cc.ctrlDownArrow.glowOn = false;
-                    gv.cc.ctrlLeftArrow.glowOn = false;
-                    gv.cc.ctrlRightArrow.glowOn = false;
-                    gv.cc.ctrlUpRightArrow.glowOn = false;
-                    gv.cc.ctrlDownRightArrow.glowOn = false;
-                    gv.cc.ctrlUpLeftArrow.glowOn = false;
-                    gv.cc.ctrlDownLeftArrow.glowOn = false;
-                    btnMove.glowOn = false;
-                    gv.cc.btnInventory.glowOn = false;
-                    btnAttack.glowOn = false;
-                    btnCast.glowOn = false;
-                    btnSkipTurn.glowOn = false;
-
-                    //TOUCH ON MAP AREA
-                    int gridx = (int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
-                    int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
-                    //int gridx = (int)e.X / gv.squareSize - 4;
-                    //int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
-
-                    if (gridy < gv.mod.currentEncounter.MapSizeY)
-                    {
-                        gv.cc.floatyText = "";
-                        gv.cc.floatyText2 = "";
-                        gv.cc.floatyText3 = "";
-                        //Check for second tap so TARGET
-                    }
-
-                    //BUTTONS
-                    if ((gv.cc.ctrlUpArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX) && (gridy + UpperLeftSquare.Y == pc.combatLocY - 1)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveUp(pc);
-                    }
-                    else if ((gv.cc.ctrlDownArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX) && (gridy + UpperLeftSquare.Y == pc.combatLocY + 1)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveDown(pc);
-                    }
-                    else if ((gv.cc.ctrlLeftArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX - 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveLeft(pc);
-                    }
-                    else if ((gv.cc.ctrlRightArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX + 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveRight(pc);
-                    }
-                    else if ((gv.cc.ctrlUpRightArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX + 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY - 1)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveUpRight(pc);
-                    }
-                    else if ((gv.cc.ctrlDownRightArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX + 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY + 1)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveDownRight(pc);
-                    }
-                    else if ((gv.cc.ctrlUpLeftArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX - 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY - 1)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveUpLeft(pc);
-                    }
-                    else if ((gv.cc.ctrlDownLeftArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX - 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY + 1)))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveDownLeft(pc);
-                    }
-                    else if (btnMove.getImpact(x, y))
-                    {
-                        if (canMove)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "info";
-                            gv.screenType = "combat";
-                            //Toast.makeText(gameContext, "Move gv.mode", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.screenType = "combatInventory";
-                        gv.screenInventory.resetInventory();
-                        //Toast.makeText(gameContext, "Inventory Button", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        currentCombatMode = "attack";
-                        gv.screenType = "combat";
-                        setTargetHighlightStartLocation(pc);
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        if (pc.knownSpellsTags.Count > 0)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "castSelector";
-                            gv.screenType = "combatCast";
-                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                            spellSelectorIndex = 0;
-                            setTargetHighlightStartLocation(pc);
-                        }
-                        else
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.screenType = "combat";
-                        endPcTurn(false);
-                    }
-                    break;
-            }
-        }*/
-        /*public void onTouchCombatAttack(MouseEventArgs e, MouseEventType.EventType eventType)
-        {
-            Player pc = gv.mod.playerList[currentPlayerIndex];
-
-            gv.cc.ctrlUpArrow.glowOn = false;
-            gv.cc.ctrlDownArrow.glowOn = false;
-            gv.cc.ctrlLeftArrow.glowOn = false;
-            gv.cc.ctrlRightArrow.glowOn = false;
-            gv.cc.ctrlUpRightArrow.glowOn = false;
-            gv.cc.ctrlDownRightArrow.glowOn = false;
-            gv.cc.ctrlUpLeftArrow.glowOn = false;
-            gv.cc.ctrlDownLeftArrow.glowOn = false;
-            btnSelect.glowOn = false;
-            btnMove.glowOn = false;
-            gv.cc.btnInventory.glowOn = false;
-            btnAttack.glowOn = false;
-            btnCast.glowOn = false;
-            btnSkipTurn.glowOn = false;
-
-            //int eventAction = event.getAction();
-            switch (eventType)
-            {
-                case MouseEventType.EventType.MouseDown:
-                case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
-                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownLeftArrow.glowOn = true;
-                    }
-                    else if (btnSelect.getImpact(x, y))
-                    {
-                        btnSelect.glowOn = true;
-                    }
-                    else if (btnMove.getImpact(x, y))
-                    {
-                        btnMove.glowOn = true;
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        gv.cc.btnInventory.glowOn = true;
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        btnAttack.glowOn = true;
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        btnCast.glowOn = true;
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        btnSkipTurn.glowOn = true;
-                    }
-                    break;
-
-                case MouseEventType.EventType.MouseUp:
-                    x = (int)e.X;
-                    y = (int)e.Y;
-
-                    gv.cc.ctrlUpArrow.glowOn = false;
-                    gv.cc.ctrlDownArrow.glowOn = false;
-                    gv.cc.ctrlLeftArrow.glowOn = false;
-                    gv.cc.ctrlRightArrow.glowOn = false;
-                    gv.cc.ctrlUpRightArrow.glowOn = false;
-                    gv.cc.ctrlDownRightArrow.glowOn = false;
-                    gv.cc.ctrlUpLeftArrow.glowOn = false;
-                    gv.cc.ctrlDownLeftArrow.glowOn = false;
-                    btnSelect.glowOn = false;
-                    btnMove.glowOn = false;
-                    gv.cc.btnInventory.glowOn = false;
-                    btnAttack.glowOn = false;
-                    btnCast.glowOn = false;
-                    btnSkipTurn.glowOn = false;
-
-                    //TOUCH ON MAP AREA
-                    int gridx = ((int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
-                    int gridy = ((int)(e.Y - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
-
-                    if (IsInVisibleCombatWindow(gridx, gridy))
-                    {
-                        gv.cc.floatyText = "";
-                        gv.cc.floatyText2 = "";
-                        gv.cc.floatyText3 = "";
-                        //Check for second tap so TARGET
-                        if ((gridx == targetHighlightCenterLocation.X) && (gridy == targetHighlightCenterLocation.Y))
-                        {
-                            TargetAttackPressed(pc);                            
-                        }
-                        //targetHighlightCenterLocation.Y = gridy + UpperLeftSquare.Y;
-                        //targetHighlightCenterLocation.X = gridx + UpperLeftSquare.X;
-                        targetHighlightCenterLocation.Y = gridy;
-                        targetHighlightCenterLocation.X = gridx;
-                    }
-
-                    //BUTTONS
-                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(8);
-                    }
-                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(2);
-                    }
-                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(4);
-                    }
-                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(6);
-                    }
-                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(9);
-                    }
-                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(3);
-                    }
-                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(7);
-                    }
-                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(1);
-                    }
-                    else if (btnSelect.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        TargetAttackPressed(pc);                        
-                    }
-                    else if (btnMove.getImpact(x, y))
-                    {
-                        if (canMove)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "move";
-                            gv.screenType = "combat";
-                        }
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.screenType = "combatInventory";
-                        gv.screenInventory.resetInventory();
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        currentCombatMode = "info";
-                        gv.screenType = "combat";
-                        setTargetHighlightStartLocation(pc);
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        if (pc.knownSpellsTags.Count > 0)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "castSelector";
-                            gv.screenType = "combatCast";
-                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                            spellSelectorIndex = 0;
-                            setTargetHighlightStartLocation(pc);
-                        }
-                        else
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        endPcTurn(false);
-                    }
-                    break;
-            }
-        }*/
-        /*public void onTouchCombatCast(MouseEventArgs e, MouseEventType.EventType eventType)
-        {
-            //gv.cc.onTouchLog();
-            Player pc = gv.mod.playerList[currentPlayerIndex];
-
-            gv.cc.ctrlUpArrow.glowOn = false;
-            gv.cc.ctrlDownArrow.glowOn = false;
-            gv.cc.ctrlLeftArrow.glowOn = false;
-            gv.cc.ctrlRightArrow.glowOn = false;
-            gv.cc.ctrlUpRightArrow.glowOn = false;
-            gv.cc.ctrlDownRightArrow.glowOn = false;
-            gv.cc.ctrlUpLeftArrow.glowOn = false;
-            gv.cc.ctrlDownLeftArrow.glowOn = false;
-            btnSelect.glowOn = false;
-            btnMove.glowOn = false;
-            gv.cc.btnInventory.glowOn = false;
-            btnAttack.glowOn = false;
-            btnCast.glowOn = false;
-            btnSkipTurn.glowOn = false;
-
-            //int eventAction = event.getAction();
-            switch (eventType)
-            {
-                case MouseEventType.EventType.MouseDown:
-                case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
-                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownRightArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlUpLeftArrow.glowOn = true;
-                    }
-                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
-                    {
-                        gv.cc.ctrlDownLeftArrow.glowOn = true;
-                    }
-                    else if (btnSelect.getImpact(x, y))
-                    {
-                        btnSelect.glowOn = true;
-                    }
-                    else if (btnMove.getImpact(x, y))
-                    {
-                        btnMove.glowOn = true;
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        gv.cc.btnInventory.glowOn = true;
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        btnAttack.glowOn = true;
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        btnCast.glowOn = true;
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        btnSkipTurn.glowOn = true;
-                    }
-                    break;
-
-                case MouseEventType.EventType.MouseUp:
-                    x = (int)e.X;
-                    y = (int)e.Y;
-
-                    gv.cc.ctrlUpArrow.glowOn = false;
-                    gv.cc.ctrlDownArrow.glowOn = false;
-                    gv.cc.ctrlLeftArrow.glowOn = false;
-                    gv.cc.ctrlRightArrow.glowOn = false;
-                    gv.cc.ctrlUpRightArrow.glowOn = false;
-                    gv.cc.ctrlDownRightArrow.glowOn = false;
-                    gv.cc.ctrlUpLeftArrow.glowOn = false;
-                    gv.cc.ctrlDownLeftArrow.glowOn = false;
-                    btnSelect.glowOn = false;
-                    btnMove.glowOn = false;
-                    gv.cc.btnInventory.glowOn = false;
-                    btnAttack.glowOn = false;
-                    btnCast.glowOn = false;
-                    btnSkipTurn.glowOn = false;
-
-                    //TOUCH ON MAP AREA
-                    int gridx = ((int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
-                    int gridy = ((int)(e.Y - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
-
-                    if (IsInVisibleCombatWindow(gridx, gridy))
-                    //if (gridy < gv.mod.currentEncounter.MapSizeY)
-                    {
-                        gv.cc.floatyText = "";
-                        gv.cc.floatyText2 = "";
-                        gv.cc.floatyText3 = "";
-                        //Check for second tap so TARGET
-                        if ((gridx == targetHighlightCenterLocation.X) && (gridy == targetHighlightCenterLocation.Y))
-                        {
-                            TargetCastPressed(pc);
-                        }
-                        targetHighlightCenterLocation.Y = gridy;
-                        targetHighlightCenterLocation.X = gridx;
-                    }
-
-                    //BUTTONS
-                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(8);
-                    }
-                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(2);
-                    }
-                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(4);
-                    }
-                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(6);
-                    }
-                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(9);
-                    }
-                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(3);
-                    }
-                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(7);
-                    }
-                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        MoveTargetHighlight(1);
-                    }
-                    else if (btnSelect.getImpact(x, y))
-                    {
-                        TargetCastPressed(pc);
-                        //Toast.makeText(gameContext, "Selected", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (btnMove.getImpact(x, y))
-                    {
-                        if (canMove)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "move";
-                            gv.screenType = "combat";
-                            //Toast.makeText(gameContext, "Move gv.mode", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (gv.cc.btnInventory.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        gv.screenType = "combatInventory";
-                        gv.screenInventory.resetInventory();
-                        //Toast.makeText(gameContext, "Inventory Button", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (btnAttack.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        currentCombatMode = "attack";
-                        gv.screenType = "combat";
-                        setTargetHighlightStartLocation(pc);
-                        //Toast.makeText(gameContext, "Attack gv.mode", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (btnCast.getImpact(x, y))
-                    {
-                        if (pc.knownSpellsTags.Count > 0)
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            currentCombatMode = "castSelector";
-                            gv.screenType = "combatCast";
-                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                            spellSelectorIndex = 0;
-                            setTargetHighlightStartLocation(pc);
-                        }
-                        else
-                        {
-                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (btnSkipTurn.getImpact(x, y))
-                    {
-                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
-                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
-                        endPcTurn(false);
-                    }
-                    break;
-            }
-        }*/
-
-        public void onTouchCombat(MouseEventArgs e, MouseEventType.EventType eventType)
+        #region Mouse Input        
+        public void onTouchCombat(int eX, int eY, MouseEventType.EventType eventType)
         {
             switch (eventType)
             {
                 case MouseEventType.EventType.MouseDown:
                 case MouseEventType.EventType.MouseMove:
-                    int x = (int)e.X;
-                    int y = (int)e.Y;
+                    int x = (int)eX;
+                    int y = (int)eY;
 
                     //NEW SYSTEM
                     combatUiLayout.setHover(x, y);
 
-                    int gridx = (int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
-                    int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
+                    int gridx = (int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
+                    int gridy = (int)(eY - (gv.squareSize / 2)) / gv.squareSize;
 
                     #region FloatyText
                     gv.cc.floatyText = "";
@@ -10497,8 +9239,8 @@ namespace IBx
                     break;
 
                 case MouseEventType.EventType.MouseUp:
-                    x = (int)e.X;
-                    y = (int)e.Y;
+                    x = (int)eX;
+                    y = (int)eY;
 
                     Player pc = gv.mod.playerList[currentPlayerIndex];
 
@@ -10674,10 +9416,10 @@ namespace IBx
                     #endregion
 
                     #region TOUCH ON MAP AREA
-                    gridx = ((int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
-                    gridy = ((int)(e.Y - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
-                    int tappedSqrX = ((int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize);
-                    int tappedSqrY = ((int)(e.Y - (gv.squareSize / 2)) / gv.squareSize);
+                    gridx = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
+                    gridy = ((int)(eY - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
+                    int tappedSqrX = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize);
+                    int tappedSqrY = ((int)(eY - (gv.squareSize / 2)) / gv.squareSize);
 
                     if (IsInVisibleCombatWindow(gridx, gridy))
                     {
@@ -10930,7 +9672,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -10947,7 +9689,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -10995,7 +9737,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11012,7 +9754,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11060,7 +9802,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11077,7 +9819,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11125,7 +9867,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11142,7 +9884,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11190,7 +9932,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11207,7 +9949,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11255,7 +9997,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11272,7 +10014,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11320,7 +10062,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11337,7 +10079,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11386,7 +10128,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11403,7 +10145,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11452,7 +10194,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11469,7 +10211,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11518,7 +10260,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11535,7 +10277,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11584,7 +10326,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11601,7 +10343,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11650,7 +10392,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11667,7 +10409,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11716,7 +10458,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11733,7 +10475,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11782,7 +10524,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11799,7 +10541,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11848,7 +10590,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11865,7 +10607,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11914,7 +10656,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11931,7 +10673,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11980,7 +10722,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -11997,7 +10739,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12046,7 +10788,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12063,7 +10805,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12112,7 +10854,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12129,7 +10871,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12178,7 +10920,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12195,7 +10937,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12244,7 +10986,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12261,7 +11003,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12310,7 +11052,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12327,7 +11069,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12376,7 +11118,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12393,7 +11135,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12442,7 +11184,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12459,7 +11201,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12508,7 +11250,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12525,7 +11267,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12574,7 +11316,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12591,7 +11333,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12640,7 +11382,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12657,7 +11399,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12706,7 +11448,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12723,7 +11465,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12772,7 +11514,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12789,7 +11531,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12838,7 +11580,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12855,7 +11597,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12904,7 +11646,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12921,7 +11663,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12970,7 +11712,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -12987,7 +11729,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13036,7 +11778,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13053,7 +11795,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13102,7 +11844,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13119,7 +11861,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13168,7 +11910,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13185,7 +11927,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13234,7 +11976,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13251,7 +11993,7 @@ namespace IBx
                                 if (crt.hp > 0)
                                 {
                                     buttonCounter++;
-                                    if (crt.token.PixelSize.Width > 100)
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                     {
                                         buttonCounter++;
                                     }
@@ -13822,8 +12564,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)pc.token.PixelSize.Height / 100f));
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)pc.token.Height / 100f));
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 100);
                 if ((gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).category.Equals("Melee"))
                         || (gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).name.Equals("none"))
                         || (gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).name.Equals("none")))
@@ -13912,8 +12654,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -13996,8 +12738,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -14074,8 +12816,11 @@ namespace IBx
             {
                 ttl = (int)(Math.Abs(dY) * speed);
             }
-            SharpDX.Vector2 vel = SharpDX.Vector2.Normalize(new SharpDX.Vector2(dX, dY));
-            Sprite spr = new Sprite(gv, filename, startX, startY, vel.X / speed, vel.Y / speed, angle, 0, 1.0f, ttl, false, 100);
+            float magnitude = (float)Math.Sqrt((dX * dX) + (dY * dY));
+            float normX = dX / magnitude;
+            float normY = dY / magnitude;
+            //SharpDX.Vector2 vel = SharpDX.Vector2.Normalize(new SharpDX.Vector2(dX, dY));
+            Sprite spr = new Sprite(gv, filename, startX, startY, normX / speed, normY / speed, angle, 0, 1.0f, ttl, false, 100);
             group.SpriteGroup.Add(spr);
         }
         public void addHitAnimation(AnimationStackGroup group)

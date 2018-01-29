@@ -60,8 +60,8 @@ namespace IBx
             if (btnPortrait == null)
             {
                 btnPortrait = new IbbPortrait(gv, 1.0f);
-                btnPortrait.ImgBG = gv.cc.LoadBitmap("item_slot");
-                btnPortrait.Glow = gv.cc.LoadBitmap("btn_small_glow");
+                btnPortrait.ImgBG = "item_slot";
+                btnPortrait.Glow = "btn_small_glow";
                 btnPortrait.X = 2 * gv.squareSize - (pW * 2);
                 btnPortrait.Y = 1 * gv.squareSize + pH * 2;
                 btnPortrait.Height = (int)(gv.ibpheight * gv.screenDensity);
@@ -70,9 +70,9 @@ namespace IBx
             if (btnToken == null)
             {
                 btnToken = new IbbButton(gv, 1.0f);
-                btnToken.Img = gv.cc.LoadBitmap("item_slot");
-                //btnToken.Img2 = gv.cc.LoadBitmap(pc.tokenFilename);
-                btnToken.Glow = gv.cc.LoadBitmap("btn_small_glow");
+                btnToken.Img = "item_slot";
+                //btnToken.Img2 = "pc.tokenFilename);
+                btnToken.Glow = "btn_small_glow";
                 btnToken.X = 2 * gv.squareSize - (pW * 2);
                 btnToken.Y = 3 * gv.squareSize + pH * 2;
                 btnToken.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -89,8 +89,8 @@ namespace IBx
                 {
                     btnSpells.Text = gv.mod.spellLabelPlural.ToUpper();
                 }
-                btnSpells.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnSpells.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnSpells.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnSpells.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnSpells.X = 6 * gv.squareSize + padW * 1 + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 //btnSpells.Y = 10 * gv.squareSize + pH * 2; See OnDraw for Y
                 btnSpells.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -108,8 +108,8 @@ namespace IBx
                     btnTraits.Text = gv.mod.traitsLabelPlural.ToUpper();
                 }
                 //btnTraits.Text = gv.mod.playerList[gv.cc.partyScreenPcIndex].playerClass.traitLabelPlural.ToUpper();
-                btnTraits.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnTraits.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnTraits.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnTraits.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnTraits.X = 7 * gv.squareSize + padW * 2 + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 //btnSpells.Y = 10 * gv.squareSize + pH * 2; See OnDraw for Y
                 btnTraits.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -119,8 +119,8 @@ namespace IBx
             {
                 btnEffects = new IbbButton(gv, 0.6f);
                 btnEffects.Text = "EFFECTS";
-                btnEffects.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnEffects.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnEffects.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnEffects.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnEffects.X = 8 * gv.squareSize + padW * 3 + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 //btnSpells.Y = 10 * gv.squareSize + pH * 2; See OnDraw for Y
                 btnEffects.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -130,8 +130,8 @@ namespace IBx
             {
                 btnOthers = new IbbButton(gv, 0.6f);
                 btnOthers.Text = "OTHERS";
-                btnOthers.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnOthers.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnOthers.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnOthers.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnOthers.X = 9 * gv.squareSize + padW * 4 + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 //btnSpells.Y = 10 * gv.squareSize + pH * 2; See OnDraw for Y
                 btnOthers.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -141,8 +141,8 @@ namespace IBx
             {
                 btnPartyRoster = new IbbButton(gv, 0.6f);
                 btnPartyRoster.Text = "ROSTER";
-                btnPartyRoster.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnPartyRoster.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPartyRoster.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnPartyRoster.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 ///btnPartyRoster.X = 13 * gv.squareSize;
                 btnPartyRoster.X = (gv.screenWidth / 2) + (int)((gv.ibbwidthL / 2) * gv.screenDensity) + (int)(gv.squareSize * 0.5);
                 btnPartyRoster.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -152,8 +152,8 @@ namespace IBx
             {
                 btnHelp = new IbbButton(gv, 0.8f);
                 btnHelp.Text = "HELP";
-                btnHelp.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnHelp.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 //btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
                 btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.X = (gv.screenWidth / 2) - (int)((gv.ibbwidthL / 2) * gv.screenDensity) - (int)(gv.squareSize * 1.5);
@@ -164,8 +164,8 @@ namespace IBx
             {
                 btnInfo = new IbbButton(gv, 0.8f);
                 btnInfo.Text = "INFO";
-                btnInfo.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnInfo.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnInfo.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnInfo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnInfo.X = 10 * gv.squareSize + (padW * 5) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 //btnInfo.X = (11 * gv.squareSize) - padW + (int)(gv.squareSize * 0.75f);
                 //btnInfo.Y = 9 * gv.squareSize + pH * 2;
@@ -178,8 +178,8 @@ namespace IBx
             {
                 btnReturn = new IbbButton(gv, 1.2f);
                 btnReturn.Text = "RETURN";
-                btnReturn.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnReturn.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnReturn.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnReturn.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnReturn.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
                 btnReturn.Y = 9 * gv.squareSize + pH * 2;
                 btnReturn.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -188,8 +188,8 @@ namespace IBx
             if (btnLevelUp == null)
             {
                 btnLevelUp = new IbbButton(gv, 1.2f);
-                btnLevelUp.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnLevelUp.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnLevelUp.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnLevelUp.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnLevelUp.Text = "Level Up";
                 //btnLevelUp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
                 //btnLevelUp.Y = 8 * gv.squareSize - pH * 2;
@@ -202,8 +202,8 @@ namespace IBx
             if (btnMainHand == null)
             {
                 btnMainHand = new IbbButton(gv, 1.0f);
-                btnMainHand.Img = gv.cc.LoadBitmap("item_slot_mainhand"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_mainhand);
-                btnMainHand.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnMainHand.Img = "item_slot_mainhand"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_mainhand);
+                btnMainHand.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnMainHand.X = 6 * gv.squareSize + (padW * 1) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnMainHand.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnMainHand.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -212,8 +212,8 @@ namespace IBx
             if (btnHead == null)
             {
                 btnHead = new IbbButton(gv, 1.0f);
-                btnHead.Img = gv.cc.LoadBitmap("item_slot_head"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_head);
-                btnHead.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnHead.Img = "item_slot_head"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_head);
+                btnHead.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnHead.X = 8 * gv.squareSize + (padW * 3) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnHead.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnHead.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -222,8 +222,8 @@ namespace IBx
             if (btnGloves == null)
             {
                 btnGloves = new IbbButton(gv, 1.0f);
-                btnGloves.Img = gv.cc.LoadBitmap("item_slot_gloves"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_neck);
-                btnGloves.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnGloves.Img = "item_slot_gloves"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_neck);
+                btnGloves.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 
                 btnGloves.X = 9 * gv.squareSize + (padW * 4) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 //btnGloves.X = 8 * gv.squareSize + (padW * 5) + gv.oXshift + (int)(gv.squareSize * 0.75f);
@@ -243,8 +243,8 @@ namespace IBx
             if (btnNeck == null)
             {
                 btnNeck = new IbbButton(gv, 1.0f);
-                btnNeck.Img = gv.cc.LoadBitmap("item_slot_neck"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_neck);
-                btnNeck.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnNeck.Img = "item_slot_neck"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_neck);
+                btnNeck.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnNeck.X = 7 * gv.squareSize + (padW * 2) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnNeck.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnNeck.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -253,8 +253,8 @@ namespace IBx
             if (btnOffHand == null)
             {
                 btnOffHand = new IbbButton(gv, 1.0f);
-                btnOffHand.Img = gv.cc.LoadBitmap("item_slot_offhand"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_offhand);
-                btnOffHand.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnOffHand.Img = "item_slot_offhand"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_offhand);
+                btnOffHand.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnOffHand.X = 9 * gv.squareSize + (padW * 4) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnOffHand.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnOffHand.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -263,8 +263,8 @@ namespace IBx
             if (btnRing == null)
             {
                 btnRing = new IbbButton(gv, 1.0f);
-                btnRing.Img = gv.cc.LoadBitmap("item_slot_ring"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_ring);
-                btnRing.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnRing.Img = "item_slot_ring"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_ring);
+                btnRing.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnRing.X = 6 * gv.squareSize + (padW * 1) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnRing.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnRing.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -273,8 +273,8 @@ namespace IBx
             if (btnBody == null)
             {
                 btnBody = new IbbButton(gv, 1.0f);
-                btnBody.Img = gv.cc.LoadBitmap("item_slot_body"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_body);
-                btnBody.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnBody.Img = "item_slot_body"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_body);
+                btnBody.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnBody.X = 8 * gv.squareSize + (padW * 3) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnBody.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnBody.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -283,8 +283,8 @@ namespace IBx
             if (btnFeet == null)
             {
                 btnFeet = new IbbButton(gv, 1.0f);
-                btnFeet.Img = gv.cc.LoadBitmap("item_slot_feet"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_feet);
-                btnFeet.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnFeet.Img = "item_slot_feet"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_feet);
+                btnFeet.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnFeet.X = 7 * gv.squareSize + (padW * 2) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnFeet.Y = 1 * gv.squareSize; //not used, see onDraw function
                 btnFeet.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -293,8 +293,8 @@ namespace IBx
             if (btnRing2 == null)
             {
                 btnRing2 = new IbbButton(gv, 1.0f);
-                btnRing2.Img = gv.cc.LoadBitmap("item_slot_ring"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_ring);
-                btnRing2.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnRing2.Img = "item_slot_ring"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_ring);
+                btnRing2.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnRing2.X = 10 * gv.squareSize + (padW * 5) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnRing2.Y = 2 * gv.squareSize + padW; //not used, see onDraw function
                 btnRing2.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -303,8 +303,8 @@ namespace IBx
             if (btnAmmo == null)
             {
                 btnAmmo = new IbbButton(gv, 1.0f);
-                btnAmmo.Img = gv.cc.LoadBitmap("item_slot_ammo"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_ring);
-                btnAmmo.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnAmmo.Img = "item_slot_ammo"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot_ring);
+                btnAmmo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnAmmo.X = 10 * gv.squareSize + (padW * 5) + gv.oXshift + (int)(gv.squareSize * 0.75f);
                 btnAmmo.Y = 2 * gv.squareSize + padW; //not used, see onDraw function
                 btnAmmo.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -314,8 +314,8 @@ namespace IBx
             for (int x = 0; x < 6; x++)
             {
                 IbbButton btnNew = new IbbButton(gv, 1.0f);
-                btnNew.Img = gv.cc.LoadBitmap("item_slot"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-                btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+                btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnNew.X = ((x + 3) * gv.squareSize) + (padW * (x + 1)) + gv.oXshift;
                 btnNew.Y = pH * 2;
                 btnNew.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -334,8 +334,7 @@ namespace IBx
                 {
                     if (!gv.mod.playerList[cntPCs].isTemporaryAllyForThisEncounterOnly)
                     {
-                        gv.cc.DisposeOfBitmap(ref btn.Img2);
-                        btn.Img2 = gv.cc.LoadBitmap(gv.mod.playerList[cntPCs].tokenFilename);
+                        btn.Img2 = gv.mod.playerList[cntPCs].tokenFilename;
                     }
                 }
                 cntPCs++;
@@ -344,8 +343,8 @@ namespace IBx
         }
         public void resetTokenAndPortrait()
         {
-            btnToken.Img2 = gv.mod.playerList[gv.cc.partyScreenPcIndex].token;
-            btnPortrait.Img = gv.mod.playerList[gv.cc.partyScreenPcIndex].portrait;
+            btnToken.Img2 = gv.mod.playerList[gv.cc.partyScreenPcIndex].tokenFilename;
+            btnPortrait.Img = gv.mod.playerList[gv.cc.partyScreenPcIndex].portraitFilename;
         }
 
         public void redrawParty()
@@ -391,25 +390,25 @@ namespace IBx
 
             //DRAW LEFT STATS
             //name            
-            gv.DrawText(pc.name, locX, locY += leftStartY, 1.0f, Color.White);
+            gv.DrawText(pc.name, locX, locY += leftStartY);
 
             //race
-            gv.DrawText(gv.mod.raceLabel +": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing, 1.0f, Color.White);
+            gv.DrawText(gv.mod.raceLabel +": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing);
 
             //gender
             if (pc.isMale)
             {
-                gv.DrawText("Gender: Male", locX, locY += spacing, 1.0f, Color.White);
+                gv.DrawText("Gender: Male", locX, locY += spacing);
             }
             else
             {
-                gv.DrawText("Gender: Female", locX, locY += spacing, 1.0f, Color.White);
+                gv.DrawText("Gender: Female", locX, locY += spacing);
             }
 
             //class
-            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing, 1.0f, Color.White);
-            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing, 1.0f, Color.White);
-            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing, 1.0f, Color.White);
+            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing);
+            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing);
+            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing);
             //gv.DrawText("---------------", locX, locY += spacing, 1.0f, Color.White);
 
             //LOCATE STATS INFO BUTTONS
@@ -494,26 +493,16 @@ namespace IBx
             if (gv.cc.partyItemSlotIndex == 9) { btnGloves.glowOn = true; }
             else { btnGloves.glowOn = false; }
 
-            gv.cc.DisposeOfBitmap(ref btnMainHand.Img2);
-            btnMainHand.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnHead.Img2);
-            btnHead.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.HeadRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnGloves.Img2);
-            btnGloves.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.GlovesRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnNeck.Img2);
-            btnNeck.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.NeckRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnOffHand.Img2);
-            btnOffHand.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.OffHandRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnRing.Img2);
-            btnRing.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.RingRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnBody.Img2);
-            btnBody.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.BodyRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnFeet.Img2);
-            btnFeet.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.FeetRefs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnRing2.Img2);
-            btnRing2.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.Ring2Refs.resref).itemImage);
-            gv.cc.DisposeOfBitmap(ref btnAmmo.Img2);
-            btnAmmo.Img2 = gv.cc.LoadBitmap(gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).itemImage);
+            btnMainHand.Img2 = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).itemImage;
+            btnHead.Img2 = gv.mod.getItemByResRefForInfo(pc.HeadRefs.resref).itemImage;
+            btnGloves.Img2 = gv.mod.getItemByResRefForInfo(pc.GlovesRefs.resref).itemImage;
+            btnNeck.Img2 = gv.mod.getItemByResRefForInfo(pc.NeckRefs.resref).itemImage;
+            btnOffHand.Img2 = gv.mod.getItemByResRefForInfo(pc.OffHandRefs.resref).itemImage;
+            btnRing.Img2 = gv.mod.getItemByResRefForInfo(pc.RingRefs.resref).itemImage;
+            btnBody.Img2 = gv.mod.getItemByResRefForInfo(pc.BodyRefs.resref).itemImage;
+            btnFeet.Img2 = gv.mod.getItemByResRefForInfo(pc.FeetRefs.resref).itemImage;
+            btnRing2.Img2 = gv.mod.getItemByResRefForInfo(pc.Ring2Refs.resref).itemImage;
+            btnAmmo.Img2 = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).itemImage;
 
             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             /*
@@ -1238,7 +1227,7 @@ namespace IBx
             tb.AddHtmlTextToLog(text);
             tb.onDrawLogBox();                       
         }
-        public void onTouchParty(MouseEventArgs e, MouseEventType.EventType eventType, bool inCombat)
+        public void onTouchParty(int eX, int eY, MouseEventType.EventType eventType, bool inCombat)
         {
             try
             {
@@ -1257,8 +1246,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
 
                         if (btnLevelUp.getImpact(x, y))
                         {
@@ -1302,8 +1291,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnLevelUp.glowOn = false;
                         btnPartyRoster.glowOn = false;
@@ -1600,13 +1589,11 @@ namespace IBx
         }
         public void tokenLoad(Player p)
         {
-            p.token = gv.cc.LoadBitmap(p.tokenFilename);
-            btnToken.Img2 = p.token;
+            btnToken.Img2 = p.tokenFilename;
         }
         public void portraitLoad(Player p)
         {
-            p.portrait = gv.cc.LoadBitmap(p.portraitFilename);
-            btnPortrait.Img = p.portrait;
+            btnPortrait.Img = p.portraitFilename;
         }
         public String isUseableBy(Item it)
         {
@@ -1870,21 +1857,20 @@ namespace IBx
             }
         }
 
-        public void doLevelUp()
+        public async void doLevelUp()
         {
             List<string> actionList = new List<string> { "Cancel", "LEVEL UP" };
 
-            using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Level Up Action"))
-            {
-                itSel.IceBlinkButtonClose.Enabled = true;
-                itSel.IceBlinkButtonClose.Visible = true;
-                itSel.setupAll(gv);
-                var ret = itSel.ShowDialog();
-                if (itSel.selectedIndex == 0) // selected to Cancel
+            string selected = await gv.ListViewPage(actionList, "Level Up Action");
+            int selectedIndex = gv.GetSelectedIndex(selected, actionList);
+
+            //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Level Up Action"))
+            //{
+                if (selectedIndex == 0) // selected to Cancel
                 {
                     //do nothing
                 }
-                else if (itSel.selectedIndex == 1) // selected to LEVEL UP
+                else if (selectedIndex == 1) // selected to LEVEL UP
                 {
                     Player pc = gv.mod.playerList[gv.cc.partyScreenPcIndex];
                     //LEVEL UP ALL STATS AND UPDATE STATS
@@ -2389,7 +2375,7 @@ namespace IBx
                         doLevelUpSummary();
                     }
                 }
-            }
+            //}
         }
         public void doLevelUpSummary()
         {

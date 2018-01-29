@@ -35,8 +35,8 @@ namespace IBx
             {
                 btnReturn = new IbbButton(gv, 1.0f);
                 btnReturn.Text = "RETURN SELECTED";
-                btnReturn.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnReturn.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnReturn.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnReturn.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnReturn.X = (gv.screenWidth / 2) - (int)(170.0f * gv.screenDensity / 2.0f);
                 btnReturn.Y = 10 * gv.squareSize + pH * 2;
                 btnReturn.Height = (int)(50 * gv.screenDensity);
@@ -46,8 +46,8 @@ namespace IBx
             for (int x = 0; x < 6; x++)
             {
                 IbbButton btnNew = new IbbButton(gv, 1.0f);
-                btnNew.Img = gv.cc.LoadBitmap("item_slot"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-                btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+                btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnNew.X = ((x) * gv.squareSize) + (padW * (x + 1)) + gv.oXshift;
                 btnNew.Y = pH * 2;
                 btnNew.Height = (int)(50 * gv.screenDensity);
@@ -94,26 +94,26 @@ namespace IBx
 
             //DRAW LEFT STATS
             //name            
-            gv.DrawText("Name: " + pc.name, locX, locY += leftStartY, 1.0f, Color.White);
+            gv.DrawText("Name: " + pc.name, locX, locY += leftStartY);
 
             //race
-            gv.DrawText(gv.mod.raceLabel + ": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing, 1.0f, Color.White);
+            gv.DrawText(gv.mod.raceLabel + ": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing);
 
             //gender
             if (pc.isMale)
             {
-                gv.DrawText("Gender: Male", locX, locY += spacing, 1.0f, Color.White);
+                gv.DrawText("Gender: Male", locX, locY += spacing);
             }
             else
             {
-                gv.DrawText("Gender: Female", locX, locY += spacing, 1.0f, Color.White);
+                gv.DrawText("Gender: Female", locX, locY += spacing);
             }
 
             //class
-            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing, 1.0f, Color.White);
-            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing, 1.0f, Color.White);
-            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing, 1.0f, Color.White);
-            gv.DrawText("---------------", locX, locY += spacing, 1.0f, Color.White);
+            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing);
+            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing);
+            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing);
+            gv.DrawText("---------------", locX, locY += spacing);
             
             //DRAW RIGHT STATS
             int actext = 0;
@@ -133,7 +133,7 @@ namespace IBx
                         
             btnReturn.Draw();
         }
-        public void onTouchPcSelector(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchPcSelector(int eX, int eY, MouseEventType.EventType eventType)
         {
             try
             {
@@ -143,8 +143,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
 
                         if (btnReturn.getImpact(x, y))
                         {
@@ -153,8 +153,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnReturn.glowOn = false;
 

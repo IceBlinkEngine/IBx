@@ -26,7 +26,7 @@ namespace IBx
         private IbbButton btnFinished = null;
         private IbbButton btnAbort = null;
 
-        private Bitmap blankItemSlot;
+        private string blankItemSlot;
         private int pcCreationIndex = 0;
         //private int pcTokenSelectionIndex = 0;
         //private int pcPortraitSelectionIndex = 0;
@@ -41,7 +41,7 @@ namespace IBx
         {
             //gv.mod = m;
             gv = g;
-            blankItemSlot = gv.cc.LoadBitmap("item_slot");
+            blankItemSlot = "item_slot";
             LoadPlayerBitmapList();
             LoadPlayerPortraitList();
             CreateRaceList();
@@ -53,8 +53,6 @@ namespace IBx
         public void resetPC()
         {
             pc = gv.cc.LoadPlayer(gv.mod.defaultPlayerFilename);
-            pc.token = gv.cc.LoadBitmap(pc.tokenFilename);
-            pc.portrait = gv.cc.LoadBitmap(pc.portraitFilename);
             pc.playerClass = gv.mod.getPlayerClass(pc.classTag);
             pc.race = this.getAllowedRace(pc.raceTag);
             pc.name = "CharacterName";
@@ -115,7 +113,7 @@ namespace IBx
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.ToString());
+                            //MessageBox.Show(ex.ToString());
                             gv.errorLog(ex.ToString());
                         }
                     }
@@ -123,7 +121,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
                 gv.errorLog(ex.ToString());
             }
             try
@@ -149,7 +147,7 @@ namespace IBx
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.ToString());
+                            //MessageBox.Show(ex.ToString());
                             gv.errorLog(ex.ToString());
                         }
                     }
@@ -157,7 +155,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
                 gv.errorLog(ex.ToString());
             }
         }
@@ -184,7 +182,7 @@ namespace IBx
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.ToString());
+                            //MessageBox.Show(ex.ToString());
                             gv.errorLog(ex.ToString());
                         }
                     }
@@ -192,7 +190,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
                 gv.errorLog(ex.ToString());
             }
             try
@@ -218,7 +216,7 @@ namespace IBx
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.ToString());
+                            //MessageBox.Show(ex.ToString());
                             gv.errorLog(ex.ToString());
                         }
                     }
@@ -226,7 +224,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                //MessageBox.Show(ex.ToString());
                 gv.errorLog(ex.ToString());
             }
         }
@@ -241,19 +239,19 @@ namespace IBx
             if (btnPortrait == null)
             {
                 btnPortrait = new IbbPortrait(gv, 1.0f);
-                btnPortrait.ImgBG = gv.cc.LoadBitmap("item_slot");
-                btnPortrait.Glow = gv.cc.LoadBitmap("btn_small_glow");
+                btnPortrait.ImgBG = "item_slot";
+                btnPortrait.Glow = "btn_small_glow";
                 btnPortrait.X = 10 * gv.squareSize;
                 btnPortrait.Y = 1 * gv.squareSize + pH * 2;
-                btnPortrait.Height = (int)(pc.portrait.PixelSize.Height * gv.screenDensity);
-                btnPortrait.Width = (int)(pc.portrait.PixelSize.Width * gv.screenDensity);
+                btnPortrait.Height = (int)(gv.cc.GetFromBitmapList(pc.portraitFilename).Height * gv.screenDensity);
+                btnPortrait.Width = (int)(gv.cc.GetFromBitmapList(pc.portraitFilename).Width * gv.screenDensity);
             }
             if (btnToken == null)
             {
                 btnToken = new IbbButton(gv, 1.0f);
-                btnToken.Img = gv.cc.LoadBitmap("item_slot");
-                btnToken.Img2 = gv.cc.LoadBitmap(pc.tokenFilename);
-                btnToken.Glow = gv.cc.LoadBitmap("btn_small_glow");
+                btnToken.Img = "item_slot";
+                btnToken.Img2 = pc.tokenFilename;
+                btnToken.Glow = "btn_small_glow";
                 btnToken.X = 12 * gv.squareSize;
                 btnToken.Y = 1 * gv.squareSize + pH * 2;
                 btnToken.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -262,8 +260,8 @@ namespace IBx
             if (btnName == null)
             {
                 btnName = new IbbButton(gv, 1.0f);
-                btnName.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnName.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnName.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnName.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnName.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1;
                 btnName.Y = 0 * gv.squareSize + gv.squareSize / 2;
                 btnName.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -272,8 +270,8 @@ namespace IBx
             if (btnRace == null)
             {
                 btnRace = new IbbButton(gv, 1.0f);
-                btnRace.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnRace.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnRace.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnRace.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnRace.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1;
                 btnRace.Y = 1 * gv.squareSize + gv.squareSize / 2;
                 btnRace.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -282,8 +280,8 @@ namespace IBx
             if (btnGender == null)
             {
                 btnGender = new IbbButton(gv, 1.0f);
-                btnGender.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnGender.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnGender.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnGender.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnGender.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1;
                 btnGender.Y = 2 * gv.squareSize + gv.squareSize / 2;
                 btnGender.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -292,8 +290,8 @@ namespace IBx
             if (btnClass == null)
             {
                 btnClass = new IbbButton(gv, 1.0f);
-                btnClass.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnClass.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnClass.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnClass.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnClass.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1;
                 btnClass.Y = 3 * gv.squareSize + gv.squareSize / 2;
                 btnClass.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -303,8 +301,8 @@ namespace IBx
             if (btnPlayerGuideOnPcCreation == null)
             {
                 btnPlayerGuideOnPcCreation = new IbbButton(gv, 1.0f);
-                btnPlayerGuideOnPcCreation.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnPlayerGuideOnPcCreation.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnPlayerGuideOnPcCreation.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnPlayerGuideOnPcCreation.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnPlayerGuideOnPcCreation.Text = "Player's Guide";
                 btnPlayerGuideOnPcCreation.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1;
                 btnPlayerGuideOnPcCreation.Y = 7 * gv.squareSize;
@@ -314,8 +312,8 @@ namespace IBx
             if (btnBeginnerGuideOnPcCreation == null)
             {
                 btnBeginnerGuideOnPcCreation = new IbbButton(gv, 1.0f);
-                btnBeginnerGuideOnPcCreation.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnBeginnerGuideOnPcCreation.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnBeginnerGuideOnPcCreation.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnBeginnerGuideOnPcCreation.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnBeginnerGuideOnPcCreation.Text = "Beginner's Guide";
                 btnBeginnerGuideOnPcCreation.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1;
                 btnBeginnerGuideOnPcCreation.Y = 8 * gv.squareSize + pH;
@@ -325,8 +323,8 @@ namespace IBx
             if (btnRollStats == null)
             {
                 btnRollStats = new IbbButton(gv, 1.0f);
-                btnRollStats.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnRollStats.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnRollStats.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnRollStats.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnRollStats.Text = "Roll Stats";
                 btnRollStats.X = center + pW * 1;
                 btnRollStats.Y = 7 * gv.squareSize;
@@ -336,8 +334,8 @@ namespace IBx
             if (btnFinished == null)
             {
                 btnFinished = new IbbButton(gv, 1.0f);
-                btnFinished.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-                btnFinished.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnFinished.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnFinished.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnFinished.Text = "Finished";
                 btnFinished.X = center + pW * 1;
                 btnFinished.Y = 8 * gv.squareSize + pH;
@@ -348,8 +346,8 @@ namespace IBx
             {
                 btnAbort = new IbbButton(gv, 0.8f);
                 btnAbort.Text = "Abort";
-                btnAbort.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
-                btnAbort.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
+                btnAbort.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
+                btnAbort.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
                 btnAbort.X = 8 * gv.squareSize + padW * 1 + gv.oXshift;
                 btnAbort.Y = 9 * gv.squareSize + pH * 2;
                 btnAbort.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -382,7 +380,7 @@ namespace IBx
             //Page Title
             gv.DrawText("CREATE CHARACTER", pW * 40 + gv.squareSize, pH * 1);
 
-            Color color = Color.White;
+            string color = "white";
 
             int actext = 0;
             if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
@@ -477,9 +475,9 @@ namespace IBx
             }
             int yLoc = 3 * gv.squareSize;
             IbRect rect = new IbRect(tabX + gv.squareSize - pW, yLoc, pW * 35, pH * 50);
-            gv.DrawText(textToSpan, rect, 1.0f, Color.White);
+            gv.DrawText(textToSpan, rect, "white");
 
-            btnPortrait.Img = pc.portrait;
+            btnPortrait.Img = pc.portraitFilename;
             btnPortrait.Draw();
             btnToken.Draw();
             btnName.Text = pc.name;
@@ -505,7 +503,7 @@ namespace IBx
             btnPlayerGuideOnPcCreation.Draw();
             btnBeginnerGuideOnPcCreation.Draw();
         }
-        public void onTouchPcCreation(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchPcCreation(int eX, int eY, MouseEventType.EventType eventType)
         {
             try
             {
@@ -524,8 +522,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
                         if (btnRollStats.getImpact(x, y))
                         {
                             btnRollStats.glowOn = true;
@@ -569,8 +567,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnRollStats.glowOn = false;
                         btnFinished.glowOn = false;
@@ -968,39 +966,38 @@ namespace IBx
 
         public void tokenLoad(Player p)
         {
-            p.token = gv.cc.LoadBitmap(p.tokenFilename);
-            btnToken.Img2 = p.token;
+            btnToken.Img2 = p.tokenFilename;
         }
         public void portraitLoad(Player p)
         {
-            p.portrait = gv.cc.LoadBitmap(p.portraitFilename);
-            btnPortrait.Img = p.portrait;
+            btnPortrait.Img = p.portraitFilename;
         }
-        public void changePcName()
+        public async void changePcName()
         {
-            using (TextInputDialog itSel = new TextInputDialog(gv, "Choose a unique Name for this PC."))
-            {
-                itSel.IceBlinkButtonClose.Visible = true;
-                itSel.IceBlinkButtonClose.Enabled = true;
-                itSel.textInput = "Type unique Name Here";
+            string myinput = await gv.StringInputBox("Choose a unique Name for this PC:", pc.name);
 
-                var ret = itSel.ShowDialog();
+            //using (TextInputDialog itSel = new TextInputDialog(gv, "Choose a unique Name for this PC."))
+            //{
+                //itSel.IceBlinkButtonClose.Visible = true;
+                //itSel.IceBlinkButtonClose.Enabled = true;
+                //itSel.textInput = "Type unique Name Here";
 
-                if (ret == DialogResult.OK)
-                {
-                    if (itSel.textInput.Length > 0)
+                //var ret = itSel.ShowDialog();
+
+                
+                    if (myinput.Length > 0)
                     {
-                        pc.name = itSel.textInput;
-                        pc.tag = itSel.textInput.ToLower();
+                        pc.name = myinput;
+                        pc.tag = myinput.ToLower();
                         bool foundNameConflict = false;
                         foreach (Player p in gv.mod.playerList)
                         {
                             if ((p.name == pc.name) || (p.tag == pc.tag))
                             {
                                 gv.sf.MessageBoxHtml("This name already exists, please choose a different one.");
-                                pc.name = "";
-                                pc.tag = "";
-                                itSel.textInput = "Type unique Name Here";
+                                pc.name = "name";
+                                pc.tag = "name";
+                                //itSel.textInput = "Type unique Name Here";
                                 foundNameConflict = true;
                                 break;
                             }
@@ -1012,9 +1009,9 @@ namespace IBx
                                 if ((p.name == pc.name) || (p.tag == pc.tag))
                                 {
                                     gv.sf.MessageBoxHtml("This name already exists, please choose a different one.");
-                                    pc.name = "";
-                                    pc.tag = "";
-                                    itSel.textInput = "Type unique Name Here";
+                                    pc.name = "name";
+                                    pc.tag = "name";
+                                    //itSel.textInput = "Type unique Name Here";
                                     break;
                                 }
                             }
@@ -1024,8 +1021,8 @@ namespace IBx
                     {
                         //Toast.makeText(gv.gameContext, "Entering a blank name is not allowed", Toast.LENGTH_SHORT).show();
                     }
-                }
-            }
+                
+            //}
         }
         public void reRollStats(Player p)
         {

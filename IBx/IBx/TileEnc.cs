@@ -58,6 +58,10 @@ namespace IBx
          //[JsonIgnore]
 	    public bool LoSBlocked = false;
 
+        public string tileBitmap1;
+        public string tileBitmap2;
+        public string tileBitmap3;
+
         public TileEnc()
 	    {
 	

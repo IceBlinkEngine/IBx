@@ -2170,7 +2170,7 @@ namespace IBx
                             prp2.LocationX = Convert.ToInt32(p3);
                             prp2.LocationY = Convert.ToInt32(p4);
                             //gv.cc.DisposeOfBitmap(ref prp2.token);
-                            //prp2.token = gv.cc.LoadBitmap(prp.ImageFileName);
+                            //prp2.token = "prp.ImageFileName);
                            
                             for (int i2 = 0; i2 < gv.mod.moduleAreasObjects.Count; i2++)
                             {
@@ -2258,7 +2258,7 @@ namespace IBx
                     //test if still needed with IB2 later on
                     //crucial for loading the creature token
                     //gv.cc.DisposeOfBitmap(ref copy.token);
-                    //copy.token = gv.cc.LoadBitmap(copy.cr_tokenFilename);
+                    //copy.token = "copy.cr_tokenFilename);
 
                     //Automaically create a unique tag                      
                     copy.cr_tag = "SummonTag" + mod.getNextIdNumber();  
@@ -3690,8 +3690,8 @@ namespace IBx
             try
             {
                 Player newPc = gv.cc.LoadPlayer(filename +".json"); //ex: filename = "ezzbel.json"
-                //newPc.token = gv.cc.LoadBitmap(newPc.tokenFilename);
-                //newPc.portrait = gv.cc.LoadBitmap(newPc.portraitFilename);
+                //newPc.token = "newPc.tokenFilename);
+                //newPc.portrait = "newPc.portraitFilename);
                 newPc.playerClass = mod.getPlayerClass(newPc.classTag);
                 newPc.race = mod.getRace(newPc.raceTag);
                 //check to see if already in party before adding
@@ -3744,8 +3744,8 @@ namespace IBx
                 newPc.combatLocX = locationX;
                 newPc.combatLocY = locationY;
 
-                //newPc.token = gv.cc.LoadBitmap(newPc.tokenFilename);
-                //newPc.portrait = gv.cc.LoadBitmap(newPc.portraitFilename);
+                //newPc.token = "newPc.tokenFilename);
+                //newPc.portrait = "newPc.portraitFilename);
                 newPc.playerClass = mod.getPlayerClass(newPc.classTag);
                 newPc.race = mod.getRace(newPc.raceTag);
                 //check to see if already in party before adding
@@ -3968,7 +3968,7 @@ namespace IBx
                 if (mod.playerList.Count > 0)
                 {
                     Player copyPC = pc.DeepCopy();
-                    //copyPC.token = gv.cc.LoadBitmap(copyPC.tokenFilename);
+                    //copyPC.token = "copyPC.tokenFilename);
                     copyPC.playerClass = mod.getPlayerClass(copyPC.classTag);
                     copyPC.race = mod.getRace(copyPC.raceTag);
                     mod.partyRosterList.Add(copyPC);
@@ -4037,7 +4037,7 @@ namespace IBx
                 if ((mod.partyRosterList.Count > 0) && (mod.playerList.Count < mod.MaxPartySize))
                 {
                     Player copyPC = pc.DeepCopy();
-                    //copyPC.token = gv.cc.LoadBitmap(copyPC.tokenFilename);
+                    //copyPC.token = "copyPC.tokenFilename);
                     copyPC.playerClass = mod.getPlayerClass(copyPC.classTag);
                     copyPC.race = mod.getRace(copyPC.raceTag);
                     mod.playerList.Add(copyPC);
@@ -4202,7 +4202,7 @@ namespace IBx
                     gv.mod.partyTokenFilename = filename;
                 }
                 //gv.cc.DisposeOfBitmap(ref gv.mod.partyTokenBitmap);
-                //gv.mod.partyTokenBitmap = gv.cc.LoadBitmap(gv.mod.partyTokenFilename);
+                //gv.mod.partyTokenBitmap = "gv.mod.partyTokenFilename);
                 if (!mod.playerList[0].combatFacingLeft)
                 {
 //TODO                    mod.partyTokenBitmap = gv.cc.flip(mod.partyTokenBitmap);

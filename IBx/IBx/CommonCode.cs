@@ -415,28 +415,12 @@ namespace IBx
         {
             List<string> actionList = new List<string> { "Yes, Return To Main Menu", "No, Keep Playing" };
 
-            using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Are you sure you wish to exit to Main Menu?"))
+            /*TODO using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Are you sure you wish to exit to Main Menu?"))
             {
                 itSel.IceBlinkButtonClose.Enabled = true;
                 itSel.IceBlinkButtonClose.Visible = true;
                 itSel.setupAll(gv);
                 var ret = itSel.ShowDialog();
-
-                /*
-                if (fixedModule.Equals("")) //this is the IceBlink Engine app
-                {
-                    screenLauncher = new ScreenLauncher(mod, this);
-                    screenLauncher.loadModuleFiles();
-                    screenType = "launcher";
-                }
-                else //this is a fixed module
-                {
-                    mod = cc.LoadModule(fixedModule + "/" + fixedModule + ".mod", false);
-                    resetGame();
-                    cc.LoadSaveListItems();
-                    screenType = "title";
-                }
-                */
 
                 if (itSel.selectedIndex == 0)
                 {
@@ -478,13 +462,14 @@ namespace IBx
                     //keep playing 
                 }
             }
+            */
         }
          
         public void doSavesDialog()
         {
             List<string> saveList = new List<string> { slot0, slot1, slot2, slot3, slot4, slot5, "Return to Main Menu" };
 
-            using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a slot to save game."))
+            /*TODO using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a slot to save game."))
             {
                 itSel.IceBlinkButtonClose.Enabled = true;
                 itSel.IceBlinkButtonClose.Visible = true;
@@ -589,12 +574,12 @@ namespace IBx
                     doVerifyReturnToMain();
                 }
             }
-
+            */
         }
         public void doLoadSaveGameDialog()
         {
             List<string> saveList = new List<string> { slotA, slot0, slot1, slot2, slot3, slot4, slot5 };
-
+            /*TODO
             using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a Saved Game to Load."))
             {
                 itSel.IceBlinkButtonClose.Visible = true;
@@ -693,6 +678,7 @@ namespace IBx
                     }
                 }
             }
+            */
         }
         public ModuleInfo LoadModuleInfo(string filename)
         {
@@ -11703,5 +11689,6 @@ namespace IBx
             }
             return fSize;
         }
+
     }
 }

@@ -52,8 +52,8 @@ namespace IBx
 
         public void setHover(IB2Panel parentPanel, int x, int y)
         {
-            //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
-            //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
+            //int Width = gv.cc.GetFromBitmapList(ImgFilename).Width;
+            //int Height = gv.cc.GetFromBitmapList(ImgFilename).Height;
             if (show)
             {
                 glowOn = false;
@@ -76,8 +76,8 @@ namespace IBx
 
         public bool getImpact(IB2Panel parentPanel, int x, int y)
         {
-            //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
-            //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
+            //int Width = gv.cc.GetFromBitmapList(ImgFilename).Width;
+            //int Height = gv.cc.GetFromBitmapList(ImgFilename).Height;
             if (show)
             {
                 if ((x >= (int)((parentPanel.currentLocX + X) * gv.screenDensity)) && (x <= (int)((parentPanel.currentLocX + X + Width) * gv.screenDensity)))
@@ -104,8 +104,8 @@ namespace IBx
                 int pH = (int)((float)gv.screenHeight / 200.0f);
                 int pW = (int)((float)gv.screenHeight / 200.0f);
                 float fSize = (float)(gv.squareSize / 4) * scaler;
-                //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
-                //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
+                //int Width = gv.cc.GetFromBitmapList(ImgFilename).Width;
+                //int Height = gv.cc.GetFromBitmapList(ImgFilename).Height;
 
                 IbRect src = new IbRect(0, 0, Width, Height);
                 IbRect dst = new IbRect((int)((parentPanel.currentLocX + this.X) * gv.screenDensity), (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity), (int)((float)Width * gv.screenDensity), (int)((float)Height * gv.screenDensity));

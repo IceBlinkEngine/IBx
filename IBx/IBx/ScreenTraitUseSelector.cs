@@ -144,9 +144,9 @@ namespace IBx
             if (btnTokensLeft == null)
             {
                 btnTokensLeft = new IbbButton(gv, 1.0f);
-                btnTokensLeft.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnTokensLeft.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-                btnTokensLeft.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnTokensLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnTokensLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+                btnTokensLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnTokensLeft.X = (int)(5 * gv.squareSize) + (3 * pW);
                 btnTokensLeft.Y = (2 * gv.squareSize);
                 btnTokensLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -156,8 +156,8 @@ namespace IBx
             if (btnPageIndex == null)
             {
                 btnPageIndex = new IbbButton(gv, 1.0f);
-                btnPageIndex.Img = gv.cc.LoadBitmap("btn_small_off"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-                btnPageIndex.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+                btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnPageIndex.Text = "1/20";
                 btnPageIndex.X = (int)(6 * gv.squareSize) + (3 * pW);
                 btnPageIndex.Y = (2 * gv.squareSize);
@@ -168,9 +168,9 @@ namespace IBx
             if (btnTokensRight == null)
             {
                 btnTokensRight = new IbbButton(gv, 1.0f);
-                btnTokensRight.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnTokensRight.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-                btnTokensRight.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnTokensRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnTokensRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+                btnTokensRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnTokensRight.X = (int)(7f * gv.squareSize) + (3 * pW);
                 btnTokensRight.Y = (2 * gv.squareSize);
                 btnTokensRight.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -184,8 +184,8 @@ namespace IBx
                 
                 btnSelect.Text = gv.mod.playerList[gv.screenCastSelector.castingPlayerIndex].playerClass.labelForUseTraitAction.ToUpper() + " SELECTED " + gv.mod.playerList[gv.screenCastSelector.castingPlayerIndex].playerClass.traitLabelSingular.ToUpper();
                 
-                btnSelect.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnSelect.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnSelect.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnSelect.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnSelect.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
 			    btnSelect.Y = 9 * gv.squareSize + pH * 2;
                 btnSelect.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -195,8 +195,8 @@ namespace IBx
 		    {
 			    btnHelp = new IbbButton(gv, 0.8f);	
 			    btnHelp.Text = "HELP";
-			    btnHelp.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnHelp.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
 			    btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -206,8 +206,8 @@ namespace IBx
 		    {
 			    btnExit = new IbbButton(gv, 0.8f);	
 			    btnExit.Text = "EXIT";
-			    btnExit.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnExit.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnExit.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnExit.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnExit.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
 			    btnExit.Y = 9 * gv.squareSize + pH * 2;
                 btnExit.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -216,9 +216,9 @@ namespace IBx
 		    for (int y = 0; y < slotsPerPage; y++)
 		    {
 			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnNew.ImgOff = gv.cc.LoadBitmap("btn_small_off");
-                btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnNew.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnNew.ImgOff = "btn_small_off";
+                btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			
 			    int x = y % 5;
 			    int yy = y / 5;
@@ -263,37 +263,35 @@ namespace IBx
                         //Trait tr = gv.mod.getTraitByTag(ta.tag);
 
                         //best sue same image for trait and spell, traitImage and spellImage should align then
-                        gv.cc.DisposeOfBitmap(ref btn.Img2);
-                        btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        gv.cc.DisposeOfBitmap(ref btn.Img2Off);
-                        btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        btn.Img2 = sp.spellImage;
+                        btn.Img2Off = sp.spellImage + "_off";
 
                         //if (pc.knownSpellsTags.Contains(sp.tag))
                         //{
                         //if (isInCombat) //all spells can be used in combat
                         //{
-                            //btn.Img = gv.cc.LoadBitmap("btn_small");
+                            //btn.Img = ""btn_small");
                             btn.btnState = buttonState.Normal;
                         //}
                         //not in combat so check if spell can be used on adventure maps
                         //else if ((sp.useableInSituation.Equals("Always")) || (sp.useableInSituation.Equals("OutOfCombat")))
                         //{
-                            //btn.Img = gv.cc.LoadBitmap("btn_small");
+                            //btn.Img = ""btn_small");
                             //btn.btnState = buttonState.Normal;
-                            //btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
+                            //btn.Img2 = "sp.spellImage);
                         //}
                         //else //can't be used on adventure map
                         //{
                             //btn.btnState = buttonState.Off;
-                            //btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                            //btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                            //btn.Img2 = "sp.spellImage);
+                            //btn.Img2Off = "sp.spellImage + "_off");
                         //}
                         //}
                         //else //spell not known
                         //{
                         //btn.btnState = buttonState.Off;
-                        //btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        //btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        //btn.Img2 = "sp.spellImage);
+                        //btn.Img2Off = "sp.spellImage + "_off");
                         //}
                     }
                     else //slot is not in spells allowed index range
@@ -337,35 +335,35 @@ namespace IBx
                         //Spell sp = gv.mod.getSpellByTag(pc.knownOutsideCombatUsableTraitsTags[cntSlot]);
                         Spell sp = gv.mod.getSpellByTag(backupKnownOutsideCombatUsableTraitsTags[cntSlot + (tknPageIndex * slotsPerPage)]);
 
-                        btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        btn.Img2 = sp.spellImage;
+                        btn.Img2Off = sp.spellImage + "_off";
 
                         //if (pc.knownSpellsTags.Contains(sp.tag))
                         //{
                         //if (isInCombat) //all spells can be used in combat
                         //{
-                        //btn.Img = gv.cc.LoadBitmap("btn_small");
+                        //btn.Img = ""btn_small");
                         btn.btnState = buttonState.Normal;
                         //}
                         //not in combat so check if spell can be used on adventure maps
                         //else if ((sp.useableInSituation.Equals("Always")) || (sp.useableInSituation.Equals("OutOfCombat")))
                         //{
-                        //btn.Img = gv.cc.LoadBitmap("btn_small");
+                        //btn.Img = ""btn_small");
                         //btn.btnState = buttonState.Normal;
-                        //btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
+                        //btn.Img2 = "sp.spellImage);
                         //}
                         //else //can't be used on adventure map
                         //{
                         //btn.btnState = buttonState.Off;
-                        //btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        //btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        //btn.Img2 = "sp.spellImage);
+                        //btn.Img2Off = "sp.spellImage + "_off");
                         //}
                         //}
                         //else //spell not known
                         //{
                         //btn.btnState = buttonState.Off;
-                        //btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        //btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        //btn.Img2 = "sp.spellImage);
+                        //btn.Img2Off = "sp.spellImage + "_off");
                         //}
                     }
                     else //slot is not in spells allowed index range
@@ -520,17 +518,17 @@ namespace IBx
                         if ((pc.sp >= sp.costSP) && ((pc.hp - 1) >= sp.costHP))
                     {
                         //gv.mSheetTextPaint.setColor(Color.GREEN);
-                        gv.DrawText("Available", noticeX, noticeY, 1.0f, Color.Lime);
+                        gv.DrawText("Available", noticeX, noticeY, "lime");
                     }
                     else //if known but not enough spell points, "Insufficient SP to Cast" in yellow
                     {
                         //gv.mSheetTextPaint.setColor(Color.YELLOW);
-                        gv.DrawText("Insufficient SP or HP", noticeX, noticeY, 1.0f, Color.Yellow);
+                        gv.DrawText("Insufficient SP or HP", noticeX, noticeY, "yellow");
                     }
                 }
                     else
                     {
-                        gv.DrawText("Specific requirements like e.g. worn equipment not met", noticeX, noticeY, 1.0f, Color.Yellow);
+                        gv.DrawText("Specific requirements like e.g. worn equipment not met", noticeX, noticeY, "yellow");
                     }
                     //}
                     //not in combat so check if spell can be used on adventure maps
@@ -660,17 +658,17 @@ namespace IBx
                         if ((pc.sp >= sp.costSP) && ((pc.hp - 1) >= sp.costHP))
                     {
                         //gv.mSheetTextPaint.setColor(Color.GREEN);
-                        gv.DrawText("Available", noticeX, noticeY, 1.0f, Color.Lime);
+                        gv.DrawText("Available", noticeX, noticeY, "lime");
                     }
                     else //if known but not enough spell points, "Insufficient SP to Cast" in yellow
                     {
                         //gv.mSheetTextPaint.setColor(Color.YELLOW);
-                        gv.DrawText("Insufficient SP or HP", noticeX, noticeY, 1.0f, Color.Yellow);
+                        gv.DrawText("Insufficient SP or HP", noticeX, noticeY, "yellow");
                     }
                 }
                     else
                     {
-                        gv.DrawText("Specific requirements like e.g. worn equipment not met", noticeX, noticeY, 1.0f, Color.Yellow);
+                        gv.DrawText("Specific requirements like e.g. worn equipment not met", noticeX, noticeY, "yellow");
                     }
                     //}
                     //not in combat so check if spell can be used on adventure maps
@@ -722,16 +720,13 @@ namespace IBx
                     {
                         Spell sp = gv.mod.getSpellByTag(backupKnownInCombatUsableTraitsTags[cntSlot + (tknPageIndex * slotsPerPage)]);
                         //TraitAllowed ta = backupTraitsAllowed[cntSlot + (tknPageIndex * slotsPerPage)];
-                        gv.cc.DisposeOfBitmap(ref btn.Img2);
-                        btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        gv.cc.DisposeOfBitmap(ref btn.Img2Off);
-                        btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        btn.Img2 = sp.spellImage;
+                        btn.Img2Off = sp.spellImage + "_off";
                         btn.btnState = buttonState.Normal;
                     }
                     else
                     {
-                        gv.cc.DisposeOfBitmap(ref btn.Img);
-                        btn.Img = gv.cc.LoadBitmap("btn_small_off");
+                        btn.Img = "btn_small_off";
                         btn.Img2 = null;
                         btn.Img2Off = null;
                         btn.Img3 = null;
@@ -746,16 +741,13 @@ namespace IBx
                     {
                         Spell sp = gv.mod.getSpellByTag(backupKnownOutsideCombatUsableTraitsTags[cntSlot + (tknPageIndex * slotsPerPage)]);
                         //TraitAllowed ta = backupTraitsAllowed[cntSlot + (tknPageIndex * slotsPerPage)];
-                        gv.cc.DisposeOfBitmap(ref btn.Img2);
-                        btn.Img2 = gv.cc.LoadBitmap(sp.spellImage);
-                        gv.cc.DisposeOfBitmap(ref btn.Img2Off);
-                        btn.Img2Off = gv.cc.LoadBitmap(sp.spellImage + "_off");
+                        btn.Img2 = sp.spellImage;
+                        btn.Img2Off = sp.spellImage + "_off";
                         btn.btnState = buttonState.Normal;
                     }
                     else
                     {
-                        gv.cc.DisposeOfBitmap(ref btn.Img);
-                        btn.Img = gv.cc.LoadBitmap("btn_small_off");
+                        btn.Img = "btn_small_off";
                         btn.Img2 = null;
                         btn.Img2Off = null;
                         btn.Img3 = null;
@@ -856,7 +848,7 @@ namespace IBx
             btnTokensRight.Draw();
             btnPageIndex.Draw();
         }
-        public void onTouchCastSelector(MouseEventArgs e, MouseEventType.EventType eventType, bool inCombat)
+        public void onTouchCastSelector(int eX, int eY, MouseEventType.EventType eventType, bool inCombat)
 	    {
             try
             {
@@ -871,8 +863,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
                         if (btnHelp.getImpact(x, y))
                         {
                             btnHelp.glowOn = true;
@@ -900,8 +892,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnHelp.glowOn = false;
                         //btnInfo.glowOn = false;
@@ -1000,7 +992,7 @@ namespace IBx
             }
         }
 
-        public void doSelectedSpell(bool inCombat)
+        public async void doSelectedSpell(bool inCombat)
 	    {
             //if (isSelectedSpellSlotInKnownSpellsRange())
             //{
@@ -1236,29 +1228,33 @@ namespace IBx
                                     }
                                 }
 
-                                using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, gv.mod.playerList[gv.screenCastSelector.castingPlayerIndex].playerClass.traitLabelSingular + " Target"))
-                                {
-                                    pcSel.ShowDialog();
-                                    if (pcSel.selectedIndex > 0)
+                                //gv.itemListSelector.setupIBminiItemListSelector(gv, pcNames, gv.mod.getPlayerClass(getCastingPlayer().classTag).spellLabelSingular + " Target", "castselectorspelltarget");
+                                //gv.itemListSelector.showIBminiItemListSelector = true;
+                                string selected = await gv.ListViewPage(pcNames, "Select Target");
+                                int selectedIndex = gv.GetSelectedIndex(selected, pcNames);
+                                //using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, gv.mod.playerList[gv.screenCastSelector.castingPlayerIndex].playerClass.traitLabelSingular + " Target"))
+                                //{
+                                    //pcSel.ShowDialog();
+                                    if (selectedIndex > 0)
                                     {
                                         try
                                         {
-                                            Player target = gv.mod.playerList[pcSel.selectedIndex - 1];
+                                            Player target = gv.mod.playerList[selectedIndex - 1];
                                             gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, inCombat, true);
                                             gv.screenType = "main";
                                             doCleanUp();
                                         }
                                         catch (Exception ex)
                                         {
-                                            IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
+                                            gv.sf.MessageBox("error with Pc Selector screen: " + ex.ToString());
                                             gv.errorLog(ex.ToString());
                                         }
                                     }
-                                    else if (pcSel.selectedIndex == 0) // selected "cancel"
+                                    else if (selectedIndex == 0) // selected "cancel"
                                     {
                                         //do nothing
                                     }
-                                }
+                                //}
                             }
                         }
                         else

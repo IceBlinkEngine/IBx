@@ -13,8 +13,8 @@ namespace IBx
 {
     public class GameView
     {
-        ContentPage cp;
-        SKCanvas canvas;
+        public ContentPage cp;
+        public SKCanvas canvas;
         //this class is handled differently than Android version
         public int elapsed = 0;
         public float screenDensity;
@@ -87,7 +87,9 @@ namespace IBx
 
         public IB2HtmlLogBox log;
         public IBminiMessageBox messageBox;
+        public IbbHtmlTextBox drawTextBox;
         public bool showMessageBox = false;
+        //public IBminiItemListSelector itemListSelector;
         public CommonCode cc;
         public Module mod;
         public ScriptFunctions sf;
@@ -239,25 +241,20 @@ namespace IBx
             cc.addLogText("red", "Welcome to IceBlink 2");
             cc.addLogText("fuchsia", "You can scroll this message log box, use mouse wheel or scroll bar");
 
-            /*TODO
+            //TODO
             //setup messageBox defaults
-            messageBox = new IBminiMessageBox(this);
-            messageBox.currentLocX = 20;
-            messageBox.currentLocY = 10;
-            messageBox.numberOfLinesToShow = 17;
-            messageBox.tbWidth = 344;
-            messageBox.Width = 344;
-            messageBox.Height = 220;
-            messageBox.tbHeight = 212;
-            messageBox.setupIBminiMessageBox();
-
-            //setup itemListSelector defaults   
-            itemListSelector = new IBminiItemListSelector();
-            itemListSelector.currentLocX = 20;
-            itemListSelector.currentLocY = 10;
-            itemListSelector.Width = 344;
-            itemListSelector.Height = 220;
-            */
+            //messageBox = new IBminiMessageBox(this);
+            //messageBox.currentLocX = 20;
+            //messageBox.currentLocY = 10;
+            //messageBox.numberOfLinesToShow = 17;
+            //messageBox.tbWidth = 344;
+            //messageBox.Width = 344;
+            //messageBox.Height = 220;
+            //messageBox.tbHeight = 212;
+            //messageBox.setupIBminiMessageBox();
+                        
+            drawTextBox = new IbbHtmlTextBox(this, 320, 100, 500, 300);
+            drawTextBox.showBoxBorder = false;
 
             //TODO initializeMusic();
             //TODO setupMusicPlayers();
@@ -498,11 +495,20 @@ namespace IBx
 
         private void ResetFont()
         {
-            foreach (var res in GetType().GetTypeInfo().Assembly.GetManifestResourceNames())
-            {
-                System.Diagnostics.Debug.WriteLine("found resource: " + res);
-            }
-            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream("IBx.metamorphous_regular.ttf"))
+            //loop for testing/debugging of resource names (uncomment the next four lines to use)
+            //foreach (var res in GetType().GetTypeInfo().Assembly.GetManifestResourceNames())
+            //{
+            //    System.Diagnostics.Debug.WriteLine("found resource: " + res);
+            //}
+            string assetName = "IBx.UWP.metamorphous_regular.ttf";
+#if __IOS___
+            string assetName = "IBx.iOS.metamorphous_regular.ttf";
+#endif
+#if __ANDROID___
+            string assetName = "IBx.Droid.metamorphous_regular.ttf";
+#endif
+
+            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream(assetName))
             using (var managedStream = new SKManagedStream(stream, true))
             using (var tf = SKTypeface.FromStream(managedStream))
             {
@@ -516,7 +522,7 @@ namespace IBx
             drawFontSmallHeight = 20.0f * multiplr * mod.fontD2DScaleMultiplier;
         }
 
-        #region Area Music/Sounds
+#region Area Music/Sounds
         public void setupMusicPlayers()
         {
             /*try
@@ -813,7 +819,7 @@ namespace IBx
                 errorLog(ex.ToString());
             }*/
         }
-        #endregion
+#endregion
         
 	    public void stopMusic()
 	    {
@@ -922,6 +928,37 @@ namespace IBx
         }
 
         //DRAW ROUTINES
+        public void DrawText(string text, IbRect rect, string fontColor)
+        {
+            if (fontColor.Equals("black"))
+            {
+                text = "<font color = 'black'>" + text + "</font>";
+            }
+            else if (fontColor.Equals("red"))
+            {
+                text = "<font color = 'red'>" + text + "</font>";
+            }
+            else if (fontColor.Equals("blue"))
+            {
+                text = "<font color = 'blue'>" + text + "</font>";
+            }
+            else if (fontColor.Equals("green"))
+            {
+                text = "<font color = 'green'>" + text + "</font>";
+            }
+            else if (fontColor.Equals("yellow"))
+            {
+                text = "<font color = 'yellow'>" + text + "</font>";
+            }
+            drawTextBox.tbXloc = rect.Left;
+            drawTextBox.tbYloc = rect.Top;
+            drawTextBox.tbWidth = rect.Width;
+            drawTextBox.tbHeight = rect.Height;
+            drawTextBox.logLinesList.Clear();
+            drawTextBox.AddHtmlTextToLog(text);
+            drawTextBox.onDrawLogBox();
+            //DrawText(text, rect, FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, scaler, fontColor);
+        }
         public void DrawText(string text, float xLoc, float yLoc)
         {
             DrawText(text, xLoc, yLoc, "regular", "white", "normal", 255, false);
@@ -1035,6 +1072,10 @@ namespace IBx
             }
 
             canvas.DrawText(text, xLoc, yLoc, textPaint);
+        }
+        public float MeasureString(string text)
+        {            
+            return MeasureString(text, "regular", "normal");
         }
         public float MeasureString(string text, string size, string style)
         {
@@ -1482,7 +1523,7 @@ namespace IBx
                     //do touch scrolling if in a scrolling text box
                     if (showMessageBox)
                     {
-                        messageBox.onTouchSwipe(eX, eY, eventType);
+                        //TODO messageBox.onTouchSwipe(eX, eY, eventType);
                     }
                     else if ((screenType.Equals("main")) || (screenType.Equals("combat")))
                     {
@@ -1664,6 +1705,101 @@ namespace IBx
         {
             Application.Exit();
         }*/
+
+        //DIALOGS
+        public Task<string> ListViewPage(List<string> list, string headerText)
+        {
+            // wait in this proc, until user did his input 
+            var tcs = new TaskCompletionSource<string>();
+
+            // create and show page
+            var page = new ListViewPageIBx(tcs, list, headerText);
+            cp.Navigation.PushModalAsync(page);
+
+            // code is waiting her, until result is passed with tcs.SetResult() in btn-Clicked
+            // then proc returns the result
+            return tcs.Task;
+        }
+        public int GetSelectedIndex(string selectedString, List<string> itemList)
+        {
+            int index = 0;
+            foreach(string s in itemList)
+            {
+                if (s.Equals(selectedString))
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
+        public Task<string> StringInputBox(string headerText, string existingTextInputValue)
+        {
+            // wait in this proc, until user did his input 
+            var tcs = new TaskCompletionSource<string>();
+
+            var lblTitle = new Label { Text = "Text Entry", HorizontalOptions = LayoutOptions.Center, FontAttributes = FontAttributes.Bold };
+            var lblMessage = new Label { Text = headerText };
+            var txtInput = new Editor { Text = existingTextInputValue };
+            //txtInput.HorizontalOptions = LayoutOptions.FillAndExpand;
+            txtInput.VerticalOptions = LayoutOptions.FillAndExpand;
+
+            var btnOk = new Button
+            {
+                Text = "Ok",
+                WidthRequest = 100,
+                BackgroundColor = Xamarin.Forms.Color.FromRgb(0.8, 0.8, 0.8),
+            };
+            btnOk.Clicked += async (s, e) =>
+            {
+                // close page
+                var result = txtInput.Text;
+                await cp.Navigation.PopModalAsync();
+                // pass result
+                tcs.SetResult(result);
+            };
+
+            var btnCancel = new Button
+            {
+                Text = "Cancel",
+                WidthRequest = 100,
+                BackgroundColor = Xamarin.Forms.Color.FromRgb(0.8, 0.8, 0.8)
+            };
+            btnCancel.Clicked += async (s, e) =>
+            {
+                // close page
+                await cp.Navigation.PopModalAsync();
+                // pass empty result
+                tcs.SetResult(existingTextInputValue);
+            };
+
+            var slButtons = new StackLayout
+            {
+                Orientation = StackOrientation.Horizontal,
+                Children = { btnOk, btnCancel },
+            };
+
+            var layout = new StackLayout
+            {
+                Padding = new Thickness(0, 40, 0, 0),
+                VerticalOptions = LayoutOptions.FillAndExpand,
+                HorizontalOptions = LayoutOptions.FillAndExpand,
+                Orientation = StackOrientation.Vertical,
+                Children = { lblTitle, lblMessage, txtInput, slButtons },
+            };
+
+            // create and show page
+            var page = new ContentPage();
+            page.Content = layout;
+            cp.Navigation.PushModalAsync(page);
+            // open keyboard
+            //txtInput.Focus();
+
+            // code is waiting her, until result is passed with tcs.SetResult() in btn-Clicked
+            // then proc returns the result
+            return tcs.Task;
+        }
+
 
         /*public void SaveSettings(Settings tglSettings)
         {

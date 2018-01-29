@@ -380,9 +380,9 @@ namespace IBx
             if (btnTokensLeft == null)
             {
                 btnTokensLeft = new IbbButton(gv, 1.0f);
-                btnTokensLeft.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnTokensLeft.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-                btnTokensLeft.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnTokensLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnTokensLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+                btnTokensLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnTokensLeft.X = (int)(5 * gv.squareSize) + (3 * pW);
                 btnTokensLeft.Y = (1 * gv.squareSize);
                 btnTokensLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -392,8 +392,8 @@ namespace IBx
             if (btnPageIndex == null)
             {
                 btnPageIndex = new IbbButton(gv, 1.0f);
-                btnPageIndex.Img = gv.cc.LoadBitmap("btn_small_off"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-                btnPageIndex.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+                btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnPageIndex.Text = "1/20";
                 btnPageIndex.X = (int)(6 * gv.squareSize) + (3 * pW);
                 btnPageIndex.Y = (1 * gv.squareSize);
@@ -404,9 +404,9 @@ namespace IBx
             if (btnTokensRight == null)
             {
                 btnTokensRight = new IbbButton(gv, 1.0f);
-                btnTokensRight.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                btnTokensRight.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-                btnTokensRight.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnTokensRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnTokensRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+                btnTokensRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
                 btnTokensRight.X = (int)(7f * gv.squareSize) + (3 * pW);
                 btnTokensRight.Y = (1 * gv.squareSize);
                 btnTokensRight.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -417,8 +417,8 @@ namespace IBx
 		    {
 			    btnSelect = new IbbButton(gv, 0.8f);	
 			    btnSelect.Text = "LEARN SELECTED CHOICE";
-			    btnSelect.Img = gv.cc.LoadBitmap("btn_large"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnSelect.Glow = gv.cc.LoadBitmap("btn_large_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+			    btnSelect.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+			    btnSelect.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnSelect.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
 			    btnSelect.Y = 9 * gv.squareSize + pH * 2;
                 btnSelect.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -428,8 +428,8 @@ namespace IBx
 		    {
 			    btnHelp = new IbbButton(gv, 0.8f);	
 			    btnHelp.Text = "HELP";
-			    btnHelp.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnHelp.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
 			    btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -439,8 +439,8 @@ namespace IBx
 		    {
 			    btnExit = new IbbButton(gv, 0.8f);	
 			    btnExit.Text = "EXIT";
-			    btnExit.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnExit.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+			    btnExit.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+			    btnExit.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			    btnExit.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
 			    btnExit.Y = 9 * gv.squareSize + pH * 2;
                 btnExit.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -449,10 +449,8 @@ namespace IBx
 		    for (int y = 0; y < slotsPerPage; y++)
 		    {
 			    IbbButton btnNew = new IbbButton(gv, 1.0f);
-                gv.cc.DisposeOfBitmap(ref btnNew.Img);
-                btnNew.Img = gv.cc.LoadBitmap("btn_small"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-                gv.cc.DisposeOfBitmap(ref btnNew.Glow);
-                btnNew.Glow = gv.cc.LoadBitmap("btn_small_glow"); // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnNew.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
 			
 			    int x = y % 5;
 			    int yy = y / 5;
@@ -533,7 +531,7 @@ namespace IBx
                 {
                     maxNumber = gv.mod.getPlayerClass(pc.classTag).traitsToLearnAtLevelTable[pc.classLevel];
                 }
-                gv.DrawText("Select Choice Nr. " + traitToLearnIndex + " of " + maxNumber + " Choice(s) to Learn", noticeX, pH * 1, 1.0f, Color.Gray);
+                gv.DrawText("Select Choice Nr. " + traitToLearnIndex + " of " + maxNumber + " Choice(s) to Learn", noticeX, pH * 1, "gray");
 
                 //DRAW NOTIFICATIONS
                 if (isSelectedTraitSlotInKnownTraitsRange())
@@ -545,7 +543,7 @@ namespace IBx
                     if ((pc.knownTraitsTags.Contains(tr.tag)) || (pc.learningTraitsTags.Contains(tr.tag)))
                     {
                         //say that you already know this one
-                        gv.DrawText("Already Known", noticeX, noticeY, 1.0f, Color.Yellow);
+                        gv.DrawText("Already Known", noticeX, noticeY, "yellow");
                     }
                     else //trait not known
                     {
@@ -555,17 +553,17 @@ namespace IBx
                         //check if available to learn
                         if (isAvailableToLearn(tr.tag) && attributeRequirementsMet)
                         {
-                            gv.DrawText("Available to Learn", noticeX, noticeY, 1.0f, Color.Lime);
+                            gv.DrawText("Available to Learn", noticeX, noticeY, "lime");
                         }
                         else //not available yet
                         {
                             if (attributeRequirementsMet)
                             {
-                                gv.DrawText(pc.playerClass.traitLabelSingular + " Not Available to Learn Yet", noticeX, noticeY, 1.0f, Color.Red);
+                                gv.DrawText(pc.playerClass.traitLabelSingular + " Not Available to Learn Yet", noticeX, noticeY, "red");
                             }
                             else 
                             {
-                                gv.DrawText("Attribute requirements not met", noticeX, noticeY, 1.0f, Color.Red);
+                                gv.DrawText("Attribute requirements not met", noticeX, noticeY, "red");
                             }
                         }
                     }
@@ -602,22 +600,20 @@ namespace IBx
                     {
                         if (pc.knownTraitsTags.Contains(tr.tag)) //check to see if already known, if so turn on button
                         {
-                            gv.cc.DisposeOfBitmap(ref btn.Img);
-                            btn.Img = gv.cc.LoadBitmap("btn_small");
-                            gv.cc.DisposeOfBitmap(ref btn.Img2);
-                            btn.Img2 = gv.cc.LoadBitmap(tr.traitImage);
+                            btn.Img = "btn_small";
+                            btn.Img2 = tr.traitImage;
                             btn.Img3 = null;
 
                             //gv.cc.DisposeOfBitmap(ref btn.Img3);
-                            //btn.Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                            //btn.Img3 = ""mandatory_conversation_indicator");
                         }
                         else //trait not known yet
                         {
                             /*
                             gv.cc.DisposeOfBitmap(ref btn.Img);
-                            btn.Img = gv.cc.LoadBitmap("btn_small_off");
+                            btn.Img = ""btn_small_off");
                             gv.cc.DisposeOfBitmap(ref btn.Img2);
-                            btn.Img2 = gv.cc.LoadBitmap(tr.traitImage + "_off");
+                            btn.Img2 = "tr.traitImage + "_off");
                             btn.Img3 = null;
                             */
                             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -629,21 +625,15 @@ namespace IBx
                             //}
                             if (isAvailableToLearn(tr.tag) && attributeRequirementsMet) //if available to learn, turn on button
                             {
-                                gv.cc.DisposeOfBitmap(ref btn.Img);
-                                btn.Img = gv.cc.LoadBitmap("btn_small_off");
-                                gv.cc.DisposeOfBitmap(ref btn.Img2);
-                                btn.Img2 = gv.cc.LoadBitmap(tr.traitImage + "_off");
-                                gv.cc.DisposeOfBitmap(ref btn.Img3);
-                                btn.Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                                btn.Img = "btn_small_off";
+                                btn.Img2 = tr.traitImage + "_off";
+                                btn.Img3 = "mandatory_conversation_indicator";
                             }
                             else //not available to learn, turn off button
                             {
-                                gv.cc.DisposeOfBitmap(ref btn.Img);
-                                btn.Img = gv.cc.LoadBitmap("btn_small_off");
-                                gv.cc.DisposeOfBitmap(ref btn.Img2);
-                                btn.Img2 = gv.cc.LoadBitmap(tr.traitImage + "_off");
-                                gv.cc.DisposeOfBitmap(ref btn.Img3);
-                                btn.Img3 = gv.cc.LoadBitmap("encounter_indicator");
+                                btn.Img = "btn_small_off";
+                                btn.Img2 = tr.traitImage + "_off";
+                                btn.Img3 = "encounter_indicator";
                             }
 
                             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -653,12 +643,9 @@ namespace IBx
                     {
                         if (pc.knownTraitsTags.Contains(tr.tag)) //check to see if already known, if so turn off button
                         {
-                            gv.cc.DisposeOfBitmap(ref btn.Img);
-                            btn.Img = gv.cc.LoadBitmap("btn_small_off");
-                            gv.cc.DisposeOfBitmap(ref btn.Img2);
-                            btn.Img2 = gv.cc.LoadBitmap(tr.traitImage + "_off");
-                            gv.cc.DisposeOfBitmap(ref btn.Img3);
-                            btn.Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
+                            btn.Img = "btn_small_off";
+                            btn.Img2 = tr.traitImage + "_off";
+                            btn.Img3 = "mandatory_conversation_indicator";
                         }
                         else //trait not known yet
                         {
@@ -670,28 +657,22 @@ namespace IBx
                             //}
                             if (isAvailableToLearn(tr.tag) && attributeRequirementsMet) //if available to learn, turn on button
                             {
-                                gv.cc.DisposeOfBitmap(ref btn.Img);
-                                btn.Img = gv.cc.LoadBitmap("btn_small");
-                                gv.cc.DisposeOfBitmap(ref btn.Img2);
-                                btn.Img2 = gv.cc.LoadBitmap(tr.traitImage);
+                                btn.Img = "btn_small";
+                                btn.Img2 = tr.traitImage;
                                 btn.Img3 = null;
                             }
                             else //not available to learn, turn off button
                             {
-                                gv.cc.DisposeOfBitmap(ref btn.Img);
-                                btn.Img = gv.cc.LoadBitmap("btn_small_off");
-                                gv.cc.DisposeOfBitmap(ref btn.Img2);
-                                btn.Img2 = gv.cc.LoadBitmap(tr.traitImage + "_off");
-                                gv.cc.DisposeOfBitmap(ref btn.Img3);
-                                btn.Img3 = gv.cc.LoadBitmap("encounter_indicator");
+                                btn.Img = "btn_small_off";
+                                btn.Img2 = tr.traitImage + "_off";
+                                btn.Img3 = "encounter_indicator";
                             }
                         }
                     }				
 			    }
 			    else //slot is not in traits allowed index range
 			    {
-                    gv.cc.DisposeOfBitmap(ref btn.Img);
-                    btn.Img = gv.cc.LoadBitmap("btn_small_off"); 
+                    btn.Img = "btn_small_off"; 
 				    btn.Img2 = null;
                     btn.Img3 = null;
 			    }			
@@ -778,7 +759,7 @@ namespace IBx
                 btnPageIndex.Draw();
             }
         }
-        public void onTouchTraitLevelUp(MouseEventArgs e, MouseEventType.EventType eventType, bool inPcCreation, bool inCombat)
+        public void onTouchTraitLevelUp(int eX, int eY, MouseEventType.EventType eventType, bool inPcCreation, bool inCombat)
 	    {
             try
             {
@@ -793,8 +774,8 @@ namespace IBx
                 {
                     case MouseEventType.EventType.MouseDown:
                     case MouseEventType.EventType.MouseMove:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
                         if (btnHelp.getImpact(x, y))
                         {
                             btnHelp.glowOn = true;
@@ -822,8 +803,8 @@ namespace IBx
                         break;
 
                     case MouseEventType.EventType.MouseUp:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         btnTokensLeft.glowOn = false;
                         btnTokensRight.glowOn = false;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -17,7 +18,7 @@ namespace IBx
 	    private IbbButton btnModuleName = null;
         private IbbHtmlTextBox description;
 	    private List<Module> moduleList = new List<Module>();
-	    private List<Bitmap> titleList = new List<Bitmap>();
+	    private List<SKBitmap> titleList = new List<SKBitmap>();
 	    private int moduleIndex = 0;
 	
 	
@@ -51,7 +52,7 @@ namespace IBx
                         gv.sf.MessageBox("returned a null module");
                     }
                     moduleList.Add(mod);
-                    titleList.Add(gv.cc.LoadBitmap("title", mod));
+                    titleList.Add(gv.cc.GetFromBitmapList("title"));
                 }
             }
         }
@@ -68,9 +69,9 @@ namespace IBx
 		    if (btnLeft == null)
 		    {
 			    btnLeft = new IbbButton(gv, 1.0f);
-			    btnLeft.Img = gv.cc.LoadBitmap("btn_small");
-			    btnLeft.Img2 = gv.cc.LoadBitmap("ctrl_left_arrow");
-			    btnLeft.Glow = gv.cc.LoadBitmap("btn_small_glow");
+			    btnLeft.Img = "btn_small";
+			    btnLeft.Img2 = "ctrl_left_arrow";
+			    btnLeft.Glow = "btn_small_glow";
 			    btnLeft.X = smallLeftX;
                 btnLeft.Y = (5 * gv.squareSize) - (pH * 2);
                 btnLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -79,8 +80,8 @@ namespace IBx
 		    if (btnModuleName == null)
 		    {
 			    btnModuleName = new IbbButton(gv, 1.0f);
-			    btnModuleName.Img = gv.cc.LoadBitmap("btn_large");
-			    btnModuleName.Glow = gv.cc.LoadBitmap("btn_large_glow");
+			    btnModuleName.Img = "btn_large";
+			    btnModuleName.Glow = "btn_large_glow";
 			    btnModuleName.Text = "";
                 btnModuleName.X = wideX;
 			    btnModuleName.Y = (5 * gv.squareSize) - (pH * 2);
@@ -90,9 +91,9 @@ namespace IBx
 		    if (btnRight == null)
 		    {
 			    btnRight = new IbbButton(gv, 1.0f);
-			    btnRight.Img = gv.cc.LoadBitmap("btn_small");
-			    btnRight.Img2 = gv.cc.LoadBitmap("ctrl_right_arrow");
-			    btnRight.Glow = gv.cc.LoadBitmap("btn_small_glow");
+			    btnRight.Img = "btn_small";
+			    btnRight.Img2 = "ctrl_right_arrow";
+			    btnRight.Glow = "btn_small_glow";
 			    btnRight.X = smallRightX;
 			    btnRight.Y = (5 * gv.squareSize) - (pH * 2);
                 btnRight.Height = (int)(gv.ibbheight * gv.screenDensity);
@@ -106,7 +107,7 @@ namespace IBx
             //DRAW TITLE SCREEN
     	    if ((titleList.Count > 0) && (moduleIndex < titleList.Count))
 		    {
-                IbRect src = new IbRect(0, 0, titleList[moduleIndex].PixelSize.Width, titleList[moduleIndex].PixelSize.Height);
+                IbRect src = new IbRect(0, 0, titleList[moduleIndex].Width, titleList[moduleIndex].Height);
                 IbRect dst = new IbRect((gv.screenWidth / 2) - (gv.squareSize * 4), 0, gv.squareSize * 8, gv.squareSize * 4);
                 gv.DrawBitmap(titleList[moduleIndex], src, dst);
 		    }
@@ -136,7 +137,7 @@ namespace IBx
 		    btnRight.Draw();
 		    btnModuleName.Draw();
 	    }
-        public void onTouchLauncher(MouseEventArgs e, MouseEventType.EventType eventType)
+        public void onTouchLauncher(int eX, int eY, MouseEventType.EventType eventType)
         {
             try
             {
@@ -147,8 +148,8 @@ namespace IBx
                 switch (eventType)
                 {
                     case MouseEventType.EventType.MouseUp:
-                        int x = (int)e.X;
-                        int y = (int)e.Y;
+                        int x = (int)eX;
+                        int y = (int)eY;
 
                         btnLeft.glowOn = false;
                         btnRight.glowOn = false;
@@ -181,8 +182,8 @@ namespace IBx
 
                     case MouseEventType.EventType.MouseMove:
                     case MouseEventType.EventType.MouseDown:
-                        x = (int)e.X;
-                        y = (int)e.Y;
+                        x = (int)eX;
+                        y = (int)eY;
 
                         if (btnLeft.getImpact(x, y))
                         {

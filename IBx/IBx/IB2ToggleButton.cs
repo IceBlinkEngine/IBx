@@ -39,8 +39,8 @@ namespace IBx
 
         public bool getImpact(IB2Panel parentPanel, int x, int y)
         {
-            //int Width = gv.cc.GetFromBitmapList(ImgOnFilename).PixelSize.Width;
-            //int Height = gv.cc.GetFromBitmapList(ImgOnFilename).PixelSize.Height;
+            //int Width = gv.cc.GetFromBitmapList(ImgOnFilename).Width;
+            //int Height = gv.cc.GetFromBitmapList(ImgOnFilename).Height;
             if (show)
             {
                 if ((x >= (int)((parentPanel.currentLocX + X) * gv.screenDensity)) && (x <= (int)((parentPanel.currentLocX + X + Width) * gv.screenDensity)))
