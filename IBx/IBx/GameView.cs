@@ -508,9 +508,10 @@ namespace IBx
             string assetName = "IBx.Droid.metamorphous_regular.ttf";
 #endif
 
-            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream(assetName))
-            using (var managedStream = new SKManagedStream(stream, true))
-            using (var tf = SKTypeface.FromStream(managedStream))
+            //using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream(assetName))
+            //using (var managedStream = new SKManagedStream(stream, true))
+            //using (var tf = SKTypeface.FromStream(managedStream))
+            using (var tf = SKTypeface.FromFamilyName("Arial"))
             {
                 textPaint.Color = SKColors.White;
                 textPaint.TextSize = 60;

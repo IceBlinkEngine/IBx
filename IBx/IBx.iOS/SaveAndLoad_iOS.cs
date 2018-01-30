@@ -59,7 +59,7 @@ namespace IBx.iOS
         public string GetModuleFileString(string modFilename)
         {
             //asset module
-            if (modFilename.StartsWith("IBbasic."))
+            if (modFilename.StartsWith("IBx."))
             {
                 Assembly assembly = GetType().GetTypeInfo().Assembly;
                 Stream stream = assembly.GetManifestResourceStream(modFilename);
@@ -73,7 +73,7 @@ namespace IBx.iOS
                 string modFolder = Path.GetFileNameWithoutExtension(modFilename);
                 //try asset area            
                 Assembly assembly = GetType().GetTypeInfo().Assembly;
-                Stream stream = assembly.GetManifestResourceStream("IBbasic.iOS." + modFilename);
+                Stream stream = assembly.GetManifestResourceStream("IBx.iOS." + modFilename);
                 if (stream != null)
                 {
                     using (var reader = new System.IO.StreamReader(stream))
@@ -92,7 +92,7 @@ namespace IBx.iOS
                 else //try from external folder
                 {
                     /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                    filePath = sdCard.AbsolutePath + "/IBbasic/modules/" + modFolder + "/" + modFilename;
+                    filePath = sdCard.AbsolutePath + "/IBx/modules/" + modFolder + "/" + modFilename;
                     if (File.Exists(filePath))
                     {
                         return File.ReadAllText(filePath);
@@ -105,7 +105,7 @@ namespace IBx.iOS
         {
             //try asset area            
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBbasic.iOS." + assetFilename);
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS." + assetFilename);
             if (stream != null)
             {
                 using (var reader = new System.IO.StreamReader(stream))
@@ -124,7 +124,7 @@ namespace IBx.iOS
             else //try from external folder
             {
                 /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                filePath = sdCard.AbsolutePath + "/IBbasic/modules/" + modFolder + "/" + areaFilename + ".are";
+                filePath = sdCard.AbsolutePath + "/IBx/modules/" + modFolder + "/" + areaFilename + ".are";
                 if (File.Exists(filePath))
                 {
                     return File.ReadAllText(filePath);
@@ -136,7 +136,7 @@ namespace IBx.iOS
         {
             //try asset area            
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBbasic.iOS." + assetFilename);
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS." + assetFilename);
             if (stream != null)
             {
                 using (var reader = new System.IO.StreamReader(stream))
@@ -159,7 +159,7 @@ namespace IBx.iOS
             /*else //try from external folder
             {
                 Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                filePath = sdCard.AbsolutePath + "/IBbasic/settings.json";
+                filePath = sdCard.AbsolutePath + "/IBx/settings.json";
                 if (File.Exists(filePath))
                 {
                     return File.ReadAllText(filePath);
@@ -179,7 +179,7 @@ namespace IBx.iOS
             /*else //try from external folder
             {
                 Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                filePath = sdCard.AbsolutePath + "/IBbasic/saves/" + filename;
+                filePath = sdCard.AbsolutePath + "/IBx/saves/" + filename;
                 if (File.Exists(filePath))
                 {
                     return File.ReadAllText(filePath);
@@ -199,54 +199,54 @@ namespace IBx.iOS
         public SKBitmap LoadBitmap(string filename)
         {
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBbasic.iOS." + filename);
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS." + filename);
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS." + filename + ".png");
+                stream = assembly.GetManifestResourceStream("IBx.iOS." + filename + ".png");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS." + filename + ".jpg");
+                stream = assembly.GetManifestResourceStream("IBx.iOS." + filename + ".jpg");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.graphics." + filename);
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.graphics." + filename);
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.graphics." + filename + ".png");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.graphics." + filename + ".png");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.graphics." + filename + ".jpg");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.graphics." + filename + ".jpg");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.tiles." + filename);
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.tiles." + filename);
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.tiles." + filename + ".png");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.tiles." + filename + ".png");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.tiles." + filename + ".jpg");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.tiles." + filename + ".jpg");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.ui." + filename);
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.ui." + filename);
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.ui." + filename + ".png");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.ui." + filename + ".png");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.ui." + filename + ".jpg");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.ui." + filename + ".jpg");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.graphics.ui_missingtexture.png");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.graphics.ui_missingtexture.png");
             }
             SKManagedStream skStream = new SKManagedStream(stream);
 
@@ -304,7 +304,7 @@ namespace IBx.iOS
 
             //search in external folder
             /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/modules");
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/modules");
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File d in directory.ListFiles())
@@ -372,7 +372,7 @@ namespace IBx.iOS
 
             //search in external folder
             /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/modules");
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/modules");
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File d in directory.ListFiles())
@@ -440,7 +440,7 @@ namespace IBx.iOS
 
             //search in external folder
             /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/modules");
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/modules");
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File d in directory.ListFiles())
@@ -508,7 +508,7 @@ namespace IBx.iOS
 
             //search in external folder
             /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/modules");
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/modules");
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File d in directory.ListFiles())
@@ -562,7 +562,7 @@ namespace IBx.iOS
 
             //search in external folder
             Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/" + path);
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/" + path);
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File f in directory.ListFiles())
@@ -602,7 +602,7 @@ namespace IBx.iOS
 
             //search in external folder
             Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/" + path);
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/" + path);
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File f in directory.ListFiles())
@@ -642,7 +642,7 @@ namespace IBx.iOS
 
             //search in external folder
             Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBbasic/" + path);
+            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/" + path);
             directory.Mkdirs();
             //check to see if Lanterna2 exists, if not copy it over
             foreach (Java.IO.File f in directory.ListFiles())

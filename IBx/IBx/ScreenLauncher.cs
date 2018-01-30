@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Newtonsoft.Json;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -38,7 +39,7 @@ namespace IBx
 	
         public void loadModuleFiles()
         {
-            string[] files;
+            /*string[] files;
 
             files = Directory.GetFiles(gv.mainDirectory + "\\modules", "*.mod", SearchOption.AllDirectories);
             foreach (string file in files)
@@ -53,6 +54,25 @@ namespace IBx
                     }
                     moduleList.Add(mod);
                     titleList.Add(gv.cc.GetFromBitmapList("title"));
+                }
+            }*/
+
+            moduleList.Clear();
+            titleList.Clear();
+
+            List<string> modList = gv.GetAllModuleFiles();
+            foreach (string file in modList)
+            {
+                string s = gv.GetModuleFileString(file);
+                using (StringReader sr = new StringReader(s))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    Module modinfo = (Module)serializer.Deserialize(sr, typeof(Module));
+                    if (modinfo != null)
+                    {
+                        moduleList.Add(modinfo);
+                        titleList.Add(gv.cc.GetFromBitmapList("title"));
+                    }
                 }
             }
         }
