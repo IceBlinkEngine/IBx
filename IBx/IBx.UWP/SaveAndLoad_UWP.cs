@@ -18,9 +18,13 @@ namespace IBx.UWP
         #region ISaveAndLoad Text implementation
         public void SaveText(string filename, string text)
         {
-            /*StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            SaveTextAsync(filename, text);
+        }
+        public async void SaveTextAsync(string filename, string text)
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
             StorageFile sampleFile = await localFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(sampleFile, text);*/
+            await FileIO.WriteTextAsync(sampleFile, text);
         }
         public void SaveCharacter(string modName, string filename, Player pc)
         {
@@ -48,14 +52,31 @@ namespace IBx.UWP
                 sw.Write(json.ToString());
             }
         }*/
-
-        public string LoadText(string filename)
+        public string LoadText(string moduleName, string fullPath)
         {
-            return "";
-            /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-            StorageFile sampleFile = await storageFolder.GetFileAsync(filename);
-            string text = await Windows.Storage.FileIO.ReadTextAsync(sampleFile);
-            return text;*/
+            string text = "";
+            //check in module folder first
+            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string convertedFullPath = storageFolder.Path + "\\modules\\" + moduleName + "\\" + ConvertFullPath(fullPath, "\\");
+            if (File.Exists(convertedFullPath))
+            {
+                text = File.ReadAllText(convertedFullPath);
+                return text;
+            }
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets." + ConvertFullPath(fullPath, "."));
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+            }
+            return text;
+        }
+        public string ConvertFullPath(string fullPath, string replaceWith)
+        {
+            string convertedFullPath = "";
+            convertedFullPath = fullPath.Replace("\\", replaceWith);
+            return convertedFullPath;
         }
         public string GetModuleFileString(string modFilename)
         {
@@ -71,21 +92,12 @@ namespace IBx.UWP
             }
             else
             {
+                StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
                 string modFolder = Path.GetFileNameWithoutExtension(modFilename);
-                //try asset area            
-                Assembly assembly = GetType().GetTypeInfo().Assembly;
-                Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.modules." + modFolder + "." + modFilename);
-                if (stream != null)
-                {
-                    using (var reader = new System.IO.StreamReader(stream))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                }
-
+                
                 //try from personal folder first
-                var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                var filePath = documentsPath + "/modules/" + modFolder + "/" + modFilename;
+                //var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                var filePath = storageFolder.Path + "\\modules\\" + modFolder + "\\" + modFilename;
                 if (File.Exists(filePath))
                 {
                     return File.ReadAllText(filePath);
@@ -263,7 +275,17 @@ namespace IBx.UWP
                     list.Add(res);
                 }
             }
-
+            //search in personal folder
+            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string[] files = Directory.GetFiles(storageFolder.Path + "\\modules", "*.mod", SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                if (Path.GetFileName(file) != "NewModule.mod")
+                {
+                    list.Add(Path.GetFileName(file));
+                }
+            }
+            
             return list;
         }
         public List<string> GetAllAreaFilenames(string modFolder)
@@ -364,6 +386,13 @@ namespace IBx.UWP
                     list.Add(GetFileNameFromResource(res));
                 }
             }
+            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string[] files = Directory.GetFiles(storageFolder.Path + "\\modules\\" + modFolder + "\\graphics", "*" + endsWith, SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                list.Add(Path.GetFileName(file));
+            }
+            
             /*
             //search in personal folder
             var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);

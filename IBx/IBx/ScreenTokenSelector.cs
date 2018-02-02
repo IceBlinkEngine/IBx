@@ -43,30 +43,33 @@ namespace IBx
             playerTokenList.Clear();
             try
             {
+                // ####### TODO ###### make a GetFilesFromFolderWithExtension(folderpath, extension) just like Directory.GetFiles() works
+                List<string> files = gv.GetGraphicsFiles(gv.mod.moduleName, ".png");
+
                 //Load from gv.module folder first
-                string[] files;
-                if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))
-                {
-                    files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens", "*.png");
+                //string[] files;
+                //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))
+                //{
+                    //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens", "*.png");
                     //directory.mkdirs(); 
-                    foreach (string file in files)
+                foreach (string file in files)
+                {
+                    try
                     {
-                        try
+                        string filename = Path.GetFileName(file);
+                        if (filename.EndsWith(".png"))
                         {
-                            string filename = Path.GetFileName(file);
-                            if (filename.EndsWith(".png"))
-                            {
-                                string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
-                                playerTokenList.Add(fileNameWithOutExt);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //MessageBox.Show(ex.ToString());
-                            gv.errorLog(ex.ToString());
+                            string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
+                            playerTokenList.Add(fileNameWithOutExt);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show(ex.ToString());
+                        gv.errorLog(ex.ToString());
+                    }
                 }
+                //}
             }
             catch (Exception ex)
             {
@@ -76,7 +79,7 @@ namespace IBx
             try
             {
                 //Load from PlayerTokens folder last
-                string[] files;
+                /*TODO string[] files;
                 if (Directory.Exists(gv.mainDirectory + "\\PlayerTokens"))
                 {
                     files = Directory.GetFiles(gv.mainDirectory + "\\PlayerTokens", "*.png");
@@ -101,7 +104,7 @@ namespace IBx
                             gv.errorLog(ex.ToString());
                         }
                     }
-                }
+                }*/
             }
             catch (Exception ex)
             {

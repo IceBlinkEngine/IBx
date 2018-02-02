@@ -61,13 +61,13 @@ namespace IBx.Droid
                 sw.Write(json.ToString());
             }
         }*/
-        public string LoadText(string folderAndFilename)
+        public string LoadText(string moduleName, string fullPath)
         {
             //asset module
-            if (folderAndFilename.StartsWith("IBx."))
+            if (fullPath.StartsWith("IBx."))
             {
                 Assembly assembly = GetType().GetTypeInfo().Assembly;
-                Stream stream = assembly.GetManifestResourceStream(folderAndFilename);
+                Stream stream = assembly.GetManifestResourceStream(fullPath);
                 using (var reader = new System.IO.StreamReader(stream))
                 {
                     return reader.ReadToEnd();
@@ -77,18 +77,18 @@ namespace IBx.Droid
             {
                 //try from personal folder first
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                var filePath = Path.Combine(documentsPath, folderAndFilename);
-                if (File.Exists(documentsPath + "/" + folderAndFilename))
+                var filePath = Path.Combine(documentsPath, fullPath);
+                if (File.Exists(documentsPath + "/" + fullPath))
                 {
-                    return File.ReadAllText(documentsPath + "/" + folderAndFilename);
+                    return File.ReadAllText(documentsPath + "/" + fullPath);
                 }                
                 else //try from external folder
                 {
                     Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                    Java.IO.File file = new Java.IO.File(sdCard.AbsolutePath + "/IBx/" + folderAndFilename);
+                    Java.IO.File file = new Java.IO.File(sdCard.AbsolutePath + "/IBx/" + fullPath);
                     if (file.Exists())
                     {
-                        return File.ReadAllText(sdCard.AbsolutePath + "/IBx/" + folderAndFilename);
+                        return File.ReadAllText(sdCard.AbsolutePath + "/IBx/" + fullPath);
                     }                        
                 }                
             }

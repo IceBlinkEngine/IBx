@@ -73,12 +73,13 @@ namespace IBx
         public string fixedModule = "";
         //public PrivateFontCollection myFonts; //CREATE A FONT COLLECTION
         //public FontFamily family;
-        public Font drawFontReg;
-        public Font drawFontLarge;
-        public Font drawFontSmall;
+        //public Font drawFontReg;
+        //public Font drawFontLarge;
+        //public Font drawFontSmall;
         public float drawFontRegHeight;
         public float drawFontLargeHeight;
         public float drawFontSmallHeight;
+        public float drawFontRegWidth;
         //public SolidBrush drawBrush = new SolidBrush(Color.White);
         public string screenType = "splash"; //launcher, title, moreGames, main, party, inventory, combatInventory, shop, journal, combat, combatCast, convo
         public AnimationState animationState = AnimationState.None;
@@ -136,6 +137,8 @@ namespace IBx
         public long previousTime = 0;
         public bool stillProcessingGameLoop = false;
         public float fps = 0;
+        public int MouseX = 0;
+        public int MouseY = 0;
         public int reportFPScount = 0;
 
         //public Timer animationTimer = new Timer();
@@ -269,7 +272,7 @@ namespace IBx
             }
             else //this is a fixed module
             {
-                mod = cc.LoadModule(fixedModule + "/" + fixedModule + ".mod", false);
+                mod = cc.LoadModule(fixedModule + "/" + fixedModule + ".mod");
                 resetGame();
                 cc.LoadSaveListItems();
                 screenType = "title";
@@ -388,7 +391,7 @@ namespace IBx
 	    public void resetGame()
 	    {
 		    //mod = new Module();
-		    mod = cc.LoadModule(mod.moduleName + ".mod", false);
+		    mod = cc.LoadModule(mod.moduleName + ".mod");
             if (mod.useSmoothMovement == true)
             {
                 //16 milliseconds a tick, equals - theoretically - about 60 FPS
@@ -415,7 +418,7 @@ namespace IBx
             bool foundArea = mod.setCurrentArea(mod.startingArea, this);
             if (!foundArea)
             {
-                sf.MessageBoxHtml("Area: " + mod.startingArea + " does not exist in the module...check the spelling or make sure your are pointing to the correct starting area that you intended");
+                //sf.MessageBoxHtml("Area: " + mod.startingArea + " does not exist in the module...check the spelling or make sure your are pointing to the correct starting area that you intended");
             }
 
             mod.PlayerLocationX = mod.startingPlayerPositionX;
@@ -517,10 +520,10 @@ namespace IBx
                 textPaint.TextSize = 60;
                 textPaint.Typeface = tf;
             }
-            float multiplr = (float)squareSize / 100.0f;
-            drawFontLargeHeight = 32.0f * multiplr * mod.fontD2DScaleMultiplier;
-            drawFontRegHeight = 26.0f * multiplr * mod.fontD2DScaleMultiplier;
-            drawFontSmallHeight = 20.0f * multiplr * mod.fontD2DScaleMultiplier;
+            drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.5);
+            drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.333);
+            drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.25);
+            drawFontRegWidth = 10.0f;
         }
 
 #region Area Music/Sounds
@@ -1072,7 +1075,7 @@ namespace IBx
                 textPaint.Color = SKColors.White.WithAlpha(opacity);
             }
 
-            canvas.DrawText(text, xLoc, yLoc, textPaint);
+            canvas.DrawText(text, xLoc + oXshift, yLoc + oYshift + textPaint.TextSize, textPaint);
         }
         public float MeasureString(string text)
         {            
@@ -1113,9 +1116,11 @@ namespace IBx
                 textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Normal);
             }
             return textPaint.MeasureText(text);
+            
         }
         public CoordinateF MeasureStringSize(string text, string size, string style)
         {
+            
             // Measure string width.
             //Font size  (small, regular, large)          
             if (size.Equals("small"))
@@ -1151,6 +1156,7 @@ namespace IBx
             textPaint.MeasureText(text, ref textBounds);
             CoordinateF returnSize = new CoordinateF(textBounds.Width, textBounds.Height);
             return returnSize;
+            
         }
 
         public void DrawRectangle(IbRect rect, SKColor penColor, int penWidth)
@@ -1432,10 +1438,10 @@ namespace IBx
                 {
                     for (int y = -2; y <= 2; y++)
                     {
-                        DrawText("FPS:" + fps.ToString(), x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
+                        DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")", x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
                     }
                 }
-                DrawText("FPS:" + fps.ToString(), 5, screenHeight - txtH - 5 - oYshift, "white");
+                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")", 5, screenHeight - txtH - 5 - oYshift, "white");
             }
 
             //EndDraw(); //uncomment this for DIRECT2D ADDITIONS
@@ -1513,6 +1519,8 @@ namespace IBx
             {
                 int eX = (int)e.Location.X - oXshift;
                 int eY = (int)e.Location.Y - oYshift;
+                MouseX = eX;
+                MouseY = eY;
                 //do only itemListSelector if visible
                 /*if (itemListSelector.showIBminiItemListSelector)
                 {
@@ -1801,7 +1809,10 @@ namespace IBx
             return tcs.Task;
         }
 
-
+        public string LoadText(string moduleName, string fullPath)
+        {
+            return DependencyService.Get<ISaveAndLoad>().LoadText(moduleName, fullPath);
+        }
         /*public void SaveSettings(Settings tglSettings)
         {
             DependencyService.Get<ISaveAndLoad>().SaveSettings(tglSettings);

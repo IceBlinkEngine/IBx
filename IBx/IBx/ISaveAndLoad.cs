@@ -16,7 +16,7 @@ namespace IBx
     public interface ISaveAndLoad
     {
         void SaveText(string filename, string text);
-        string LoadText(string filename);
+        string LoadText(string moduleName, string fullPath);
         string GetModuleFileString(string modFilename);
         string GetModuleAssetFileString(string modFolder, string assetFilename);
         string GetSettingsString();

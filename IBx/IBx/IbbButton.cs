@@ -42,7 +42,7 @@ namespace IBx
         {
             if ((x >= X) && (x <= (X + this.Width)))
             {
-                if ((y >= Y + gv.oYshift) && (y <= (Y + gv.oYshift + this.Height)))
+                if ((y >= Y) && (y <= (Y + this.Height)))
                 {
                     if (!playedHoverSound)
                     {
@@ -139,7 +139,7 @@ namespace IBx
             {
                 for (int y = -2; y <= 2; y++)
                 {
-                    gv.DrawText(Text, this.X + ulX + x, this.Y + ulY + y , fontHeightInString, "yellow");
+                    gv.DrawText(Text, this.X + ulX + x, this.Y + ulY + y , fontHeightInString, "black");
                 }
             }
             if (!this.btnWithGold)

@@ -99,12 +99,25 @@ namespace IBx
                 //loop through each line and print each word
                 foreach (FormattedWord word in logLinesList[i].wordsList)
                 {
-                    int difYheight = logLinesList[i].lineHeight - (int)gv.drawFontRegHeight;                    
+                    float fontsize = 0;
+                    if (word.fontSize.Equals("small"))
+                    {
+                        fontsize = gv.drawFontSmallHeight;
+                    }
+                    else if (word.fontSize.Equals("large"))
+                    {
+                        fontsize = gv.drawFontLargeHeight;
+                    }
+                    else
+                    {
+                        fontsize = gv.drawFontRegHeight;
+                    }
+                    int difYheight = logLinesList[i].lineHeight - (int)fontsize;                    
                     DrawString(word.text + " ", xLoc, yLoc + difYheight, word.style, word.color, word.fontSize, 255, word.underlined);
                     xLoc += gv.MeasureString(word.text + " ", word.fontSize, word.style);
                 }
                 xLoc = 0;
-                yLoc += logLinesList[i].lineHeight;
+                yLoc += logLinesList[i].lineHeight + (logLinesList[i].lineHeight / 4);
             }
         }        
     }

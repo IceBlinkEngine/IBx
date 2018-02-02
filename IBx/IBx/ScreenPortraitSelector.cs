@@ -43,6 +43,7 @@ namespace IBx
             playerPortraitList.Clear();
             try
             {
+                List<string> files = gv.GetGraphicsFiles(gv.mod.moduleName, ".png");
                 //Load from gv.module folder first
                 string[] files;
                 if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits"))

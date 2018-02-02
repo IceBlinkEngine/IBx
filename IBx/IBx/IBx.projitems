@@ -1032,6 +1032,6 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\ibscript\winter.ibs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\modules\Hearkenwold\Hearkenwold.mod" />
+    <Folder Include="$(MSBuildThisFileDirectory)Assets\modules\" />
   </ItemGroup>
 </Project>

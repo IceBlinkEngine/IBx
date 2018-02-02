@@ -1168,40 +1168,30 @@ namespace IBx
                 gv.mod.playerList[0].mainPc = true;
             }
         }
-        public Module LoadModule(string folderAndFilename, bool fullPath)
+        public Module LoadModule(string folderAndFilename)
         {
             Module toReturn = null;
-            if (fullPath)
+            string s = gv.GetModuleFileString(folderAndFilename);
+            using (StringReader sr = new StringReader(s))
             {
-                // deserialize JSON directly from a file
-                using (StreamReader file = File.OpenText(folderAndFilename))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    toReturn = (Module)serializer.Deserialize(file, typeof(Module));
-                }
-            }
-            else
-            {
-                // deserialize JSON directly from a file
-                using (StreamReader file = File.OpenText(GetModulePath() + "\\" + folderAndFilename))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    toReturn = (Module)serializer.Deserialize(file, typeof(Module));
-                }
+                JsonSerializer serializer = new JsonSerializer();
+                toReturn = (Module)serializer.Deserialize(sr, typeof(Module));
             }
             return toReturn;
         }
         public void LoadRaces()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\races.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\races.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleRacesList = (List<Race>)serializer.Deserialize(file, typeof(List<Race>));
-            }
+            }            
         }
         public void LoadPlayerClasses()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\playerClasses.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\playerClasses.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.modulePlayerClassList = (List<PlayerClass>)serializer.Deserialize(file, typeof(List<PlayerClass>));
@@ -1209,7 +1199,8 @@ namespace IBx
         }
         public void LoadItems()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\items.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\items.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleItemsList = (List<Item>)serializer.Deserialize(file, typeof(List<Item>));
@@ -1217,7 +1208,8 @@ namespace IBx
         }
         public void LoadContainers()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\containers.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\containers.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleContainersList = (List<Container>)serializer.Deserialize(file, typeof(List<Container>));
@@ -1225,7 +1217,8 @@ namespace IBx
         }
         public void LoadShops()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\shops.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\shops.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleShopsList = (List<Shop>)serializer.Deserialize(file, typeof(List<Shop>));
@@ -1233,7 +1226,8 @@ namespace IBx
         }
         public void LoadJournal()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\journal.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\journal.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleJournal = (List<JournalQuest>)serializer.Deserialize(file, typeof(List<JournalQuest>));
@@ -1241,7 +1235,8 @@ namespace IBx
         }
         public void LoadEffects()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\effects.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\effects.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleEffectsList = (List<Effect>)serializer.Deserialize(file, typeof(List<Effect>));
@@ -1249,7 +1244,8 @@ namespace IBx
         }
         public void LoadSpells()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\spells.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\spells.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleSpellsList = (List<Spell>)serializer.Deserialize(file, typeof(List<Spell>));
@@ -1257,7 +1253,8 @@ namespace IBx
         }
         public void LoadTraits()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\traits.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\traits.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleTraitsList = (List<Trait>)serializer.Deserialize(file, typeof(List<Trait>));
@@ -1269,7 +1266,8 @@ namespace IBx
         {
             try
             {
-                using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\weathers.json"))
+                string json = gv.LoadText(gv.mod.moduleName, "data\\weathers.json");
+                using (StringReader file = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     gv.mod.moduleWeathersList = (List<Weather>)serializer.Deserialize(file, typeof(List<Weather>));
@@ -1287,7 +1285,8 @@ namespace IBx
         {
             try
             {
-                using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\weatherEffects.json"))
+                string json = gv.LoadText(gv.mod.moduleName, "data\\weatherEffects.json");
+                using (StringReader file = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     gv.mod.moduleWeatherEffectsList = (List<WeatherEffect>)serializer.Deserialize(file, typeof(List<WeatherEffect>));
@@ -1301,7 +1300,8 @@ namespace IBx
 
         public void LoadCreatures()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\creatures.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\creatures.json");
+            using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleCreaturesList = (List<Creature>)serializer.Deserialize(file, typeof(List<Creature>));
@@ -1309,7 +1309,8 @@ namespace IBx
         }
         public void LoadEncounters()
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\encounters.json"))
+            string json = gv.LoadText(gv.mod.moduleName, "data\\encounters.json");
+            using (StringReader file = new StringReader(json))
             { 
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleEncountersList = (List<Encounter>)serializer.Deserialize(file, typeof(List<Encounter>));
@@ -1318,7 +1319,7 @@ namespace IBx
 
         public string GetModulePath()
         {
-            return gv.mainDirectory + "\\modules\\" + gv.mod.moduleName;
+            return "\\modules\\" + gv.mod.moduleName;
         }
 
         //GENERAL
@@ -11534,11 +11535,11 @@ namespace IBx
                         newWord.underlined = GetIsUnderlined(tagStack);
                         newWord.fontSize = GetFontSizeInPixels(tagStack);
                         newWord.color = GetColor(tagStack);
-                        float adjustedWordWidthForScreenDensity = (1920f / gv.screenWidth);
-                        float adjustedWordHeightForScreenDensity = (1080f / gv.screenHeight);
+                        //float adjustedWordWidthForScreenDensity = (1920f / gv.screenWidth);
+                        //float adjustedWordHeightForScreenDensity = (1080f / gv.screenHeight);
 
-                        float height = gv.MeasureStringSize(newWord.text, newWord.fontSize, newWord.style).Y * adjustedWordHeightForScreenDensity;
-                        float wordWidth = gv.MeasureStringSize(newWord.text + " ", newWord.fontSize, newWord.style).X * adjustedWordWidthForScreenDensity;
+                        float height = gv.MeasureStringSize(newWord.text, newWord.fontSize, newWord.style).Y;
+                        float wordWidth = gv.MeasureStringSize(newWord.text + " ", newWord.fontSize, newWord.style).X;
                         if (height > lineHeight) { lineHeight = (int)height; }
 
                         if (xLoc + wordWidth > width) //word wrap

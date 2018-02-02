@@ -437,16 +437,17 @@ namespace IBx
             {
                 try
                 {
-                    using (StreamReader file = File.OpenText(gv.mainDirectory + "\\modules\\" + this.moduleName + "\\areas\\" + areaName + ".lvl"))
+                    string json = gv.LoadText(this.moduleName, "areas\\" + areaName + ".lvl");
+                    using (StringReader sr = new StringReader(json))
                     {
                         JsonSerializer serializer = new JsonSerializer();
-                        Area newArea = (Area)serializer.Deserialize(file, typeof(Area));
+                        Area newArea = (Area)serializer.Deserialize(sr, typeof(Area));
                         foreach (Prop p in newArea.Props)
                         {
                             p.initializeProp();
                         }
                         moduleAreasObjects.Add(newArea);
-                    }
+                    }                    
                 }
                 catch (Exception ex)
                 {

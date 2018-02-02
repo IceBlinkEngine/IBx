@@ -168,13 +168,14 @@ namespace IBx
         {
             try
             {
+                /*TODO
                 //string filepath = gv.mainDirectory + "\\CombatUILayout.json";
                 string filepath = gv.cc.GetModulePath() + "\\data\\CombatUILayout.json";
                 string json = JsonConvert.SerializeObject(combatUiLayout, Newtonsoft.Json.Formatting.Indented);
                 using (StreamWriter sw = new StreamWriter(filepath))
                 {
                     sw.Write(json.ToString());
-                }
+                }*/
             }
             catch (Exception ex)
             {
@@ -186,7 +187,16 @@ namespace IBx
         {
             try
             {
-                if (File.Exists(gv.cc.GetModulePath() + "\\data\\CombatUILayout.json"))
+                string json = gv.LoadText(gv.mod.moduleName, "data\\CombatUILayout.json");
+                using (StringReader file = new StringReader(json))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    combatUiLayout = (IB2UILayout)serializer.Deserialize(file, typeof(IB2UILayout));
+                    combatUiLayout.setupIB2UILayout(gv);
+                }
+
+
+                /*if (File.Exists(gv.cc.GetModulePath() + "\\data\\CombatUILayout.json"))
                 {
                     using (StreamReader file = File.OpenText(gv.cc.GetModulePath() + "\\data\\CombatUILayout.json"))
                     {
@@ -203,7 +213,7 @@ namespace IBx
                         combatUiLayout = (IB2UILayout)serializer.Deserialize(file, typeof(IB2UILayout));
                         combatUiLayout.setupIB2UILayout(gv);
                     }
-                }
+                }*/
 
                 IB2ToggleButton tgl = combatUiLayout.GetToggleByTag("tglHP");
                 if (tgl != null)

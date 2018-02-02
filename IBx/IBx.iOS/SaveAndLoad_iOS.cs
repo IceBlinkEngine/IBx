@@ -49,7 +49,7 @@ namespace IBx.iOS
             }
         }*/
 
-        public string LoadText(string filename)
+        public string LoadText(string moduleName, string fullPath)
         {
             return "";
             /*string path = CreatePathToFile(filename);

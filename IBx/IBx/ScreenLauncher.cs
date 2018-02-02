@@ -139,12 +139,12 @@ namespace IBx
                 string textToSpan = "<u>Module Description</u>" + "<br>";
                 //textToSpan += "<b><i><big>" + moduleList[moduleIndex].moduleLabelName + "</big></i></b><br>";
                 textToSpan += moduleList[moduleIndex].moduleDescription;
-                description.logLinesList.Clear();
-                description.AddHtmlTextToLog(textToSpan);
+                description.logLinesList.Clear();                
                 description.tbXloc = 4 * gv.squareSize + gv.oXshift;
                 description.tbYloc = 6 * gv.squareSize + gv.oYshift;
-                description.tbWidth = 12 * gv.squareSize;
+                description.tbWidth = 10 * gv.squareSize;
                 description.tbHeight = 6 * gv.squareSize;
+                description.AddHtmlTextToLog(textToSpan);
                 description.onDrawLogBox();
                 
                 btnModuleName.Text = moduleList[moduleIndex].moduleLabelName;

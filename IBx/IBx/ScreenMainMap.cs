@@ -76,25 +76,14 @@ namespace IBx
         {
             try
             {
-                if (File.Exists(gv.cc.GetModulePath() + "\\data\\MainUILayout.json"))
+                string json = gv.LoadText(gv.mod.moduleName, "data\\MainUILayout.json");                
+                using (StringReader file = new StringReader(json))
                 {
-                    using (StreamReader file = File.OpenText(gv.cc.GetModulePath() + "\\data\\MainUILayout.json"))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        mainUiLayout = (IB2UILayout)serializer.Deserialize(file, typeof(IB2UILayout));
-                        mainUiLayout.setupIB2UILayout(gv);
-                    }
+                    JsonSerializer serializer = new JsonSerializer();
+                    mainUiLayout = (IB2UILayout)serializer.Deserialize(file, typeof(IB2UILayout));
+                    mainUiLayout.setupIB2UILayout(gv);
                 }
-                else
-                {
-                    using (StreamReader file = File.OpenText(gv.mainDirectory + "\\default\\NewModule\\data\\MainUILayout.json"))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        mainUiLayout = (IB2UILayout)serializer.Deserialize(file, typeof(IB2UILayout));
-                        mainUiLayout.setupIB2UILayout(gv);
-                    }
-                }
-
+                                                
                 IB2ToggleButton tgl = mainUiLayout.GetToggleByTag("tglMiniMap");
                 if (tgl != null)
                 {
@@ -151,13 +140,14 @@ namespace IBx
         {
             try
             {
+                /*TODO
                 //string filepath = gv.mainDirectory + "\\MainUILayout.json";
                 string filepath = gv.cc.GetModulePath() + "\\data\\MainUILayout.json";
                 string json = JsonConvert.SerializeObject(mainUiLayout, Newtonsoft.Json.Formatting.Indented);
                 using (StreamWriter sw = new StreamWriter(filepath))
                 {
                     sw.Write(json.ToString());
-                }
+                }*/
             }
             catch (Exception ex)
             {
