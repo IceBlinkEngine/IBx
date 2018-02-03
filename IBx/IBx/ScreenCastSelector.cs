@@ -39,7 +39,7 @@ namespace IBx
 	    {
 		    //mod = m;
 		    gv = g;
-		    stringMessageCastSelector = gv.cc.loadTextToString("data/MessageCastSelector.txt");
+		    stringMessageCastSelector = gv.cc.loadTextToString("MessageCastSelector.txt");
 	    }
 
         public void sortTraitsForLevelUp(Player pc)

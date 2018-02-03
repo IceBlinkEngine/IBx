@@ -34,7 +34,7 @@ namespace IBx
             //gv.mod = m;
             gv = g;
             setControlsStart();
-            stringMessagePartyBuild = gv.cc.loadTextToString("data/MessagePartyBuild.txt");
+            stringMessagePartyBuild = gv.cc.loadTextToString("MessagePartyBuild.txt");
             //create a list of character .json files from saves/gv.modulefoldername/characters and the default PC
             //loadPlayerList();
         }
@@ -57,10 +57,11 @@ namespace IBx
         public void loadPlayerList()
         {
             pcList.Clear();
-            string[] files;
-            if (Directory.Exists(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters"))
-            {
-                files = Directory.GetFiles(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters", "*.json");
+            List<string> files = gv.GetAllFilesWithExtensionFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\characters", ".json");
+            //string[] files;
+            //if (Directory.Exists(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters"))
+            //{
+                //files = Directory.GetFiles(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters", "*.json");
                 foreach (string file in files)
                 {
                     try
@@ -73,7 +74,7 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-            }
+            //}
         }
         public void AddCharacterToList(string filename)
         {
@@ -110,10 +111,11 @@ namespace IBx
         {
             Player toReturn = null;
             // deserialize JSON directly from a file
-            using (StreamReader file = File.OpenText(filename))
+            string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename);
+            using (StringReader sr = new StringReader(json))            
             {
                 JsonSerializer serializer = new JsonSerializer();
-                toReturn = (Player)serializer.Deserialize(file, typeof(Player));
+                toReturn = (Player)serializer.Deserialize(sr, typeof(Player));
             }
             return toReturn;
         }

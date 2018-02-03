@@ -37,7 +37,7 @@ namespace IBx
 		    //gv.mod = m;
 		    gv = g;
 		    setControlsStart();
-		    stringMessageShop = gv.cc.loadTextToString("data/MessageShop.txt");
+		    stringMessageShop = gv.cc.loadTextToString("MessageShop.txt");
 	    }    
 	
         public void setControlsStart()

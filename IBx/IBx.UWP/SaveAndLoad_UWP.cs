@@ -52,12 +52,38 @@ namespace IBx.UWP
                 sw.Write(json.ToString());
             }
         }*/
-        public string LoadText(string moduleName, string fullPath)
+
+        public string LoadStringFromUserFolder(string fullPath)
         {
             string text = "";
             //check in module folder first
             StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-            string convertedFullPath = storageFolder.Path + "\\modules\\" + moduleName + "\\" + ConvertFullPath(fullPath, "\\");
+            string convertedFullPath = storageFolder.Path + ConvertFullPath(fullPath, "\\");
+            if (File.Exists(convertedFullPath))
+            {
+                text = File.ReadAllText(convertedFullPath);
+                return text;
+            }
+            return text;
+        }
+        public string LoadStringFromAssetFolder(string fullPath)
+        {
+            string text = "";
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets" + ConvertFullPath(fullPath, "."));
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+            }
+            return text;
+        }
+        public string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath)
+        {
+            string text = "";
+            //check in module folder first
+            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string convertedFullPath = storageFolder.Path + ConvertFullPath(userFolderpath, "\\");
             if (File.Exists(convertedFullPath))
             {
                 text = File.ReadAllText(convertedFullPath);
@@ -65,19 +91,21 @@ namespace IBx.UWP
             }
             //check in Assests folder last
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets." + ConvertFullPath(fullPath, "."));
+            Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets" + ConvertFullPath(assetFolderpath, "."));
             using (var reader = new System.IO.StreamReader(stream))
             {
                 text = reader.ReadToEnd();
             }
             return text;
         }
+
         public string ConvertFullPath(string fullPath, string replaceWith)
         {
             string convertedFullPath = "";
             convertedFullPath = fullPath.Replace("\\", replaceWith);
             return convertedFullPath;
         }
+
         public string GetModuleFileString(string modFilename)
         {
             //asset module
@@ -262,6 +290,50 @@ namespace IBx.UWP
 
         }
         #endregion
+
+        public List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension)
+        {
+            List<string> list = new List<string>();
+            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string[] files = Directory.GetFiles(storageFolder.Path + ConvertFullPath(folderpath, "\\"), "*" + extension, SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                list.Add(Path.GetFileName(file));                
+            }
+            return list;
+        }
+        public List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension)
+        {
+            List<string> list = new List<string>();
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                if ((res.Contains(ConvertFullPath(folderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    list.Add(res);
+                }
+            }
+            return list;
+        }
+        public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
+        {
+            List<string> list = new List<string>();
+            StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string[] files = Directory.GetFiles(storageFolder.Path + ConvertFullPath(userFolderpath, "\\"), "*" + extension, SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                list.Add(Path.GetFileName(file));
+            }
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                if ((res.Contains(ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    list.Add(res);
+                }
+            }
+            return list;
+        }
 
         public List<string> GetAllModuleFiles()
         {

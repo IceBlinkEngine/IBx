@@ -45,7 +45,7 @@ namespace IBx
 		    gv = g;
 		    setControlsStart();
 		    pc = new Player();
-		    stringMessageSpellLevelUp = gv.cc.loadTextToString("data/MessageSpellLevelUp.txt");
+		    stringMessageSpellLevelUp = gv.cc.loadTextToString("MessageSpellLevelUp.txt");
 	    }
 	
 	    public void resetPC(bool info_only, Player p, bool inCombat)

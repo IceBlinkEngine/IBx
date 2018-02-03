@@ -1809,10 +1809,31 @@ namespace IBx
             return tcs.Task;
         }
 
-        public string LoadText(string moduleName, string fullPath)
+        public string LoadStringFromUserFolder(string fullPath)
         {
-            return DependencyService.Get<ISaveAndLoad>().LoadText(moduleName, fullPath);
+            return DependencyService.Get<ISaveAndLoad>().LoadStringFromUserFolder(fullPath);
         }
+        public string LoadStringFromAssetFolder(string fullPath)
+        {
+            return DependencyService.Get<ISaveAndLoad>().LoadStringFromAssetFolder(fullPath);
+        }
+        public string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath)
+        {
+            return DependencyService.Get<ISaveAndLoad>().LoadStringFromEitherFolder(assetFolderpath, userFolderpath);
+        }
+        public List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllFilesWithExtensionFromUserFolder(folderpath, extension);
+        }
+        public List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllFilesWithExtensionFromAssetFolder(folderpath, extension);
+        }
+        public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
+        {
+            return DependencyService.Get<ISaveAndLoad>().GetAllFilesWithExtensionFromBothFolders(assetFolderpath, userFolderpath, extension);
+        }
+        
         /*public void SaveSettings(Settings tglSettings)
         {
             DependencyService.Get<ISaveAndLoad>().SaveSettings(tglSettings);
@@ -1885,7 +1906,7 @@ namespace IBx
 
         public void errorLog(string text)
         {
-            if (mainDirectory == null) 
+            /*TODO if (mainDirectory == null) 
             { 
                 mainDirectory = Directory.GetCurrentDirectory(); 
             }
@@ -1893,7 +1914,7 @@ namespace IBx
             {
                 writer.Write(DateTime.Now + ": ");
                 writer.WriteLine(text);
-            }
+            }*/
         }
     }
 }

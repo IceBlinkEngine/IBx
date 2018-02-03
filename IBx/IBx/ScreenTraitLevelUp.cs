@@ -45,7 +45,7 @@ namespace IBx
 		    gv = g;
 		    setControlsStart();
 		    pc = new Player();
-		    stringMessageTraitLevelUp = gv.cc.loadTextToString("data/MessageTraitLevelUp.txt");
+		    stringMessageTraitLevelUp = gv.cc.loadTextToString("MessageTraitLevelUp.txt");
 	    }
 	
 	    public void resetPC(bool info_only, Player p)

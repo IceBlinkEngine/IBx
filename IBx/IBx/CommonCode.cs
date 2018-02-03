@@ -190,30 +190,33 @@ namespace IBx
             if (!filename.Contains(".json"))
             {
                 // deserialize JSON directly from a file
-                using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\" + filename + ".json"))
+                string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename + ".json");
+                using (StringReader sr = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    toReturn = (Player)serializer.Deserialize(file, typeof(Player));
+                    toReturn = (Player)serializer.Deserialize(sr, typeof(Player));
                 }
                 return toReturn.DeepCopy();
             }
             else
             {
                 // deserialize JSON directly from a file
-                using (StreamReader file = File.OpenText(GetModulePath() + "\\data\\" + filename))
+                string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename);
+                using (StringReader sr = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    toReturn = (Player)serializer.Deserialize(file, typeof(Player));
+                    toReturn = (Player)serializer.Deserialize(sr, typeof(Player));
                 }
                 return toReturn.DeepCopy();
             }
         }
         public void LoadCurrentConvo(string filename)
         {
-            using (StreamReader file = File.OpenText(GetModulePath() + "\\dialog\\" + filename + ".json"))
+            string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\dialog\\" + filename + ".json");
+            using (StringReader sr = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                gv.screenConvo.currentConvo = (Convo)serializer.Deserialize(file, typeof(Convo));
+                gv.screenConvo.currentConvo = (Convo)serializer.Deserialize(sr, typeof(Convo));
             }
         }
         public void AutoSave()
@@ -685,10 +688,14 @@ namespace IBx
             ModuleInfo m = new ModuleInfo();
             try
             {
-                using (StreamReader file = File.OpenText(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\" + filename))
+                string json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\" + filename);
+                if (json != "")
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    m = (ModuleInfo)serializer.Deserialize(file, typeof(ModuleInfo));
+                    using (StringReader sr = new StringReader(json))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        m = (ModuleInfo)serializer.Deserialize(sr, typeof(ModuleInfo));
+                    }
                 }
             }
             catch { }
@@ -910,10 +917,11 @@ namespace IBx
             Module toReturn = null;
 
             // deserialize JSON directly from a file
-            using (StreamReader file = File.OpenText(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\" + filename))
+            string json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\" + filename);
+            using (StringReader sr = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                toReturn = (Module)serializer.Deserialize(file, typeof(Module));
+                toReturn = (Module)serializer.Deserialize(sr, typeof(Module));
             }
             return toReturn;
         }
@@ -1181,7 +1189,7 @@ namespace IBx
         }
         public void LoadRaces()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\races.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\races.json", "\\modules\\" + gv.mod.moduleName + "\\data\\races.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1190,7 +1198,7 @@ namespace IBx
         }
         public void LoadPlayerClasses()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\playerClasses.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\playerClasses.json", "\\modules\\" + gv.mod.moduleName + "\\data\\playerClasses.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1199,7 +1207,7 @@ namespace IBx
         }
         public void LoadItems()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\items.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\items.json", "\\modules\\" + gv.mod.moduleName + "\\data\\items.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1208,7 +1216,7 @@ namespace IBx
         }
         public void LoadContainers()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\containers.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\containers.json", "\\modules\\" + gv.mod.moduleName + "\\data\\containers.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1217,7 +1225,7 @@ namespace IBx
         }
         public void LoadShops()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\shops.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\shops.json", "\\modules\\" + gv.mod.moduleName + "\\data\\shops.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1226,7 +1234,7 @@ namespace IBx
         }
         public void LoadJournal()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\journal.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\journal.json", "\\modules\\" + gv.mod.moduleName + "\\data\\journal.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1235,7 +1243,7 @@ namespace IBx
         }
         public void LoadEffects()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\effects.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\effects.json", "\\modules\\" + gv.mod.moduleName + "\\data\\effects.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1244,7 +1252,7 @@ namespace IBx
         }
         public void LoadSpells()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\spells.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\spells.json", "\\modules\\" + gv.mod.moduleName + "\\data\\spells.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1253,7 +1261,7 @@ namespace IBx
         }
         public void LoadTraits()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\traits.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\traits.json", "\\modules\\" + gv.mod.moduleName + "\\data\\traits.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1266,7 +1274,7 @@ namespace IBx
         {
             try
             {
-                string json = gv.LoadText(gv.mod.moduleName, "data\\weathers.json");
+                string json = gv.LoadStringFromEitherFolder("\\data\\weathers.json", "\\modules\\" + gv.mod.moduleName + "\\data\\weathers.json");
                 using (StringReader file = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -1285,7 +1293,7 @@ namespace IBx
         {
             try
             {
-                string json = gv.LoadText(gv.mod.moduleName, "data\\weatherEffects.json");
+                string json = gv.LoadStringFromEitherFolder("\\data\\weatherEffects.json", "\\modules\\" + gv.mod.moduleName + "\\data\\weatherEffects.json");
                 using (StringReader file = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -1300,7 +1308,7 @@ namespace IBx
 
         public void LoadCreatures()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\creatures.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\creatures.json", "\\modules\\" + gv.mod.moduleName + "\\data\\creatures.json");
             using (StringReader file = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1309,7 +1317,7 @@ namespace IBx
         }
         public void LoadEncounters()
         {
-            string json = gv.LoadText(gv.mod.moduleName, "data\\encounters.json");
+            string json = gv.LoadStringFromEitherFolder("\\data\\encounters.json", "\\modules\\" + gv.mod.moduleName + "\\data\\encounters.json");
             using (StringReader file = new StringReader(json))
             { 
                 JsonSerializer serializer = new JsonSerializer();
@@ -11340,7 +11348,18 @@ namespace IBx
 
         public string loadTextToString(string filename)
         {
-            string txt = null;
+            string txt = "";
+            try
+            {
+                txt = gv.LoadStringFromEitherFolder("\\data\\" + filename, "\\modules\\" + gv.mod.moduleName + "\\data\\" + filename);
+            }
+            catch (Exception ex)
+            {
+                gv.errorLog(ex.ToString());
+                return "";
+            }
+            return txt;
+            /*
             try
             {
                 if (File.Exists(GetModulePath() + "\\data\\" + filename))
@@ -11358,6 +11377,7 @@ namespace IBx
                 return null;
             }
             return txt;
+            */
         }
         
         public void MakeDirectoryIfDoesntExist(string filenameAndFullPath)

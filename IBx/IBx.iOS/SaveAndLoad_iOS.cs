@@ -49,13 +49,59 @@ namespace IBx.iOS
             }
         }*/
 
-        public string LoadText(string moduleName, string fullPath)
+        public string LoadStringFromUserFolder(string fullPath)
         {
-            return "";
-            /*string path = CreatePathToFile(filename);
-            using (StreamReader sr = File.OpenText(path))
-                return await sr.ReadToEndAsync();*/
+            string text = "";
+            //check in module folder first
+            /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string convertedFullPath = storageFolder.Path + ConvertFullPath(fullPath, "\\");
+            if (File.Exists(convertedFullPath))
+            {
+                text = File.ReadAllText(convertedFullPath);
+                return text;
+            }*/
+            return text;
         }
+        public string LoadStringFromAssetFolder(string fullPath)
+        {
+            string text = "";
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets." + ConvertFullPath(fullPath, "."));
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+            }
+            return text;
+        }
+        public string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath)
+        {
+            string text = "";
+            //check in module folder first
+            /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string convertedFullPath = storageFolder.Path + ConvertFullPath(userFolderpath, "\\");
+            if (File.Exists(convertedFullPath))
+            {
+                text = File.ReadAllText(convertedFullPath);
+                return text;
+            }*/
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets." + ConvertFullPath(assetFolderpath, "."));
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+            }
+            return text;
+        }
+
+        public string ConvertFullPath(string fullPath, string replaceWith)
+        {
+            string convertedFullPath = "";
+            convertedFullPath = fullPath.Replace("\\", replaceWith);
+            return convertedFullPath;
+        }
+
         public string GetModuleFileString(string modFilename)
         {
             //asset module
@@ -262,6 +308,24 @@ namespace IBx.iOS
         }
         #endregion
 
+        public List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension)
+        {
+            List<string> list = new List<string>();
+
+            return list;
+        }
+        public List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension)
+        {
+            List<string> list = new List<string>();
+
+            return list;
+        }
+        public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
+        {
+            List<string> list = new List<string>();
+
+            return list;
+        }
         public List<string> GetAllModuleFiles()
         {
             List<string> list = new List<string>();

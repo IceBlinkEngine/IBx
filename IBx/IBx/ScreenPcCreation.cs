@@ -95,11 +95,12 @@ namespace IBx
             playerTokenList.Clear();
             try
             {
+                List<string> files = gv.GetAllFilesWithExtensionFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\pctokens", ".png");
                 //Load from gv.module folder first
-                string[] files;
-                if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))
-                {
-                    files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens", "*.png");
+                //string[] files;
+                //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))
+                //{
+                    //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens", "*.png");
                     foreach (string file in files)
                     {
                         try
@@ -117,7 +118,7 @@ namespace IBx
                             gv.errorLog(ex.ToString());
                         }
                     }
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -127,7 +128,7 @@ namespace IBx
             try
             {
                 //Load from PlayerTokens folder last
-                string[] files;
+                /*TODO string[] files;
                 if (Directory.Exists(gv.mainDirectory + "\\PlayerTokens"))
                 {
                     files = Directory.GetFiles(gv.mainDirectory + "\\PlayerTokens", "*.png");
@@ -151,7 +152,7 @@ namespace IBx
                             gv.errorLog(ex.ToString());
                         }
                     }
-                }
+                }*/
             }
             catch (Exception ex)
             {
@@ -164,11 +165,12 @@ namespace IBx
             playerPortraitList.Clear();
             try
             {
+                List<string> files = gv.GetAllFilesWithExtensionFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\portraits", ".png");
                 //Load from gv.module folder first
-                string[] files;
-                if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits"))
-                {
-                    files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits", "*.png");
+                //string[] files;
+                //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits"))
+                //{
+                    //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits", "*.png");
                     foreach (string file in files)
                     {
                         try
@@ -186,7 +188,7 @@ namespace IBx
                             gv.errorLog(ex.ToString());
                         }
                     }
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -196,7 +198,7 @@ namespace IBx
             try
             {
                 //Load from PlayerTokens folder last
-                string[] files;
+                /*TODO string[] files;
                 if (Directory.Exists(gv.mainDirectory + "\\PlayerPortraits"))
                 {
                     files = Directory.GetFiles(gv.mainDirectory + "\\PlayerPortraits", "*.png");
@@ -220,7 +222,7 @@ namespace IBx
                             gv.errorLog(ex.ToString());
                         }
                     }
-                }
+                }*/
             }
             catch (Exception ex)
             {

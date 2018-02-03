@@ -437,7 +437,7 @@ namespace IBx
             {
                 try
                 {
-                    string json = gv.LoadText(this.moduleName, "areas\\" + areaName + ".lvl");
+                    string json = gv.LoadStringFromUserFolder("\\modules\\" + moduleName + "\\areas\\" + areaName + ".lvl");
                     using (StringReader sr = new StringReader(json))
                     {
                         JsonSerializer serializer = new JsonSerializer();

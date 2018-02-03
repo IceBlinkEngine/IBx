@@ -43,9 +43,7 @@ namespace IBx
             playerTokenList.Clear();
             try
             {
-                // ####### TODO ###### make a GetFilesFromFolderWithExtension(folderpath, extension) just like Directory.GetFiles() works
-                List<string> files = gv.GetGraphicsFiles(gv.mod.moduleName, ".png");
-
+                List<string> files = gv.GetAllFilesWithExtensionFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\pctokens", ".png");
                 //Load from gv.module folder first
                 //string[] files;
                 //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))

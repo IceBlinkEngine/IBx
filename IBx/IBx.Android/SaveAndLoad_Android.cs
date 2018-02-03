@@ -61,39 +61,60 @@ namespace IBx.Droid
                 sw.Write(json.ToString());
             }
         }*/
-        public string LoadText(string moduleName, string fullPath)
+
+        public string LoadStringFromUserFolder(string fullPath)
         {
-            //asset module
-            if (fullPath.StartsWith("IBx."))
+            string text = "";
+            //check in module folder first
+            /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string convertedFullPath = storageFolder.Path + ConvertFullPath(fullPath, "\\");
+            if (File.Exists(convertedFullPath))
             {
-                Assembly assembly = GetType().GetTypeInfo().Assembly;
-                Stream stream = assembly.GetManifestResourceStream(fullPath);
-                using (var reader = new System.IO.StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
-            }            
-            else
-            {
-                //try from personal folder first
-                var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                var filePath = Path.Combine(documentsPath, fullPath);
-                if (File.Exists(documentsPath + "/" + fullPath))
-                {
-                    return File.ReadAllText(documentsPath + "/" + fullPath);
-                }                
-                else //try from external folder
-                {
-                    Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                    Java.IO.File file = new Java.IO.File(sdCard.AbsolutePath + "/IBx/" + fullPath);
-                    if (file.Exists())
-                    {
-                        return File.ReadAllText(sdCard.AbsolutePath + "/IBx/" + fullPath);
-                    }                        
-                }                
-            }
-            return "";
+                text = File.ReadAllText(convertedFullPath);
+                return text;
+            }*/
+            return text;
         }
+        public string LoadStringFromAssetFolder(string fullPath)
+        {
+            string text = "";
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.Droid.Assets." + ConvertFullPath(fullPath, "."));
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+            }
+            return text;
+        }
+        public string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath)
+        {
+            string text = "";
+            //check in module folder first
+            /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+            string convertedFullPath = storageFolder.Path + ConvertFullPath(userFolderpath, "\\");
+            if (File.Exists(convertedFullPath))
+            {
+                text = File.ReadAllText(convertedFullPath);
+                return text;
+            }*/
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.Droid.Assets." + ConvertFullPath(assetFolderpath, "."));
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+            }
+            return text;
+        }
+
+        public string ConvertFullPath(string fullPath, string replaceWith)
+        {
+            string convertedFullPath = "";
+            convertedFullPath = fullPath.Replace("\\", replaceWith);
+            return convertedFullPath;
+        }
+
         public string GetModuleFileString(string modFilename)
         {
             //asset module
@@ -288,6 +309,24 @@ namespace IBx.Droid
         }
         #endregion
 
+        public List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension)
+        {
+            List<string> list = new List<string>();
+
+            return list;
+        }
+        public List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension)
+        {
+            List<string> list = new List<string>();
+
+            return list;
+        }
+        public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
+        {
+            List<string> list = new List<string>();
+
+            return list;
+        }
         public List<string> GetAllModuleFiles()
         {
             List<string> list = new List<string>();

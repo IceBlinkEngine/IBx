@@ -28,7 +28,7 @@ namespace IBx
             //gv.mod = m;
             gv = g;
 		    setControlsStart();
-		    stringMessagePartyRoster = gv.cc.loadTextToString("data/MessagePartyRoster.txt");
+		    stringMessagePartyRoster = gv.cc.loadTextToString("MessagePartyRoster.txt");
 	    }    
 	    public void refreshPlayerTokens()
 	    {

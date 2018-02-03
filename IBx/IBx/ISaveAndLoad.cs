@@ -16,7 +16,11 @@ namespace IBx
     public interface ISaveAndLoad
     {
         void SaveText(string filename, string text);
-        string LoadText(string moduleName, string fullPath);
+
+        string LoadStringFromUserFolder(string fullPath);
+        string LoadStringFromAssetFolder(string fullPath);
+        string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath);
+
         string GetModuleFileString(string modFilename);
         string GetModuleAssetFileString(string modFolder, string assetFilename);
         string GetSettingsString();
@@ -31,6 +35,10 @@ namespace IBx
 
         void SaveBitmap(string filename, SKBitmap bmp);
         SKBitmap LoadBitmap(string filename);
+
+        List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension);
+        List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension);
+        List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension);
 
         List<string> GetAllModuleFiles();
         List<string> GetAllAreaFilenames(string modFolder);
