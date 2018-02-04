@@ -255,7 +255,7 @@ namespace IBx.Droid
             //StorageFile sampleFile = await localFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
             //await FileIO.WriteTextAsync(sampleFile, bmp);
         }
-        public SKBitmap LoadBitmap(string filename)
+        public SKBitmap LoadBitmap(string filename, Module mdl)
         {
             Assembly assembly = GetType().GetTypeInfo().Assembly;
             Stream stream = assembly.GetManifestResourceStream("IBx.Droid.Assets.graphics." + filename);

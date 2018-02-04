@@ -237,57 +237,142 @@ namespace IBx.UWP
             //StorageFile sampleFile = await localFolder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
             //await FileIO.WriteTextAsync(sampleFile, bmp);
         }
-        public SKBitmap LoadBitmap(string filename)
+        public SKBitmap LoadBitmap(string filename, Module mdl)
         {
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics." + filename);
-            if (stream == null)
+            SKBitmap bm = null;
+            try
             {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics." + filename + ".png");
-            }
-            if (stream == null)
+                StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                if ((mdl.currentArea.sourceBitmapName != "") && (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + mdl.currentArea.sourceBitmapName + "\\" + filename + ".png")))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + mdl.currentArea.sourceBitmapName + "\\" + filename + ".png");
+                }
+                else if ((mdl.currentArea.sourceBitmapName != "") && (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + mdl.currentArea.sourceBitmapName + "\\" + filename + ".PNG")))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + mdl.currentArea.sourceBitmapName + "\\" + filename + ".PNG");
+                }
+                else if ((mdl.currentArea.sourceBitmapName != "") && (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + mdl.currentArea.sourceBitmapName + "\\" + filename + ".jpg")))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + mdl.currentArea.sourceBitmapName + "\\" + filename + ".jpg");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\tiles\\" + filename + ".png"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\tiles\\" + filename + ".png");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\tiles\\" + filename + ".PNG"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\tiles\\" + filename + ".PNG");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\tiles\\" + filename))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\tiles\\" + filename);
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename + ".png"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename + ".png");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename + ".PNG"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename + ".PNG");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename + ".jpg"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename + ".jpg");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\graphics\\" + filename);
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\ui\\" + filename + ".png"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\ui\\" + filename + ".png");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\ui\\" + filename + ".PNG"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\ui\\" + filename + ".PNG");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\ui\\" + filename))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\ui\\" + filename);
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\pctokens\\" + filename + ".png"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\pctokens\\" + filename + ".png");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\pctokens\\" + filename + ".PNG"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\pctokens\\" + filename + ".PNG");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\pctokens\\" + filename))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\pctokens\\" + filename);
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\portraits\\" + filename + ".png"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\portraits\\" + filename + ".png");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\portraits\\" + filename + ".PNG"))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\portraits\\" + filename + ".PNG");
+                }
+                else if (File.Exists(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\portraits\\" + filename))
+                {
+                    bm = SKBitmap.Decode(storageFolder.Path + "\\modules\\" + mdl.moduleName + "\\portraits\\" + filename);
+                }
+                //STOP here if already found bitmap
+                if (bm != null)
+                {
+                    return bm;
+                }
+                //If not found then try in Asset folder
+                Assembly assembly = GetType().GetTypeInfo().Assembly;
+                Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics." + filename);
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics." + filename + ".png");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics." + filename + ".jpg");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.tiles." + filename);
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.tiles." + filename + ".png");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.tiles." + filename + ".jpg");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.ui." + filename);
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.ui." + filename + ".png");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.ui." + filename + ".jpg");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics.ui_missingtexture.png");
+                }
+                SKManagedStream skStream = new SKManagedStream(stream);
+                return SKBitmap.Decode(skStream);
+            }        
+            catch (Exception ex)
             {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics." + filename + ".jpg");
+                Assembly assembly = GetType().GetTypeInfo().Assembly;
+                Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics.ui_missingtexture.png");                
+                SKManagedStream skStream = new SKManagedStream(stream);
+                return SKBitmap.Decode(skStream);
             }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.tiles." + filename);
-            }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.tiles." + filename + ".png");
-            }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.tiles." + filename + ".jpg");
-            }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.ui." + filename);
-            }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.ui." + filename + ".png");
-            }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.ui." + filename + ".jpg");
-            }
-            if (stream == null)
-            {
-                stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics.ui_missingtexture.png");
-            }
-            SKManagedStream skStream = new SKManagedStream(stream);
-
-            //Stream fileStream = File.OpenRead("btn_small_on.png");
-            return SKBitmap.Decode(skStream);
-
-            //StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-            //StorageFile sampleFile = await storageFolder.GetFileAsync(filename);
-            //SKBitmap text = await Windows.Storage.FileIO.ReadTextAsync(sampleFile);
-            //return text;
-
-
         }
         #endregion
 

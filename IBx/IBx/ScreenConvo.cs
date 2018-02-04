@@ -214,7 +214,7 @@ namespace IBx
                 {
                     totalHeight += fl.lineHeight;
                 }
-                currentPcNodeRectList.Add(new IbRect(startX, startY + gv.oYshift, (int)totalWidth, (int)totalHeight));
+                currentPcNodeRectList.Add(new IbRect(startX, startY, (int)totalWidth, (int)totalHeight));
 
                 startY += (int)totalHeight + pad;
                 cnt++;

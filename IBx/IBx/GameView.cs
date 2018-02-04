@@ -1227,12 +1227,12 @@ namespace IBx
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror)
         {
-            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity)
         {
-            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift)
@@ -1241,7 +1241,7 @@ namespace IBx
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift)
         {
-            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
@@ -1254,7 +1254,7 @@ namespace IBx
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
         {
-            float angleInDegrees = (360.0f) / (float)(Math.PI * 2);
+            float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror, float opacity)
@@ -1874,9 +1874,9 @@ namespace IBx
         {
             return DependencyService.Get<ISaveAndLoad>().GetDataAssetFileString(assetFilename);
         }
-        public SKBitmap LoadBitmap(string filename)
+        public SKBitmap LoadBitmap(string filename, Module mdl)
         {
-            return DependencyService.Get<ISaveAndLoad>().LoadBitmap(filename);
+            return DependencyService.Get<ISaveAndLoad>().LoadBitmap(filename, mdl);
         }
         public List<string> GetAllModuleFiles()
         {

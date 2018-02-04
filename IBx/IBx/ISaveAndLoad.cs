@@ -34,7 +34,7 @@ namespace IBx
         //void SaveSaveGame(string modName, string filename, SaveGame save);
 
         void SaveBitmap(string filename, SKBitmap bmp);
-        SKBitmap LoadBitmap(string filename);
+        SKBitmap LoadBitmap(string filename, Module mdl);
 
         List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension);
         List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension);

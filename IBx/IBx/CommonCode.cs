@@ -11201,7 +11201,7 @@ namespace IBx
         public SKBitmap LoadBitmap(string filename, Module mdl) //change this to LoadBitmapGDI
         {
             SKBitmap bm = null;
-            bm = gv.LoadBitmap(filename);
+            bm = gv.LoadBitmap(filename, mdl);
             /*
             try
             {

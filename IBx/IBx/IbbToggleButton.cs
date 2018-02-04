@@ -27,7 +27,7 @@ namespace IBx
         {
             if ((x >= X) && (x <= (X + this.Width)))
             {
-                if ((y >= Y + gv.oYshift) && (y <= (Y + gv.oYshift + this.Height)))
+                if ((y >= Y) && (y <= (Y + this.Height)))
                 {
                     return true;
                 }
