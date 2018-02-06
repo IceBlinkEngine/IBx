@@ -15,36 +15,20 @@ namespace IBx
     /// </summary>
     public interface ISaveAndLoad
     {
-        void SaveText(string filename, string text);
+        void SaveText(string fullPath, string text);
 
         string LoadStringFromUserFolder(string fullPath);
         string LoadStringFromAssetFolder(string fullPath);
         string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath);
+        string[] LoadStringLinesFromEitherFolder(string assetFolderpath, string userFolderpath);
 
         string GetModuleFileString(string modFilename);
-        string GetModuleAssetFileString(string modFolder, string assetFilename);
-        string GetSettingsString();
-        string GetDataAssetFileString(string assetFilename);
-        string GetSaveFileString(string modName, string filename);
-        List<string> GetGraphicsFiles(string modFolder, string endsWith);
-        List<string> GetTileFiles(string modFolder, string endsWith);
-        List<string> GetCharacterFiles(string modFolder, string endsWith);
-        void SaveCharacter(string modName, string filename, Player pc);
-        void SaveModuleAssetFile(string modFolder, string assetFilenameWithExtension, string json);
-        //void SaveSaveGame(string modName, string filename, SaveGame save);
-
-        void SaveBitmap(string filename, SKBitmap bmp);
+        
         SKBitmap LoadBitmap(string filename, Module mdl);
 
         List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension);
         List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension);
         List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension);
-
         List<string> GetAllModuleFiles();
-        List<string> GetAllAreaFilenames(string modFolder);
-        List<string> GetAllConvoFilenames(string modFolder);
-        List<string> GetAllEncounterFilenames(string modFolder);
-
-        bool FileExists(string filename);
     }
 }

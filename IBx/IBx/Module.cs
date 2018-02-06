@@ -492,7 +492,7 @@ namespace IBx
                     }
                 }
                 //didn't find the area in the mod list so try and load it
-                string s = gv.GetModuleAssetFileString(this.moduleName, areaFilename + ".are");
+                /*string s = gv.GetModuleAssetFileString(this.moduleName, areaFilename + ".are");
                 using (StringReader sr = new StringReader(s))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -503,7 +503,7 @@ namespace IBx
                         this.currentArea = are;
                         return true;
                     }
-                }
+                }*/
                 return false;
             }
             catch (Exception ex)
@@ -525,7 +525,7 @@ namespace IBx
                     }
                 }
                 //didn't find the area in the mod list so try and load it
-                string s = gv.GetModuleAssetFileString(this.moduleName, EncFilename + ".enc");
+                /*string s = gv.GetModuleAssetFileString(this.moduleName, EncFilename + ".enc");
                 using (StringReader sr = new StringReader(s))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -536,7 +536,7 @@ namespace IBx
                         this.currentEncounter = enc;
                         return true;
                     }
-                }
+                }*/
                 return false;
             }
             catch (Exception ex)
@@ -558,7 +558,7 @@ namespace IBx
                     }
                 }*/
                 //didn't find the area in the mod list so try and load it
-                string s = gv.GetModuleAssetFileString(this.moduleName, ConvoFilename + ".dlg");
+                /*string s = gv.GetModuleAssetFileString(this.moduleName, ConvoFilename + ".dlg");
                 using (StringReader sr = new StringReader(s))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -569,7 +569,7 @@ namespace IBx
                         gv.screenConvo.currentConvo = cnv;
                         return true;
                     }
-                }
+                }*/
                 return false;
             }
             catch (Exception ex)

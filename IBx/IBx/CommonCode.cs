@@ -221,13 +221,10 @@ namespace IBx
         }
         public void AutoSave()
         {
-            string filename = gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\autosave.json";
-            MakeDirectoryIfDoesntExist(filename);
+            string filename = "\\saves\\" + gv.mod.moduleName + "\\autosave.json";
+            //TODO MakeDirectoryIfDoesntExist(filename);
             string json = JsonConvert.SerializeObject(gv.mod, Newtonsoft.Json.Formatting.Indented);
-            using (StreamWriter sw = new StreamWriter(filename))
-            {
-                sw.Write(json.ToString());
-            }
+            gv.SaveText(filename, json);
             gv.screenMainMap.saveUILayout();
             gv.screenCombat.saveUILayout();
         }
@@ -265,8 +262,8 @@ namespace IBx
             gv.screenMainMap.saveUILayout();
             gv.screenCombat.saveUILayout();
 
-            string filename = gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\quicksave.json";
-            MakeDirectoryIfDoesntExist(filename);
+            string filename = "\\saves\\" + gv.mod.moduleName + "\\quicksave.json";
+            //TODO MakeDirectoryIfDoesntExist(filename);
 
             //make backup of each encounter's tiles and then clear them
             List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();
@@ -302,10 +299,7 @@ namespace IBx
             }
 
             string json = JsonConvert.SerializeObject(gv.mod, Newtonsoft.Json.Formatting.Indented);
-            using (StreamWriter sw = new StreamWriter(filename))
-            {
-                sw.Write(json.ToString());
-            }
+            gv.SaveText(filename, json);
 
             //restore the encounter tiles after saving
             for (int i = 0; i < gv.mod.moduleEncountersList.Count; i++)
@@ -337,8 +331,8 @@ namespace IBx
             gv.screenMainMap.saveUILayout();
             gv.screenCombat.saveUILayout();
 
-            string filepath = gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\" + filename;
-            MakeDirectoryIfDoesntExist(filepath);
+            string filepath = "\\saves\\" + gv.mod.moduleName + "\\" + filename;
+            //TODO MakeDirectoryIfDoesntExist(filepath);
 
             //make backup of each encounter's tiles and then clear them
             List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();   
@@ -374,10 +368,7 @@ namespace IBx
             }
 
             string json = JsonConvert.SerializeObject(gv.mod, Newtonsoft.Json.Formatting.Indented);
-            using (StreamWriter sw = new StreamWriter(filepath))
-            {
-                sw.Write(json.ToString());
-            }
+            gv.SaveText(filepath, json);
 
             //restore the encounter tiles after saving
             for (int i = 0; i < gv.mod.moduleEncountersList.Count; i++)
@@ -405,13 +396,10 @@ namespace IBx
             ModuleInfo newModInfo = new ModuleInfo();
             newModInfo.saveName = gv.mod.saveName;
 
-            string filepath = gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\" + filename;
-            MakeDirectoryIfDoesntExist(filepath);
+            string filepath = "\\saves\\" + gv.mod.moduleName + "\\" + filename;
+            //TODO MakeDirectoryIfDoesntExist(filepath);
             string json = JsonConvert.SerializeObject(newModInfo, Newtonsoft.Json.Formatting.Indented);
-            using (StreamWriter sw = new StreamWriter(filepath))
-            {
-                sw.Write(json.ToString());
-            }
+            gv.SaveText(filepath, json);
         }
 
         public void doVerifyReturnToMain()
@@ -8879,26 +8867,25 @@ namespace IBx
 
         }
         public void doConversationBasedOnTag(string tag)
-        {
-           
-            //if (gv.mod.doConvo)
-            //{
-                try
-                {
-                    gv.mod.allowImmediateRetransition = true;
-                    LoadCurrentConvo(tag);
-                    gv.screenType = "convo";
-                    gv.screenConvo.startConvo();
-                }
-                catch (Exception ex)
+        {           
+            try
+            {                
+                LoadCurrentConvo(tag);
+                if (gv.screenConvo.currentConvo == null)
                 {
                     gv.sf.MessageBox("failed to open conversation with tag: " + tag);
                 }
-            //}
-            //else
-            //{
-                //gv.mod.doConvo = true;
-            //}
+                else
+                {
+                    gv.mod.allowImmediateRetransition = true;
+                    gv.screenType = "convo";
+                    gv.screenConvo.startConvo();
+                }
+            }
+            catch (Exception ex)
+            {
+                gv.sf.MessageBox("failed to open conversation with tag: " + tag);
+            }
         }
 
         //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -11389,6 +11376,7 @@ namespace IBx
         //DIRECT2D STUFF
         public SKBitmap GetFromBitmapList(string fileNameWithOutExt)
         {
+            if (fileNameWithOutExt == null) { fileNameWithOutExt = "none"; }
             //check to see if in list already and return bitmap it if found
             if (commonBitmapList.ContainsKey(fileNameWithOutExt))
             {

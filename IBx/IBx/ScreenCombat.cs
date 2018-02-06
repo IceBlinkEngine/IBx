@@ -187,7 +187,7 @@ namespace IBx
         {
             try
             {
-                string json = gv.LoadStringFromEitherFolder("\\data\\CombatUILayout.json", "\\modules\\" + gv.mod.moduleName + "data\\CombatUILayout.json");
+                string json = gv.LoadStringFromEitherFolder("\\data\\CombatUILayout.json", "\\modules\\" + gv.mod.moduleName + "\\data\\CombatUILayout.json");
                 using (StringReader file = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();

@@ -59,11 +59,13 @@ namespace IBx
             //read in script file and create line numbered list
             if (parms != "fullScreenEffectScript")
             {
-                lines = File.ReadAllLines(gv.cc.GetModulePath() + "\\ibscript\\" + filename + ".ibs");
+                lines = gv.LoadStringLinesFromEitherFolder("\\ibscript\\" + filename + ".ibs", "\\modules\\" + gv.mod.moduleName + "\\ibscript\\" + filename + ".ibs");
+                //lines = File.ReadAllLines(gv.cc.GetModulePath() + "\\ibscript\\" + filename + ".ibs");
             }
             else
             {
-                lines = File.ReadAllLines(gv.cc.GetModulePath() + "\\ibscript\\" + "\\fullScreenEffectScripts\\" + filename + ".ibs");
+                lines = gv.LoadStringLinesFromEitherFolder("\\ibscript\\fullScreenEffectScripts\\" + filename + ".ibs", "\\modules\\" + gv.mod.moduleName + "\\ibscript\\fullScreenEffectScripts\\" + filename + ".ibs");
+                //lines = File.ReadAllLines(gv.cc.GetModulePath() + "\\ibscript\\" + "\\fullScreenEffectScripts\\" + filename + ".ibs");
             }
             List<string> converttolist = lines.ToList();
             converttolist.Insert(0, "//line 0");

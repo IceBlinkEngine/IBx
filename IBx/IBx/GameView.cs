@@ -1809,6 +1809,10 @@ namespace IBx
             return tcs.Task;
         }
 
+        public void SaveText(string fullPath, string text)
+        {
+            DependencyService.Get<ISaveAndLoad>().SaveText(fullPath, text);
+        }
         public string LoadStringFromUserFolder(string fullPath)
         {
             return DependencyService.Get<ISaveAndLoad>().LoadStringFromUserFolder(fullPath);
@@ -1820,6 +1824,10 @@ namespace IBx
         public string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath)
         {
             return DependencyService.Get<ISaveAndLoad>().LoadStringFromEitherFolder(assetFolderpath, userFolderpath);
+        }
+        public string[] LoadStringLinesFromEitherFolder(string assetFolderpath, string userFolderpath)
+        {
+            return DependencyService.Get<ISaveAndLoad>().LoadStringLinesFromEitherFolder(assetFolderpath, userFolderpath);
         }
         public List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension)
         {
@@ -1834,45 +1842,9 @@ namespace IBx
             return DependencyService.Get<ISaveAndLoad>().GetAllFilesWithExtensionFromBothFolders(assetFolderpath, userFolderpath, extension);
         }
         
-        /*public void SaveSettings(Settings tglSettings)
-        {
-            DependencyService.Get<ISaveAndLoad>().SaveSettings(tglSettings);
-        }*/
-        /*public void SaveSaveGame(string modName, string filename, SaveGame save)
-        {
-            DependencyService.Get<ISaveAndLoad>().SaveSaveGame(modName, filename, save);
-        }*/
-        public void SaveCharacter(string modName, string filename, Player pc)
-        {
-            DependencyService.Get<ISaveAndLoad>().SaveCharacter(modName, filename, pc);
-        }
-        public void SaveModuleAsset(string modFolder, string assetFilenameWithExtension, string json)
-        {
-            DependencyService.Get<ISaveAndLoad>().SaveModuleAssetFile(modFolder, assetFilenameWithExtension, json);
-        }
-        public List<string> GetTileFiles(string modFolder, string endsWith)
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetTileFiles(modFolder, endsWith);
-        }
-        public List<string> GetGraphicsFiles(string modFolder, string endsWith)
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetGraphicsFiles(modFolder, endsWith);
-        }
-        public List<string> GetCharacterFiles(string modFolder, string endsWith)
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetCharacterFiles(modFolder, endsWith);
-        }
         public string GetModuleFileString(string modFilename)
         {
             return DependencyService.Get<ISaveAndLoad>().GetModuleFileString(modFilename);
-        }
-        public string GetModuleAssetFileString(string modFolder, string assetFilename)
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetModuleAssetFileString(modFolder, assetFilename);
-        }
-        public string GetDataAssetFileString(string assetFilename)
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetDataAssetFileString(assetFilename);
         }
         public SKBitmap LoadBitmap(string filename, Module mdl)
         {
@@ -1882,39 +1854,11 @@ namespace IBx
         {
             return DependencyService.Get<ISaveAndLoad>().GetAllModuleFiles();
         }
-        public List<string> GetAllAreaFilenames()
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetAllAreaFilenames(mod.moduleName);
-        }
-        public List<string> GetAllConvoFilenames()
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetAllConvoFilenames(mod.moduleName);
-        }
-        public List<string> GetAllEncounterFilenames()
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetAllEncounterFilenames(mod.moduleName);
-        }
-        public string GetSettingsString()
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetSettingsString();
-        }
-        public string GetSaveFileString(string modName, string filename)
-        {
-            return DependencyService.Get<ISaveAndLoad>().GetSaveFileString(modName, filename);
-        }
-
-
+        
         public void errorLog(string text)
         {
-            /*TODO if (mainDirectory == null) 
-            { 
-                mainDirectory = Directory.GetCurrentDirectory(); 
-            }
-            using (StreamWriter writer = new StreamWriter(mainDirectory + "//IB2ErrorLog.txt", true))
-            {
-                writer.Write(DateTime.Now + ": ");
-                writer.WriteLine(text);
-            }*/
+            string filename = "\\IB2ErrorLog.txt";
+            SaveText(filename, text);
         }
     }
 }

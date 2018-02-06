@@ -387,6 +387,7 @@ namespace IBx
 
         public void MessageBoxHtml(string message)
         {
+            gv.cp.DisplayAlert("Message", message, "OK");
             //TODO gv.messageBox.logLinesList.Clear();
             //gv.messageBox.AddHtmlTextToLog(message);
             //gv.messageBox.currentTopLineIndex = 0;

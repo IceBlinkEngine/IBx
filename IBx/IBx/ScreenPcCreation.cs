@@ -963,7 +963,10 @@ namespace IBx
                         break;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                int x = 0;
+            }
         }
 
         public void tokenLoad(Player p)
@@ -1090,13 +1093,10 @@ namespace IBx
         }
         public void SaveCharacter(Player p)
         {
-            string filename = gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters\\" + pc.tag + ".json";
-            gv.cc.MakeDirectoryIfDoesntExist(filename);
-            string json = JsonConvert.SerializeObject(pc, Newtonsoft.Json.Formatting.Indented);
-            using (StreamWriter sw = new StreamWriter(filename))
-            {
-                sw.Write(json.ToString());
-            }
+            string filename = "\\saves\\" + gv.mod.moduleName + "\\characters\\" + p.tag + ".json";
+            //TODO gv.cc.MakeDirectoryIfDoesntExist(filename);
+            string json = JsonConvert.SerializeObject(p, Newtonsoft.Json.Formatting.Indented);
+            gv.SaveText(filename, json);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace IBx
         {
             try
             {
-                string json = gv.LoadStringFromEitherFolder("\\data\\MainUILayout.json", "\\modules\\" + gv.mod.moduleName + "data\\MainUILayout.json");                
+                string json = gv.LoadStringFromEitherFolder("\\data\\MainUILayout.json", "\\modules\\" + gv.mod.moduleName + "\\data\\MainUILayout.json");                
                 using (StringReader file = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();

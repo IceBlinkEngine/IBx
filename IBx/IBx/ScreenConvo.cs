@@ -22,8 +22,8 @@ namespace IBx
 	    public int pcNodeGlow = -1;
 	    public int npcNodeEndY = 0;
 	    public int originalSelectedPartyLeader = 0;
-	    public int parentIdNum = 0;    
-        public string convoBitmap;
+	    public int parentIdNum = 0;
+        public string convoBitmap = "npc_blob_portrait";
         public string convoPlusBitmap;
         private bool doActions = true;
         public List<int> nodeIndexList = new List<int>();

@@ -1034,4 +1034,7 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Assets\modules\" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\data\MessagePartyRoster.txt" />
+  </ItemGroup>
 </Project>
