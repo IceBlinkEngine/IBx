@@ -876,6 +876,9 @@ namespace IBx
         //Animation Timer Stuff
         public void postDelayed(string type, int delay)
         {
+            animationTimerOn = true;
+            animationStartTime = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
+            animationDelayTime = delay;
             /*if (type.Equals("doAnimation"))
             {
                 animationTimer.Enabled = true;
@@ -888,16 +891,23 @@ namespace IBx
                 animationTimer.Start();
             }*/
         }
-        private void AnimationTimer_Tick(object sender, EventArgs e)
+        private void AnimationTimer_Tick()
         {
-            /*if ((!screenCombat.blockAnimationBridge) || (!mod.useCombatSmoothMovement))
+            if ((!screenCombat.blockAnimationBridge) || (!mod.useCombatSmoothMovement))
             {
-                animationTimer.Enabled = false;
-                animationTimer.Stop();
+                animationTimerOn = false;
                 screenCombat.doAnimationController();
-            }*/
+            }
+            else
+            {
+                animationTimerOn = true;
+                animationStartTime = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
+            }
         }
-        
+        public bool animationTimerOn = false;
+        public long animationStartTime = 0;
+        public int animationDelayTime = 0;
+
         public void gameTimer_Tick(SKCanvasView sk_canvas)
         {
             if (!stillProcessingGameLoop)
@@ -905,9 +915,16 @@ namespace IBx
                 stillProcessingGameLoop = true; //starting the game loop so do not allow another tick call to run until finished with this tick call.
                 long current = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
                 elapsed = (int)(current - previousTime); //calculate the total ms elapsed since the last time through the game loop
+                if (animationTimerOn) //do combat animation stuff
+                {
+                    long timePassed = current - animationStartTime;
+                    if (timePassed > animationDelayTime)
+                    {                        
+                        AnimationTimer_Tick();
+                    }
+                }
                 Update(elapsed); //runs AI and physics
-                //Render(elapsed); //draw the screen frame
-                sk_canvas.InvalidateSurface();
+                sk_canvas.InvalidateSurface(); //draw the screen frame
                 if (reportFPScount >= 10)
                 {
                     reportFPScount = 0;
