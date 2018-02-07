@@ -140,6 +140,9 @@ namespace IBx
         public int MouseX = 0;
         public int MouseY = 0;
         public int reportFPScount = 0;
+        public bool animationTimerOn = false;
+        public long animationStartTime = 0;
+        public int animationDelayTime = 0;
 
         //public Timer animationTimer = new Timer();
         //public Timer areaMusicTimer = new Timer();
@@ -147,7 +150,7 @@ namespace IBx
         //public Timer weatherSounds1Timer = new Timer();
         //public Timer weatherSounds2Timer = new Timer();
         //public Timer weatherSounds3Timer = new Timer();
-        
+
         public float floatPixMovedPerTick = 4f;
         public int realTimeTimerMilliSecondsEllapsed = 0;
         public int smoothMoveTimerLengthInMilliSeconds = 16;
@@ -229,9 +232,7 @@ namespace IBx
             //CREATES A FONTFAMILY
             ResetFont();
             //ResetDirect2DFont();
-            
-            //TODO animationTimer.Tick += new System.EventHandler(this.AnimationTimer_Tick);
-
+                        
             log = new IB2HtmlLogBox(this);
             log.numberOfLinesToShow = 20;
             cc.addLogText("red", "screenDensity: " + screenDensity);
@@ -903,10 +904,7 @@ namespace IBx
                 animationTimerOn = true;
                 animationStartTime = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
             }
-        }
-        public bool animationTimerOn = false;
-        public long animationStartTime = 0;
-        public int animationDelayTime = 0;
+        }        
 
         public void gameTimer_Tick(SKCanvasView sk_canvas)
         {

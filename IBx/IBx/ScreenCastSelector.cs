@@ -771,7 +771,7 @@ namespace IBx
                                         }
                                     }
 
-                                    string selected = await gv.ListViewPage(pcNames, "Select Taarget");
+                                    string selected = await gv.ListViewPage(pcNames, "Select Target");
                                     int selectedIndex = gv.GetSelectedIndex(selected, pcNames);
                                     //using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, gv.mod.getPlayerClass(getCastingPlayer().classTag).spellLabelSingular + " Target"))
                                     //{

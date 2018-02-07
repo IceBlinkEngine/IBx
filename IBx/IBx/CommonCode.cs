@@ -222,7 +222,6 @@ namespace IBx
         public void AutoSave()
         {
             string filename = "\\saves\\" + gv.mod.moduleName + "\\autosave.json";
-            //TODO MakeDirectoryIfDoesntExist(filename);
             string json = JsonConvert.SerializeObject(gv.mod, Newtonsoft.Json.Formatting.Indented);
             gv.SaveText(filename, json);
             gv.screenMainMap.saveUILayout();
@@ -263,8 +262,7 @@ namespace IBx
             gv.screenCombat.saveUILayout();
 
             string filename = "\\saves\\" + gv.mod.moduleName + "\\quicksave.json";
-            //TODO MakeDirectoryIfDoesntExist(filename);
-
+            
             //make backup of each encounter's tiles and then clear them
             List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();
             foreach (Encounter enc in gv.mod.moduleEncountersList)
@@ -332,8 +330,7 @@ namespace IBx
             gv.screenCombat.saveUILayout();
 
             string filepath = "\\saves\\" + gv.mod.moduleName + "\\" + filename;
-            //TODO MakeDirectoryIfDoesntExist(filepath);
-
+            
             //make backup of each encounter's tiles and then clear them
             List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();   
             foreach (Encounter enc in gv.mod.moduleEncountersList)
@@ -397,23 +394,23 @@ namespace IBx
             newModInfo.saveName = gv.mod.saveName;
 
             string filepath = "\\saves\\" + gv.mod.moduleName + "\\" + filename;
-            //TODO MakeDirectoryIfDoesntExist(filepath);
             string json = JsonConvert.SerializeObject(newModInfo, Newtonsoft.Json.Formatting.Indented);
             gv.SaveText(filepath, json);
         }
 
-        public void doVerifyReturnToMain()
+        public async void doVerifyReturnToMain()
         {
             List<string> actionList = new List<string> { "Yes, Return To Main Menu", "No, Keep Playing" };
+            string selected = await gv.ListViewPage(actionList, "Item Action");
+            int selectedIndex = gv.GetSelectedIndex(selected, actionList);
+            //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Are you sure you wish to exit to Main Menu?"))
+            //{
+                //itSel.IceBlinkButtonClose.Enabled = true;
+                //itSel.IceBlinkButtonClose.Visible = true;
+                //itSel.setupAll(gv);
+                //var ret = itSel.ShowDialog();
 
-            /*TODO using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Are you sure you wish to exit to Main Menu?"))
-            {
-                itSel.IceBlinkButtonClose.Enabled = true;
-                itSel.IceBlinkButtonClose.Visible = true;
-                itSel.setupAll(gv);
-                var ret = itSel.ShowDialog();
-
-                if (itSel.selectedIndex == 0)
+                if (selectedIndex == 0)
                 {
                     //go to launcher screen  
                     if (gv.fixedModule.Equals("")) //this is the IceBlink Engine app  
@@ -436,38 +433,37 @@ namespace IBx
                             gv.screenTitle = new ScreenTitle(gv.mod, gv);
                         }
 
-                        //TODO make sure this works  
                         gv.screenLauncher.loadModuleFiles();
                         gv.screenType = "launcher";
                     }
                     else //this is a fixed module  
                     {
-                        gv.mod = gv.cc.LoadModule(gv.fixedModule + "/" + gv.fixedModule + ".mod", false);
+                        gv.mod = gv.cc.LoadModule(gv.fixedModule + "/" + gv.fixedModule + ".mod");
                         gv.resetGame();
                         gv.cc.LoadSaveListItems();
                         gv.screenType = "title";
                     }
                 }
-                if (itSel.selectedIndex == 1)
+                if (selectedIndex == 1)
                 {
                     //keep playing 
                 }
-            }
-            */
+            //}            
         }
          
-        public void doSavesDialog()
+        public async void doSavesDialog()
         {
             List<string> saveList = new List<string> { slot0, slot1, slot2, slot3, slot4, slot5, "Return to Main Menu" };
+            string selected = await gv.ListViewPage(saveList, "Item Action");
+            int selectedIndex = gv.GetSelectedIndex(selected, saveList);
+            //using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a slot to save game."))
+            //{
+                //itSel.IceBlinkButtonClose.Enabled = true;
+                //itSel.IceBlinkButtonClose.Visible = true;
+                //itSel.setupAll(gv);
+                //var ret = itSel.ShowDialog();
 
-            /*TODO using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a slot to save game."))
-            {
-                itSel.IceBlinkButtonClose.Enabled = true;
-                itSel.IceBlinkButtonClose.Visible = true;
-                itSel.setupAll(gv);
-                var ret = itSel.ShowDialog();
-
-                if (itSel.selectedIndex == 0)
+                if (selectedIndex == 0)
                 {
                     try
                     {
@@ -479,7 +475,7 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-                else if (itSel.selectedIndex == 1)
+                else if (selectedIndex == 1)
                 {
                     Player pc = gv.mod.playerList[0];
                     gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
@@ -495,7 +491,7 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-                else if (itSel.selectedIndex == 2)
+                else if (selectedIndex == 2)
                 {
                     Player pc = gv.mod.playerList[0];
                     gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
@@ -511,7 +507,7 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-                else if (itSel.selectedIndex == 3)
+                else if (selectedIndex == 3)
                 {
                     Player pc = gv.mod.playerList[0];
                     gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
@@ -527,7 +523,7 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-                else if (itSel.selectedIndex == 4)
+                else if (selectedIndex == 4)
                 {
                     Player pc = gv.mod.playerList[0];
                     gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
@@ -543,7 +539,7 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-                else if (itSel.selectedIndex == 5)
+                else if (selectedIndex == 5)
                 {
                     Player pc = gv.mod.playerList[0];
                     gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
@@ -559,25 +555,25 @@ namespace IBx
                         gv.errorLog(ex.ToString());
                     }
                 }
-                else if (itSel.selectedIndex == 6)
+                else if (selectedIndex == 6)
                 {
                     //ask if they really want to exit, remind to save first  
                     doVerifyReturnToMain();
                 }
-            }
-            */
+            //}            
         }
-        public void doLoadSaveGameDialog()
+        public async void doLoadSaveGameDialog()
         {
             List<string> saveList = new List<string> { slotA, slot0, slot1, slot2, slot3, slot4, slot5 };
-            /*TODO
-            using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a Saved Game to Load."))
-            {
-                itSel.IceBlinkButtonClose.Visible = true;
-                itSel.IceBlinkButtonClose.Enabled = true;
-                itSel.ShowDialog();
+            string selected = await gv.ListViewPage(saveList, "Item Action");
+            int selectedIndex = gv.GetSelectedIndex(selected, saveList);
+            //using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a Saved Game to Load."))
+            //{
+                //itSel.IceBlinkButtonClose.Visible = true;
+                //itSel.IceBlinkButtonClose.Enabled = true;
+                //itSel.ShowDialog();
 
-                if (itSel.selectedIndex == 0)
+                if (selectedIndex == 0)
                 {
                     bool result = LoadSave("autosave.json");
                     if (result)
@@ -590,7 +586,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if (itSel.selectedIndex == 1)
+                else if (selectedIndex == 1)
                 {
                     bool result = LoadSave("quicksave.json");
                     if (result)
@@ -603,7 +599,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if (itSel.selectedIndex == 2)
+                else if (selectedIndex == 2)
                 {
                     bool result = LoadSave("slot1.json");
                     if (result)
@@ -616,7 +612,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if (itSel.selectedIndex == 3)
+                else if (selectedIndex == 3)
                 {
                     bool result = LoadSave("slot2.json");
                     if (result)
@@ -629,7 +625,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if (itSel.selectedIndex == 4)
+                else if (selectedIndex == 4)
                 {
                     bool result = LoadSave("slot3.json");
                     if (result)
@@ -642,7 +638,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if (itSel.selectedIndex == 5)
+                else if (selectedIndex == 5)
                 {
                     bool result = LoadSave("slot4.json");
                     if (result)
@@ -655,7 +651,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if (itSel.selectedIndex == 6)
+                else if (selectedIndex == 6)
                 {
                     bool result = LoadSave("slot5.json");
                     if (result)
@@ -668,8 +664,7 @@ namespace IBx
                         //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-            */
+            //}            
         }
         public ModuleInfo LoadModuleInfo(string filename)
         {

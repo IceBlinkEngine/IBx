@@ -28,7 +28,7 @@ namespace IBx.Droid
             string dir = Path.GetDirectoryName(convertedFullPath);
             Directory.CreateDirectory(dir);
             var path = ConvertFullPath(fullPath, "/");
-            using (StreamWriter sw = File.CreateText(path))
+            using (StreamWriter sw = File.CreateText(storageFolder + path))
             {
                 sw.Write(text);
             }                

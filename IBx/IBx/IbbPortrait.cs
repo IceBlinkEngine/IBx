@@ -40,7 +40,6 @@ namespace IBx
                     if (!playedHoverSound)
                     {
                         playedHoverSound = true;
-                        //TODO gv.playerButtonEnter.Play();
                     }
                     return true;
                 }

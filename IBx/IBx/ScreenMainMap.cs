@@ -33911,135 +33911,13 @@ namespace IBx
 
                     else if (rtn.Equals("btnCastOnMainMap"))
                     {
-
-                        List<string> pcNames = new List<string>();
-                        List<int> pcIndex = new List<int>();
-                        pcNames.Add("cancel");
-
-                        int cnt = 0;
-                        foreach (Player p in gv.mod.playerList)
-                        {
-                            if (p.isAlive())
-                            {
-                                if (hasMainMapTypeSpell(p))
-                                {
-                                    pcNames.Add(p.name);
-                                    pcIndex.Add(cnt);
-                                }
-                            }
-                            cnt++;
-                        }
-
-                        //If only one PC, do not show select PC dialog...just go to cast selector
-                        if (pcIndex.Count == 1)
-                        {
-                            try
-                            {
-                                gv.screenCastSelector.castingPlayerIndex = pcIndex[0];
-                                gv.screenCombat.spellSelectorIndex = 0;
-                                gv.screenType = "mainMapCast";
-                                return;
-                            }
-                            catch (Exception ex)
-                            {
-                                //print error
-                                //IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
-                                gv.errorLog(ex.ToString());
-                                return;
-                            }
-                        }
-
-                        /*TODO using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Caster"))
-                        {
-                            pcSel.ShowDialog();
-
-                            if (pcSel.selectedIndex > 0)
-                            {
-                                try
-                                {
-                                    gv.screenCastSelector.castingPlayerIndex = pcIndex[pcSel.selectedIndex - 1]; // pcIndex.get(item - 1);
-                                    gv.screenCombat.spellSelectorIndex = 0;
-                                    gv.screenType = "mainMapCast";
-                                }
-                                catch (Exception ex)
-                                {
-                                    IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
-                                    gv.errorLog(ex.ToString());
-                                    //print error
-                                }
-                            }
-                            else if (pcSel.selectedIndex == 0) // selected "cancel"
-                            {
-                                //do nothing
-                            }
-                        }*/
+                        DoCastOnMainMap();                        
                     }
 
                     //adding lines for trait use button on main map
                     else if (rtn.Equals("btnUseTraitOnMainMap"))
                     {
-
-                        List<string> pcNames = new List<string>();
-                        List<int> pcIndex = new List<int>();
-                        pcNames.Add("cancel");
-
-                        int cnt = 0;
-                        foreach (Player p in gv.mod.playerList)
-                        {
-                            if (p.isAlive())
-                            {
-                                if (p.knownOutsideCombatUsableTraitsTags.Count > 0)
-                                {
-                                    pcNames.Add(p.name);
-                                    pcIndex.Add(cnt);
-                                }
-                            }
-                            cnt++;
-                        }
-
-                        //If only one PC, do not show select PC dialog...just go to cast selector
-                        if (pcIndex.Count == 1)
-                        {
-                            try
-                            {
-                                gv.screenCastSelector.castingPlayerIndex = pcIndex[0];
-                                gv.screenCombat.spellSelectorIndex = 0;
-                                gv.screenType = "mainMapTraitUse";
-                                return;
-                            }
-                            catch (Exception ex)
-                            {
-                                //print error
-                                //IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
-                                gv.errorLog(ex.ToString());
-                                return;
-                            }
-                        }
-
-                        /*TODO using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Character"))
-                        {
-                            pcSel.ShowDialog();
-
-                            if (pcSel.selectedIndex > 0)
-                            {
-                                try
-                                {
-                                    gv.screenCastSelector.castingPlayerIndex = pcIndex[pcSel.selectedIndex - 1]; // pcIndex.get(item - 1);
-                                    gv.screenCombat.spellSelectorIndex = 0;
-                                    gv.screenType = "mainMapTraitUse";
-                                }
-                                catch (Exception ex)
-                                {
-                                    IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
-                                    gv.errorLog(ex.ToString());
-                                    //print error
-                                }
-                            }
-                            else if (pcSel.selectedIndex == 0) // selected "cancel"
-                            {
-                                //do nothing
-                            }
-                        }*/
+                        DoUseTraitOnMainMap();                        
                     }
 
                     else if (rtn.Equals("btnToggleArrows"))
@@ -34167,6 +34045,140 @@ namespace IBx
                     }
                     break;
             }
+        }
+        public async void DoCastOnMainMap()
+        {
+            List<string> pcNames = new List<string>();
+            List<int> pcIndex = new List<int>();
+            pcNames.Add("cancel");
+
+            int cnt = 0;
+            foreach (Player p in gv.mod.playerList)
+            {
+                if (p.isAlive())
+                {
+                    if (hasMainMapTypeSpell(p))
+                    {
+                        pcNames.Add(p.name);
+                        pcIndex.Add(cnt);
+                    }
+                }
+                cnt++;
+            }
+
+            //If only one PC, do not show select PC dialog...just go to cast selector
+            if (pcIndex.Count == 1)
+            {
+                try
+                {
+                    gv.screenCastSelector.castingPlayerIndex = pcIndex[0];
+                    gv.screenCombat.spellSelectorIndex = 0;
+                    gv.screenType = "mainMapCast";
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    //print error
+                    //IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
+                    gv.errorLog(ex.ToString());
+                    return;
+                }
+            }
+
+            string selected = await gv.ListViewPage(pcNames, "Select Caster");
+            int selectedIndex = gv.GetSelectedIndex(selected, pcNames);
+
+            //using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Caster"))
+            //{
+                //pcSel.ShowDialog();
+
+                if (selectedIndex > 0)
+                {
+                    try
+                    {
+                        gv.screenCastSelector.castingPlayerIndex = pcIndex[selectedIndex - 1]; // pcIndex.get(item - 1);
+                        gv.screenCombat.spellSelectorIndex = 0;
+                        gv.screenType = "mainMapCast";
+                    }
+                    catch (Exception ex)
+                    {
+                        gv.sf.MessageBox("error with Pc Selector screen: " + ex.ToString());
+                        gv.errorLog(ex.ToString());
+                        //print error
+                    }
+                }
+                else if (selectedIndex == 0) // selected "cancel"
+                {
+                    //do nothing
+                }
+            //}
+        }
+        public async void DoUseTraitOnMainMap()
+        {
+            List<string> pcNames = new List<string>();
+            List<int> pcIndex = new List<int>();
+            pcNames.Add("cancel");
+
+            int cnt = 0;
+            foreach (Player p in gv.mod.playerList)
+            {
+                if (p.isAlive())
+                {
+                    if (p.knownOutsideCombatUsableTraitsTags.Count > 0)
+                    {
+                        pcNames.Add(p.name);
+                        pcIndex.Add(cnt);
+                    }
+                }
+                cnt++;
+            }
+
+            //If only one PC, do not show select PC dialog...just go to cast selector
+            if (pcIndex.Count == 1)
+            {
+                try
+                {
+                    gv.screenCastSelector.castingPlayerIndex = pcIndex[0];
+                    gv.screenCombat.spellSelectorIndex = 0;
+                    gv.screenType = "mainMapTraitUse";
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    //print error
+                    //IBMessageBox.Show(gv, "error with Pc Selector screen: " + ex.ToString());
+                    gv.errorLog(ex.ToString());
+                    return;
+                }
+            }
+
+            string selected = await gv.ListViewPage(pcNames, "Select Character");
+            int selectedIndex = gv.GetSelectedIndex(selected, pcNames);
+
+            //using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, "Select Character"))
+            //{
+                //pcSel.ShowDialog();
+
+                if (selectedIndex > 0)
+                {
+                    try
+                    {
+                        gv.screenCastSelector.castingPlayerIndex = pcIndex[selectedIndex - 1]; // pcIndex.get(item - 1);
+                        gv.screenCombat.spellSelectorIndex = 0;
+                        gv.screenType = "mainMapTraitUse";
+                    }
+                    catch (Exception ex)
+                    {
+                        gv.sf.MessageBox("error with Pc Selector screen: " + ex.ToString());
+                        gv.errorLog(ex.ToString());
+                        //print error
+                    }
+                }
+                else if (selectedIndex == 0) // selected "cancel"
+                {
+                    //do nothing
+                }
+            //}
         }
         //to test new layout system, change this to onTouchMainOld
         public void onKeyUp()

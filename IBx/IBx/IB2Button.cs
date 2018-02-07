@@ -65,7 +65,6 @@ namespace IBx
                         if (!playedHoverSound)
                         {
                             playedHoverSound = true;
-                            //TODO gv.playerButtonEnter.Play();
                         }
                         glowOn = true;
                     }
@@ -87,7 +86,6 @@ namespace IBx
                         if (!playedHoverSound)
                         {
                             playedHoverSound = true;
-                            //TODO gv.playerButtonEnter.Play();
                         }
                         return true;
                     }
