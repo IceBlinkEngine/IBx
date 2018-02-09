@@ -111,7 +111,7 @@ namespace IBx
         {
             Player toReturn = null;
             // deserialize JSON directly from a file
-            string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename);
+            string json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\characters\\" + filename);
             using (StringReader sr = new StringReader(json))            
             {
                 JsonSerializer serializer = new JsonSerializer();

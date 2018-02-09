@@ -152,7 +152,7 @@ namespace IBx
         public int partyGold = 0;
         public bool showPartyToken = false;
         public string partyTokenFilename = "prp_party";
-        [JsonIgnore]
+        //[JsonIgnore]
         //public Bitmap partyTokenBitmap;
         public List<Player> playerList = new List<Player>();
         public List<Player> partyRosterList = new List<Player>();

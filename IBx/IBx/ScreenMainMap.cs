@@ -2490,7 +2490,7 @@ namespace IBx
             if (!gv.mod.currentArea.areaDark)
             {
                 drawBottomFullScreenEffects();
-                if ((!gv.mod.currentArea.ImageFileName.Equals("none")) && (gv.cc.bmpMap != null))
+                if (!gv.mod.currentArea.ImageFileName.Equals("none"))
                 {
                     drawMap();
                 }
@@ -27240,28 +27240,31 @@ namespace IBx
 
         public void drawMap()
         {
-            int bmpWidth = gv.cc.bmpMap.Width;
-            int bmpHeight = gv.cc.bmpMap.Height;
-            int dstX = (gv.playerOffsetX - gv.mod.PlayerLocationX) * gv.squareSize;
-            int dstY = (gv.playerOffsetY - gv.mod.PlayerLocationY) * gv.squareSize;
-            int dstWidth = (int)(bmpWidth * 2 * gv.screenDensity); //assumes squares are 50x50 in this image
-            int dstHeight = (int)(bmpHeight * 2 * gv.screenDensity); //assumes squares are 50x50 in this image
+            if (!gv.mod.currentArea.ImageFileName.Equals("none"))
+            {
+                int bmpWidth = gv.cc.GetFromBitmapList(gv.mod.currentArea.ImageFileName).Width;
+                int bmpHeight = gv.cc.GetFromBitmapList(gv.mod.currentArea.ImageFileName).Height;
+                int dstX = (gv.playerOffsetX - gv.mod.PlayerLocationX) * gv.squareSize;
+                int dstY = (gv.playerOffsetY - gv.mod.PlayerLocationY) * gv.squareSize;
+                int dstWidth = (int)(bmpWidth * 2 * gv.screenDensity); //assumes squares are 50x50 in this image
+                int dstHeight = (int)(bmpHeight * 2 * gv.screenDensity); //assumes squares are 50x50 in this image
 
-            IbRect src = new IbRect(0, 0, bmpWidth, bmpHeight);
-            IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
-            gv.DrawBitmap(gv.cc.bmpMap, src, dst);
+                IbRect src = new IbRect(0, 0, bmpWidth, bmpHeight);
+                IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(gv.mod.currentArea.ImageFileName), src, dst);
 
-            drawColumnOfBlack(-1);
-            drawColumnOfBlack(-2);
-            drawRowOfBlack(-1);
-            drawColumnOfBlack(gv.playerOffsetX * 2 + 1);
-            drawColumnOfBlack(gv.playerOffsetX * 2 + 2);
-            //hurgh16
-            //drawColumnOfBlack(gv.playerOffsetX * 2 + 3);
-            //drawColumnOfBlack(gv.playerOffsetX * 2 + 4);
-            //drawColumnOfBlack(gv.playerOffsetX * 2 + 5);
-            //drawColumnOfBlack(gv.playerOffsetX * 2 + 6);
-            drawRowOfBlack(gv.playerOffsetY * 2 + 2);
+                drawColumnOfBlack(-1);
+                drawColumnOfBlack(-2);
+                drawRowOfBlack(-1);
+                drawColumnOfBlack(gv.playerOffsetX * 2 + 1);
+                drawColumnOfBlack(gv.playerOffsetX * 2 + 2);
+                //hurgh16
+                //drawColumnOfBlack(gv.playerOffsetX * 2 + 3);
+                //drawColumnOfBlack(gv.playerOffsetX * 2 + 4);
+                //drawColumnOfBlack(gv.playerOffsetX * 2 + 5);
+                //drawColumnOfBlack(gv.playerOffsetX * 2 + 6);
+                drawRowOfBlack(gv.playerOffsetY * 2 + 2);
+            }
         }
 
         public void drawProps()
