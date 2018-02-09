@@ -301,6 +301,44 @@ namespace IBx.iOS
             return list;
         }
 
+        //Android.Media.MediaPlayer playerAreaMusic;
+        public void CreateAreaMusicPlayer()
+        {
+            //playerAreaMusic = new Android.Media.MediaPlayer();
+            //playerAreaMusic.Looping = true;
+            //playerAreaMusic.SetVolume(0.5f, 0.5f);
+        }
+        public void LoadAreaMusicFile(string fileName)
+        {
+            //playerAreaMusic.Reset();
+            //AssetFileDescriptor afd = Android.App.Application.Context.Assets.OpenFd(fileName);
+            //playerAreaMusic.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
+        }
+        public void PlayAreaMusic()
+        {
+            /*
+            if (playerAreaMusic == null)
+            {
+                return;
+            }
+            if (playerAreaMusic.IsPlaying)
+            {
+                playerAreaMusic.Pause();
+                playerAreaMusic.SeekTo(0);
+            }
+            playerAreaMusic.Start();
+            */
+        }
+        public void StopAreaMusic()
+        {
+            //playerAreaMusic.Pause();
+            //playerAreaMusic.SeekTo(0);
+        }
+        public void PauseAreaMusic()
+        {
+            //playerAreaMusic.Pause();
+        }
+
         static string CreatePathToFile(string fileName)
         {
             return Path.Combine(DocumentsPath, fileName);

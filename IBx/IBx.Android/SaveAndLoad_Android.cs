@@ -1,4 +1,5 @@
-﻿using IBx.Droid;
+﻿using Android.Content.Res;
+using IBx.Droid;
 using Newtonsoft.Json;
 using SkiaSharp;
 using System;
@@ -435,5 +436,54 @@ namespace IBx.Droid
             filename = parts[parts.Count - 2] + "." + parts[parts.Count - 1];
             return filename;
         }
+                
+        Android.Media.MediaPlayer playerAreaMusic;                        
+        public void CreateAreaMusicPlayer()
+        {
+            playerAreaMusic = new Android.Media.MediaPlayer();
+            playerAreaMusic.Looping = true;
+            playerAreaMusic.SetVolume(0.5f, 0.5f);
+        }        
+        public void LoadAreaMusicFile(string fullPath)
+        {
+            playerAreaMusic.Reset();
+            string filename = Path.GetFileNameWithoutExtension(fullPath);                                           
+            if (filename != "none")
+            {
+                //check in module folder first
+                Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
+                //string filePath = sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/");
+                if (File.Exists(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/")))
+                {
+                    playerAreaMusic.SetDataSource(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/"));
+                }
+                else if (File.Exists(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/") + ".mp3"))
+                {
+                    playerAreaMusic.SetDataSource(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/") + ".mp3");
+                }
+            }
+        }                
+        public void PlayAreaMusic()
+        {
+            if (playerAreaMusic == null)
+            {
+                return;
+            }
+            if (playerAreaMusic.IsPlaying)
+            {
+                playerAreaMusic.Pause();
+                playerAreaMusic.SeekTo(0);
+            }
+            playerAreaMusic.Start();
+        }
+        public void StopAreaMusic()
+        {
+            playerAreaMusic.Pause();
+            playerAreaMusic.SeekTo(0);
+        }
+        public void PauseAreaMusic()
+        {
+            playerAreaMusic.Pause();
+        }        
     }
 }

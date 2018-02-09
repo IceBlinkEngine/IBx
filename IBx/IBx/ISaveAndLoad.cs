@@ -30,5 +30,12 @@ namespace IBx
         List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension);
         List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension);
         List<string> GetAllModuleFiles();
+
+        void CreateAreaMusicPlayer();
+        void LoadAreaMusicFile(string fileName);
+        void PlayAreaMusic();
+        void StopAreaMusic();
+        void PauseAreaMusic();
+        
     }
 }

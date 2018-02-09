@@ -15,7 +15,6 @@ namespace IBx
     {
         public ContentPage cp;
         public SKCanvas canvas;
-        //this class is handled differently than Android version
         public int elapsed = 0;
         public float screenDensity;
         public int screenWidth;
@@ -48,39 +47,13 @@ namespace IBx
         public SKPaint drawPaint = new SKPaint();
         public SKPaint textPaint = new SKPaint();
         public SKRect textBounds = new SKRect();
-
-
-        //public Graphics gCanvas;
-
-        //DIRECT2D STUFF
-        /*
-        public SharpDX.Direct3D11.Device _device;
-        public SwapChain _swapChain;
-        public Texture2D _backBuffer;
-        public RenderTargetView _backBufferView;
-        public SharpDX.Direct2D1.Factory factory2D;
-        public SharpDX.DirectWrite.Factory factoryDWrite;
-        public RenderTarget renderTarget2D;
-        public SolidColorBrush sceneColorBrush;
-        public ResourceFontLoader CurrentResourceFontLoader;
-        public SharpDX.DirectWrite.FontCollection CurrentFontCollection;
-        public string FontFamilyName;
-        public TextFormat textFormat;
-        public TextLayout textLayout;
-        */
-
+                
         public string versionNum = "v1.00";
         public string fixedModule = "";
-        //public PrivateFontCollection myFonts; //CREATE A FONT COLLECTION
-        //public FontFamily family;
-        //public Font drawFontReg;
-        //public Font drawFontLarge;
-        //public Font drawFontSmall;
         public float drawFontRegHeight;
         public float drawFontLargeHeight;
         public float drawFontSmallHeight;
         public float drawFontRegWidth;
-        //public SolidBrush drawBrush = new SolidBrush(Color.White);
         public string screenType = "splash"; //launcher, title, moreGames, main, party, inventory, combatInventory, shop, journal, combat, combatCast, convo
         public AnimationState animationState = AnimationState.None;
         public int triggerIndex = 0;
@@ -123,7 +96,7 @@ namespace IBx
         //public WMPLib.WindowsMediaPlayer weatherSounds3;
        
         //public SoundPlayer soundPlayer = new SoundPlayer();
-        public Dictionary<string, Stream> oSoundStreams = new Dictionary<string, Stream>();
+        //public Dictionary<string, Stream> oSoundStreams = new Dictionary<string, Stream>();
         //public System.Media.SoundPlayer playerButtonEnter = new System.Media.SoundPlayer();
         //public System.Media.SoundPlayer playerButtonClick = new System.Media.SoundPlayer();
        
@@ -132,7 +105,6 @@ namespace IBx
         public string currentCombatMusic = "";
 
         //timers
-        //public Timer gameTimer = new Timer();
         public Stopwatch gameTimerStopwatch = new Stopwatch();
         public long previousTime = 0;
         public bool stillProcessingGameLoop = false;
@@ -144,7 +116,6 @@ namespace IBx
         public long animationStartTime = 0;
         public int animationDelayTime = 0;
 
-        //public Timer animationTimer = new Timer();
         //public Timer areaMusicTimer = new Timer();
         //public Timer areaSoundsTimer = new Timer();
         //public Timer weatherSounds1Timer = new Timer();
@@ -260,11 +231,8 @@ namespace IBx
             drawTextBox = new IbbHtmlTextBox(this, 320, 100, 500, 300);
             drawTextBox.showBoxBorder = false;
 
-            //TODO initializeMusic();
-            //TODO setupMusicPlayers();
-            //TODO initializeCombatMusic();
-
-
+            setupMusicPlayers();
+            
             if (fixedModule.Equals("")) //this is the IceBlink Engine app
             {
                 screenLauncher = new ScreenLauncher(mod, this);
@@ -527,9 +495,10 @@ namespace IBx
             drawFontRegWidth = 10.0f;
         }
 
-#region Area Music/Sounds
+        //MUSIC and SOUNDS
         public void setupMusicPlayers()
         {
+            CreateAreaMusicPlayer();
             /*try
             {
                 areaMusic = new WMPLib.WindowsMediaPlayer();
@@ -572,55 +541,23 @@ namespace IBx
         }
         public void startMusic()
         {
-            /*try
+            try
             {
-                if ((currentMainMusic.Equals(mod.currentArea.AreaMusic)) && (areaMusic != null))
+                if (currentMainMusic.Equals(mod.currentArea.AreaMusic))
                 {
-                    areaMusic.controls.play();
+                    PlayAreaMusic();
                 }
                 else
                 {
-                    areaMusic.controls.stop();
-                   
-                    if (mod.currentArea.AreaMusic != "none")
-                    {
-                        if (File.Exists(this.mainDirectory + "\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic))
-                        {
-                            areaMusic.URL = this.mainDirectory + "\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic;
-                        }
-                        else if (File.Exists(this.mainDirectory + "\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic + ".mp3"))
-                        {
-                            areaMusic.URL = this.mainDirectory + "\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic + ".mp3";
-                        }
-                        else if (File.Exists(this.mainDirectory + "\\default\\NewModule\\music\\" + mod.currentArea.AreaMusic + ".mp3"))
-                        {
-                            areaMusic.URL = this.mainDirectory + "\\default\\NewModule\\music\\" + mod.currentArea.AreaMusic + ".mp3";
-                        }
-                        else if (File.Exists(this.mainDirectory + "\\default\\NewModule\\music\\" + mod.currentArea.AreaMusic))
-                        {
-                            areaMusic.URL = this.mainDirectory + "\\default\\NewModule\\music\\" + mod.currentArea.AreaMusic;
-                        }
-                        else
-                        {
-                            areaMusic.URL = "";
-                        }
-                        if (areaMusic.URL != "")
-                        {
-                            areaMusic.controls.stop();
-                            areaMusic.controls.play();
-                        }
-                    }
-                    else
-                    {
-                        areaMusic.URL = "";
-                    }
+                    LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic);
+                    PlayAreaMusic();
                 }
             }
             catch (Exception ex)
             {
                 cc.addLogText("red", "Failed on startMusic(): " + ex.ToString());
                 errorLog(ex.ToString());
-            }*/        
+            }       
         }
         public void startAmbient()
         {
@@ -824,10 +761,9 @@ namespace IBx
                 errorLog(ex.ToString());
             }*/
         }
-#endregion
-        
 	    public void stopMusic()
 	    {
+            StopAreaMusic();
             //areaMusic.controls.pause();
 	    }
 	    public void stopAmbient()
@@ -873,8 +809,8 @@ namespace IBx
                 }
             } */           
 	    }
-
-        //Animation Timer Stuff
+       
+        //ANIMATION TIMER STUFF
         public void postDelayed(string type, int delay)
         {
             animationTimerOn = true;
@@ -906,6 +842,7 @@ namespace IBx
             }
         }        
 
+        //GAME LOOP
         public void gameTimer_Tick(SKCanvasView sk_canvas)
         {
             if (!stillProcessingGameLoop)
@@ -1213,13 +1150,6 @@ namespace IBx
             }
         }
         
-        /*public void DrawBitmapGDI(System.Drawing.Bitmap bitmap, IbRect source, IbRect target)
-        {
-            Rectangle tar = new Rectangle(target.Left, target.Top + oYshift, target.Width, target.Height);
-            Rectangle src = new Rectangle(source.Left, source.Top, source.Width, source.Height);
-            gCanvas.DrawImage(bitmap, tar, src, GraphicsUnit.Pixel);
-        }*/
-
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target)
         {
             DrawBitmap(bitmap, source, target, 0f, false, 1.0f, 0, 0, 1, 1);
@@ -1712,24 +1642,6 @@ namespace IBx
             return base.ProcessCmdKey(ref msg, keyData);
         }*/
 
-        //ON FORM CLOSING
-        /*private void GameView_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            DialogResult dlg = IBMessageBox.Show(this, "Are you sure you wish to exit?", enumMessageButton.YesNo);
-            if (dlg == DialogResult.Yes)
-            {
-                e.Cancel = false;
-            }
-            if (dlg == DialogResult.No)
-            {
-                e.Cancel = true;
-            }
-        }*/
-        /*private void GameView_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }*/
-
         //DIALOGS
         public Task<string> ListViewPage(List<string> list, string headerText)
         {
@@ -1824,6 +1736,7 @@ namespace IBx
             return tcs.Task;
         }
 
+        //PLATFORM SPECIFIC CALLS
         public void SaveText(string fullPath, string text)
         {
             DependencyService.Get<ISaveAndLoad>().SaveText(fullPath, text);
@@ -1855,8 +1768,7 @@ namespace IBx
         public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
         {
             return DependencyService.Get<ISaveAndLoad>().GetAllFilesWithExtensionFromBothFolders(assetFolderpath, userFolderpath, extension);
-        }
-        
+        }        
         public string GetModuleFileString(string modFilename)
         {
             return DependencyService.Get<ISaveAndLoad>().GetModuleFileString(modFilename);
@@ -1869,7 +1781,28 @@ namespace IBx
         {
             return DependencyService.Get<ISaveAndLoad>().GetAllModuleFiles();
         }
-        
+        public void CreateAreaMusicPlayer()
+        {
+            DependencyService.Get<ISaveAndLoad>().CreateAreaMusicPlayer();
+        }
+        public void LoadAreaMusicFile(string fileName)
+        {
+            DependencyService.Get<ISaveAndLoad>().LoadAreaMusicFile(fileName);
+        }
+        public void PlayAreaMusic()
+        {
+            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
+        }
+        public void StopAreaMusic()
+        {
+            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
+        }
+        public void PauseAreaMusic()
+        {
+            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
+        }
+
+        //ERROR REPORTING FILE
         public void errorLog(string text)
         {
             string filename = "\\IB2ErrorLog.txt";
