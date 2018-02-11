@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Xamarin.Forms;
 
@@ -350,42 +352,65 @@ namespace IBx.UWP
             return list;
         }
 
-        //Android.Media.MediaPlayer playerAreaMusic;
+        MediaPlayer playerAreaMusic;
         public void CreateAreaMusicPlayer()
         {
-            //playerAreaMusic = new Android.Media.MediaPlayer();
-            //playerAreaMusic.Looping = true;
-            //playerAreaMusic.SetVolume(0.5f, 0.5f);
+            playerAreaMusic = new MediaPlayer();
+            playerAreaMusic.IsLoopingEnabled = true;
+            playerAreaMusic.AutoPlay = false;
+            playerAreaMusic.Volume = 0.5;
         }
-        public void LoadAreaMusicFile(string fileName)
+        public void LoadAreaMusicFile(string fullPath)
         {
-            //playerAreaMusic.Reset();
-            //AssetFileDescriptor afd = Android.App.Application.Context.Assets.OpenFd(fileName);
-            //playerAreaMusic.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
+            string filename = Path.GetFileName(fullPath);
+            if (filename != "none")
+            {
+                //check in module folder first
+                StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                string convertedFullPath = storageFolder.Path + ConvertFullPath(fullPath, "\\");
+                string convertedFullPathUri = ConvertFullPath(fullPath, "/");
+                if (File.Exists(convertedFullPath))
+                {
+                    playerAreaMusic.Source = MediaSource.CreateFromUri(new Uri("ms-appdata:///local" + convertedFullPathUri));
+                }
+                else if (File.Exists(convertedFullPath + ".mp3"))
+                {
+                    playerAreaMusic.Source = MediaSource.CreateFromUri(new Uri("ms-appdata:///local" + convertedFullPathUri + ".mp3"));
+                }
+            }
+            if (playerAreaMusic != null)
+            {
+                //playerAreaMusic.Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/" + fileName));
+                //playerAreaMusic.MediaEnded += OnPlaybackEnded;
+            }
         }
+        
         public void PlayAreaMusic()
         {
-            /*
-            if (playerAreaMusic == null)
+            if (playerAreaMusic == null || playerAreaMusic.Source == null)
             {
                 return;
             }
-            if (playerAreaMusic.IsPlaying)
+
+            if (playerAreaMusic.PlaybackSession.PlaybackState == MediaPlaybackState.Playing)
             {
                 playerAreaMusic.Pause();
-                playerAreaMusic.SeekTo(0);
+                playerAreaMusic.PlaybackSession.Position = TimeSpan.FromSeconds(0);
+                playerAreaMusic.Play();
             }
-            playerAreaMusic.Start();
-            */
+            else
+            {
+                playerAreaMusic.Play();
+            }
         }
         public void StopAreaMusic()
         {
-            //playerAreaMusic.Pause();
-            //playerAreaMusic.SeekTo(0);
+            playerAreaMusic.Pause();
+            playerAreaMusic.PlaybackSession.Position = TimeSpan.FromSeconds(0);
         }
         public void PauseAreaMusic()
         {
-            //playerAreaMusic.Pause();
+            playerAreaMusic.Pause();
         }
     }
 }
