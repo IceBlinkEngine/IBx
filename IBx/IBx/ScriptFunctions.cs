@@ -10777,6 +10777,7 @@ namespace IBx
                                     int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                     gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
                                     pc.AddEffectByObject(thisSpellEffect, classLevel);
+                                    gv.cc.doEffectScript(pc, thisSpellEffect);
                                 }
                                 #endregion
                             }
