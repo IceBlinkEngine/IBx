@@ -41,7 +41,10 @@ namespace IBx
         public List<LocalImmunityString> traitWorksNeverWhen = new List<LocalImmunityString>();
 
         public bool usesTurnToActivate = true;
+        public bool onlyOncePerTurn = true;
+        public bool isSwiftAction = false;
         public int castTimeInTurns = 0;
+        public int coolDownTime = 0;
         public bool canBeInterrupted = true;
         public bool triggersAoO = true;
         public string spellToReplaceByTag = "none";
@@ -63,6 +66,9 @@ namespace IBx
             copy.triggersAoO = this.triggersAoO;
             copy.canBeInterrupted = this.canBeInterrupted;
             copy.usesTurnToActivate = this.usesTurnToActivate;
+            copy.onlyOncePerTurn = this.onlyOncePerTurn;
+            copy.isSwiftAction = this.isSwiftAction;
+            copy.coolDownTime = this.coolDownTime;
 		    copy.name = this.name;
 		    copy.tag = this.tag;
 		    copy.spellImage = this.spellImage;

@@ -735,9 +735,75 @@ namespace IBx
             // NOT CURRENTLY USED
             //U  "partyInventoryTagList": [], (use all save) update Items later on down
             gv.mod.partyInventoryRefsList.Clear();
+
+            gv.mod.addedItemsRefs.Clear();
+            foreach (string s in saveMod.addedItemsRefs)
+            {
+                gv.mod.addedItemsRefs.Add(s);
+            }
+
             foreach (ItemRefs s in saveMod.partyInventoryRefsList)
             {
-                gv.mod.partyInventoryRefsList.Add(s.DeepCopy());
+                bool allowAdding = true;
+
+                foreach (Player p in gv.mod.playerList)
+                {
+                    if (p.AmmoRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.BodyRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.FeetRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.GlovesRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.HeadRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.MainHandRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.NeckRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.OffHandRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.RingRefs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                    if (p.Ring2Refs.tag == s.tag)
+                    {
+                        allowAdding = false;
+                        break;
+                    }
+                }
+
+                    if (allowAdding)
+                    {
+                        gv.mod.partyInventoryRefsList.Add(s.DeepCopy());
+                    }
             }
             //U  "moduleShopsList": [], (have an original shop items tags list and the current tags list to see what to add or delete from the save tags list)
             this.updateShops(saveMod);
@@ -10068,7 +10134,7 @@ namespace IBx
 
                 if (!showFullInfo)
                 {
-                    if (lineCount < 11)
+                    if (lineCount < 10)
                     {
                         textToSpan += "Press INFO for item description " + "<BR>";
                     }

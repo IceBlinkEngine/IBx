@@ -141,15 +141,34 @@ namespace IBx
 		    gv.DrawText("--------------", locX, locY += spacing, "black");
 		    if (gv.mod.partyJournalQuests.Count > 0)
     	    {
-			    int cnt = 0;
-			    foreach (JournalQuest jq in gv.mod.partyJournalQuests)
-			    {
-                    if (journalScreenQuestIndex == cnt) { color = "lime"; }
-				    else { color = "black"; }	
-                    gv.DrawText(jq.Name, locX, locY += spacing, color);
-				    cnt++;
-			    }
-    	    }
+                int minQuestNumber = journalScreenQuestIndex - 3;
+                int maxQuestNumber = journalScreenQuestIndex + 3;
+                if (minQuestNumber < 0)
+                {
+                    maxQuestNumber -= minQuestNumber;
+                    if (maxQuestNumber > gv.mod.partyJournalQuests.Count -1)
+                    {
+                        maxQuestNumber = gv.mod.partyJournalQuests.Count - 1;
+                    }
+                    minQuestNumber = 0;
+                }
+                if (maxQuestNumber > gv.mod.partyJournalQuests.Count - 1)
+                {
+                    minQuestNumber -= (maxQuestNumber - (gv.mod.partyJournalQuests.Count - 1));
+                    if (minQuestNumber < 0)
+                    {
+                        minQuestNumber = 0;
+                    }
+                    maxQuestNumber = gv.mod.partyJournalQuests.Count - 1;
+                }
+
+                for (int i = minQuestNumber; i <= maxQuestNumber;i++)
+                {
+                    if (journalScreenQuestIndex == i) { color = "lime"; }
+                    else { color = "black"; }
+                    gv.DrawText(gv.mod.partyJournalQuests[i].Name, locX, locY += spacing, color);
+                }
+            }
 		
 		    //DRAW QUEST ENTRIES
 		    locY = tabStartY;
