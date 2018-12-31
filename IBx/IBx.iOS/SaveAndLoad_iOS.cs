@@ -9,12 +9,52 @@ using System.Reflection;
 using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
+using Google.Analytics;
+using Plugin.SimpleAudioPlayer;
 
 [assembly: Dependency(typeof(SaveAndLoad_iOS))]
 namespace IBx.iOS
 {
     public class SaveAndLoad_iOS : ISaveAndLoad
     {
+        public string TrackingId = "UA-60615839-12";
+        public ITracker Tracker;
+        const string AllowTrackingKey = "AllowTracking";
+        int numOfTrackerEventHitsInThisSession = 0;
+        public ISimpleAudioPlayer soundPlayer;
+        public ISimpleAudioPlayer areaMusicPlayer;
+        public ISimpleAudioPlayer areaAmbientSoundsPlayer;
+
+        #region Instantition...
+        private static SaveAndLoad_iOS thisRef;
+        public SaveAndLoad_iOS()
+        {
+            // no code req'd
+        }
+
+        public static SaveAndLoad_iOS GetGASInstance()
+        {
+            if (thisRef == null)
+                // it's ok, we can call this constructor
+                thisRef = new SaveAndLoad_iOS();
+            return thisRef;
+        }
+        #endregion
+
+        public bool AllowReadWriteExternal()
+        {
+            return true;
+        }
+
+        public void CreateUserFolders()
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var directoryname = Path.Combine(documents, "modules");
+            Directory.CreateDirectory(directoryname);
+            directoryname = Path.Combine(documents, "saves");
+            Directory.CreateDirectory(directoryname);
+        }
+
         public void SaveText(string filename, string text)
         {
             /*string path = CreatePathToFile(filename);
@@ -232,107 +272,256 @@ namespace IBx.iOS
 
             return list;
         }
-        public List<string> GetAllModuleFiles()
+        public List<string> GetAllModuleFiles(bool userOnly)
         {
             List<string> list = new List<string>();
 
-            //search in assets
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
-            foreach (var res in assembly.GetManifestResourceNames())
+            if (!userOnly)
             {
-                if (res.EndsWith(".mod"))
+                //search in assets
+                Assembly assembly = GetType().GetTypeInfo().Assembly;
+                foreach (var res in assembly.GetManifestResourceNames())
                 {
-                    list.Add(res);
+                    if ((res.EndsWith(".mod")) && (!res.EndsWith("NewModule.mod")))
+                    {
+                        list.Add(res);
+                    }
                 }
             }
 
             //search in personal folder
-            /*var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            Java.IO.File directory = new Java.IO.File(documentsPath + "/modules");
-            directory.Mkdirs();
-            foreach (Java.IO.File d in directory.ListFiles())
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string[] files = Directory.GetFiles(documents + "/modules", "*.mod", SearchOption.AllDirectories);
+            foreach (string file in files)
             {
-                if (d.IsDirectory)
+                if (Path.GetFileName(file) != "NewModule.mod")
                 {
-                    Java.IO.File modDirectory = new Java.IO.File(directory.Path + "/" + d.Name);
-                    foreach (Java.IO.File f in modDirectory.ListFiles())
-                    {
-                        try
-                        {
-                            if (f.Name.EndsWith(".mod"))
-                            {
-                                list.Add(f.Name);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
+                    list.Add(Path.GetFileName(file));
                 }
-            }*/
+            }
 
-            //search in external folder
-            /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/modules");
-            directory.Mkdirs();
-            //check to see if Lanterna2 exists, if not copy it over
-            foreach (Java.IO.File d in directory.ListFiles())
-            {
-                if (d.IsDirectory)
-                {
-                    Java.IO.File modDirectory = new Java.IO.File(directory.Path + "/" + d.Name);
-                    foreach (Java.IO.File f in modDirectory.ListFiles())
-                    {
-                        try
-                        {
-                            if (f.Name.EndsWith(".mod"))
-                            {
-                                list.Add(f.Name);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
-            }*/
             return list;
         }
 
-        //Android.Media.MediaPlayer playerAreaMusic;
-        public void CreateAreaMusicPlayer()
+        public void TrackAppEvent(string Category, string EventAction, string EventLabel)
         {
-            //playerAreaMusic = new Android.Media.MediaPlayer();
-            //playerAreaMusic.Looping = true;
-            //playerAreaMusic.SetVolume(0.5f, 0.5f);
-        }
-        public void LoadAreaMusicFile(string fileName)
-        {
-            //playerAreaMusic.Reset();
-            //AssetFileDescriptor afd = Android.App.Application.Context.Assets.OpenFd(fileName);
-            //playerAreaMusic.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
-        }
-        public void PlayAreaMusic()
-        {
-            /*
-            if (playerAreaMusic == null)
+            try
             {
+                if (numOfTrackerEventHitsInThisSession > 300)
+                {
+                    Gai.SharedInstance.DefaultTracker.Send(DictionaryBuilder.CreateScreenView().Build());
+                    Gai.SharedInstance.Dispatch(); // Manually dispatch the event immediately
+                    numOfTrackerEventHitsInThisSession = 0;
+                }
+                else
+                {
+                    numOfTrackerEventHitsInThisSession++;
+                }
+                Gai.SharedInstance.DefaultTracker.Send(DictionaryBuilder.CreateEvent("iOS_" + Category, "iOS_" + EventAction, "iOS_" + EventLabel, null).Build());
+                Gai.SharedInstance.Dispatch(); // Manually dispatch the event immediately
+            }
+            catch
+            {
+
+            }
+        }
+        public void InitializeNativeGAS()
+        {
+            try
+            {
+                var optionsDict = NSDictionary.FromObjectAndKey(new NSString("YES"), new NSString(AllowTrackingKey));
+                NSUserDefaults.StandardUserDefaults.RegisterDefaults(optionsDict);
+
+                Gai.SharedInstance.OptOut = !NSUserDefaults.StandardUserDefaults.BoolForKey(AllowTrackingKey);
+
+                Gai.SharedInstance.DispatchInterval = 10;
+                Gai.SharedInstance.TrackUncaughtExceptions = true;
+
+                Tracker = Gai.SharedInstance.GetTracker("TestApp", TrackingId);
+            }
+            catch
+            {
+
+            }
+        }
+
+        Stream GetStreamFromFile(GameView gv, string filename)
+        {
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            var stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.modules." + gv.mod.moduleName + "." + filename);
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.modules." + gv.mod.moduleName + "." + filename + ".wav");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.modules." + gv.mod.moduleName + "." + filename + ".mp3");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.sounds." + filename);
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.sounds." + filename + ".wav");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.sounds." + filename + ".mp3");
+            }
+            return stream;
+        }
+        public void PlaySound(GameView gv, string filenameNoExtension)
+        {
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
+            {
+                //play nothing
                 return;
             }
-            if (playerAreaMusic.IsPlaying)
+            else
             {
-                playerAreaMusic.Pause();
-                playerAreaMusic.SeekTo(0);
+                if (soundPlayer == null)
+                {
+                    soundPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                }
+                try
+                {
+                    soundPlayer.Loop = false;
+                    soundPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                    soundPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    if (gv.mod.debugMode) //SD_20131102
+                    {
+                        gv.cc.addLogText("<yl>failed to play sound" + filenameNoExtension + "</yl><BR>");
+                    }
+                }
             }
-            playerAreaMusic.Start();
-            */
+        }
+        public void PlayAreaMusic(GameView gv, string filenameNoExtension)
+        {
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
+            {
+                //play nothing
+                return;
+            }
+            else
+            {
+                if (areaMusicPlayer == null)
+                {
+                    areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                }
+                try
+                {
+                    areaMusicPlayer.Loop = true;
+                    areaMusicPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                    areaMusicPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    if (gv.mod.debugMode) //SD_20131102
+                    {
+                        gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                    }
+                }
+            }
+        }
+        public void PlayAreaAmbientSounds(GameView gv, string filenameNoExtension)
+        {
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
+            {
+                //play nothing
+                return;
+            }
+            else
+            {
+                if (areaAmbientSoundsPlayer == null)
+                {
+                    areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                }
+                try
+                {
+                    areaAmbientSoundsPlayer.Loop = true;
+                    areaAmbientSoundsPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                    areaAmbientSoundsPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    if (gv.mod.debugMode) //SD_20131102
+                    {
+                        gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                    }
+                }
+            }
+        }
+        public void RestartAreaMusicIfEnded(GameView gv)
+        {
+            //restart area music
+            if (areaMusicPlayer == null)
+            {
+                areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if ((!areaMusicPlayer.IsPlaying) && (gv.mod.playSoundFx))
+                {
+                    try
+                    {
+                        areaMusicPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            //restart area ambient sounds
+            if (areaAmbientSoundsPlayer == null)
+            {
+                areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if ((!areaAmbientSoundsPlayer.IsPlaying) && (gv.mod.playSoundFx))
+                {
+                    try
+                    {
+                        areaAmbientSoundsPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         public void StopAreaMusic()
         {
-            //playerAreaMusic.Pause();
-            //playerAreaMusic.SeekTo(0);
+            if (areaMusicPlayer == null)
+            {
+                areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if (areaMusicPlayer.IsPlaying)
+                {
+                    areaMusicPlayer.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         public void PauseAreaMusic()
         {

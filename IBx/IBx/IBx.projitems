@@ -1032,9 +1032,9 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\ibscript\winter.ibs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Assets\modules\" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\data\MessagePartyRoster.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\data\MessagePartyRoster.txt" />
+    <Folder Include="$(MSBuildThisFileDirectory)Assets\modules\" />
   </ItemGroup>
 </Project>

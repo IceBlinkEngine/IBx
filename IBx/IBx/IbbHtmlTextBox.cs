@@ -55,7 +55,7 @@ namespace IBx
             {
                 fontH = gv.drawFontRegHeight;
             }
-            if ((y > -2) && (y <= tbHeight - fontH))
+            if ((y > -10) && (y <= tbHeight - fontH))
             {
                 gv.DrawText(text, x + tbXloc, y + tbYloc, fontHeight, fontColor, style, opacity, isUnderlined);
             }

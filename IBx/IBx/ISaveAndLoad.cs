@@ -15,6 +15,9 @@ namespace IBx
     /// </summary>
     public interface ISaveAndLoad
     {
+        bool AllowReadWriteExternal();
+        void CreateUserFolders();
+
         void SaveText(string fullPath, string text);
 
         string LoadStringFromUserFolder(string fullPath);
@@ -29,13 +32,15 @@ namespace IBx
         List<string> GetAllFilesWithExtensionFromUserFolder(string folderpath, string extension);
         List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension);
         List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension);
-        List<string> GetAllModuleFiles();
+        List<string> GetAllModuleFiles(bool userOnly);
 
-        void CreateAreaMusicPlayer();
-        void LoadAreaMusicFile(string fileName);
-        void PlayAreaMusic();
+        void TrackAppEvent(string Category, string EventAction, string EventLabel);
+
+        void RestartAreaMusicIfEnded(GameView gv);
+        void PlaySound(GameView gv, string fileName);
+        void PlayAreaMusic(GameView gv, string fileName);
+        void PlayAreaAmbientSounds(GameView gv, string fileName);
         void StopAreaMusic();
         void PauseAreaMusic();
-        
     }
 }

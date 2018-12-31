@@ -60,7 +60,7 @@ namespace IBx
             moduleList.Clear();
             titleList.Clear();
 
-            List<string> modList = gv.GetAllModuleFiles();
+            List<string> modList = gv.GetAllModuleFiles(true);
             foreach (string file in modList)
             {
                 string s = gv.GetModuleFileString(file);

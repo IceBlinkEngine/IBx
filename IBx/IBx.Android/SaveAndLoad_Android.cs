@@ -1,6 +1,11 @@
-﻿using Android.Content.Res;
+﻿using Android;
+using Android.Content.Res;
+using Android.Content;
+using Android.Content.PM;
+using Android.Gms.Analytics;
 using IBx.Droid;
 using Newtonsoft.Json;
+using Plugin.SimpleAudioPlayer;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -15,11 +20,90 @@ namespace IBx.Droid
 {
     public class SaveAndLoad_Android : ISaveAndLoad
     {
+        public string TrackingId = "UA-60615839-12";
+        private static GoogleAnalytics GAInstance;
+        private static Tracker GATracker;
+        public Context thisContext;
+        int numOfTrackerEventHitsInThisSession = 0;
+        public ISimpleAudioPlayer soundPlayer;
+        public ISimpleAudioPlayer areaMusicPlayer;
+        public ISimpleAudioPlayer areaAmbientSoundsPlayer;
+
+        #region Instantiation ...
+        private static SaveAndLoad_Android thisRef;
+        public SaveAndLoad_Android()
+        {
+            // no code req'd
+        }
+
+        public static SaveAndLoad_Android GetGASInstance()
+        {
+            if (thisRef == null)
+                // it's ok, we can call this constructor
+                thisRef = new SaveAndLoad_Android();
+            return thisRef;
+        }
+        #endregion
+
+        public void Initialize_NativeGAS(Context AppContext = null)
+        {
+            thisContext = AppContext;
+            GAInstance = GoogleAnalytics.GetInstance(AppContext.ApplicationContext);
+            GAInstance.SetLocalDispatchPeriod(10);
+
+            GATracker = GAInstance.NewTracker(TrackingId);
+            GATracker.EnableExceptionReporting(true);
+            GATracker.EnableAdvertisingIdCollection(true);
+        }
+
         public string ConvertFullPath(string fullPath, string replaceWith)
         {
             string convertedFullPath = "";
             convertedFullPath = fullPath.Replace("\\", replaceWith);
             return convertedFullPath;
+        }
+
+        public bool AllowReadWriteExternal()
+        {
+            if (Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.M)
+            {
+                return true;
+            }
+            if (Android.App.Application.Context.CheckSelfPermission(Manifest.Permission.WriteExternalStorage) == (int)Permission.Granted)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void CreateUserFolders()
+        {            
+            if (AllowReadWriteExternal())
+            {
+                Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
+                string convertedFullPath = sdCard.AbsolutePath + "/IBx/modules";
+                string path = ConvertFullPath(convertedFullPath, "\\");
+                Directory.CreateDirectory(path);
+                convertedFullPath = sdCard.AbsolutePath + "/IBx/saves";
+                path = ConvertFullPath(convertedFullPath, "\\");
+                Directory.CreateDirectory(path);
+                convertedFullPath = sdCard.AbsolutePath + "/IBx/user";
+                path = ConvertFullPath(convertedFullPath, "\\");
+                Directory.CreateDirectory(path);
+                convertedFullPath = sdCard.AbsolutePath + "/IBx/module_backups";
+                path = ConvertFullPath(convertedFullPath, "\\");
+                Directory.CreateDirectory(path);
+            }
+            else
+            {
+                var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string convertedFullPath = documents + "/IBx/saves";
+                string path = ConvertFullPath(convertedFullPath, "\\");
+                Directory.CreateDirectory(path);
+            }
         }
 
         public void SaveText(string fullPath, string text)
@@ -354,68 +438,52 @@ namespace IBx.Droid
             }
             return list;
         }
-        public List<string> GetAllModuleFiles()
+        public List<string> GetAllModuleFiles(bool userOnly)
         {
             List<string> list = new List<string>();
 
             //search in assets
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
-            foreach (var res in assembly.GetManifestResourceNames())
+            if (!userOnly)
             {
-                if (res.EndsWith(".mod"))
+                Assembly assembly = GetType().GetTypeInfo().Assembly;
+                foreach (var res in assembly.GetManifestResourceNames())
                 {
-                    list.Add(res);
-                }
-            }
-
-            //search in personal folder
-            var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            Java.IO.File directory = new Java.IO.File(documentsPath + "/modules");
-            directory.Mkdirs();
-            foreach (Java.IO.File d in directory.ListFiles())
-            {
-                if (d.IsDirectory)
-                {
-                    Java.IO.File modDirectory = new Java.IO.File(directory.Path + "/" + d.Name);
-                    foreach (Java.IO.File f in modDirectory.ListFiles())
+                    if ((res.EndsWith(".mod")) && (!res.EndsWith("NewModule.mod")))
                     {
-                        try
-                        {
-                            if (f.Name.EndsWith(".mod"))
-                            {
-                                list.Add(f.Name);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
+                        list.Add(res);
                     }
                 }
-
             }
+                        
             //search in external folder
-            Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            directory = new Java.IO.File(sdCard.AbsolutePath + "/IBx/modules");
-            directory.Mkdirs();
-            //check to see if Lanterna2 exists, if not copy it over
-            foreach (Java.IO.File d in directory.ListFiles())
+            string root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (AllowReadWriteExternal())
             {
-                if (d.IsDirectory)
+                Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
+                root = sdCard.AbsolutePath;
+            }
+            //Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
+            Java.IO.File directory = new Java.IO.File(root + "/IBx/modules");
+            if (directory.Exists())
+            {
+                foreach (Java.IO.File d in directory.ListFiles())
                 {
-                    Java.IO.File modDirectory = new Java.IO.File(directory.Path + "/" + d.Name);
-                    foreach (Java.IO.File f in modDirectory.ListFiles())
+                    if (d.IsDirectory)
                     {
-                        try
+                        Java.IO.File modDirectory = new Java.IO.File(directory.Path + "/" + d.Name);
+                        foreach (Java.IO.File f in modDirectory.ListFiles())
                         {
-                            if (f.Name.EndsWith(".mod"))
+                            try
                             {
-                                list.Add(f.Name);
+                                if (f.Name.EndsWith(".mod"))
+                                {
+                                    list.Add(f.Name);
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
+                            catch (Exception ex)
+                            {
 
+                            }
                         }
                     }
                 }
@@ -423,6 +491,29 @@ namespace IBx.Droid
 
             return list;
         }
+
+        public void TrackAppEvent(string Category, string EventAction, string EventLabel)
+        {
+            try
+            {
+                if (numOfTrackerEventHitsInThisSession > 300)
+                {
+                    GATracker.Send(new HitBuilders.EventBuilder().SetNewSession().Build());
+                    numOfTrackerEventHitsInThisSession = 0;
+                }
+                else
+                {
+                    numOfTrackerEventHitsInThisSession++;
+                }
+                HitBuilders.EventBuilder builder = new HitBuilders.EventBuilder();
+                builder.SetCategory("An_" + Category);
+                builder.SetAction("An_" + EventAction);
+                builder.SetLabel("An_" + EventLabel);
+                GATracker.Send(builder.Build());
+            }
+            catch { }
+        }
+
 
         string CreatePathToFile(string filename)
         {
@@ -436,54 +527,188 @@ namespace IBx.Droid
             filename = parts[parts.Count - 2] + "." + parts[parts.Count - 1];
             return filename;
         }
-                
-        Android.Media.MediaPlayer playerAreaMusic;                        
-        public void CreateAreaMusicPlayer()
+
+        Stream GetStreamFromFile(GameView gv, string filename)
         {
-            playerAreaMusic = new Android.Media.MediaPlayer();
-            playerAreaMusic.Looping = true;
-            playerAreaMusic.SetVolume(0.5f, 0.5f);
-        }        
-        public void LoadAreaMusicFile(string fullPath)
-        {
-            playerAreaMusic.Reset();
-            string filename = Path.GetFileNameWithoutExtension(fullPath);                                           
-            if (filename != "none")
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            var stream = assembly.GetManifestResourceStream("Raventhal.iOS.Assets.modules." + gv.mod.moduleName + "." + filename);
+            if (stream == null)
             {
-                //check in module folder first
-                Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-                //string filePath = sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/");
-                if (File.Exists(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/")))
-                {
-                    playerAreaMusic.SetDataSource(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/"));
-                }
-                else if (File.Exists(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/") + ".mp3"))
-                {
-                    playerAreaMusic.SetDataSource(sdCard.AbsolutePath + "/IBx" + ConvertFullPath(fullPath, "/") + ".mp3");
-                }
+                stream = assembly.GetManifestResourceStream("Raventhal.iOS.Assets.modules." + gv.mod.moduleName + "." + filename + ".wav");
             }
-        }                
-        public void PlayAreaMusic()
-        {
-            if (playerAreaMusic == null)
+            if (stream == null)
             {
+                stream = assembly.GetManifestResourceStream("Raventhal.iOS.Assets.modules." + gv.mod.moduleName + "." + filename + ".mp3");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("Raventhal.iOS.Assets.sounds." + filename);
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("Raventhal.iOS.Assets.sounds." + filename + ".wav");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("Raventhal.iOS.Assets.sounds." + filename + ".mp3");
+            }
+            return stream;
+        }
+        public void PlaySound(GameView gv, string filenameNoExtension)
+        {
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
+            {
+                //play nothing
                 return;
             }
-            if (playerAreaMusic.IsPlaying)
+            else
             {
-                playerAreaMusic.Pause();
-                playerAreaMusic.SeekTo(0);
+                if (soundPlayer == null)
+                {
+                    soundPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                }
+                try
+                {
+                    soundPlayer.Loop = false;
+                    soundPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                    soundPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    if (gv.mod.debugMode) //SD_20131102
+                    {
+                        gv.cc.addLogText("<yl>failed to play sound" + filenameNoExtension + "</yl><BR>");
+                    }
+                }
             }
-            playerAreaMusic.Start();
+        }
+        public void PlayAreaMusic(GameView gv, string filenameNoExtension)
+        {
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
+            {
+                //play nothing
+                return;
+            }
+            else
+            {
+                if (areaMusicPlayer == null)
+                {
+                    areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                }
+                try
+                {
+                    areaMusicPlayer.Loop = true;
+                    areaMusicPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                    areaMusicPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    if (gv.mod.debugMode) //SD_20131102
+                    {
+                        gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                    }
+                }
+            }
+        }
+        public void PlayAreaAmbientSounds(GameView gv, string filenameNoExtension)
+        {
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
+            {
+                //play nothing
+                return;
+            }
+            else
+            {
+                if (areaAmbientSoundsPlayer == null)
+                {
+                    areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                }
+                try
+                {
+                    areaAmbientSoundsPlayer.Loop = true;
+                    areaAmbientSoundsPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                    areaAmbientSoundsPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    if (gv.mod.debugMode) //SD_20131102
+                    {
+                        gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                    }
+                }
+            }
+        }
+        public void RestartAreaMusicIfEnded(GameView gv)
+        {
+            //restart area music
+            if (areaMusicPlayer == null)
+            {
+                areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if ((!areaMusicPlayer.IsPlaying) && (gv.mod.playSoundFx))
+                {
+                    try
+                    {
+                        areaMusicPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            //restart area ambient sounds
+            if (areaAmbientSoundsPlayer == null)
+            {
+                areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if ((!areaAmbientSoundsPlayer.IsPlaying) && (gv.mod.playSoundFx))
+                {
+                    try
+                    {
+                        areaAmbientSoundsPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         public void StopAreaMusic()
         {
-            playerAreaMusic.Pause();
-            playerAreaMusic.SeekTo(0);
+            if (areaMusicPlayer == null)
+            {
+                areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if (areaMusicPlayer.IsPlaying)
+                {
+                    areaMusicPlayer.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         public void PauseAreaMusic()
         {
-            playerAreaMusic.Pause();
-        }        
+            //playerAreaMusic.Pause();
+        }
     }
 }

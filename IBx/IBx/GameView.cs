@@ -147,6 +147,7 @@ namespace IBx
             
             //this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.GameView_MouseWheel);
             mainDirectory = Directory.GetCurrentDirectory();
+            CreateUserFolders();
 
             try
             {
@@ -483,12 +484,12 @@ namespace IBx
             //using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream(assetName))
             //using (var managedStream = new SKManagedStream(stream, true))
             //using (var tf = SKTypeface.FromStream(managedStream))
-            using (var tf = SKTypeface.FromFamilyName("Arial"))
-            {
+            //using (var tf = SKTypeface.FromFamilyName("Arial"))
+            //{
                 textPaint.Color = SKColors.White;
                 textPaint.TextSize = 60;
-                textPaint.Typeface = tf;
-            }
+                textPaint.Typeface = SKTypeface.FromFamilyName("Arial");
+            //}
             drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.5);
             drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.333);
             drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.25);
@@ -545,12 +546,12 @@ namespace IBx
             {
                 if (currentMainMusic.Equals(mod.currentArea.AreaMusic))
                 {
-                    PlayAreaMusic();
+                    PlayAreaMusic(mod.currentArea.AreaMusic);
                 }
                 else
                 {
                     LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic);
-                    PlayAreaMusic();
+                    PlayAreaMusic(mod.currentArea.AreaMusic);
                 }
             }
             catch (Exception ex)
@@ -784,9 +785,9 @@ namespace IBx
                 oSoundStreams.Add(Path.GetFileNameWithoutExtension(f), File.OpenRead(Path.GetFullPath(f)));
             }*/
 	    }
-	    public void PlaySound(string filenameNoExtension)
+	    /*public void PlaySound(string filenameNoExtension)
 	    {            
-            /*if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!mod.playSoundFx))
+            if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!mod.playSoundFx))
             {
                 //play nothing
                 return;
@@ -807,8 +808,8 @@ namespace IBx
                     }
                     initializeSounds();
                 }
-            } */           
-	    }
+            }            
+	    }*/
        
         //ANIMATION TIMER STUFF
         public void postDelayed(string type, int delay)
@@ -955,6 +956,10 @@ namespace IBx
                 textPaint.TextSize = drawFontRegHeight;
             }
 
+            if (textPaint.Typeface == null)
+            {
+                textPaint.Typeface = SKTypeface.FromFamilyName("Arial");
+            }
             //Font Style (bold, bolditalic, italic, normal)
             if (style.Equals("bold"))
             {
@@ -1035,6 +1040,10 @@ namespace IBx
         }
         public float MeasureString(string text, string size, string style)
         {
+            if (text.Equals(""))
+            {
+                return 0f;
+            }
             // Measure string width.
             //Font size  (small, regular, large)          
             if (size.Equals("small"))
@@ -1050,6 +1059,10 @@ namespace IBx
                 textPaint.TextSize = drawFontRegHeight;
             }
 
+            if (textPaint.Typeface == null)
+            {
+                textPaint.Typeface = SKTypeface.FromFamilyName("Arial");
+            }
             //Font Style (bold, bolditalic, italic, normal)
             if (style.Equals("bold"))
             {
@@ -1072,42 +1085,56 @@ namespace IBx
         }
         public CoordinateF MeasureStringSize(string text, string size, string style)
         {
-            
+            if (text.Equals(""))
+            {
+                return new CoordinateF(0, 0);
+            }
             // Measure string width.
-            //Font size  (small, regular, large)          
-            if (size.Equals("small"))
+            //Font size  (small, regular, large)   
+            try
             {
-                textPaint.TextSize = drawFontSmallHeight;
-            }
-            else if (size.Equals("large"))
-            {
-                textPaint.TextSize = drawFontLargeHeight;
-            }
-            else
-            {
-                textPaint.TextSize = drawFontRegHeight;
-            }
+                if (size.Equals("small"))
+                {
+                    textPaint.TextSize = drawFontSmallHeight;
+                }
+                else if (size.Equals("large"))
+                {
+                    textPaint.TextSize = drawFontLargeHeight;
+                }
+                else
+                {
+                    textPaint.TextSize = drawFontRegHeight;
+                }
 
-            //Font Style (bold, bolditalic, italic, normal)
-            if (style.Equals("bold"))
-            {
-                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Bold);
+                if (textPaint.Typeface == null)
+                {
+                    textPaint.Typeface = SKTypeface.FromFamilyName("Arial");
+                }
+                //Font Style (bold, bolditalic, italic, normal)
+                if (style.Equals("bold"))
+                {
+                    textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Bold);
+                }
+                else if (style.Equals("italic"))
+                {
+                    textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Italic);
+                }
+                else if (style.Equals("bolditalic"))
+                {
+                    textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.BoldItalic);
+                }
+                else
+                {
+                    textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Normal);
+                }
+                textPaint.MeasureText(text, ref textBounds);
+                CoordinateF returnSize = new CoordinateF(textBounds.Width, textBounds.Height);
+                return returnSize;
             }
-            else if (style.Equals("italic"))
+            catch
             {
-                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Italic);
+                return new CoordinateF(0, 0);
             }
-            else if (style.Equals("bolditalic"))
-            {
-                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.BoldItalic);
-            }
-            else
-            {
-                textPaint.Typeface = SKTypeface.FromTypeface(textPaint.Typeface, SKTypefaceStyle.Normal);
-            }
-            textPaint.MeasureText(text, ref textBounds);
-            CoordinateF returnSize = new CoordinateF(textBounds.Width, textBounds.Height);
-            return returnSize;
             
         }
 
@@ -1737,6 +1764,10 @@ namespace IBx
         }
 
         //PLATFORM SPECIFIC CALLS
+        public void CreateUserFolders() //called at start-up
+        {
+            DependencyService.Get<ISaveAndLoad>().CreateUserFolders();
+        }
         public void SaveText(string fullPath, string text)
         {
             DependencyService.Get<ISaveAndLoad>().SaveText(fullPath, text);
@@ -1777,29 +1808,42 @@ namespace IBx
         {
             return DependencyService.Get<ISaveAndLoad>().LoadBitmap(filename, mdl);
         }
-        public List<string> GetAllModuleFiles()
+        public List<string> GetAllModuleFiles(bool userOnly)
         {
-            return DependencyService.Get<ISaveAndLoad>().GetAllModuleFiles();
+            return DependencyService.Get<ISaveAndLoad>().GetAllModuleFiles(userOnly);
+        }
+
+        public void RestartAreaMusicIfEnded()
+        {
+            DependencyService.Get<ISaveAndLoad>().RestartAreaMusicIfEnded(this);
+        }
+        public void PlaySound(string filenameNoExtension)
+        {
+            DependencyService.Get<ISaveAndLoad>().PlaySound(this, filenameNoExtension);
         }
         public void CreateAreaMusicPlayer()
         {
-            DependencyService.Get<ISaveAndLoad>().CreateAreaMusicPlayer();
+            //DependencyService.Get<ISaveAndLoad>().CreateAreaMusicPlayer();
         }
         public void LoadAreaMusicFile(string fileName)
         {
-            DependencyService.Get<ISaveAndLoad>().LoadAreaMusicFile(fileName);
+            //DependencyService.Get<ISaveAndLoad>().LoadAreaMusicFile(fileName);
         }
-        public void PlayAreaMusic()
+        public void PlayAreaMusic(string filenameNoExtension)
         {
-            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
+            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic(this, filenameNoExtension);
+        }
+        public void PlayAreaAmbientSounds(string filenameNoExtension)
+        {
+            DependencyService.Get<ISaveAndLoad>().PlayAreaAmbientSounds(this, filenameNoExtension);
         }
         public void StopAreaMusic()
         {
-            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
+            DependencyService.Get<ISaveAndLoad>().StopAreaMusic();
         }
         public void PauseAreaMusic()
         {
-            DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
+            //DependencyService.Get<ISaveAndLoad>().PlayAreaMusic();
         }
 
         //ERROR REPORTING FILE

@@ -11,6 +11,7 @@ namespace IBx
 	{
         static public int ScreenWidth;
         static public int ScreenHeight;
+        static public string fixedModule = "";
 
         public App ()
 		{

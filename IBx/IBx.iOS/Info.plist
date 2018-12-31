@@ -9,25 +9,28 @@
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>MinimumOSVersion</key>
-	<string>11.2</string>
+	<string>10.3</string>
 	<key>CFBundleDisplayName</key>
-	<string>IBx</string>
+	<string>IceBlinkEngine</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.yourcompany.IBx</string>
+	<string>com.iceblinkengine.ibb.ibx</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>1</string>
 	<key>CFBundleIconFiles</key>
 	<array>
 		<string>Icon-60@2x</string>
@@ -50,5 +53,7 @@
 	<string>LaunchScreen</string>
 	<key>CFBundleName</key>
 	<string>IBx</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.01</string>
 </dict>
 </plist>
