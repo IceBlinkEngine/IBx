@@ -362,6 +362,9 @@ namespace IBx
 	    {
 		    //mod = new Module();
 		    mod = cc.LoadModule(mod.moduleName + ".mod");
+            log.tagStack.Clear();
+            log.logLinesList.Clear();
+            log.currentTopLineIndex = 0;
             if (mod.useSmoothMovement == true)
             {
                 //16 milliseconds a tick, equals - theoretically - about 60 FPS

@@ -23,6 +23,7 @@ namespace IBx
         public IB2UILayout combatUiLayout = null;
         public bool showHP = false;
         public bool showSP = false;
+        public bool showMoveKeys = false;
         public bool showMoveOrder = false;
         public bool showIniBar = true;
         public bool showArrows = true;
@@ -225,6 +226,11 @@ namespace IBx
                 {
                     showSP = tgl2.toggleOn;
                 }
+                IB2ToggleButton tgl3 = combatUiLayout.GetToggleByTag("tglMoveKeys");
+                if (tgl3 != null)
+                {
+                    showMoveKeys = tgl3.toggleOn;
+                }
                 foreach (IB2Panel pnlC in combatUiLayout.panelList)
                 {
                     if (pnlC.tag.Equals("logPanel"))
@@ -347,6 +353,9 @@ namespace IBx
             {
                 //TODO gv.cc.LoadTileBitmapList();
             }
+            //swipe the old creature list of current encounter
+            gv.mod.currentEncounter.encounterCreatureList.Clear();
+
             //Load up all creature stuff
             foreach (CreatureRefs crf in gv.mod.currentEncounter.encounterCreatureRefsList)
             {
@@ -1670,7 +1679,7 @@ namespace IBx
         public void startPcTurn()
         {
             gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Clear();
-            gv.mod.swiftActionHasBeenUSedThisTurn = false;
+            gv.mod.swiftActionHasBeenUsedThisTurn = false;
 
             CalculateUpperLeft();
             //karl
@@ -8744,7 +8753,7 @@ namespace IBx
         #region Keyboard Input
         public void onKeyUp()
         {
-            /*TODO if (keyData == Keys.M)
+            /*TODO if (keyData == Keys.M || keyData == Keys.Q)
             {
                 if (canMove)
                 {
@@ -8760,7 +8769,41 @@ namespace IBx
                     }
                 }
             }
-            else if (keyData == Keys.A)
+            else if (keyData == Keys.R)
+            {
+                //scroll log up
+                //do same for combat screen
+                //wheel
+                //int numberOfTextLinesToMove = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
+                int numberOfTextLinesToMove = 1;
+                gv.mod.logFadeCounter = 120;
+                gv.mod.logOpacity = 1f;
+
+                if (numberOfTextLinesToMove != 0)
+                {
+                    gv.log.SetCurrentTopLineIndex(-numberOfTextLinesToMove);
+                    //gv.Invalidate();
+                    gv.Render(0);
+                }
+            }
+            else if (keyData == Keys.F)
+            {
+                //scroll log up
+                //do same for combat screen
+                //wheel
+                //int numberOfTextLinesToMove = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
+                int numberOfTextLinesToMove = 1;
+                gv.mod.logFadeCounter = 120;
+                gv.mod.logOpacity = 1f;
+
+                if (numberOfTextLinesToMove != 0)
+                {
+                    gv.log.SetCurrentTopLineIndex(+numberOfTextLinesToMove);
+                    //gv.Invalidate();
+                    gv.Render(0);
+                }
+            }
+            else if (keyData == Keys.E)
             {
                 if (isPlayerTurn)
                 {
@@ -8809,7 +8852,7 @@ namespace IBx
                     gv.screenInventory.resetInventory(true);
                 }
             }
-            else if (keyData == Keys.S)
+            else if (keyData == Keys.Space)
             {
                 if (isPlayerTurn)
                 {
@@ -8933,7 +8976,7 @@ namespace IBx
             }
 
             #region Move Map
-            if (keyData == Keys.Up)
+            if (keyData == Keys.Up && !showMoveKeys)
             {
                 if (gv.mod.useManualCombatCam)
                 {
@@ -8952,7 +8995,7 @@ namespace IBx
                     return;
                 }
             }
-            else if (keyData == Keys.Left)
+            else if (keyData == Keys.Left && !showMoveKeys)
             {
                 if (gv.mod.useManualCombatCam)
                 {
@@ -8971,7 +9014,7 @@ namespace IBx
                     return;
                 }
             }
-            else if (keyData == Keys.Down)
+            else if (keyData == Keys.Down && !showMoveKeys)
             {
                 if (gv.mod.useManualCombatCam)
                 {
@@ -8990,7 +9033,83 @@ namespace IBx
                     return;
                 }
             }
-            else if (keyData == Keys.Right)
+            else if (keyData == Keys.Right && !showMoveKeys)
+            {
+                if (gv.mod.useManualCombatCam)
+                {
+                    if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
+                    {
+                        UpperLeftSquare.X++;
+                    }
+                    return;
+                }
+                else
+                {
+                    if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - gv.playerOffsetX - 1)
+                    {
+                        UpperLeftSquare.X++;
+                    }
+                    return;
+                }
+            }
+            if (keyData == Keys.W && showMoveKeys)
+            {
+                if (gv.mod.useManualCombatCam)
+                {
+                    if (UpperLeftSquare.Y > -gv.playerOffsetY)
+                    {
+                        UpperLeftSquare.Y--;
+                    }
+                    return;
+                }
+                else
+                {
+                    if (UpperLeftSquare.Y > 0)
+                    {
+                        UpperLeftSquare.Y--;
+                    }
+                    return;
+                }
+            }
+            else if (keyData == Keys.A && showMoveKeys)
+            {
+                if (gv.mod.useManualCombatCam)
+                {
+                    if (UpperLeftSquare.X > -gv.playerOffsetX)
+                    {
+                        UpperLeftSquare.X--;
+                    }
+                    return;
+                }
+                else
+                {
+                    if (UpperLeftSquare.X > 0)
+                    {
+                        UpperLeftSquare.X--;
+                    }
+                    return;
+                }
+            }
+            else if (keyData == Keys.S && showMoveKeys)
+            {
+                if (gv.mod.useManualCombatCam)
+                {
+                    if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
+                    {
+                        UpperLeftSquare.Y++;
+                    }
+                    return;
+                }
+                else
+                {
+                    if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - gv.playerOffsetY - 1)
+                    {
+                        UpperLeftSquare.Y++;
+                    }
+                    return;
+                }
+            }
+            else if (keyData == Keys.D && showMoveKeys)
             {
                 if (gv.mod.useManualCombatCam)
                 {
@@ -9019,7 +9138,7 @@ namespace IBx
                     continueTurn = false;
                     MoveUpLeft(pc);
                 }
-                else if (keyData == Keys.NumPad8)
+                else if ( (keyData == Keys.NumPad8) || (keyData == Keys.Up && showMoveKeys) || (keyData == Keys.W && !showMoveKeys) )
                 {
                     continueTurn = false;
                     MoveUp(pc);
@@ -9029,7 +9148,7 @@ namespace IBx
                     continueTurn = false;
                     MoveUpRight(pc);
                 }
-                else if (keyData == Keys.NumPad4)
+                else if ((keyData == Keys.NumPad4) || (keyData == Keys.Left && showMoveKeys) || (keyData == Keys.A && !showMoveKeys))
                 {
                     continueTurn = false;
                     MoveLeft(pc);
@@ -9038,7 +9157,7 @@ namespace IBx
                 {
                     CenterScreenOnPC();
                 }
-                else if (keyData == Keys.NumPad6)
+                else if ( (keyData == Keys.NumPad6) || (keyData == Keys.Right && showMoveKeys) || (keyData == Keys.D && !showMoveKeys) )
                 {
                     continueTurn = false;
                     MoveRight(pc);
@@ -9048,7 +9167,7 @@ namespace IBx
                     continueTurn = false;
                     MoveDownLeft(pc);
                 }
-                else if (keyData == Keys.NumPad2)
+                else if ( (keyData == Keys.NumPad2) || (keyData == Keys.Down && showMoveKeys) || (keyData == Keys.S && !showMoveKeys) )
                 {
                     continueTurn = false;
                     MoveDown(pc);
@@ -9260,6 +9379,13 @@ namespace IBx
                         if (tgl == null) { return; }
                         tgl.toggleOn = !tgl.toggleOn;
                         showSP = !showSP;
+                    }
+                    if (rtn.Equals("tglMoveKeys"))
+                    {
+                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                        if (tgl == null) { return; }
+                        tgl.toggleOn = !tgl.toggleOn;
+                        showMoveKeys = !showMoveKeys;
                     }
                     if (rtn.Equals("tglMoveOrder"))
                     {
@@ -12668,6 +12794,20 @@ namespace IBx
                 launchProjectile(filename, startX, startY, endX, endY, newGroup);
                 //gv.PlaySound(gv.cc.currentSelectedSpell.spellEndSound);
                 object target = getCastTarget(pc);
+                //papagei
+                if (gv.cc.currentSelectedSpell.onlyOncePerTurn)
+                {
+                    gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Add(gv.cc.currentSelectedSpell.tag);
+                }
+                if (gv.cc.currentSelectedSpell.isSwiftAction)
+                {
+                    gv.mod.swiftActionHasBeenUsedThisTurn = true;
+                }
+                if (gv.cc.currentSelectedSpell.coolDownTime > 0)
+                {
+                    pc.coolingSpellsByTag.Add(gv.cc.currentSelectedSpell.tag);
+                    pc.coolDownTimes.Add(gv.cc.currentSelectedSpell.coolDownTime);
+                }
                 gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, false, false);
                 //add ending projectile animation
                 newGroup = new AnimationStackGroup();

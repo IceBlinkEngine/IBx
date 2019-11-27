@@ -11,6 +11,9 @@ namespace IBx
 {
     public class Module
     {
+        public bool activeSearchDoneThisMove = false;
+        public bool activeSearchSPCostPaidByByLeaderOnly = true;
+        public int activeSearchSPCost = 1;
 
         public List<string> addedItemsRefs = new List<string>();
 
@@ -64,7 +67,9 @@ namespace IBx
         public float sandStormDirectionX = 1f;
         public float sandStormDirectionY = 1f;
         public string sandStormBlowingTo = "";
-      
+
+        public bool breakActiveSearch = false;
+
         public string moduleName = "none";
         public string moduleLabelName = "none";
         public int moduleVersion = 1;
@@ -73,7 +78,9 @@ namespace IBx
         public string defaultPlayerFilename = "drin.json";
         public bool mustUsePreMadePC = false;
         public int numberOfPlayerMadePcsAllowed = 1;
+        public int numberOfPlayerMadePcsRequired = 1;
         public int MaxPartySize = 6;
+        public int requiredPartySize = 0;
         public string moduleDescription = "";
         public string moduleCredits = "";
         public int nextIdNumber = 100;
@@ -103,8 +110,15 @@ namespace IBx
         public bool calledByRealTimeTimer = false;
         public int numberOfRationsRemaining = 0;
         public int maxNumberOfRationsAllowed = 7;
+        public bool hungerIsLethal = true;
+        public float maxHPandSPPercentageLostOnHunger = 20;
+        public bool showRestMessagesInLog = true;
+        public bool showRestMessagesInBox = true;
+        public string messageOnRest = "Party safely rests until completely healed.";
+        public string messageOnRestAndRaise = "Party safely rests until completely healed (bringing back the - at least presumedly - dead as well).";
         public int maxNumberOfLightSourcesAllowed = 7;
         public int minutesSinceLastRationConsumed = 0;
+        //public Keys KeyDebug = new Keys();
         [JsonIgnore]
         public List<Item> moduleItemsList = new List<Item>();
         
@@ -130,7 +144,7 @@ namespace IBx
         [JsonIgnore]
         public List<string> nonRepeatableFreeActionsUsedThisTurnBySpellTag= new List<string>();
         [JsonIgnore]
-        public bool swiftActionHasBeenUSedThisTurn = false;
+        public bool swiftActionHasBeenUsedThisTurn = false;
 
 
         public List<string> moduleAreasList = new List<string>();

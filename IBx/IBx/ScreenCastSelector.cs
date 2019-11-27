@@ -352,7 +352,7 @@ namespace IBx
                 //Player pc = getCastingPlayer();	
 
                 bool swiftBlocked = false;
-                if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUSedThisTurn)
+                if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUsedThisTurn)
                 {
                     swiftBlocked = true;
                 }
@@ -637,7 +637,7 @@ namespace IBx
                         gv.screenCombat.dontEndTurn = false;
 
                         bool swiftBlocked = false;
-                        if (GetCurrentlySelectedSpell().isSwiftAction && gv.mod.swiftActionHasBeenUSedThisTurn)
+                        if (GetCurrentlySelectedSpell().isSwiftAction && gv.mod.swiftActionHasBeenUsedThisTurn)
                         {
                             swiftBlocked = true;
                         }
@@ -753,7 +753,7 @@ namespace IBx
                                 {
                                     gv.cc.currentSelectedSpell = GetCurrentlySelectedSpell();
                                     getCastingPlayer().thisCasterCanBeInterrupted = GetCurrentlySelectedSpell().canBeInterrupted;
-
+                                    /*
                                     if (GetCurrentlySelectedSpell().onlyOncePerTurn)
                                     {
                                         gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Add(GetCurrentlySelectedSpell().tag);
@@ -767,9 +767,7 @@ namespace IBx
                                         getCastingPlayer().coolingSpellsByTag.Add(GetCurrentlySelectedSpell().tag);
                                         getCastingPlayer().coolDownTimes.Add(GetCurrentlySelectedSpell().coolDownTime);
                                     }
-                                    
-                                    
-
+                                    */
                                     gv.screenType = "combat";
                                     gv.screenCombat.currentCombatMode = "cast";
                                     doCleanUp();

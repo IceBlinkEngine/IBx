@@ -516,7 +516,7 @@ namespace IBx
                     {
 
                         bool swiftBlocked = false;
-                        if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUSedThisTurn)
+                        if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUsedThisTurn)
                         {
                             swiftBlocked = true;
                         }
@@ -1167,7 +1167,7 @@ namespace IBx
                     {
 
                         bool swiftBlocked = false;
-                        if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUSedThisTurn)
+                        if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUsedThisTurn)
                         {
                             swiftBlocked = true;
                         }
@@ -1185,6 +1185,7 @@ namespace IBx
 
                         if ((pc.sp >= sp.costSP) && (pc.hp > sp.costHP)&& !gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Contains(sp.tag) && !swiftBlocked && !coolBlocked)
                         {
+                            /*
                             if (sp.onlyOncePerTurn)
                             {
                                 gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Add(sp.tag);
@@ -1198,6 +1199,7 @@ namespace IBx
                                 pc.coolingSpellsByTag.Add(sp.tag);
                                 pc.coolDownTimes.Add(sp.coolDownTime);
                             }
+                            */
 
                             gv.cc.currentSelectedSpell = sp;
                             gv.screenType = "combat";

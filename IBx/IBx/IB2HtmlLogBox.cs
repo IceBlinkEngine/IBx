@@ -11,8 +11,11 @@ namespace IBx
         [JsonIgnore]
         public GameView gv;
         public string tag = "";
+        [JsonIgnore]
         public List<string> tagStack = new List<string>();
+        [JsonIgnore]
         public List<FormattedLine> logLinesList = new List<FormattedLine>();
+        [JsonIgnore]
         public int currentTopLineIndex = 0;
         public int numberOfLinesToShow = 17;
         public float xLoc = 0;
@@ -94,6 +97,8 @@ namespace IBx
                     logLinesList.Add(fl);
                 }
             }
+            gv.mod.logFadeCounter = 120;
+            gv.mod.logOpacity = 1f;
             scrollToEnd();
         }
         public void onDrawLogBox(IB2Panel parentPanel)
@@ -182,7 +187,7 @@ namespace IBx
             {
                 currentTopLineIndex = 0;
             }
-        }        
+        }
         /*private bool isMouseWithinTextBox(MouseEventArgs e)
         {
             if ((e.X > (int)(tbXloc * gv.screenDensity)) && (e.X < (int)(tbWidth * gv.screenDensity) + (int)(tbXloc * gv.screenDensity)) && (e.Y > (int)(tbYloc * gv.screenDensity)) && (e.Y < (int)(tbHeight * gv.screenDensity) + (int)(tbYloc * gv.screenDensity)))
@@ -190,12 +195,14 @@ namespace IBx
                 return true;
             }
             return false;
-        }*/        
+        }*/
         /*public void onMouseWheel(object sender, MouseEventArgs e)
         {
             if (isMouseWithinTextBox(e))
             {
                 // Update the drawing based upon the mouse wheel scrolling. 
+                gv.mod.logFadeCounter = 120;
+                gv.mod.logOpacity = 1f;
                 int numberOfTextLinesToMove = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
 
                 if (numberOfTextLinesToMove != 0)
@@ -228,6 +235,8 @@ namespace IBx
 
                     if (isTouchWithinTextBox(eX, eY))
                     {
+                        gv.mod.logFadeCounter = 120;
+                        gv.mod.logOpacity = 1f;
                         touchIsDown = true;
                         lastTouchMoveLocationY = eY;
                         touchMoveDeltaY = 0;
@@ -240,6 +249,8 @@ namespace IBx
                     {
                         if (isTouchWithinTextBox(eX, eY))
                         {
+                            gv.mod.logFadeCounter = 120;
+                            gv.mod.logOpacity = 1f;
                             touchMoveDeltaY = lastTouchMoveLocationY - eY;
                             if (touchMoveDeltaY > gv.drawFontRegHeight)
                             {

@@ -401,6 +401,10 @@ namespace IBx
         /// <param name="max"> The maximum value that can be found (ex. Random(5, 9); will return a number between 5-9 so 5, 6, 7, 8 or 9 are possible results).</param>
         public int RandInt(int min, int max)
         {
+            if (min > max)
+            {
+                min = max;
+            }
             //A 32-bit signed integer greater than or equal to minValue and less than maxValue; that is, the range of return values includes minValue but not maxValue.
             return rand.Next(min, max + 1);
         }
@@ -564,6 +568,10 @@ namespace IBx
                     else if (filename.Equals("gaForceRestAndRaiseDead.cs"))
                     {
                         itForceRestAndRaiseDead();
+                    }
+                    else if (filename.Equals("gaForceRestAndRaiseDeadRequireRations.cs"))
+                    {
+                        itForceRestAndRaiseDeadRequireRations();
                     }
                     else if (filename.Equals("gaMovePartyToLastLocation.cs"))
                     {
@@ -1555,13 +1563,16 @@ namespace IBx
                         int parm3 = Convert.ToInt32(p3);
 
                         bool useRollTen = false;
-                        if ((p4.Equals("false")) || (p4.Equals("False")) || (p4.Equals("")))
+                        if (p4 != null)
                         {
-                            useRollTen = false;
-                        }
-                        else if ((p4.Equals("true")) || (p4.Equals("True")) || (p4.Equals("10")))
-                        {
-                            useRollTen = true;
+                            if ((p4.Equals("false")) || (p4.Equals("False")) || (p4.Equals("")))
+                            {
+                                useRollTen = false;
+                            }
+                            else if ((p4.Equals("true")) || (p4.Equals("True")) || (p4.Equals("10")))
+                            {
+                                useRollTen = true;
+                            }
                         }
                         gv.mod.returnCheck = CheckPassSkill(parm1, p2, parm3, useRollTen);
                     }
@@ -8761,8 +8772,16 @@ namespace IBx
                             pc.sp = pc.spMax;
                         }
                     }
-                    MessageBox("Party safely rests until completely healed.");
-                    gv.cc.addLogText("<font color='lime'>" + "Party safely rests until completely healed." + "</font><BR>");
+                    if (gv.mod.showRestMessagesInBox)
+                    {
+                        MessageBox(gv.mod.messageOnRest);
+                    }
+                    if (gv.mod.showRestMessagesInLog)
+                    {
+                        gv.cc.addLogText("<font color='lime'>" + gv.mod.messageOnRest + "</font><BR>");
+                    }
+                    //MessageBox("Party safely rests until completely healed.");
+                    //gv.cc.addLogText("<font color='lime'>" + "Party safely rests until completely healed." + "</font><BR>");
                 }
                 else 
                 { 
@@ -8780,8 +8799,16 @@ namespace IBx
                         pc.sp = pc.spMax;
                     }
                 }
-                MessageBox("Party safely rests until completely healed.");
-                gv.cc.addLogText("<font color='lime'>" + "Party safely rests until completely healed." + "</font><BR>");
+                if (gv.mod.showRestMessagesInBox)
+                {
+                    MessageBox(gv.mod.messageOnRest);
+                }
+                if (gv.mod.showRestMessagesInLog)
+                {
+                    gv.cc.addLogText("<font color='lime'>" + gv.mod.messageOnRest + "</font><BR>");
+                }
+                //MessageBox("Party safely rests until completely healed.");
+                //gv.cc.addLogText("<font color='lime'>" + "Party safely rests until completely healed." + "</font><BR>");
             }
         }
 
@@ -8794,10 +8821,16 @@ namespace IBx
                      pc.hp = pc.hpMax;  
                      pc.sp = pc.spMax;  
                  }  
-             }  
-             MessageBox("Party safely rests until completely healed.");  
-             gv.cc.addLogText("<gn>" + "Party safely rests until completely healed." + "</gn><BR>");  
-         }  
+             }
+            if (gv.mod.showRestMessagesInBox)
+            {
+                MessageBox(gv.mod.messageOnRest);
+            }
+            if (gv.mod.showRestMessagesInLog)
+            {
+                gv.cc.addLogText("<font color='lime'>" + gv.mod.messageOnRest + "</font><BR>");
+            }
+        }  
 
 
         public void itForceRestAndRaiseDead()
@@ -8809,9 +8842,76 @@ namespace IBx
                 pc.sp = pc.spMax;
                 pc.charStatus = "Alive";
             }
-            MessageBox("Party safely rests until completely healed and the dead are raised.");
-            gv.cc.addLogText("<font color='lime'>" + "Party safely rests until completely healed and the dead are raised." + "</font><BR>");
+            if (gv.mod.showRestMessagesInBox)
+            {
+                MessageBox(gv.mod.messageOnRestAndRaise);
+            }
+            if (gv.mod.showRestMessagesInLog)
+            {
+                gv.cc.addLogText("<font color='lime'>" + gv.mod.messageOnRestAndRaise + "</font><BR>");
+            }
         }
+        public void itForceRestAndRaiseDeadRequireRations()
+        {
+            if (gv.mod.useRationSystem)
+            {
+                if (gv.mod.numberOfRationsRemaining > 0)
+                {
+                    foreach (ItemRefs ir in gv.mod.partyInventoryRefsList)
+                    {
+                        if (ir.isRation)
+                        {
+                            ir.quantity--;
+                            if (ir.quantity < 1)
+                            {
+                                gv.mod.partyInventoryRefsList.Remove(ir);
+                            }
+                            break;
+                        }
+                    }
+
+                    foreach (Player pc in mod.playerList)
+                    {
+                        pc.hp = pc.hpMax;
+                        pc.sp = pc.spMax;
+                        pc.charStatus = "Alive";
+                    }
+                    if (gv.mod.showRestMessagesInBox)
+                    {
+                        MessageBox(gv.mod.messageOnRestAndRaise);
+                    }
+                    if (gv.mod.showRestMessagesInLog)
+                    {
+                        gv.cc.addLogText("<font color='lime'>" + gv.mod.messageOnRestAndRaise + "</font><BR>");
+                    }
+                }//not enough rations:
+                else
+                {
+                    MessageBox("Party cannot rest without rations.");
+                    gv.cc.addLogText("<font color='red'>" + "Party cannot rest without rations." + "</font><BR>");
+                }
+
+            }//no ration system:
+            else
+            {
+                foreach (Player pc in mod.playerList)
+                {
+                    pc.hp = pc.hpMax;
+                    pc.sp = pc.spMax;
+                    pc.charStatus = "Alive";
+                }
+                if (gv.mod.showRestMessagesInBox)
+                {
+                    MessageBox(gv.mod.messageOnRestAndRaise);
+                }
+                if (gv.mod.showRestMessagesInLog)
+                {
+                    gv.cc.addLogText("<font color='lime'>" + gv.mod.messageOnRestAndRaise + "</font><BR>");
+                }
+
+            }
+
+        }//method end
         public void itSpHeal(Player pc, Item it, int healAmount)
         {
             pc.sp += healAmount;
@@ -9202,7 +9302,21 @@ namespace IBx
                     }
                     #endregion
                 }
-                if ((ef.doBuff) || (ef.durationInUnits > 0))
+                if ((ef.doBuff) || (ef.durationInUnits > 0) || (ef.doDeBuff))
+                {
+                    if (!ef.isPermanent)
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + pc.name + " has effect: " + ef.name + ", (" + (int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) + " turn(s) remain)</font><BR>");
+                        if ((int)(ef.durationInUnits / gv.mod.TimePerRound) <= 1)
+                        {
+                            gv.cc.addLogText("<font color='yellow'>" + "This effect is removed on start of next turn of " + pc.name + "</font><BR>");
+                        }
+                    }
+                    UpdateStats(pc);
+                    //no need to do anything here as buffs are used in updateStats or during
+                    //checks such as ef.addStatusType.Equals("Held") on Player or Creature class
+                }
+                /*if ((ef.doDeBuff) || (ef.durationInUnits > 0))
                 {
                     if (!ef.isPermanent)
                     {
@@ -9214,20 +9328,7 @@ namespace IBx
                     }
                     //no need to do anything here as buffs are used in updateStats or during
                     //checks such as ef.addStatusType.Equals("Held") on Player or Creature class
-                }
-                if ((ef.doDeBuff) || (ef.durationInUnits > 0))
-                {
-                    if (!ef.isPermanent)
-                    {
-                        gv.cc.addLogText("<font color='yellow'>" + pc.name + " has effect: " + ef.name + ", (" + (int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) + " turn(s) remain)</font><BR>");
-                        if ((int)(ef.durationInUnits / gv.mod.TimePerRound) <= 1)
-                        {
-                            gv.cc.addLogText("<font color='yellow'>" + "This effect is removed on start of next turn of " + pc.name + "</font><BR>");
-                        }
-                    }
-                    //no need to do anything here as buffs are used in updateStats or during
-                    //checks such as ef.addStatusType.Equals("Held") on Player or Creature class
-                }
+                }*/
             }
             #endregion
 
@@ -10775,7 +10876,7 @@ namespace IBx
                                         //gv.cc.addLogText("<font color='yellow'>" + "No saving roll allowed against longer lasting effect of " + thisSpellEffect.name + "</font><BR>");
                                     }
                                     int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
-                                    gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                    //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
                                     pc.AddEffectByObject(thisSpellEffect, classLevel);
                                     gv.cc.doEffectScript(pc, thisSpellEffect);
                                 }
@@ -11221,6 +11322,7 @@ namespace IBx
                             int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                             gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
                             crt.AddEffectByObject(thisSpellEffect, classLevel);
+                            //gv.cc.doEffectScript(pc, thisSpellEffect);
                         }
                         #endregion
                     }
@@ -11567,9 +11669,10 @@ namespace IBx
                                 {
                                     //gv.cc.addLogText("<font color='yellow'>" + "No saving roll allowed against longer lasting effect of " + thisSpellEffect.name + "</font><BR>");
                                 }
-                                int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
-                                gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                //int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
+                                //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
                                 pc.AddEffectByObject(thisSpellEffect, classLevel);
+                                gv.cc.doEffectScript(pc, thisSpellEffect);
                             }
                             #endregion
                         }
