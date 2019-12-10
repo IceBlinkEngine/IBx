@@ -11,6 +11,8 @@ using System;
 using Newtonsoft.Json;
 using Google.Analytics;
 using Plugin.SimpleAudioPlayer;
+using UIKit;
+using SkiaSharp.Views.iOS;
 
 [assembly: Dependency(typeof(SaveAndLoad_iOS))]
 namespace IBx.iOS
@@ -55,16 +57,57 @@ namespace IBx.iOS
             Directory.CreateDirectory(directoryname);
         }
 
-        public void SaveText(string filename, string text)
+        public void SaveText(string fullPath, string text)
         {
-            /*string path = CreatePathToFile(filename);
-            using (StreamWriter sw = File.CreateText(path))
-                await sw.WriteAsync(text);*/
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string convertedFullPath = documents + ConvertFullPath(fullPath, "/");
+            string dir = Path.GetDirectoryName(convertedFullPath);
+            try
+            {
+                Directory.CreateDirectory(dir);
+                using (StreamWriter sw = File.CreateText(convertedFullPath))
+                {
+                    sw.Write(text);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }        
         
         public string LoadStringFromUserFolder(string fullPath)
         {
             string text = "";
+            //check in app module folder first
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets" + ConvertFullPath(fullPath, "."));
+            if (stream != null)
+            {
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    text = reader.ReadToEnd();
+                }
+                return text;
+            }
+
+            //check in user module folder next
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string convertedFullPath = documents + ConvertFullPath(fullPath, "/");
+            if (File.Exists(convertedFullPath))
+            {
+                try
+                {
+                    text = File.ReadAllText(convertedFullPath);
+                }
+                catch (Exception ex)
+                {
+
+                }
+                return text;
+            }
+            return text;
+
             //check in module folder first
             /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
             string convertedFullPath = storageFolder.Path + ConvertFullPath(fullPath, "\\");
@@ -72,23 +115,82 @@ namespace IBx.iOS
             {
                 text = File.ReadAllText(convertedFullPath);
                 return text;
-            }*/
-            return text;
+            }*/           
+            
         }
         public string LoadStringFromAssetFolder(string fullPath)
         {
-            string text = "";
+            /*string text = "";
             //check in Assests folder last
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets." + ConvertFullPath(fullPath, "."));
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets" + ConvertFullPath(fullPath, "."));
             using (var reader = new System.IO.StreamReader(stream))
             {
                 text = reader.ReadToEnd();
+            }
+            return text;*/
+
+            string text = "";
+            //string filename = Path.GetFileName("C:" + fullPath);
+            int pos = fullPath.LastIndexOf("\\") + 1;
+            string filename = fullPath.Substring(pos, fullPath.Length - pos);
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                //System.Diagnostics.Debug.WriteLine(res);
+            }
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets" + ConvertFullPath(fullPath, "."));
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS." + filename);
+            }
+            if (stream != null)
+            {
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    text = reader.ReadToEnd();
+                }
             }
             return text;
         }
         public string LoadStringFromEitherFolder(string assetFolderpath, string userFolderpath)
         {
+            string text = "";
+            int pos = userFolderpath.LastIndexOf("\\") + 1;
+            string filename = userFolderpath.Substring(pos, userFolderpath.Length - pos);
+            //check in module folder first
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string convertedFullPath = documents + ConvertFullPath(userFolderpath, "/");
+            if (File.Exists(convertedFullPath))
+            {
+                try
+                {
+                    text = File.ReadAllText(convertedFullPath);
+                }
+                catch (Exception ex)
+                {
+
+                }
+                return text;
+            }
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."));
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS." + filename);
+            }
+            if (stream != null)
+            {
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    text = reader.ReadToEnd();
+                }
+            }
+            return text;
+
+            /*
             string text = "";
             //check in module folder first
             /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
@@ -99,13 +201,14 @@ namespace IBx.iOS
                 return text;
             }*/
             //check in Assests folder last
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            /*Assembly assembly = GetType().GetTypeInfo().Assembly;
             Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets." + ConvertFullPath(assetFolderpath, "."));
             using (var reader = new System.IO.StreamReader(stream))
             {
                 text = reader.ReadToEnd();
             }
             return text;
+            */
         }
         public string[] LoadStringLinesFromEitherFolder(string assetFolderpath, string userFolderpath)
         {
@@ -160,7 +263,7 @@ namespace IBx.iOS
                 string modFolder = Path.GetFileNameWithoutExtension(modFilename);
                 //try asset area            
                 Assembly assembly = GetType().GetTypeInfo().Assembly;
-                Stream stream = assembly.GetManifestResourceStream("IBx.iOS." + modFilename);
+                Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + modFolder + "." + modFilename);
                 if (stream != null)
                 {
                     using (var reader = new System.IO.StreamReader(stream))
@@ -191,6 +294,119 @@ namespace IBx.iOS
         
         public SKBitmap LoadBitmap(string filename, Module mdl)
         {
+            //MODULE'S GRAPHICS FOLDER
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var modulesDir = Path.Combine(documents, "modules");
+            var modFolder = Path.Combine(modulesDir, mdl.moduleName);
+            var modGraphicsFolder = Path.Combine(modFolder, "graphics");
+            var filePath = Path.Combine(modGraphicsFolder, filename);
+
+            if (File.Exists(filePath))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath).ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".png"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".jpg"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            modGraphicsFolder = Path.Combine(modFolder, "pctokens");
+            filePath = Path.Combine(modGraphicsFolder, filename);
+            if (File.Exists(filePath))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath).ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".png"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".jpg"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            modGraphicsFolder = Path.Combine(modFolder, "portraits");
+            filePath = Path.Combine(modGraphicsFolder, filename);
+            if (File.Exists(filePath))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath).ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".png"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".jpg"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            modGraphicsFolder = Path.Combine(modFolder, "tiles");
+            filePath = Path.Combine(modGraphicsFolder, filename);
+            if (File.Exists(filePath))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath).ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".png"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".jpg"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            modGraphicsFolder = Path.Combine(modFolder, "ui");
+            filePath = Path.Combine(modGraphicsFolder, filename);
+            if (File.Exists(filePath))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath).ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".png"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".jpg"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+
+            //USER FOLDER
+            documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var userDir = Path.Combine(documents, "user");
+            filePath = Path.Combine(userDir, filename);
+
+            if (File.Exists(filePath))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath).ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".png"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".jpg"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+
+            //DEFAULT ASSETS
             Assembly assembly = GetType().GetTypeInfo().Assembly;
             Stream stream = assembly.GetManifestResourceStream("IBx.iOS." + filename);
             if (stream == null)
@@ -244,8 +460,17 @@ namespace IBx.iOS
             SKManagedStream skStream = new SKManagedStream(stream);
 
             //Stream fileStream = File.OpenRead("btn_small_on.png");
-            return SKBitmap.Decode(skStream);
-
+            //return SKBitmap.Decode(skStream);
+            try
+            {
+                return SKBitmap.Decode(skStream);
+            }
+            catch (Exception ex)
+            {
+                Stream stream2 = assembly.GetManifestResourceStream("IBx.iOS.Assets.graphics.ui_missingtexture.png");
+                SKManagedStream skStream2 = new SKManagedStream(stream2);
+                return SKBitmap.Decode(skStream2);
+            }
             //StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
             //StorageFile sampleFile = await storageFolder.GetFileAsync(filename);
             //SKBitmap text = await Windows.Storage.FileIO.ReadTextAsync(sampleFile);
@@ -258,18 +483,93 @@ namespace IBx.iOS
         {
             List<string> list = new List<string>();
 
+            //FROM ASSETS
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+
+            //DEBUGGING RESOURCE PATH
+            //foreach (var res in assembly.GetManifestResourceNames())
+            //{
+            //    int x3 = 0;
+            //}
+
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                if ((res.Contains(ConvertFullPath(folderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2]);
+                }
+            }
+
+            //FROM USER FOLDER
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (Directory.Exists(documents + ConvertFullPath(folderpath, "/")))
+            {
+                string[] files = Directory.GetFiles(documents + ConvertFullPath(folderpath, "/"), "*" + extension, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    list.Add(Path.GetFileNameWithoutExtension(file));
+                }
+            }
+
             return list;
         }
         public List<string> GetAllFilesWithExtensionFromAssetFolder(string folderpath, string extension)
         {
             List<string> list = new List<string>();
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
 
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                if ((res.Contains(ConvertFullPath(folderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2]);
+                }
+            }
             return list;
         }
         public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
         {
             List<string> list = new List<string>();
 
+            //FROM USER FOLDER
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (Directory.Exists(documents + ConvertFullPath(userFolderpath, "/")))
+            {
+                string[] files = Directory.GetFiles(documents + ConvertFullPath(userFolderpath, "/"), "*" + extension, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    list.Add(Path.GetFileNameWithoutExtension(file));
+                }
+            }
+
+            //FROM ASSETS
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+
+            //DEBUGGING RESOURCE PATH
+            //foreach (var res in assembly.GetManifestResourceNames())
+            //{
+            //    int x3 = 0;
+            //}
+            //module folder in app 
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2]);
+                }
+            }
+
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2]);
+                }
+            }
             return list;
         }
         public List<string> GetAllModuleFiles(bool userOnly)

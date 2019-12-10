@@ -472,27 +472,33 @@ namespace IBx
         private void ResetFont()
         {
             //loop for testing/debugging of resource names (uncomment the next four lines to use)
-            //foreach (var res in GetType().GetTypeInfo().Assembly.GetManifestResourceNames())
-            //{
-            //    System.Diagnostics.Debug.WriteLine("found resource: " + res);
-            //}
-            string assetName = "IBx.UWP.metamorphous_regular.ttf";
-#if __IOS___
-            string assetName = "IBx.iOS.metamorphous_regular.ttf";
-#endif
-#if __ANDROID___
-            string assetName = "IBx.Droid.metamorphous_regular.ttf";
-#endif
+            /*foreach (var res in GetType().GetTypeInfo().Assembly.GetManifestResourceNames())
+            {
+                if (res.Contains("meta"))
+                {
+                    int x = 1;
+                }
+                System.Diagnostics.Debug.WriteLine("found resource: " + res);
+            }*/
 
-            //using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream(assetName))
-            //using (var managedStream = new SKManagedStream(stream, true))
-            //using (var tf = SKTypeface.FromStream(managedStream))
-            //using (var tf = SKTypeface.FromFamilyName("Arial"))
-            //{
-                textPaint.Color = SKColors.White;
-                textPaint.TextSize = 60;
-                textPaint.Typeface = SKTypeface.FromFamilyName("Arial");
-            //}
+            textPaint.Color = SKColors.White;
+            textPaint.TextSize = 60;
+            textPaint.Typeface = SKTypeface.FromFamilyName("Arial");
+
+            /*string assetName = "IBx.UWP.metamorphous_regular.ttf";
+            //string assetName = "IBx.iOS.metamorphous_regular.ttf";
+            //string assetName = "IBx.Droid.metamorphous_regular.ttf";
+
+            using (var stream = GetType().GetTypeInfo().Assembly.GetManifestResourceStream(assetName))
+            {
+                using (var managedStream = new SKManagedStream(stream, true))
+                {                    
+                    textPaint.Color = SKColors.White;
+                    textPaint.TextSize = 60;
+                    textPaint.Typeface = SKTypeface.FromStream(managedStream);                    
+                }
+            }*/
+            
             drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.5);
             drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.333);
             drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.25);
