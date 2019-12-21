@@ -9,26 +9,26 @@ using System.Text;
 
 namespace IBx
 {
-    public class ScreenLauncher 
+    public class ScreenLauncher
     {
-	    //private Module mod;
-	    private GameView gv;
-	
-	    private IbbButton btnLeft = null;
-	    private IbbButton btnRight = null;
+        //private Module mod;
+        private GameView gv;
+
+        private IbbButton btnLeft = null;
+        private IbbButton btnRight = null;
         private IbbButton btnExit = null;
         private IbbButton btnModuleName = null;
         private IbbHtmlTextBox description;
-	    private List<Module> moduleList = new List<Module>();
-	    private List<SKBitmap> titleList = new List<SKBitmap>();
-	    private int moduleIndex = 0;
-	
-	
-	    public ScreenLauncher(Module m, GameView g) 
-	    {
-		    //mod = m;
-		    gv = g;
-		    setControlsStart();
+        private List<Module> moduleList = new List<Module>();
+        private List<SKBitmap> titleList = new List<SKBitmap>();
+        private int moduleIndex = 0;
+
+
+        public ScreenLauncher(Module m, GameView g)
+        {
+            //mod = m;
+            gv = g;
+            setControlsStart();
             int pH = (int)((float)gv.screenHeight / 100.0f);
             description = new IbbHtmlTextBox(gv);
             description.tbXloc = 0 * gv.squareSize + gv.oXshift;
@@ -36,8 +36,8 @@ namespace IBx
             description.tbWidth = 16 * gv.squareSize;
             description.tbHeight = 6 * gv.squareSize;
             description.showBoxBorder = false;
-	    }
-	
+        }
+
         public void loadModuleFiles()
         {
             /*string[] files;
@@ -77,49 +77,49 @@ namespace IBx
                 }
             }
         }
-        	    	
-	    public void setControlsStart()
-	    {		
-		    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
+
+        public void setControlsStart()
+        {
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
             int wideX = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2);
             int smallLeftX = wideX - (int)(gv.ibbwidthR * gv.screenDensity);
             int smallRightX = wideX + (int)(gv.ibbwidthL * gv.screenDensity);
-		    int padW = gv.squareSize/6;
-		
-		    if (btnLeft == null)
-		    {
-			    btnLeft = new IbbButton(gv, 1.0f);
-			    btnLeft.Img = "btn_small";
-			    btnLeft.Img2 = "ctrl_left_arrow";
-			    btnLeft.Glow = "btn_small_glow";
-			    btnLeft.X = smallLeftX;
+            int padW = gv.squareSize / 6;
+
+            if (btnLeft == null)
+            {
+                btnLeft = new IbbButton(gv, 1.0f);
+                btnLeft.Img = "btn_small";
+                btnLeft.Img2 = "ctrl_left_arrow";
+                btnLeft.Glow = "btn_small_glow";
+                btnLeft.X = smallLeftX;
                 btnLeft.Y = (5 * gv.squareSize) - (pH * 2);
                 btnLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnLeft.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		    if (btnModuleName == null)
-		    {
-			    btnModuleName = new IbbButton(gv, 1.0f);
-			    btnModuleName.Img = "btn_large";
-			    btnModuleName.Glow = "btn_large_glow";
-			    btnModuleName.Text = "";
+            }
+            if (btnModuleName == null)
+            {
+                btnModuleName = new IbbButton(gv, 1.0f);
+                btnModuleName.Img = "btn_large";
+                btnModuleName.Glow = "btn_large_glow";
+                btnModuleName.Text = "";
                 btnModuleName.X = wideX;
-			    btnModuleName.Y = (5 * gv.squareSize) - (pH * 2);
+                btnModuleName.Y = (5 * gv.squareSize) - (pH * 2);
                 btnModuleName.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnModuleName.Width = (int)(gv.ibbwidthL * gv.screenDensity);
-		    }
-		    if (btnRight == null)
-		    {
-			    btnRight = new IbbButton(gv, 1.0f);
-			    btnRight.Img = "btn_small";
-			    btnRight.Img2 = "ctrl_right_arrow";
-			    btnRight.Glow = "btn_small_glow";
-			    btnRight.X = smallRightX;
-			    btnRight.Y = (5 * gv.squareSize) - (pH * 2);
+            }
+            if (btnRight == null)
+            {
+                btnRight = new IbbButton(gv, 1.0f);
+                btnRight.Img = "btn_small";
+                btnRight.Img2 = "ctrl_right_arrow";
+                btnRight.Glow = "btn_small_glow";
+                btnRight.X = smallRightX;
+                btnRight.Y = (5 * gv.squareSize) - (pH * 2);
                 btnRight.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnRight.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
+            }
             if (btnExit == null)
             {
                 btnExit = new IbbButton(gv, 1.0f);
@@ -133,41 +133,41 @@ namespace IBx
             }
         }
 
-	    //TITLE SCREEN  
+        //TITLE SCREEN  
         public void redrawLauncher()
         {
             //DRAW TITLE SCREEN
-    	    if ((titleList.Count > 0) && (moduleIndex < titleList.Count))
-		    {
+            if ((titleList.Count > 0) && (moduleIndex < titleList.Count))
+            {
                 IbRect src = new IbRect(0, 0, titleList[moduleIndex].Width, titleList[moduleIndex].Height);
                 IbRect dst = new IbRect((gv.screenWidth / 2) - (gv.squareSize * 4), 0, gv.squareSize * 8, gv.squareSize * 4);
                 gv.DrawBitmap(titleList[moduleIndex], src, dst);
-		    }
-            	
-    	    //DRAW DESCRIPTION BOX
+            }
+
+            //DRAW DESCRIPTION BOX
             if ((moduleList.Count > 0) && (moduleIndex < moduleList.Count))
-		    {
-                
+            {
+
                 string textToSpan = "<u>Module Description</u>" + "<br>";
                 //textToSpan += "<b><i><big>" + moduleList[moduleIndex].moduleLabelName + "</big></i></b><br>";
                 textToSpan += moduleList[moduleIndex].moduleDescription;
-                description.logLinesList.Clear();                
+                description.logLinesList.Clear();
+                description.AddHtmlTextToLog(textToSpan);
                 description.tbXloc = 4 * gv.squareSize + gv.oXshift;
                 description.tbYloc = 6 * gv.squareSize + gv.oYshift;
-                description.tbWidth = 10 * gv.squareSize;
+                description.tbWidth = 12 * gv.squareSize;
                 description.tbHeight = 6 * gv.squareSize;
-                description.AddHtmlTextToLog(textToSpan);
                 description.onDrawLogBox();
-                
+
                 btnModuleName.Text = moduleList[moduleIndex].moduleLabelName;
-	    	    drawLauncherControls();
-		    }
+                drawLauncherControls();
+            }
         }
         public void drawLauncherControls()
-	    {    	
-		    btnLeft.Draw();		
-		    btnRight.Draw();
-		    btnModuleName.Draw();
+        {
+            btnLeft.Draw();
+            btnRight.Draw();
+            btnModuleName.Draw();
             btnExit.Draw();
         }
         public void onTouchLauncher(int eX, int eY, MouseEventType.EventType eventType)

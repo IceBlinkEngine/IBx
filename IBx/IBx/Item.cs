@@ -11,14 +11,14 @@ using Newtonsoft.Json;
 
 namespace IBx
 {
-    public class Item 
+    public class Item
     {
-	    public string name = "none"; //item name  
+        public string name = "none"; //item name  
         public bool isRation = false;
         public bool isLightSource = false;
         public string itemImage = "blank";
-        [JsonIgnore]
-	    //public Bitmap token;
+        //[JsonIgnore]
+        //public Bitmap token;
         public string ArmorWeightType = "Light"; //Light, Medium, Heavy 
         public string tag = "none"; //item unique tag name    
         public string resref = "none"; //item unique tag name    
@@ -30,26 +30,26 @@ namespace IBx
         public string itemOnUseSound = "none"; //Filename of sound to play when the item is used (no extension)
         public string itemEndSound = "none"; //Filename of sound to play upon end use of item like explosion from thrown grenade (no extension)
         public string category = "Armor"; //catergory type (Armor, Ranged, Melee, General, Ring, Shield, Ammo, Gloves)
-	    public bool plotItem = false;
-	    public int value = 0; //cost in credits
-	    public int quantity = 1; //useful for stacking and ammo
-	    public int groupSizeForSellingStackableItems = 1;
-	    public int charges = 0; //useful for items like wand of mage bolts
+        public bool plotItem = false;
+        public int value = 0; //cost in credits
+        public int quantity = 1; //useful for stacking and ammo
+        public int groupSizeForSellingStackableItems = 1;
+        public int charges = 0; //useful for items like wand of mage bolts
         public string ammoType = "none"; //typically arrow, stone, bolt 
-	    public bool twoHanded = false; //true if item requires the use of two hands
+        public bool twoHanded = false; //true if item requires the use of two hands
         public bool canNotBeUnequipped = false;
         public bool isStackable = false;
         public bool automaticallyHitsTarget = false; //does not require a successful to hit roll, always hits target (ex. mage bolt wand)
         public int attackBonus = 0; //attack bonus
-	    public int attackRange = 1; //attack range
-	    public int AreaOfEffect = 0; //AoE radius
+        public int attackRange = 1; //attack range
+        public int AreaOfEffect = 0; //AoE radius
         public AreaOfEffectShape aoeShape = AreaOfEffectShape.Circle;
         public string spellTag = "none";
         public int damageNumDice = 1; //number of dice to roll for damage
-	    public int damageDie = 2; //type of dice to roll for damage
-	    public int damageAdder = 0; //the adder like 2d4+1 where "1" is the adder
-	    public int armorBonus = 0; //armor bonus
-	    public int maxDexBonus = 99; //maximum Dexterity bonus allowed with this armor
+        public int damageDie = 2; //type of dice to roll for damage
+        public int damageAdder = 0; //the adder like 2d4+1 where "1" is the adder
+        public int armorBonus = 0; //armor bonus
+        public int maxDexBonus = 99; //maximum Dexterity bonus allowed with this armor
         public int modifierMaxHP = 0;
         public int modifierMaxSP = 0;
         public int requiredSTR = 0;
@@ -59,9 +59,9 @@ namespace IBx
         public int requiredWIS = 0;
         public int requiredCHA = 0;
         public int attributeBonusModifierStr = 0;
-	    public int attributeBonusModifierDex = 0;
-	    public int attributeBonusModifierInt = 0;
-	    public int attributeBonusModifierCha = 0;
+        public int attributeBonusModifierDex = 0;
+        public int attributeBonusModifierInt = 0;
+        public int attributeBonusModifierCha = 0;
         public int attributeBonusModifierCon = 0;
         public int attributeBonusModifierWis = 0;
         public int attributeBonusModifierLuk = 0;
@@ -71,8 +71,8 @@ namespace IBx
         public int hpCostPerAttack = 0;
 
         public int savingThrowModifierReflex = 0;
-	    public int savingThrowModifierFortitude = 0;
-	    public int savingThrowModifierWill = 0;
+        public int savingThrowModifierFortitude = 0;
+        public int savingThrowModifierWill = 0;
         public int MovementPointModifier = 0;
         public int spRegenPerRoundInCombat = 0;
         public int hpRegenPerRoundInCombat = 0;
@@ -93,12 +93,12 @@ namespace IBx
         public int levelOfItemForCastSpell = 1;
         public bool usePlayerClassLevelForOnUseItemCastSpell = false;
         public int damageTypeResistanceValueAcid = 0;
-	    public int damageTypeResistanceValueCold = 0;
-	    public int damageTypeResistanceValueNormal = 0;
-	    public int damageTypeResistanceValueElectricity = 0;
-	    public int damageTypeResistanceValueFire = 0;
-	    public int damageTypeResistanceValueMagic = 0;
-	    public int damageTypeResistanceValuePoison = 0;
+        public int damageTypeResistanceValueCold = 0;
+        public int damageTypeResistanceValueNormal = 0;
+        public int damageTypeResistanceValueElectricity = 0;
+        public int damageTypeResistanceValueFire = 0;
+        public int damageTypeResistanceValueMagic = 0;
+        public int damageTypeResistanceValuePoison = 0;
         public int requiredLevel = 0;
         public string typeOfDamage = "Normal"; //Normal,Acid,Cold,Electricity,Fire,Magic,Poison
         public List<LocalImmunityString> entriesForPcTags = new List<LocalImmunityString>();
@@ -126,30 +126,30 @@ namespace IBx
         public bool onlyUseableWhenEquipped = false;
 
         public Item()
-	    {
-		
-	    }
-	    public Item DeepCopy()
-	    {
-		    Item copy = new Item();
-		    copy.name = this.name;
+        {
+
+        }
+        public Item DeepCopy()
+        {
+            Item copy = new Item();
+            copy.name = this.name;
             copy.onlyUseableWhenEquipped = this.onlyUseableWhenEquipped;
             copy.endTurnAfterEquipping = this.endTurnAfterEquipping;
             copy.isRation = this.isRation;
             copy.isLightSource = this.isLightSource;
             copy.ArmorWeightType = this.ArmorWeightType;
-		    copy.itemImage = this.itemImage;
-		    copy.tag = this.tag;
-		    copy.resref = this.resref;
-		    copy.desc = this.desc;
-		    copy.descFull = this.descFull;
-		    copy.useableInSituation = this.useableInSituation;
-		    copy.projectileSpriteFilename = this.projectileSpriteFilename;	
-		    copy.spriteEndingFilename = this.spriteEndingFilename;
-		    copy.itemOnUseSound = this.itemOnUseSound;
-		    copy.category = this.category;
-		    copy.plotItem = this.plotItem;
-		    copy.value = this.value;
+            copy.itemImage = this.itemImage;
+            copy.tag = this.tag;
+            copy.resref = this.resref;
+            copy.desc = this.desc;
+            copy.descFull = this.descFull;
+            copy.useableInSituation = this.useableInSituation;
+            copy.projectileSpriteFilename = this.projectileSpriteFilename;
+            copy.spriteEndingFilename = this.spriteEndingFilename;
+            copy.itemOnUseSound = this.itemOnUseSound;
+            copy.category = this.category;
+            copy.plotItem = this.plotItem;
+            copy.value = this.value;
             copy.requiredLevel = this.requiredLevel;
             copy.requiredSTR = this.requiredSTR;
             copy.requiredDEX = this.requiredDEX;
@@ -162,50 +162,50 @@ namespace IBx
             copy.restrictedRace = this.restrictedRace;
             copy.maxStrengthBonusAllowedForWeapon = this.maxStrengthBonusAllowedForWeapon;
             copy.quantity = this.quantity;
-		    copy.groupSizeForSellingStackableItems = this.groupSizeForSellingStackableItems;
-		    copy.charges = this.charges;
-		    copy.ammoType = this.ammoType;
-		    copy.twoHanded = this.twoHanded;
-		    copy.canNotBeUnequipped = this.canNotBeUnequipped; 
-		    copy.isStackable = this.isStackable;
+            copy.groupSizeForSellingStackableItems = this.groupSizeForSellingStackableItems;
+            copy.charges = this.charges;
+            copy.ammoType = this.ammoType;
+            copy.twoHanded = this.twoHanded;
+            copy.canNotBeUnequipped = this.canNotBeUnequipped;
+            copy.isStackable = this.isStackable;
             copy.automaticallyHitsTarget = this.automaticallyHitsTarget;
-		    copy.attackBonus = this.attackBonus;
-		    copy.attackRange = this.attackRange;
-		    copy.AreaOfEffect = this.AreaOfEffect;
+            copy.attackBonus = this.attackBonus;
+            copy.attackRange = this.attackRange;
+            copy.AreaOfEffect = this.AreaOfEffect;
             copy.aoeShape = this.aoeShape;
             copy.canNotBeChangedInCombat = this.canNotBeChangedInCombat;
             copy.spellTag = this.spellTag;
             copy.damageNumDice = this.damageNumDice;
-		    copy.damageDie = this.damageDie;
-		    copy.damageAdder = this.damageAdder;
+            copy.damageDie = this.damageDie;
+            copy.damageAdder = this.damageAdder;
             copy.additionalAttacks = this.additionalAttacks;
             copy.armorBonus = this.armorBonus;
-		    copy.maxDexBonus = this.maxDexBonus;
+            copy.maxDexBonus = this.maxDexBonus;
             copy.modifierMaxHP = this.modifierMaxHP;
             copy.modifierMaxSP = this.modifierMaxSP;
             copy.attributeBonusModifierStr = this.attributeBonusModifierStr;
-		    copy.attributeBonusModifierDex = this.attributeBonusModifierDex;
-		    copy.attributeBonusModifierInt = this.attributeBonusModifierInt;
-		    copy.attributeBonusModifierCha = this.attributeBonusModifierCha;
+            copy.attributeBonusModifierDex = this.attributeBonusModifierDex;
+            copy.attributeBonusModifierInt = this.attributeBonusModifierInt;
+            copy.attributeBonusModifierCha = this.attributeBonusModifierCha;
             copy.attributeBonusModifierCon = this.attributeBonusModifierCon;
             copy.attributeBonusModifierWis = this.attributeBonusModifierWis;
             copy.attributeBonusModifierLuk = this.attributeBonusModifierLuk;
-		    copy.savingThrowModifierReflex = this.savingThrowModifierReflex;
-		    copy.savingThrowModifierFortitude = this.savingThrowModifierFortitude;
-		    copy.savingThrowModifierWill = this.savingThrowModifierWill;
+            copy.savingThrowModifierReflex = this.savingThrowModifierReflex;
+            copy.savingThrowModifierFortitude = this.savingThrowModifierFortitude;
+            copy.savingThrowModifierWill = this.savingThrowModifierWill;
             copy.MovementPointModifier = this.MovementPointModifier;
             copy.spRegenPerRoundInCombat = this.spRegenPerRoundInCombat;
             copy.hpRegenPerRoundInCombat = this.hpRegenPerRoundInCombat;
             copy.minutesPerSpRegenOutsideCombat = this.minutesPerSpRegenOutsideCombat;
             copy.minutesPerHpRegenOutsideCombat = this.minutesPerHpRegenOutsideCombat;
-		    copy.onScoringHit = this.onScoringHit;
-		    copy.onScoringHitParms = this.onScoringHitParms;
+            copy.onScoringHit = this.onScoringHit;
+            copy.onScoringHitParms = this.onScoringHitParms;
             copy.tagOfTraitInfluenced = this.tagOfTraitInfluenced;
             copy.traitSkillRollModifier = this.traitSkillRollModifier;
             //test
-        copy.onUseItem = this.onUseItem;
-		    copy.onWhileEquipped = this.onWhileEquipped;
-		    copy.onUseItemIBScript = this.onUseItemIBScript;
+            copy.onUseItem = this.onUseItem;
+            copy.onWhileEquipped = this.onWhileEquipped;
+            copy.onUseItemIBScript = this.onUseItemIBScript;
             copy.onUseItemIBScriptParms = this.onUseItemIBScriptParms;
             copy.destroyItemAfterOnUseItemIBScript = this.destroyItemAfterOnUseItemIBScript;
             copy.destroyItemAfterOnUseItemScript = this.destroyItemAfterOnUseItemScript;
@@ -216,13 +216,13 @@ namespace IBx
             copy.levelOfItemForCastSpell = this.levelOfItemForCastSpell;
             copy.usePlayerClassLevelForOnUseItemCastSpell = this.usePlayerClassLevelForOnUseItemCastSpell;
             copy.damageTypeResistanceValueAcid = this.damageTypeResistanceValueAcid;
-		    copy.damageTypeResistanceValueNormal = this.damageTypeResistanceValueNormal;
-		    copy.damageTypeResistanceValueCold = this.damageTypeResistanceValueCold;
-		    copy.damageTypeResistanceValueElectricity = this.damageTypeResistanceValueElectricity;
-		    copy.damageTypeResistanceValueFire = this.damageTypeResistanceValueFire;
-		    copy.damageTypeResistanceValueMagic = this.damageTypeResistanceValueMagic;
-		    copy.damageTypeResistanceValuePoison = this.damageTypeResistanceValuePoison;
-		    copy.typeOfDamage = this.typeOfDamage;
+            copy.damageTypeResistanceValueNormal = this.damageTypeResistanceValueNormal;
+            copy.damageTypeResistanceValueCold = this.damageTypeResistanceValueCold;
+            copy.damageTypeResistanceValueElectricity = this.damageTypeResistanceValueElectricity;
+            copy.damageTypeResistanceValueFire = this.damageTypeResistanceValueFire;
+            copy.damageTypeResistanceValueMagic = this.damageTypeResistanceValueMagic;
+            copy.damageTypeResistanceValuePoison = this.damageTypeResistanceValuePoison;
+            copy.typeOfDamage = this.typeOfDamage;
             copy.labelForCastAction = this.labelForCastAction;
             copy.labelForSpellsButtonInCombat = this.labelForSpellsButtonInCombat;
             copy.entriesForPcTags = new List<LocalImmunityString>();
@@ -233,6 +233,6 @@ namespace IBx
             copy.hpRegenTimer = this.hpRegenTimer;
             copy.spRegenTimer = this.spRegenTimer;
             return copy;
-	    }
+        }
     }
 }

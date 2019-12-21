@@ -11,6 +11,231 @@ namespace IBx
 {
     public class Module
     {
+        public bool playLightningSound = false;
+        public bool mainMapMovementRelevantKeyPressed = false;
+        public bool justLeftCombat = false;
+
+        [JsonIgnore]
+        public List<string> bmpNearbyNameList = new List<string>();
+
+        public int overrideVisibilityRange = 2;
+        public bool skipTextRender = false;
+        public int findNewPointCounter = 0;
+
+        public bool partyJustCameFromNeighbouringArea = false;
+        public bool isBreathingWorld = true;
+
+        public bool newPropMoveSystem = false;
+        public bool justWentSouth = false;
+        public bool justWentNorth = false;
+        public bool justWentEast = false;
+        public bool justWentWest = false;
+
+        //leader
+        public float breathAnimationDelayCounter = 0;
+        public bool showBreathingFrame = false;
+        public float walkAnimationDelayCounter = 0;
+        public bool showWalkingFrame = false;
+        public float idleAnimationDelayCounter = 0;
+        public bool showIdlingFrame = false;
+        public float hurdle = 10f;
+
+        //0
+        public float breathAnimationDelayCounter0 = 0;
+        public bool showBreathingFrame0 = false;
+        public float walkAnimationDelayCounter0 = 0;
+        public bool showWalkingFrame0 = false;
+        public float idleAnimationDelayCounter0 = 0;
+        public bool showIdlingFrame0 = false;
+        public float hurdle0 = 10f;
+
+        //1
+        public float breathAnimationDelayCounter1 = 0;
+        public bool showBreathingFrame1 = false;
+        public float walkAnimationDelayCounter1 = 0;
+        public bool showWalkingFrame1 = false;
+        public float idleAnimationDelayCounter1 = 0;
+        public bool showIdlingFrame1 = false;
+        public float hurdle1 = 10f;
+
+        //2
+        public float breathAnimationDelayCounter2 = 0;
+        public bool showBreathingFrame2 = false;
+        public float walkAnimationDelayCounter2 = 0;
+        public bool showWalkingFrame2 = false;
+        public float idleAnimationDelayCounter2 = 0;
+        public bool showIdlingFrame2 = false;
+        public float hurdle2 = 10f;
+
+        //3
+        public float breathAnimationDelayCounter3 = 0;
+        public bool showBreathingFrame3 = false;
+        public float walkAnimationDelayCounter3 = 0;
+        public bool showWalkingFrame3 = false;
+        public float idleAnimationDelayCounter3 = 0;
+        public bool showIdlingFrame3 = false;
+        public float hurdle3 = 10f;
+
+        //4
+        public float breathAnimationDelayCounter4 = 0;
+        public bool showBreathingFrame4 = false;
+        public float walkAnimationDelayCounter4 = 0;
+        public bool showWalkingFrame4 = false;
+        public float idleAnimationDelayCounter4 = 0;
+        public bool showIdlingFrame4 = false;
+        public float hurdle4 = 10f;
+
+        //5
+        public float breathAnimationDelayCounter5 = 0;
+        public bool showBreathingFrame5 = false;
+        public float walkAnimationDelayCounter5 = 0;
+        public bool showWalkingFrame5 = false;
+        public float idleAnimationDelayCounter5 = 0;
+        public bool showIdlingFrame5 = false;
+        public float hurdle5 = 10f;
+
+
+        //walking
+        //public float hurdle = 10f;
+
+        public int breathAnimationFrequency = 10;
+        public int idleAnimationFrequency = 10;
+
+
+
+
+
+
+        public float sprintModifier = 1.0f;
+        public int oldTailPositionX = 0;
+        public int oldTailPositionY = 0;
+        public string tailScrollDirection = "none"; //up, down, left, right
+
+        public bool doNotStartScrolling = false;
+        public bool keyUpPressedAgain = true;
+        //public bool mouseUpPressedAgain = true;
+
+        public bool blockUpKey = false;
+        public bool blockDownKey = false;
+        public bool blockLeftKey = false;
+        public bool blockRightKey = false;
+
+        public bool calledByWaiting = false;
+        public float scrollModeSpeed = 1.1f;
+        public long elapsed2 = 0;
+        public int keyPressCounter = 0;
+        public List<float> distances = new List<float>();
+        public int stopScrollCounter = 0;
+        //public Keys LastPressKeyData = new Keys();
+        public string lastPressedKey = "none";
+        public string frozenPressedKey = "none";
+        public float lastScrollStep = 10;
+        public float scrollingSpeedReduction = 1f;
+        public bool doTriggerInspiteOfScrolling = true;
+
+        public bool comningFromBattle = false;
+        public float preRenderDistance = 0;
+        public float postUpdateAdjustmentDistance = 0;
+
+        public float scrollingOverhang = 0;
+        public float scrollingOverhang2 = 0;
+
+        public bool blockMainKeyboard = false;
+        public bool wasJustCalled = false;
+
+        public bool doThisScrollingsLightShift = true;
+        public float nightTimeDarknessOpacity = 0.6f;
+
+        public int counterUpMoves = 0;
+        public int uCounter = 0;
+        public bool useScrollingSystem = true;
+        public float scrollingTimer = 100; //runs from 100 to 0
+        public bool isScrollingNow = false;
+        public string scrollingDirection = "up"; //up, right, down, left
+        public float scrollingSpeed = 4.0f;//default 4f, lower is faster
+
+        public bool useFastRender = false;
+        public bool isInitialParticleWave = false;
+        public bool wasSuccessfulPush = false;
+        public bool showPortrtaitsThisUpdate = false;
+        public string permanentPartyText = "none";
+        public bool playFootstepSound = true;
+        public bool hudIsShown = true;
+        public float nightTimeDarkness = 0.65f;
+        public bool stopMoves = false;
+        public bool gitTest = false;
+        //public bool noHaloForParty = false;
+        //public bool noHaloAddToParty = false;
+        public string drawPartyDirection = "none"; //left, right, up, down
+        public string tagOfStealthMainTrait = "shadow";
+        public string tagOfStealthCombatTrait = "stealth";
+        public string tagOfMovementSpeedTrait = "traveller";
+        public string tagOfSpotEnemyTrait = "lookout";
+        public string tagOfDisarmTrapCombatTrait = "disabledevice";
+
+
+        public bool useFlatFootedSystem = true;
+
+        public bool partyIsSearching = false;
+        public int timePerStepAfterSpeedCalc = 6; //in minutes
+
+        public int partySpeed = 100; //default speed is 100; max is 199, min is 1
+        public int vehicleAdditionalSpeed = 0;//ís added to party speed, always caps at 199 though (min 1 in case of negative additional vehicle speed)
+        public int absoluteVehicleSpeed = 0; //The his replaces the normal party speed, use values from 1 to 199;
+
+
+        public string oldPartyTokenFilename = "none";
+        public bool oldPartyTokenEnabledState = false;
+
+        public bool currentlyOnOwnZone = false;
+        public bool currentlyOnMotherZone = false;
+        public bool currentlyOnGrandMotherZone = false;
+
+
+        public bool overviewOwnZoneMapExists = false;
+        public bool overviewMotherZoneMapExists = false;
+        public bool overviewGrandMotherZoneMapExists = false;
+
+        public bool showOverviewButtonOwnZoneMap = false;
+        public bool showOverviewButtonMotherZoneMap = false;
+        public bool showOverviewButtonGrandMotherZoneMap = false;
+
+        public string filenameOfOwnZoneMap = "none";
+        public string filenameOfMotherZoneMap = "none";
+        public string filenameOfGrandMotherZoneMap = "none";
+
+        public string ingameNameOfOwnZoneMap = "none";
+        public string ingameNameOfMotherZoneMap = "none";
+        public string ingameNameOfGrandMotherZoneMap = "none";
+
+        public string overviewReturnAreaName = "none";
+        public int overviewReturnLocationX = 0;
+        public int overviewReturnLocationY = 0;
+
+        public bool allowIntraPartyConvos = false;
+
+        public bool useLightSystem = true;
+
+        public bool useComplexCoordinateSystem = true;
+
+        public bool useAlternativeSpeechBubbleSystem = true;
+
+        //public bool showGuildInfo = true;
+
+        public bool realTimeTimerStopped = false;
+
+        public int poorVisionModifier = 0;
+
+        public int nightFightModifier = -4;
+        public int darkFightModifier = -8;
+
+        public bool alreadyDeleted = false;
+
+        public string currentPropTag = "none";
+
+        public bool noRimLights = false;
+        public bool blendOutTooHighAndTooDeepTiles = false;
+
         public bool activeSearchDoneThisMove = false;
         public bool activeSearchSPCostPaidByByLeaderOnly = true;
         public int activeSearchSPCost = 1;
@@ -55,7 +280,7 @@ namespace IBx
         public bool isSandstorm = false;
         public float logOpacity = 1f;
         public int logFadeCounter = 120;
-        
+        public bool hideInterfaceNextMove = false;
 
         public float pixDistanceToBorderWest = 0;
         public float pixDistanceToBorderEast = 0;
@@ -80,17 +305,38 @@ namespace IBx
         public int numberOfPlayerMadePcsAllowed = 1;
         public int numberOfPlayerMadePcsRequired = 1;
         public int MaxPartySize = 6;
-        public int requiredPartySize = 0;
+        //public int requiredPartySize = 0;
         public string moduleDescription = "";
         public string moduleCredits = "";
         public int nextIdNumber = 100;
         public int WorldTime = 0;
+        public int lastWorldTime = 0;
         public int TimePerRound = 6;
         public bool debugMode = false;
         public bool allowSave = true;
         public bool useLuck = false;
         public bool hideRoster = false;
         public bool use3d6 = false;
+
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        public bool useHybridRollPointDistribution = false;
+        public bool useManualPointDistribution = true;
+        public int attributeBaseValue = 10;
+        public int attributeMinValue = 6;
+        public int attributeMaxValue = 18;
+        public int pointPoolSize = 15;
+        public int twoPointThreshold = 14;
+        public int threePointThreshold = 16;
+        public int fourPointThreshold = 18;
+        public int numberOfMentalAtttributesBelowBaseAllowed = 2;
+        public int numberOfPhysicalAtttributesBelowBaseAllowed = 2;
+
+        public int counterMentalAttributesBelowTen = 0;
+        public int counterPhysicalAttributesBelowTen = 0;
+        public int counterPointsToDistributeLeft = 0;
+
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
         public bool useUIBackground = true;
         public string fontName = "Metamorphous";
         public string fontFilename = "Metamorphous-Regular.ttf";
@@ -121,9 +367,9 @@ namespace IBx
         //public Keys KeyDebug = new Keys();
         [JsonIgnore]
         public List<Item> moduleItemsList = new List<Item>();
-        
+
         public List<Encounter> moduleEncountersList = new List<Encounter>();
-        
+
         public List<Container> moduleContainersList = new List<Container>();
         public List<Shop> moduleShopsList = new List<Shop>();
         [JsonIgnore]
@@ -140,18 +386,22 @@ namespace IBx
         public List<Trait> moduleTraitsList = new List<Trait>();
         [JsonIgnore]
         public List<Effect> moduleEffectsList = new List<Effect>();
-
         [JsonIgnore]
-        public List<string> nonRepeatableFreeActionsUsedThisTurnBySpellTag= new List<string>();
+        public List<string> nonRepeatableFreeActionsUsedThisTurnBySpellTag = new List<string>();
         [JsonIgnore]
         public bool swiftActionHasBeenUsedThisTurn = false;
+        public List<Faction> moduleFactionsList = new List<Faction>();
 
+        public List<Prop> propsWaitingForRespawn = new List<Prop>();
 
         public List<string> moduleAreasList = new List<string>();
-        
+
         public List<string> moduleConvosList = new List<string>();
-        
+
         public List<Area> moduleAreasObjects = new List<Area>();
+
+        public int lastYadjustment = 0;
+        public int lastXadjustment = 0;
 
         public List<GlobalInt> moduleGlobalInts = new List<GlobalInt>();
         public List<GlobalString> moduleGlobalStrings = new List<GlobalString>();
@@ -180,6 +430,7 @@ namespace IBx
         public List<JournalQuest> partyJournalQuests = new List<JournalQuest>();
         public List<JournalQuest> partyJournalCompleted = new List<JournalQuest>();
         public string partyJournalNotes = "";
+        public bool hideZeroPowerTraits = false;
         public int selectedPartyLeader = 0;
         [JsonIgnore]
         public bool returnCheck = false;
@@ -195,8 +446,8 @@ namespace IBx
         public int indexOfPCtoLastUseItem = 0;
         public bool com_showGrid = false;
         public bool map_showGrid = false;
-        public bool playMusic = false;
-        public bool playSoundFx = false;
+        public bool playMusic = true;
+        public bool playSoundFx = true;
         public bool playButtonSounds = false;
         public bool playButtonHaptic = false;
         public bool showTutorialParty = true;
@@ -216,7 +467,7 @@ namespace IBx
         public bool useRealTimeTimer = false;
         public bool useSmoothMovement = true;
         public bool useAllTileSystem = true;
-        public int realTimeTimerLengthInMilliSeconds = 7000;
+        public int realTimeTimerLengthInMilliSeconds = 1500;
         public int attackFromBehindToHitModifier = 2;
         public int attackFromBehindDamageModifier = 0;
         public bool EncounterOfTurnDone = false;
@@ -305,7 +556,7 @@ namespace IBx
         //from 1 to 336
         public int currentDay = 1;
         public int currentWeekDay = 1;
-        public int currentMonthDay = 1; 
+        public int currentMonthDay = 1;
 
 
 
@@ -316,11 +567,11 @@ namespace IBx
         public bool allowImmediateRetransition = false;
         //[JsonIgnore]
         //public List<Bitmap> loadedTileBitmaps = new List<Bitmap>();
-        public List<string> loadedTileBitmapsNames = new List<string>();
+        public List<String> loadedTileBitmapsNames = new List<String>();
         //[JsonIgnore]
         //public List<System.Drawing.Bitmap> loadedMinimapTileBitmaps = new List<System.Drawing.Bitmap>();
         public List<String> loadedMinimapTileBitmapsNames = new List<String>();
-        
+
         public string partyLightColor = "yellow";
         public float partyRingHaloIntensity = 1f;
         public float partyFocalHaloIntensity = 1f;
@@ -338,7 +589,7 @@ namespace IBx
         public float fullScreenAnimationFrameCounter1 = 0;
         public float changeCounter1 = 0;
         public float changeFrameCounter1 = 0;
-        public float fullScreenAnimationSpeedX1 = 0; 
+        public float fullScreenAnimationSpeedX1 = 0;
         public float fullScreenAnimationSpeedY1 = 0;
         public float fullScreenAnimationFrameCounterX1 = 0;
         public float fullScreenAnimationFrameCounterY1 = 0;
@@ -467,7 +718,7 @@ namespace IBx
                             p.initializeProp();
                         }
                         moduleAreasObjects.Add(newArea);
-                    }                    
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -475,7 +726,6 @@ namespace IBx
                 }
             }
         }
-
         public bool setCurrentArea(string filename, GameView gv)
         {
             try
@@ -485,8 +735,21 @@ namespace IBx
                     if (area.Filename.Equals(filename))
                     {
                         this.currentArea = area;
-                        //gv.cc.bmpMap = this.currentArea.ImageFileName;
-                        //TODO gv.cc.LoadTileBitmapList();                        
+                        if (!gv.mod.useAllTileSystem)
+                        {
+                            //gv.cc.DisposeOfBitmap(ref gv.cc.bmpMap);
+                            gv.cc.bmpMap = gv.cc.LoadBitmap(this.currentArea.ImageFileName);
+
+                            //TODO gv.cc.LoadTileBitmapList();
+
+                            /*foreach (Prop p in this.currentArea.Props)
+                            {
+                                gv.cc.DisposeOfBitmap(ref p.token);
+                                p.token = gv.cc.LoadBitmap(p.ImageFileName);
+                            }*/
+
+                        }
+
                         return true;
                     }
                 }
@@ -499,107 +762,6 @@ namespace IBx
             }
 
         }
-        public bool setCurrentAreaNew(string areaFilename, GameView gv)
-        {
-            try
-            {
-                foreach (Area area in this.moduleAreasObjects)
-                {
-                    if (area.Filename.Equals(areaFilename))
-                    {
-                        this.currentArea = area;
-                        return true;
-                    }
-                }
-                //didn't find the area in the mod list so try and load it
-                /*string s = gv.GetModuleAssetFileString(this.moduleName, areaFilename + ".are");
-                using (StringReader sr = new StringReader(s))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    Area are = (Area)serializer.Deserialize(sr, typeof(Area));
-                    if (are != null)
-                    {
-                        this.moduleAreasObjects.Add(are);
-                        this.currentArea = are;
-                        return true;
-                    }
-                }*/
-                return false;
-            }
-            catch (Exception ex)
-            {
-                gv.errorLog(ex.ToString());
-                return false;
-            }
-        }
-        public bool setCurrentEncounter(string EncFilename, GameView gv)
-        {
-            try
-            {
-                foreach (Encounter enc in this.moduleEncountersList)
-                {
-                    if (enc.encounterName.Equals(EncFilename))
-                    {
-                        this.currentEncounter = enc;
-                        return true;
-                    }
-                }
-                //didn't find the area in the mod list so try and load it
-                /*string s = gv.GetModuleAssetFileString(this.moduleName, EncFilename + ".enc");
-                using (StringReader sr = new StringReader(s))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    Encounter enc = (Encounter)serializer.Deserialize(sr, typeof(Encounter));
-                    if (enc != null)
-                    {
-                        this.moduleEncountersList.Add(enc);
-                        this.currentEncounter = enc;
-                        return true;
-                    }
-                }*/
-                return false;
-            }
-            catch (Exception ex)
-            {
-                gv.errorLog(ex.ToString());
-                return false;
-            }
-        }
-        public bool setCurrentConvo(string ConvoFilename, GameView gv)
-        {
-            try
-            {
-                /*TODO foreach (Convo cnv in this.moduleConvosList)
-                {
-                    if (cnv.ConvoFileName.Equals(ConvoFilename))
-                    {
-                        gv.screenConvo.currentConvo = cnv;
-                        return true;
-                    }
-                }*/
-                //didn't find the area in the mod list so try and load it
-                /*string s = gv.GetModuleAssetFileString(this.moduleName, ConvoFilename + ".dlg");
-                using (StringReader sr = new StringReader(s))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    Convo cnv = (Convo)serializer.Deserialize(sr, typeof(Convo));
-                    if (cnv != null)
-                    {
-                        //TODO this.moduleConvosList.Add(cnv);
-                        gv.screenConvo.currentConvo = cnv;
-                        return true;
-                    }
-                }*/
-                return false;
-            }
-            catch (Exception ex)
-            {
-                gv.errorLog(ex.ToString());
-                return false;
-            }
-
-        }
-
 
         public int getNextIdNumber()
         {

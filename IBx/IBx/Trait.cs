@@ -10,26 +10,29 @@ using Newtonsoft.Json;
 
 namespace IBx
 {
-    public class Trait 
+    public class Trait
     {
-	    public string name = "newTrait";
-	    public string tag = "newTraitTag";
-	    public string traitImage = "sp_magebolt";
-	    public string description = "";
-	    public string prerequisiteTrait = "none";
-	    public int skillModifier = 0;
-	    public string skillModifierAttribute = "str";
-	    public string useableInSituation = "Always"; //InCombat, OutOfCombat, Always, Passive
+        public string name = "newTrait";
+        public string nameOfTraitGroup = "none";
+        public string tag = "newTraitTag";
+        public string traitImage = "sp_magebolt";
+        public string description = "";
+        public bool showOnMainMap = false;
+        public string methodOfChecking = "leader";  //leader (>=0), highest (-2; best suited for oneMustSuccceed, too), lowest(-3; (best suited for allMustSucceéd, too)), average (-4), allMustSucced (-5),  
+        public string prerequisiteTrait = "none";
+        public int skillModifier = 0;
+        public string skillModifierAttribute = "str";
+        public string useableInSituation = "Always"; //InCombat, OutOfCombat, Always, Passive
         public string associatedSpellTag = "none";
         //note: uses turn to activate is defined on spell level
-	    public string spriteFilename = "none";
-	    public string spriteEndingFilename = "none";
-	    public int costSP = 10;	
-	    public string traitTargetType = "Enemy"; //Self, Enemy, Friend, PointLocation
-	    public string traitEffectType = "Damage"; //Damage, Heal, Buff, Debuff
-	    public int aoeRadius = 1;
-	    public int range = 2;	
-	    public string traitScript = "none";//not used
+        public string spriteFilename = "none";
+        public string spriteEndingFilename = "none";
+        public int costSP = 10;
+        public string traitTargetType = "Enemy"; //Self, Enemy, Friend, PointLocation
+        public string traitEffectType = "Damage"; //Damage, Heal, Buff, Debuff
+        public int aoeRadius = 1;
+        public int range = 2;
+        public string traitScript = "none";//not used
         public List<EffectTagForDropDownList> traitEffectTagList = new List<EffectTagForDropDownList>();
         public List<LocalImmunityString> traitWorksOnlyWhen = new List<LocalImmunityString>();
         public List<LocalImmunityString> traitWorksNeverWhen = new List<LocalImmunityString>();
@@ -42,31 +45,34 @@ namespace IBx
         public string traitToReplaceByTag = "none";
 
         public Trait()
-	    {
-		
-	    }
-	
-	    public Trait DeepCopy()
-	    {
-		    Trait copy = new Trait();
+        {
+
+        }
+
+        public Trait DeepCopy()
+        {
+            Trait copy = new Trait();
+            copy.nameOfTraitGroup = this.nameOfTraitGroup;
             copy.traitToReplaceByTag = this.traitToReplaceByTag;
-		    copy.name = this.name;
-		    copy.tag = this.tag;
-		    copy.traitImage = this.traitImage;
-		    copy.description = this.description;
-		    copy.prerequisiteTrait = this.prerequisiteTrait;
-		    copy.skillModifier = this.skillModifier;
-		    copy.skillModifierAttribute = this.skillModifierAttribute;
-		    copy.useableInSituation = this.useableInSituation;
-		    copy.spriteFilename = this.spriteFilename;	
-		    copy.spriteEndingFilename = this.spriteEndingFilename;
-		    copy.costSP = this.costSP;
-		    copy.traitTargetType = this.traitTargetType;
-		    copy.traitEffectType = this.traitEffectType;
-		    copy.aoeRadius = this.aoeRadius;
-		    copy.range = this.range;
-		    copy.traitScript = this.traitScript;
+            copy.name = this.name;
+            copy.tag = this.tag;
+            copy.traitImage = this.traitImage;
+            copy.description = this.description;
+            copy.prerequisiteTrait = this.prerequisiteTrait;
+            copy.skillModifier = this.skillModifier;
+            copy.skillModifierAttribute = this.skillModifierAttribute;
+            copy.useableInSituation = this.useableInSituation;
+            copy.spriteFilename = this.spriteFilename;
+            copy.spriteEndingFilename = this.spriteEndingFilename;
+            copy.costSP = this.costSP;
+            copy.traitTargetType = this.traitTargetType;
+            copy.traitEffectType = this.traitEffectType;
+            copy.aoeRadius = this.aoeRadius;
+            copy.range = this.range;
+            copy.traitScript = this.traitScript;
             copy.associatedSpellTag = this.associatedSpellTag;
+            copy.showOnMainMap = this.showOnMainMap;
+            copy.methodOfChecking = this.methodOfChecking;
 
             copy.traitWorksOnlyWhen = new List<LocalImmunityString>();
             foreach (LocalImmunityString s in this.traitWorksOnlyWhen)
@@ -87,6 +93,6 @@ namespace IBx
             }
 
             return copy;
-	    }
+        }
     }
 }

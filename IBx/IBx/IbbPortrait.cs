@@ -12,9 +12,11 @@ namespace IBx
         public string ImgBG = null;
         public string Img = null;
         public string ImgLU = null; //used for level up icon
+        public string ImgChat = null; //used for new chat option availabe indicator icon
         public string Glow = null;
         public bool glowOn = false;
         public bool levelUpOn = false;
+        public bool newChatOptionOn = false;
         public string TextHP = "";
         public string TextSP = "";
         public int X = 0;
@@ -57,7 +59,9 @@ namespace IBx
             IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgBG).Width, gv.cc.GetFromBitmapList(ImgBG).Height);
             IbRect src2 = new IbRect(0, 0, 0, 0);
             IbRect src3 = new IbRect(0, 0, 0, 0);
+            IbRect src4 = new IbRect(0, 0, 0, 0);
             IbRect dstLU = new IbRect(0, 0, 0, 0);
+            IbRect dstChat = new IbRect(0, 0, 0, 0);
 
             if (this.Img != null)
             {
@@ -67,6 +71,10 @@ namespace IBx
             {
                 src3 = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgLU).Width, gv.cc.GetFromBitmapList(ImgLU).Height);
             }
+            if (this.ImgChat != null)
+            {
+                src4 = new IbRect(0, 0, gv.cc.GetFromBitmapList(ImgChat).Width, gv.cc.GetFromBitmapList(ImgChat).Height);
+            }
             IbRect dstBG = new IbRect(this.X - (int)(3 * gv.screenDensity),
                                         this.Y - (int)(3 * gv.screenDensity),
                                         (int)((float)this.Width) + (int)(6 * gv.screenDensity),
@@ -75,6 +83,10 @@ namespace IBx
             if (this.ImgLU != null)
             {
                 dstLU = new IbRect(this.X, this.Y, gv.cc.GetFromBitmapList(ImgLU).Width, gv.cc.GetFromBitmapList(ImgLU).Height);
+            }
+            if (this.ImgChat != null)
+            {
+                dstChat = new IbRect(this.X, this.Y, gv.cc.GetFromBitmapList(ImgChat).Width, gv.cc.GetFromBitmapList(ImgChat).Height);
             }
             IbRect srcGlow = new IbRect(0, 0, gv.cc.GetFromBitmapList(Glow).Width, gv.cc.GetFromBitmapList(Glow).Height);
             IbRect dstGlow = new IbRect(this.X - (int)(7 * gv.screenDensity), 
@@ -100,6 +112,15 @@ namespace IBx
                 {
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgLU), src3, dstLU);
                 }                
+            }
+
+            if (this.ImgChat != null)
+            {
+                if (newChatOptionOn)
+                {
+                    //kvbkoeln 
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgChat), src4, dstChat);
+                }
             }
 
             if (gv.mod.useUIBackground)
@@ -135,15 +156,16 @@ namespace IBx
             int ulX = pW * 0;
             int ulY = this.Height - ((int)thisFontHeight * 2);
 
-            for (int x = -2; x <= 2; x++)
+            /*for (int x = -2; x <= 2; x++)
             {
                 for (int y = -2; y <= 2; y++)
                 {
                     gv.DrawText(TextHP, this.X + ulX + x, this.Y + ulY - pH + y , fontHeightInString, "black");
                 }
-            }
-            gv.DrawText(TextHP, this.X + ulX, this.Y + ulY - pH, fontHeightInString, "lime");
-            
+            }*/
+            //gv.DrawText(TextHP, this.X + ulX, this.Y + ulY - pH, fontHeightInString, "lime");
+            gv.DrawTextOutlined(TextHP, this.X + ulX, this.Y + ulY - pH, "normal", fontHeightInString, "lime", false);
+
             //DRAW SP/SPmax
             // Measure string.
             //stringSize = gv.cc.MeasureString(TextSP, thisFont, this.Width);
@@ -154,14 +176,15 @@ namespace IBx
             ulX = pW * 1;
             ulY = this.Height - ((int)thisFontHeight * 1);
 
-            for (int x = -2; x <= 2; x++)
+            /*for (int x = -2; x <= 2; x++)
             {
                 for (int y = -2; y <= 2; y++)
                 {
                     gv.DrawText(TextSP, this.X + ulX - pW + x, this.Y + ulY - pH + y, fontHeightInString, "black");
                 }
-            }
-            gv.DrawText(TextSP, this.X + ulX - pW, this.Y + ulY - pH, fontHeightInString, "yellow");
+            }*/
+            //gv.DrawText(TextSP, this.X + ulX - pW, this.Y + ulY - pH, fontHeightInString, "yellow");
+            gv.DrawTextOutlined(TextSP, this.X + ulX - pW, this.Y + ulY - pH, "normal", fontHeightInString, "yellow", false);
         }
     }
 }

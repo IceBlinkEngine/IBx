@@ -6,16 +6,19 @@ using System.Text;
 
 namespace IBx
 {
-    public class ScreenTraitLevelUp 
+    public class ScreenTraitLevelUp
     {
 
-	    //private gv.module gv.mod;
-	    private GameView gv;
-	
-	    private int traitSlotIndex = 0;
-        private int traitToLearnIndex = 1;
+        //private gv.module gv.mod;
+        //public bool screenInPcCreation = false;
+        //public bool screenInCombat = false;
+
+        private GameView gv;
+
+        private int traitSlotIndex = 0;
+        public int traitToLearnIndex = 1;
         private int slotsPerPage = 20;
-        
+
         //added(1)
         private int maxPages = 20;
         private int tknPageIndex = 0;
@@ -28,10 +31,11 @@ namespace IBx
         private IbbButton btnPageIndex = null;
 
         private IbbButton btnHelp = null;
-	    private IbbButton btnSelect = null;
-	    private IbbButton btnExit = null;
-	    List<string> traitsToLearnTagsList = new List<string>();
-	    private Player pc;
+        private IbbButton btnSelect = null;
+        private IbbButton btnInfo = null;
+        private IbbButton btnExit = null;
+        List<string> traitsToLearnTagsList = new List<string>();
+        public Player pc;
         public bool infoOnly = false; //set to true when called for info only
         private string stringMessageTraitLevelUp = "";
         private IbbHtmlTextBox description;
@@ -39,29 +43,29 @@ namespace IBx
         List<TraitAllowed> backupTraitsAllowed = new List<TraitAllowed>();
 
 
-        public ScreenTraitLevelUp(Module m, GameView g) 
-	    {
-		    //gv.mod = m;
-		    gv = g;
-		    setControlsStart();
-		    pc = new Player();
-		    stringMessageTraitLevelUp = gv.cc.loadTextToString("MessageTraitLevelUp.txt");
-	    }
-	
-	    public void resetPC(bool info_only, Player p)
-	    {
-		    pc = p;
+        public ScreenTraitLevelUp(Module m, GameView g)
+        {
+            //gv.mod = m;
+            gv = g;
+            setControlsStart();
+            pc = new Player();
+            stringMessageTraitLevelUp = gv.cc.loadTextToString("data/MessageTraitLevelUp.txt");
+        }
+
+        public void resetPC(bool info_only, Player p)
+        {
+            pc = p;
             infoOnly = info_only;
             traitToLearnIndex = 1;
         }
 
         public void sortTraitsForLevelUp(Player pc)
         {
-               
-                //clear 
-                backupTraitsAllowed.Clear();
-                List<string> traitsForLearningTags = new List<string>();
-                List<TraitAllowed> traitsForLearning = new List<TraitAllowed>();
+
+            //clear 
+            backupTraitsAllowed.Clear();
+            List<string> traitsForLearningTags = new List<string>();
+            List<TraitAllowed> traitsForLearning = new List<TraitAllowed>();
 
             if (!infoOnly)
             {
@@ -144,7 +148,7 @@ namespace IBx
                                 notKnownYet = false;
                             }
                         }
-                        
+
                         //not already replaced
                         foreach (string s in pc.replacedTraitsOrSpellsByTag)
                         {
@@ -339,7 +343,7 @@ namespace IBx
                                 notKnownYet = false;
                             }
                         }
-                        
+
                     }
 
                     if (notKnownYet)
@@ -366,11 +370,11 @@ namespace IBx
 
             }
         }
-	    public void setControlsStart()
-	    {			
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		    int padW = gv.squareSize/6;
+        public void setControlsStart()
+        {
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+            int padW = gv.squareSize / 6;
 
             description = new IbbHtmlTextBox(gv, 320, 100, 500, 300);
             //description = new IbbHtmlTextBox(gv, 3*gv.squareSize + 2*pW, 2*gv.squareSize, gv.squareSize*5, gv.squareSize*10);
@@ -414,57 +418,70 @@ namespace IBx
             }
 
             if (btnSelect == null)
-		    {
-			    btnSelect = new IbbButton(gv, 0.8f);	
-			    btnSelect.Text = "LEARN SELECTED CHOICE";
-			    btnSelect.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnSelect.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+            {
+                btnSelect = new IbbButton(gv, 0.8f);
+                btnSelect.Text = "LEARN SELECTED CHOICE";
+                btnSelect.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnSelect.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnSelect.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
-			    btnSelect.Y = 9 * gv.squareSize + pH * 2;
+                btnSelect.Y = 9 * gv.squareSize + pH * 2;
                 btnSelect.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSelect.Width = (int)(gv.ibbwidthL * gv.screenDensity);			
-		    }
-		    if (btnHelp == null)
-		    {
-			    btnHelp = new IbbButton(gv, 0.8f);	
-			    btnHelp.Text = "HELP";
-			    btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
-			    btnHelp.Y = 9 * gv.squareSize + pH * 2;
+                btnSelect.Width = (int)(gv.ibbwidthL * gv.screenDensity);
+            }
+
+            if (btnInfo == null)
+            {
+                btnInfo = new IbbButton(gv, 0.8f);
+                btnInfo.Text = "MORE";
+                btnInfo.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnInfo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnInfo.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
+                btnInfo.Y = 9 * gv.squareSize + pH * 2;
+                btnInfo.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnInfo.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+            }
+
+            if (btnHelp == null)
+            {
+                btnHelp = new IbbButton(gv, 0.8f);
+                btnHelp.Text = "HELP";
+                btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
+                btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnHelp.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    if (btnExit == null)
-		    {
-			    btnExit = new IbbButton(gv, 0.8f);	
-			    btnExit.Text = "EXIT";
-			    btnExit.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnExit.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnExit.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
-			    btnExit.Y = 9 * gv.squareSize + pH * 2;
+                btnHelp.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+            }
+            if (btnExit == null)
+            {
+                btnExit = new IbbButton(gv, 0.8f);
+                btnExit.Text = "EXIT";
+                btnExit.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnExit.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnExit.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
+                btnExit.Y = 9 * gv.squareSize + pH * 2;
                 btnExit.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnExit.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    for (int y = 0; y < slotsPerPage; y++)
-		    {
-			    IbbButton btnNew = new IbbButton(gv, 1.0f);
+                btnExit.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+            }
+            for (int y = 0; y < slotsPerPage; y++)
+            {
+                IbbButton btnNew = new IbbButton(gv, 1.0f);
                 btnNew.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
                 btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			
-			    int x = y % 5;
-			    int yy = y / 5;
-			    btnNew.X = ((x + 4) * gv.squareSize) + (padW * (x+1)) + gv.oXshift;
-			    btnNew.Y = (2 + yy) * gv.squareSize + (padW * yy + padW);
+
+                int x = y % 5;
+                int yy = y / 5;
+                btnNew.X = ((x + 4) * gv.squareSize) + (padW * (x + 1)) + gv.oXshift;
+                btnNew.Y = (2 + yy) * gv.squareSize + (padW * yy + padW);
 
                 btnNew.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnNew.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-			    btnTraitSlots.Add(btnNew);
-		    }			
-	    }
+                btnTraitSlots.Add(btnNew);
+            }
+        }
 
         //new method for checking attribute requiremnts of traits
-        public bool checkAttributeRequirementsOfTrait (Player pc, Trait t)
+        public bool checkAttributeRequirementsOfTrait(Player pc, Trait t)
         {
             gv.sf.UpdateStats(pc);
 
@@ -495,29 +512,29 @@ namespace IBx
 
             return true;
         }
-	
-	    //CAST SELECTOR SCREEN (COMBAT and MAIN)
+
+        //CAST SELECTOR SCREEN (COMBAT and MAIN)
         public void redrawTraitLevelUp(bool inPcCreation)
         {
-    	    traitsToLearnTagsList.Clear();
-    	    fillToLearnList();
-    	
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		
-    	    int locY = 0;
-    	    int locX = pW * 4;
+            traitsToLearnTagsList.Clear();
+            fillToLearnList();
+
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+
+            int locY = 0;
+            int locX = pW * 4;
             int textH = (int)gv.drawFontRegHeight;
-    	    int spacing = textH;
+            int spacing = textH;
             int tabX = 5 * gv.squareSize + pW * 3;
             int noticeX = 5 * gv.squareSize + pW * 3;
-    	    int noticeY = pH * 1 + spacing;
-    	    int tabStartY = 4 * gv.squareSize + pW * 10;
+            int noticeY = pH * 1 + spacing;
+            int tabStartY = 4 * gv.squareSize + pW * 10;
 
             if (!infoOnly)
             {
-                
-                
+
+
                 //DRAW TEXT		
                 locY = (gv.squareSize * 0) + (pH * 2);
                 //gv.DrawText("Select One Trait to Learn", noticeX, pH * 1, 1.0f, Color.Gray);
@@ -525,66 +542,66 @@ namespace IBx
                 if (gv.mod.getPlayerClass(pc.classTag).traitsToLearnAtLevelTable[pc.classLevel] > pc.getTraitsToLearn(gv.mod).Count)
                 {
                     maxNumber = pc.getTraitsToLearn(gv.mod).Count;
-                    maxNumber += traitToLearnIndex-1;
+                    maxNumber += traitToLearnIndex - 1;
                 }
                 else
                 {
                     maxNumber = gv.mod.getPlayerClass(pc.classTag).traitsToLearnAtLevelTable[pc.classLevel];
                 }
-                gv.DrawText("Select Choice Nr. " + traitToLearnIndex + " of " + maxNumber + " Choice(s) to Learn", noticeX, pH * 1, "gray");
+                gv.DrawText("Select Choice Nr. " + traitToLearnIndex + " of " + maxNumber + " Choice(s) to Learn", noticeX, pH * 1, 1.0f, "gray");
 
                 //DRAW NOTIFICATIONS
                 if (isSelectedTraitSlotInKnownTraitsRange())
                 {
                     Trait tr = GetCurrentlySelectedTrait();
-                    
+
                     //check to see if already known
                     //if (pc.knownTraitsTags.Contains(tr.tag))
                     if ((pc.knownTraitsTags.Contains(tr.tag)) || (pc.learningTraitsTags.Contains(tr.tag)))
                     {
                         //say that you already know this one
-                        gv.DrawText("Already Known", noticeX, noticeY, "yellow");
+                        gv.DrawText("Already Known", noticeX, noticeY, 1.0f, "yellow");
                     }
                     else //trait not known
                     {
                         //checking attribute requiremnts of trait
                         bool attributeRequirementsMet = checkAttributeRequirementsOfTrait(pc, tr);
-                        
+
                         //check if available to learn
                         if (isAvailableToLearn(tr.tag) && attributeRequirementsMet)
                         {
-                            gv.DrawText("Available to Learn", noticeX, noticeY, "lime");
+                            gv.DrawText("Available to Learn", noticeX, noticeY, 1.0f, "lime");
                         }
                         else //not available yet
                         {
                             if (attributeRequirementsMet)
                             {
-                                gv.DrawText(pc.playerClass.traitLabelSingular + " Not Available to Learn Yet", noticeX, noticeY, "red");
+                                gv.DrawText(pc.playerClass.traitLabelSingular + " Not Available to Learn Yet", noticeX, noticeY, 1.0f, "red");
                             }
-                            else 
+                            else
                             {
-                                gv.DrawText("Attribute requirements not met", noticeX, noticeY, "red");
+                                gv.DrawText("Attribute requirements not met", noticeX, noticeY, 1.0f, "red");
                             }
                         }
                     }
                 }
-            }	
-		
-		    //DRAW ALL TRAIT SLOTS		
-		    int cntSlot = 0;
-		    foreach (IbbButton btn in btnTraitSlots)
-		    {			
-			    //Player pc = getCastingPlayer();
-			
-			    if (cntSlot == traitSlotIndex) {btn.glowOn = true;}
-			    else {btn.glowOn = false;}
+            }
+
+            //DRAW ALL TRAIT SLOTS		
+            int cntSlot = 0;
+            foreach (IbbButton btn in btnTraitSlots)
+            {
+                //Player pc = getCastingPlayer();
+
+                if (cntSlot == traitSlotIndex) { btn.glowOn = true; }
+                else { btn.glowOn = false; }
 
                 //added
                 //if ((cntSlot + (tknPageIndex * slotsPerPage)) < playerTokenList.Count)
                 //{
                 //}
                 //show only traits for the PC class
-                
+
                 //here insert
                 //do we need to recalculate without change?
                 //sortTraitsForLevelUp(pc);
@@ -603,17 +620,18 @@ namespace IBx
                             btn.Img = "btn_small";
                             btn.Img2 = tr.traitImage;
                             btn.Img3 = null;
+                            //btn.Img3 = null;
 
                             //gv.cc.DisposeOfBitmap(ref btn.Img3);
-                            //btn.Img3 = ""mandatory_conversation_indicator");
+                            //btn.Img3 = gv.cc.LoadBitmap("mandatory_conversation_indicator");
                         }
                         else //trait not known yet
                         {
                             /*
                             gv.cc.DisposeOfBitmap(ref btn.Img);
-                            btn.Img = ""btn_small_off");
+                            btn.Img = gv.cc.LoadBitmap("btn_small_off");
                             gv.cc.DisposeOfBitmap(ref btn.Img2);
-                            btn.Img2 = "tr.traitImage + "_off");
+                            btn.Img2 = gv.cc.LoadBitmap(tr.traitImage + "_off");
                             btn.Img3 = null;
                             */
                             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -627,13 +645,13 @@ namespace IBx
                             {
                                 btn.Img = "btn_small_off";
                                 btn.Img2 = tr.traitImage + "_off";
-                                btn.Img3 = "mandatory_conversation_indicator";
+                                btn.Img3 = "yellow_frame";
                             }
                             else //not available to learn, turn off button
                             {
                                 btn.Img = "btn_small_off";
                                 btn.Img2 = tr.traitImage + "_off";
-                                btn.Img3 = "encounter_indicator";
+                                btn.Img3 = "red_frame";
                             }
 
                             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -645,7 +663,7 @@ namespace IBx
                         {
                             btn.Img = "btn_small_off";
                             btn.Img2 = tr.traitImage + "_off";
-                            btn.Img3 = "mandatory_conversation_indicator";
+                            btn.Img3 = "yellow_frame";
                         }
                         else //trait not known yet
                         {
@@ -653,37 +671,38 @@ namespace IBx
                             bool attributeRequirementsMet = checkAttributeRequirementsOfTrait(pc, tr);
                             //if (tr.tag == "bluff")
                             //{
-                                //int hghg = 0;
+                            //int hghg = 0;
                             //}
                             if (isAvailableToLearn(tr.tag) && attributeRequirementsMet) //if available to learn, turn on button
                             {
                                 btn.Img = "btn_small";
                                 btn.Img2 = tr.traitImage;
                                 btn.Img3 = null;
+                                //btn.Img3 = null;
                             }
                             else //not available to learn, turn off button
                             {
                                 btn.Img = "btn_small_off";
                                 btn.Img2 = tr.traitImage + "_off";
-                                btn.Img3 = "encounter_indicator";
+                                btn.Img3 = "red_frame";
                             }
                         }
-                    }				
-			    }
-			    else //slot is not in traits allowed index range
-			    {
-                    btn.Img = "btn_small_off"; 
-				    btn.Img2 = null;
+                    }
+                }
+                else //slot is not in traits allowed index range
+                {
+                    btn.Img = "btn_small_off";
+                    btn.Img2 = null;
                     btn.Img3 = null;
-			    }			
-			    btn.Draw();
-			    cntSlot++;
-		    }
-		
-		    //DRAW DESCRIPTION BOX
-		    locY = tabStartY;		
-		    if (isSelectedTraitSlotInKnownTraitsRange())
-		    {
+                }
+                btn.Draw();
+                cntSlot++;
+            }
+
+            //DRAW DESCRIPTION BOX
+            locY = tabStartY;
+            if (isSelectedTraitSlotInKnownTraitsRange())
+            {
                 Trait tr = GetCurrentlySelectedTrait();
                 Spell sp = new Spell();
                 if (tr.associatedSpellTag != "none" && tr.associatedSpellTag != "None" && tr.associatedSpellTag != "")
@@ -711,13 +730,11 @@ namespace IBx
                     {
                         textToSpan += "Takes " + sp.castTimeInTurns + " full turn(s)" + "<BR>";
                     }
-
-                    if (sp.coolDownTime > 0)
-                    {
-                        textToSpan += "Cool down time: " + sp.coolDownTime + " turn(s)" + "<BR>";
-                    }
                 }
-                
+                if (sp.coolDownTime > 0)
+                {
+                    textToSpan += "Cool down time: " + sp.coolDownTime + " turn(s)" + "<BR>";
+                }
 
                 if (tr.prerequisiteTrait != "none")
                 {
@@ -733,7 +750,7 @@ namespace IBx
 
                 if (tr.requiredStrength > 0)
                 {
-                    textToSpan += "Required STR: " + tr.requiredStrength + "<BR>"; 
+                    textToSpan += "Required STR: " + tr.requiredStrength + "<BR>";
                 }
                 if (tr.requiredDexterity > 0)
                 {
@@ -765,24 +782,27 @@ namespace IBx
                 description.logLinesList.Clear();
                 description.AddHtmlTextToLog(textToSpan);
                 description.onDrawLogBox();
-		    }
+            }
 
             if (infoOnly)
             {
+                btnInfo.Text = "MORE";
                 btnSelect.Text = "RETURN";
+                btnInfo.Draw();
                 btnSelect.Draw();
                 btnTokensLeft.Draw();
-                btnTokensRight.Draw(); 
+                btnTokensRight.Draw();
                 btnPageIndex.Draw();
-        //todo draw other buttons
-        //zeke2
-    }
+                //todo draw other buttons
+                //zeke2
+            }
             else
             {
                 btnSelect.Text = "LEARN SELECTED " + pc.playerClass.traitLabelSingular.ToUpper();
                 btnHelp.Draw();
                 btnExit.Draw();
                 btnSelect.Draw();
+                btnInfo.Draw();
                 //todo draw other buttons
                 btnTokensLeft.Draw();
                 btnTokensRight.Draw();
@@ -790,9 +810,10 @@ namespace IBx
             }
         }
         public void onTouchTraitLevelUp(int eX, int eY, MouseEventType.EventType eventType, bool inPcCreation, bool inCombat)
-	    {
+        {
             try
             {
+                btnInfo.glowOn = false;
                 btnHelp.glowOn = false;
                 btnExit.glowOn = false;
                 btnSelect.glowOn = false;
@@ -813,6 +834,10 @@ namespace IBx
                         else if (btnSelect.getImpact(x, y))
                         {
                             btnSelect.glowOn = true;
+                        }
+                        else if (btnInfo.getImpact(x, y))
+                        {
+                            btnInfo.glowOn = true;
                         }
                         else if (btnExit.getImpact(x, y))
                         {
@@ -841,6 +866,7 @@ namespace IBx
                         btnHelp.glowOn = false;
                         btnExit.glowOn = false;
                         btnSelect.glowOn = false;
+                        btnInfo.glowOn = false;
 
                         for (int j = 0; j < slotsPerPage; j++)
                         {
@@ -892,6 +918,11 @@ namespace IBx
                             {
                                 doSelectedTraitToLearn(inPcCreation);
                             }
+                        }
+                        else if (btnInfo.getImpact(x, y))
+                        {
+                            string textToSpan = GetCurrentlySelectedTrait().description;
+                            gv.sf.MessageBoxHtml(textToSpan);
                         }
                         else if (btnExit.getImpact(x, y))
                         {
@@ -956,23 +987,23 @@ namespace IBx
             }
             catch
             { }
-	    }
-    
+        }
+
         public void doSelectedTraitToLearn(bool inPcCreation)
         {
-    	    if (isSelectedTraitSlotInKnownTraitsRange())
-		    {
-			    Trait tr = GetCurrentlySelectedTrait();
+            if (isSelectedTraitSlotInKnownTraitsRange())
+            {
+                Trait tr = GetCurrentlySelectedTrait();
 
                 //checking attribute requiremnts of trait
                 bool attributeRequirementsMet = checkAttributeRequirementsOfTrait(pc, tr);
 
-			    if (isAvailableToLearn(tr.tag) && attributeRequirementsMet)
-			    {
+                if (isAvailableToLearn(tr.tag) && attributeRequirementsMet)
+                {
                     //add trait
                     //pc.knownTraitsTags.Add(tr.tag);
                     pc.learningTraitsTags.Add(tr.tag);
-                      
+
                     foreach (EffectTagForDropDownList etfddl in tr.traitEffectTagList)
                     {
                         foreach (Effect e in gv.mod.moduleEffectsList)
@@ -1010,7 +1041,7 @@ namespace IBx
                         if (inPcCreation)
                         {
                             //if there are spells to learn go to spell screen next  
-                            List < string > spellTagsList = new List<string>();
+                            List<string> spellTagsList = new List<string>();
                             spellTagsList = pc.getSpellsToLearn();
                             if (spellTagsList.Count > 0)
                             {
@@ -1021,7 +1052,7 @@ namespace IBx
                             {
                                 //save character, add them to the pcList of screenPartyBuild, and go back to build screen
                                 //foreach (string s in pc.learningTraitsTags)
-                                for (int counter = pc.learningTraitsTags.Count-1; counter >= 0; counter--)
+                                for (int counter = pc.learningTraitsTags.Count - 1; counter >= 0; counter--)
                                 {
                                     pc.knownTraitsTags.Add(pc.learningTraitsTags[counter]);
                                     //TODO: must get trait by ts string
@@ -1176,169 +1207,169 @@ namespace IBx
                                             pc.knownInCombatUsableTraitsTags.Add(tr.associatedSpellTag);
                                         }
                                     }
-                    
-                    //add permanent effects of trait to effect list of this pc
-                    foreach (EffectTagForDropDownList efTag in tr.traitEffectTagList)
-                    {//1
-                        foreach (Effect ef in gv.mod.moduleEffectsList)
-                        {//2
-                            if (ef.tag == efTag.tag)
-                            {//3
-                                if (ef.isPermanent)
-                                {//4
-                                    bool doesNotExistAlfready = true;
-                                    foreach (Effect ef2 in pc.effectsList)
-                                    {//5
-                                        if (ef2.tag == ef.tag)
-                                        {//6
-                                            doesNotExistAlfready = false;
-                                            break;
-                                        }//6
-                                    }//5
 
-                                    if (doesNotExistAlfready)
-                                    {//6
-                                        pc.effectsList.Add(ef);
-                                        gv.sf.UpdateStats(pc);
-                                        if (ef.modifyHpMax != 0)
-                                        {//7
-                                            pc.hp += ef.modifyHpMax;
-                                            if (pc.hp < 1)
-                                            {//8
-                                                pc.hp = 1;
-                                            }//8
-                                            if (pc.hp > pc.hpMax)
-                                            {
-                                                pc.hp = pc.hpMax;
-                                            }
-                                        }//7
+                                    //add permanent effects of trait to effect list of this pc
+                                    foreach (EffectTagForDropDownList efTag in tr.traitEffectTagList)
+                                    {//1
+                                        foreach (Effect ef in gv.mod.moduleEffectsList)
+                                        {//2
+                                            if (ef.tag == efTag.tag)
+                                            {//3
+                                                if (ef.isPermanent)
+                                                {//4
+                                                    bool doesNotExistAlfready = true;
+                                                    foreach (Effect ef2 in pc.effectsList)
+                                                    {//5
+                                                        if (ef2.tag == ef.tag)
+                                                        {//6
+                                                            doesNotExistAlfready = false;
+                                                            break;
+                                                        }//6
+                                                    }//5
 
-                                        if (ef.modifyCon != 0)
-                                        {//7
-                                            pc.hp += ef.modifyCon / 2;
-                                            if (pc.hp < 1)
-                                            {//8
-                                                pc.hp = 1;
-                                            }//8
-                                            if (pc.hp > pc.hpMax)
-                                            {
-                                                pc.hp = pc.hpMax;
-                                            }
-                                        }//7
+                                                    if (doesNotExistAlfready)
+                                                    {//6
+                                                        pc.effectsList.Add(ef);
+                                                        gv.sf.UpdateStats(pc);
+                                                        if (ef.modifyHpMax != 0)
+                                                        {//7
+                                                            pc.hp += ef.modifyHpMax;
+                                                            if (pc.hp < 1)
+                                                            {//8
+                                                                pc.hp = 1;
+                                                            }//8
+                                                            if (pc.hp > pc.hpMax)
+                                                            {
+                                                                pc.hp = pc.hpMax;
+                                                            }
+                                                        }//7
 
-                                        if (ef.modifySpMax != 0)
-                                        {
-                                            pc.sp += ef.modifySpMax;
-                                            if (pc.sp < 1)
-                                            {
-                                                pc.sp = 1;
-                                            }
-                                            if (pc.sp > pc.spMax)
-                                            {
-                                                pc.sp = pc.spMax;
-                                            }
-                                        }
+                                                        if (ef.modifyCon != 0)
+                                                        {//7
+                                                            pc.hp += ef.modifyCon / 2;
+                                                            if (pc.hp < 1)
+                                                            {//8
+                                                                pc.hp = 1;
+                                                            }//8
+                                                            if (pc.hp > pc.hpMax)
+                                                            {
+                                                                pc.hp = pc.hpMax;
+                                                            }
+                                                        }//7
 
-                                        if (ef.modifyStr != 0)
-                                        {
-                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("strength"))
-                                            {
-                                                pc.sp += ef.modifyStr / 2;
-                                                if (pc.sp < 1)
-                                                {
-                                                    pc.sp = 1;
-                                                }
-                                                if (pc.sp > pc.spMax)
-                                                {
-                                                    pc.sp = pc.spMax;
-                                                }
-                                            }
-                                        }
+                                                        if (ef.modifySpMax != 0)
+                                                        {
+                                                            pc.sp += ef.modifySpMax;
+                                                            if (pc.sp < 1)
+                                                            {
+                                                                pc.sp = 1;
+                                                            }
+                                                            if (pc.sp > pc.spMax)
+                                                            {
+                                                                pc.sp = pc.spMax;
+                                                            }
+                                                        }
 
-                                        if (ef.modifyDex != 0)
-                                        {
-                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("dexterity"))
-                                            {
-                                                pc.sp += ef.modifyDex / 2;
-                                                if (pc.sp < 1)
-                                                {
-                                                    pc.sp = 1;
-                                                }
-                                                if (pc.sp > pc.spMax)
-                                                {
-                                                    pc.sp = pc.spMax;
-                                                }
-                                            }
-                                        }
+                                                        if (ef.modifyStr != 0)
+                                                        {
+                                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("strength"))
+                                                            {
+                                                                pc.sp += ef.modifyStr / 2;
+                                                                if (pc.sp < 1)
+                                                                {
+                                                                    pc.sp = 1;
+                                                                }
+                                                                if (pc.sp > pc.spMax)
+                                                                {
+                                                                    pc.sp = pc.spMax;
+                                                                }
+                                                            }
+                                                        }
 
-                                        if (ef.modifyCon != 0)
-                                        {
-                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("constitution"))
-                                            {
-                                                pc.sp += ef.modifyCon / 2;
-                                                if (pc.sp < 1)
-                                                {
-                                                    pc.sp = 1;
-                                                }
-                                                if (pc.sp > pc.spMax)
-                                                {
-                                                    pc.sp = pc.spMax;
-                                                }
-                                            }
-                                        }
+                                                        if (ef.modifyDex != 0)
+                                                        {
+                                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("dexterity"))
+                                                            {
+                                                                pc.sp += ef.modifyDex / 2;
+                                                                if (pc.sp < 1)
+                                                                {
+                                                                    pc.sp = 1;
+                                                                }
+                                                                if (pc.sp > pc.spMax)
+                                                                {
+                                                                    pc.sp = pc.spMax;
+                                                                }
+                                                            }
+                                                        }
 
-                                        if (ef.modifyCha != 0)
-                                        {
-                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("charisma"))
-                                            {
-                                                pc.sp += ef.modifyCha / 2;
-                                                if (pc.sp < 1)
-                                                {
-                                                    pc.sp = 1;
-                                                }
-                                                if (pc.sp > pc.spMax)
-                                                {
-                                                    pc.sp = pc.spMax;
-                                                }
-                                            }
-                                        }
+                                                        if (ef.modifyCon != 0)
+                                                        {
+                                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("constitution"))
+                                                            {
+                                                                pc.sp += ef.modifyCon / 2;
+                                                                if (pc.sp < 1)
+                                                                {
+                                                                    pc.sp = 1;
+                                                                }
+                                                                if (pc.sp > pc.spMax)
+                                                                {
+                                                                    pc.sp = pc.spMax;
+                                                                }
+                                                            }
+                                                        }
 
-                                        if (ef.modifyInt != 0)
-                                        {
-                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("intelligence"))
-                                            {
-                                                pc.sp += ef.modifyInt / 2;
-                                                if (pc.sp < 1)
-                                                {
-                                                    pc.sp = 1;
-                                                }
-                                                if (pc.sp > pc.spMax)
-                                                {
-                                                    pc.sp = pc.spMax;
-                                                }
-                                            }
-                                        }
+                                                        if (ef.modifyCha != 0)
+                                                        {
+                                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("charisma"))
+                                                            {
+                                                                pc.sp += ef.modifyCha / 2;
+                                                                if (pc.sp < 1)
+                                                                {
+                                                                    pc.sp = 1;
+                                                                }
+                                                                if (pc.sp > pc.spMax)
+                                                                {
+                                                                    pc.sp = pc.spMax;
+                                                                }
+                                                            }
+                                                        }
 
-                                        if (ef.modifyWis != 0)
-                                        {
-                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("wisdom"))
-                                            {
-                                                pc.sp += ef.modifyWis / 2;
-                                                if (pc.sp < 1)
-                                                {
-                                                    pc.sp = 1;
-                                                }
-                                                if (pc.sp > pc.spMax)
-                                                {
-                                                    pc.sp = pc.spMax;
-                                                }
-                                            }
-                                        }
-                                    }//5
-                                }//4
-                            }//3
-                        }//2
-                    }//1 
+                                                        if (ef.modifyInt != 0)
+                                                        {
+                                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("intelligence"))
+                                                            {
+                                                                pc.sp += ef.modifyInt / 2;
+                                                                if (pc.sp < 1)
+                                                                {
+                                                                    pc.sp = 1;
+                                                                }
+                                                                if (pc.sp > pc.spMax)
+                                                                {
+                                                                    pc.sp = pc.spMax;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (ef.modifyWis != 0)
+                                                        {
+                                                            if (pc.playerClass.modifierFromSPRelevantAttribute.Equals("wisdom"))
+                                                            {
+                                                                pc.sp += ef.modifyWis / 2;
+                                                                if (pc.sp < 1)
+                                                                {
+                                                                    pc.sp = 1;
+                                                                }
+                                                                if (pc.sp > pc.spMax)
+                                                                {
+                                                                    pc.sp = pc.spMax;
+                                                                }
+                                                            }
+                                                        }
+                                                    }//5
+                                                }//4
+                                            }//3
+                                        }//2
+                                    }//1 
 
                                 }
                                 //note2
@@ -1348,21 +1379,21 @@ namespace IBx
                                 gv.screenPcCreation.SaveCharacter(pc);
                                 gv.screenPartyBuild.pcList.Add(pc);
                                 gv.screenType = "partyBuild";
-                             }
-                         }
-                         else  
-                         {
-                            
+                            }
+                        }
+                        else
+                        {
+
                             //if there are spells to learn go to spell screen next  
-                            List < string > spellTagsList = new List<string>();
+                            List<string> spellTagsList = new List<string>();
                             spellTagsList = pc.getSpellsToLearn();
                             if (spellTagsList.Count > 0)
                             {
                                 gv.screenSpellLevelUp.resetPC(false, pc, false);
                                 gv.screenType = "learnSpellLevelUp";
-                             }
-                             else //no spells or traits to learn  
-                             {
+                            }
+                            else //no spells or traits to learn  
+                            {
 
                                 for (int counter = pc.learningTraitsTags.Count - 1; counter >= 0; counter--)
                                 {
@@ -1696,54 +1727,54 @@ namespace IBx
                                 gv.screenType = "party";
                                 gv.screenParty.traitGained += tr.name + ", ";
                                 gv.screenParty.doLevelUpSummary();
-                             }
+                            }
                         }
-                  }
+                    }
                 }
                 else
-			    {
-				    gv.sf.MessageBox("Can't learn that trait, try another or exit");
-			    }
-		    }   	
+                {
+                    gv.sf.MessageBox("Can't learn that trait, try another or exit");
+                }
+            }
         }
-            
+
         public bool isAvailableToLearn(string spellTag)
         {
-    	    if (traitsToLearnTagsList.Contains(spellTag))
-    	    {
-    		    return true;
-    	    }
-    	    return false;
-        }    
+            if (traitsToLearnTagsList.Contains(spellTag))
+            {
+                return true;
+            }
+            return false;
+        }
         public void fillToLearnList()
         {
-    	    traitsToLearnTagsList = pc.getTraitsToLearn(gv.mod);	    
-        }    
+            traitsToLearnTagsList = pc.getTraitsToLearn(gv.mod);
+        }
         public Trait GetCurrentlySelectedTrait()
-	    {
+        {
             sortTraitsForLevelUp(pc);
             //TraitAllowed ta = pc.playerClass.traitsAllowed[traitSlotIndex + (tknPageIndex * slotsPerPage)];
             TraitAllowed ta = backupTraitsAllowed[traitSlotIndex + (tknPageIndex * slotsPerPage)];
             return gv.mod.getTraitByTag(ta.tag);
-	    }
-	    public bool isSelectedTraitSlotInKnownTraitsRange()
-	    {
+        }
+        public bool isSelectedTraitSlotInKnownTraitsRange()
+        {
             //return (traitSlotIndex + (tknPageIndex * slotsPerPage)) < pc.playerClass.traitsAllowed.Count;
             sortTraitsForLevelUp(pc);
             return (traitSlotIndex + (tknPageIndex * slotsPerPage)) < backupTraitsAllowed.Count;
-        }	
-	    public int getLevelAvailable(string tag)
-	    {
-		    TraitAllowed ta = pc.playerClass.getTraitAllowedByTag(tag);
-		    if (ta != null)
-		    {
-			    return ta.atWhatLevelIsAvailable;
-		    }
-		    return 0;
-	    }
-	    public void tutorialMessageTraitScreen()
+        }
+        public int getLevelAvailable(string tag)
         {
-		    gv.sf.MessageBoxHtml(this.stringMessageTraitLevelUp);	
+            TraitAllowed ta = pc.playerClass.getTraitAllowedByTag(tag);
+            if (ta != null)
+            {
+                return ta.atWhatLevelIsAvailable;
+            }
+            return 0;
+        }
+        public void tutorialMessageTraitScreen()
+        {
+            gv.sf.MessageBoxHtml(this.stringMessageTraitLevelUp);
         }
     }
 }

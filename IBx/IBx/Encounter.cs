@@ -10,10 +10,82 @@ using Newtonsoft.Json;
 
 namespace IBx
 {
-    public class Encounter 
+    public class Encounter
     {
-	    public string encounterName = "newEncounter";
-	    public string MapImage = "none";
+
+        public int encSpotEnemy = 0;// is not used if prop with encounter has spot != -1
+        public int encStealth = 0;// is not used if prop with encounter has stealth != -1
+
+        public int challengeLevel = 1;
+        public bool challengeHidden = false;
+
+        //Victory conditions
+        //Assassination
+        public bool assassinationVictory = false;
+        public string assassinationTargetTag = "none";
+        public string assassinationTargetName = "none";
+        public bool assassinationConditionMet = false;
+
+        public bool standGroundVictory = false;
+        public int standGroundTimer = 10;
+        public int standGroundInternalTimer = 10;
+
+        public bool conquerVictory = false;
+        public bool conquerTargetsCumulative = true;
+        public bool conquerConditionMet = false;
+        public int conquerTarget1X = -1;
+        public int conquerTarget1Y = -1;
+        public int conquerTarget2X = -1;
+        public int conquerTarget2Y = -1;
+        public int conquerTarget3X = -1;
+        public int conquerTarget3Y = -1;
+
+        public bool holdDefeat = false;
+        public bool holdTargetsCumulative = true;
+        public bool holdConditionMet = false;
+        public int holdTarget1X = -1;
+        public int holdTarget1Y = -1;
+        public int holdTarget2X = -1;
+        public int holdTarget2Y = -1;
+        public int holdTarget3X = -1;
+        public int holdTarget3Y = -1;
+
+        //Loss conditions
+        public bool timeLimitDefeat = false;
+        public int timeLimitTimer = 10;
+        public int timeLimitInternalTimer = 10;
+
+        public bool protectionDefeat = false;
+        public string protectionTargetName = "none";
+        public bool protectionConditionMet = false;
+
+        //Battlefield modifiers
+        public bool noSpellCastModifier = false;
+        public bool noTraitUseModifier = false;
+        public bool noItemUseModifier = false;
+        public bool onlyOneMoveModifier = false;
+        public bool reducedDamageofPcMeleeAttack = false;
+        public bool reducedDamageofPcRangedAttack = false;
+        public bool allSpellsWithoutAoE = false;
+        public List<int> originalAoEofSpells = new List<int>();
+        public bool allSpellsSPCostDoubled = false;
+        public bool noHealingAllowed = false;
+        public int hpDamageEachRound = 0;
+        public int spDamageEachRound = 0;
+
+
+        //texts at start and ned (win) of battle
+        public bool showDefaultMessageBoxAtStartOfEncounter = true;
+        public bool showDefaultMessageBoxAtEndOfEncounter = true;
+        public bool showDefaultLogTextAtStartOfEncounter = true;
+        public bool showDefaultLogTextAtEndOfEncounter = true;
+        public string customTextforMessageBoxAtStartOfEncounter = "none";
+        public string customTextforMessageBoxAtEndOfEncounter = "none";
+        public string customTextforLogTextAtStartOfEncounter = "none";
+        public string customTextforLogTextAtEndOfEncounter = "none";
+
+        public string encounterName = "newEncounter";
+        public string MapImage = "none";
         public int singleImageMapTileSize = 50;
         public bool UseMapImage = false;
         public bool UseDayNightCycle = false;
@@ -25,20 +97,20 @@ namespace IBx
         //[JsonIgnore]
         //[ReadOnly(true)]
         public List<TileEnc> encounterTiles = new List<TileEnc>();
-        
+
         //public List<TileEnc> encounterTiles = new List<TileEnc>();
-	    public List<CreatureRefs> encounterCreatureRefsList = new List<CreatureRefs>();
+        public List<CreatureRefs> encounterCreatureRefsList = new List<CreatureRefs>();
         [JsonIgnore]
-	    public List<Creature> encounterCreatureList = new List<Creature>();
+        public List<Creature> encounterCreatureList = new List<Creature>();
         public List<ItemRefs> encounterInventoryRefsList = new List<ItemRefs>();
         public List<Coordinate> encounterPcStartLocations = new List<Coordinate>();
         public List<Effect> effectsList = new List<Effect>();
-	    public int goldDrop = 0;
+        public int goldDrop = 0;
         public List<Prop> propsList = new List<Prop>();
         public string AreaMusic = "none";
-	    public int AreaMusicDelay = 0;
-	    public int AreaMusicDelayRandomAdder = 0;
-	    public string OnSetupCombatIBScript = "none";
+        public int AreaMusicDelay = 0;
+        public int AreaMusicDelayRandomAdder = 0;
+        public string OnSetupCombatIBScript = "none";
         public string OnSetupCombatIBScriptParms = "";
         public string OnStartCombatRoundIBScript = "none";
         public string OnStartCombatRoundIBScriptParms = "";
@@ -51,36 +123,36 @@ namespace IBx
         public int triggerScriptCalledFromSquareLocY = 0;
 
         public bool isFriendlyContest = false;
-    
-	    public Encounter()
-	    {
 
-		}
+        public Encounter()
+        {
+
+        }
 
         public Prop getPropByLocation(int x, int y)
-         {  
-             foreach (Prop p in this.propsList)  
-             {  
-                 if ((p.LocationX == x) && (p.LocationY == y))  
-                 {  
-                     return p;  
-                 }  
-             }  
-             return null;  
-         }  
-         public Prop getPropByTag(string tag)
-         {  
-             foreach (Prop p in this.propsList)  
-             {
-                    if (p.PropTag.Equals(tag))
-                        {
-                            return p;
-                        }
-                }  
-             return null;  
-         }
+        {
+            foreach (Prop p in this.propsList)
+            {
+                if ((p.LocationX == x) && (p.LocationY == y))
+                {
+                    return p;
+                }
+            }
+            return null;
+        }
+        public Prop getPropByTag(string tag)
+        {
+            foreach (Prop p in this.propsList)
+            {
+                if (p.PropTag.Equals(tag))
+                {
+                    return p;
+                }
+            }
+            return null;
+        }
 
-public Trigger getTriggerByLocation(int x, int y)
+        public Trigger getTriggerByLocation(int x, int y)
         {
             foreach (Trigger t in this.Triggers)
             {
@@ -107,14 +179,14 @@ public Trigger getTriggerByLocation(int x, int y)
             return null;
         }
 
-            public Effect getEffectByTag(string tag)
-            {
+        public Effect getEffectByTag(string tag)
+        {
             foreach (Effect ef in this.effectsList)
             {
                 if (ef.tag.Equals(tag)) return ef;
             }
             return null;
-            }
+        }
 
         public bool IsInEffectListAtSameLocation(string effectTag, Coordinate coor)
         {
@@ -182,7 +254,7 @@ public Trigger getTriggerByLocation(int x, int y)
         }
 
 
-    }    
+    }
 }
 
 

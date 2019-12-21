@@ -22,8 +22,8 @@ namespace IBx
         public float helpResult;
         public List<string> parmsList = new List<string>();
         public string scriptFilename = "";
-       
-        
+
+
         //The following are the keywords used:
         //if
         //else
@@ -125,7 +125,7 @@ namespace IBx
                 else if (line.StartsWith("else"))
                 {
                     //add else location to current stack ifBlock
-                    IfBlockStack[IfBlockStack.Count - 1].elseLineNumber = i;                    
+                    IfBlockStack[IfBlockStack.Count - 1].elseLineNumber = i;
                 }
                 else if (line.StartsWith("endif"))
                 {
@@ -226,7 +226,7 @@ namespace IBx
                 }
             }
             catch (Exception ex)
-            {                
+            {
                 if (gv.mod.debugMode)
                 {
                     gv.log.AddHtmlTextToLog("IBScript " + scriptFilename + " failed at line: " + currentLineNumber.ToString() + " with this Message: " + ex.Message.ToString());
@@ -247,19 +247,19 @@ namespace IBx
             else if (element[2].StartsWith("~gc"))
             {
                 fValue = (float)GetFunctionConditionalCheckReturnValue(element[2]);
-            }            
+            }
             else //@k += 2 or @k = @i + 23 - @stuff
             {
                 fValue = CalcualteNumberEquation(element[2]);
             }
-            AddToLocalNumbers(element[0], fValue, element[1]);                                    
+            AddToLocalNumbers(element[0], fValue, element[1]);
         }
         public void DoStringAssignment(string line)
         {
             string[] element = GetLeftMiddleRightSides(line);
             string sideR = ConcateString(element[2]);
             sideR = ReplaceParameter(sideR);
-            AddToLocalStrings(element[0], sideR, element[1]);            
+            AddToLocalStrings(element[0], sideR, element[1]);
         }
 
         public void DoFunction(string line)
@@ -325,7 +325,7 @@ namespace IBx
             catch
             {
             }
-            
+
             /*
                 if (line.StartsWith("~gaTakeItem("))
                 {  
@@ -348,15 +348,15 @@ namespace IBx
             int indexNum3 = 0;
             int indexNum4 = 0;
 
-            
-                //get index of object in its List
-                string index = GetBetween(element[0], '[', ']');
+
+            //get index of object in its List
+            string index = GetBetween(element[0], '[', ']');
             if (index != element[0])
             {
                 string indexReplaced = ReplaceParameter(index);
                 indexNum = (int)Convert.ToDouble(indexReplaced);
             }
-           
+
 
             string index2 = GetBetween(element[0], '{', '}');
             if (index2 != element[0])
@@ -379,10 +379,10 @@ namespace IBx
                 indexNum4 = (int)Convert.ToDouble(indexReplaced4);
             }
 
-            
+
             if (element[0].StartsWith("%Mod"))
             {
-                ModAssignment(element, indexNum);                
+                ModAssignment(element, indexNum);
             }
             else if (element[0].StartsWith("%Player"))
             {
@@ -485,7 +485,7 @@ namespace IBx
             //if false go to the line just after 'next'
             if (!retForEval)
             {
-                return fb.nextLineNumber;                
+                return fb.nextLineNumber;
             }
             return i;
         }
@@ -645,7 +645,7 @@ namespace IBx
                     helpResult /= val;
                     gv.mod.playerList[indexNum].hp = (int)helpResult;
                 }
-                    //yn1: avoided using % because I wasnt sure if this would lead to confusion with already reserved usage of % for object property identification
+                //yn1: avoided using % because I wasnt sure if this would lead to confusion with already reserved usage of % for object property identification
                 else if (element[1] == "./.=")
                 {
                     gv.mod.playerList[indexNum].hp %= val;
@@ -2122,7 +2122,7 @@ namespace IBx
                     gv.mod.playerList[indexNum].charStatus += val;
                 }
             }
-            
+
         }
         public void ModAssignment(string[] element, int indexNum)
         {
@@ -2286,29 +2286,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.PlayerLocationY  = val;
+                    gv.mod.PlayerLocationY = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.PlayerLocationY  += val;
+                    gv.mod.PlayerLocationY += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.PlayerLocationY  -= val;
+                    gv.mod.PlayerLocationY -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.PlayerLocationY  *= val;
+                    gv.mod.PlayerLocationY *= val;
                 }
                 else if (element[1] == "/=")
                 {
-                    helpResult = gv.mod.PlayerLocationY ;
+                    helpResult = gv.mod.PlayerLocationY;
                     helpResult /= val;
-                    gv.mod.PlayerLocationY  = (int)helpResult;
+                    gv.mod.PlayerLocationY = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.PlayerLocationY  %= val;
+                    gv.mod.PlayerLocationY %= val;
                 }
             }
 
@@ -2696,7 +2696,7 @@ namespace IBx
         {
             if (element[0].EndsWith("isShown"))
             {
-                
+
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
@@ -4274,7 +4274,7 @@ namespace IBx
                     gv.mod.currentEncounter.encounterCreatureList[indexNum].combatFacingLeft = false;
                 }
             }
-            
+
         }
         public void CreatureResRefAssignment(string[] element, int indexNum, int indexNum2)
         {
@@ -11316,29 +11316,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.TimePerSquare = val;
+                    gv.mod.timePerStepAfterSpeedCalc = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.TimePerSquare += val;
+                    gv.mod.timePerStepAfterSpeedCalc += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.TimePerSquare -= val;
+                    gv.mod.timePerStepAfterSpeedCalc -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.TimePerSquare *= val;
+                    gv.mod.timePerStepAfterSpeedCalc *= val;
                 }
                 else if (element[1] == "/=")
                 {
-                    helpResult = gv.mod.currentArea.TimePerSquare;
+                    helpResult = gv.mod.timePerStepAfterSpeedCalc;
                     helpResult /= val;
-                    gv.mod.currentArea.TimePerSquare = (int)helpResult;
+                    gv.mod.timePerStepAfterSpeedCalc = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.TimePerSquare %= val;
+                    gv.mod.timePerStepAfterSpeedCalc %= val;
                 }
             }
 
@@ -11577,11 +11577,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.useFullScreenEffectLayer1= true;
+                    gv.mod.currentArea.useFullScreenEffectLayer1 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.useFullScreenEffectLayer1= false;
+                    gv.mod.currentArea.useFullScreenEffectLayer1 = false;
                 }
             }
             else if (element[0].EndsWith("fullScreenEffectLayerIsActive1"))
@@ -11589,11 +11589,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive1= true;
+                    gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive1= false;
+                    gv.mod.currentArea.fullScreenEffectLayerIsActive1 = false;
                 }
             }
             else if (element[0].EndsWith("containEffectInsideAreaBorders1"))
@@ -11601,11 +11601,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.containEffectInsideAreaBorders1= true;
+                    gv.mod.currentArea.containEffectInsideAreaBorders1 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.containEffectInsideAreaBorders1= false;
+                    gv.mod.currentArea.containEffectInsideAreaBorders1 = false;
                 }
             }
             else if (element[0].EndsWith("FullScreenEffectLayer1IsTop"))
@@ -11625,11 +11625,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.isChanging1= true;
+                    gv.mod.currentArea.isChanging1 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.isChanging1= false;
+                    gv.mod.currentArea.isChanging1 = false;
                 }
             }
             else if (element[0].EndsWith("useCyclicFade1"))
@@ -11637,11 +11637,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.useCyclicFade1= true;
+                    gv.mod.currentArea.useCyclicFade1 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.useCyclicFade1= false;
+                    gv.mod.currentArea.useCyclicFade1 = false;
                 }
             }
             else if (element[0].EndsWith("changeableByWeatherScript1"))
@@ -11649,11 +11649,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.changeableByWeatherScript1= true;
+                    gv.mod.currentArea.changeableByWeatherScript1 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.changeableByWeatherScript1= false;
+                    gv.mod.currentArea.changeableByWeatherScript1 = false;
                 }
             }
             else if (element[0].EndsWith("fullScreenEffectLayerName1"))
@@ -11661,11 +11661,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerName1= val;
+                    gv.mod.currentArea.fullScreenEffectLayerName1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerName1+= val;
+                    gv.mod.currentArea.fullScreenEffectLayerName1 += val;
                 }
             }
             else if (element[0].EndsWith("directionalOverride1"))
@@ -11673,11 +11673,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.directionalOverride1= val;
+                    gv.mod.currentArea.directionalOverride1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.directionalOverride1+= val;
+                    gv.mod.currentArea.directionalOverride1 += val;
                 }
             }
             else if (element[0].EndsWith("overrideIsNoScrollSource1"))
@@ -11685,11 +11685,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideIsNoScrollSource1= val;
+                    gv.mod.currentArea.overrideIsNoScrollSource1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideIsNoScrollSource1+= val;
+                    gv.mod.currentArea.overrideIsNoScrollSource1 += val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationSpeed1"))
@@ -11697,29 +11697,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed1= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed1+= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed1-= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed1*= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationSpeed1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationSpeed1= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationSpeed1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed1%= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed1 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationSpeedX1"))
@@ -11727,29 +11727,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX1= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX1+= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX1-= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX1*= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationSpeedX1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationSpeedX1= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX1%= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX1 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationSpeedY1"))
@@ -11757,29 +11757,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY1= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY1+= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY1-= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY1*= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationSpeedY1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationSpeedY1= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY1%= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY1 %= val;
                 }
             }
             else if (element[0].EndsWith("cycleCounter1"))
@@ -11787,29 +11787,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.cycleCounter1= val;
+                    gv.mod.currentArea.cycleCounter1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.cycleCounter1+= val;
+                    gv.mod.currentArea.cycleCounter1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.cycleCounter1-= val;
+                    gv.mod.currentArea.cycleCounter1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.cycleCounter1*= val;
+                    gv.mod.currentArea.cycleCounter1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.cycleCounter1;
                     helpResult /= val;
-                    gv.mod.currentArea.cycleCounter1= helpResult;
+                    gv.mod.currentArea.cycleCounter1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.cycleCounter1%= val;
+                    gv.mod.currentArea.cycleCounter1 %= val;
                 }
             }
             else if (element[0].EndsWith("changeCounter1"))
@@ -11817,29 +11817,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeCounter1= val;
+                    gv.mod.currentArea.changeCounter1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeCounter1+= val;
+                    gv.mod.currentArea.changeCounter1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeCounter1-= val;
+                    gv.mod.currentArea.changeCounter1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeCounter1*= val;
+                    gv.mod.currentArea.changeCounter1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeCounter1;
                     helpResult /= val;
-                    gv.mod.currentArea.changeCounter1= helpResult;
+                    gv.mod.currentArea.changeCounter1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeCounter1%= val;
+                    gv.mod.currentArea.changeCounter1 %= val;
                 }
             }
             else if (element[0].EndsWith("changeLimit1"))
@@ -11847,29 +11847,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeLimit1= val;
+                    gv.mod.currentArea.changeLimit1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeLimit1+= val;
+                    gv.mod.currentArea.changeLimit1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeLimit1-= val;
+                    gv.mod.currentArea.changeLimit1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeLimit1*= val;
+                    gv.mod.currentArea.changeLimit1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeLimit1;
                     helpResult /= val;
-                    gv.mod.currentArea.changeLimit1= helpResult;
+                    gv.mod.currentArea.changeLimit1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeLimit1%= val;
+                    gv.mod.currentArea.changeLimit1 %= val;
                 }
             }
             else if (element[0].EndsWith("changeFrameCounter1"))
@@ -11877,29 +11877,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeFrameCounter1= val;
+                    gv.mod.currentArea.changeFrameCounter1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeFrameCounter1+= val;
+                    gv.mod.currentArea.changeFrameCounter1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeFrameCounter1-= val;
+                    gv.mod.currentArea.changeFrameCounter1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeFrameCounter1*= val;
+                    gv.mod.currentArea.changeFrameCounter1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeFrameCounter1;
                     helpResult /= val;
-                    gv.mod.currentArea.changeFrameCounter1= helpResult;
+                    gv.mod.currentArea.changeFrameCounter1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeFrameCounter1%= val;
+                    gv.mod.currentArea.changeFrameCounter1 %= val;
                 }
             }
             else if (element[0].EndsWith("changeNumberOfFrames1"))
@@ -11907,29 +11907,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames1= val;
+                    gv.mod.currentArea.changeNumberOfFrames1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames1+= val;
+                    gv.mod.currentArea.changeNumberOfFrames1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames1-= val;
+                    gv.mod.currentArea.changeNumberOfFrames1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames1*= val;
+                    gv.mod.currentArea.changeNumberOfFrames1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeNumberOfFrames1;
                     helpResult /= val;
-                    gv.mod.currentArea.changeNumberOfFrames1= helpResult;
+                    gv.mod.currentArea.changeNumberOfFrames1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames1%= val;
+                    gv.mod.currentArea.changeNumberOfFrames1 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationFrameCounterX1"))
@@ -11937,29 +11937,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1+= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1-= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1*= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationFrameCounterX1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1%= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationFrameCounterY1"))
@@ -11967,29 +11967,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1+= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1-= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1*= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationFrameCounterY1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1%= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 %= val;
                 }
             }
             else if (element[0].EndsWith("activateTargetChannelInParallelToThisChannel1"))
@@ -12027,29 +12027,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideSpeedX1= val;
+                    gv.mod.currentArea.overrideSpeedX1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideSpeedX1+= val;
+                    gv.mod.currentArea.overrideSpeedX1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideSpeedX1-= val;
+                    gv.mod.currentArea.overrideSpeedX1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideSpeedX1*= val;
+                    gv.mod.currentArea.overrideSpeedX1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideSpeedX1;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideSpeedX1= helpResult;
+                    gv.mod.currentArea.overrideSpeedX1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideSpeedX1%= val;
+                    gv.mod.currentArea.overrideSpeedX1 %= val;
                 }
             }
             else if (element[0].EndsWith("overrideSpeedY1"))
@@ -12057,29 +12057,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideSpeedY1= val;
+                    gv.mod.currentArea.overrideSpeedY1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideSpeedY1+= val;
+                    gv.mod.currentArea.overrideSpeedY1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideSpeedY1-= val;
+                    gv.mod.currentArea.overrideSpeedY1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideSpeedY1*= val;
+                    gv.mod.currentArea.overrideSpeedY1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideSpeedY1;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideSpeedY1= helpResult;
+                    gv.mod.currentArea.overrideSpeedY1 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideSpeedY1%= val;
+                    gv.mod.currentArea.overrideSpeedY1 %= val;
                 }
             }
 
@@ -12088,29 +12088,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur1= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur1+= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur1-= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur1*= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenEffectChanceToOccur1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur1= (int)helpResult;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur1 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur1%= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur1 %= val;
                 }
             }
             else if (element[0].EndsWith("numberOfCyclesPerOccurence1"))
@@ -12118,29 +12118,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1+= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1-= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1*= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.numberOfCyclesPerOccurence1;
                     helpResult /= val;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1= (int)helpResult;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence1 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1%= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence1 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationFrameCounter1"))
@@ -12148,29 +12148,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1+= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1-= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1*= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationFrameCounter1;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1= (int)helpResult;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1%= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 %= val;
                 }
             }
             else if (element[0].EndsWith("overrideDelayLimit1"))
@@ -12178,29 +12178,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit1= val;
+                    gv.mod.currentArea.overrideDelayLimit1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit1+= val;
+                    gv.mod.currentArea.overrideDelayLimit1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit1-= val;
+                    gv.mod.currentArea.overrideDelayLimit1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit1*= val;
+                    gv.mod.currentArea.overrideDelayLimit1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideDelayLimit1;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideDelayLimit1= (int)helpResult;
+                    gv.mod.currentArea.overrideDelayLimit1 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit1%= val;
+                    gv.mod.currentArea.overrideDelayLimit1 %= val;
                 }
             }
             else if (element[0].EndsWith("overrideDelayCounter1"))
@@ -12208,29 +12208,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter1= val;
+                    gv.mod.currentArea.overrideDelayCounter1 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter1+= val;
+                    gv.mod.currentArea.overrideDelayCounter1 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter1-= val;
+                    gv.mod.currentArea.overrideDelayCounter1 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter1*= val;
+                    gv.mod.currentArea.overrideDelayCounter1 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideDelayCounter1;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideDelayCounter1= (int)helpResult;
+                    gv.mod.currentArea.overrideDelayCounter1 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter1%= val;
+                    gv.mod.currentArea.overrideDelayCounter1 %= val;
                 }
             }
             #endregion
@@ -12240,11 +12240,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.useFullScreenEffectLayer2= true;
+                    gv.mod.currentArea.useFullScreenEffectLayer2 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.useFullScreenEffectLayer2= false;
+                    gv.mod.currentArea.useFullScreenEffectLayer2 = false;
                 }
             }
             else if (element[0].EndsWith("fullScreenEffectLayerIsActive2"))
@@ -12252,11 +12252,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive2= true;
+                    gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive2= false;
+                    gv.mod.currentArea.fullScreenEffectLayerIsActive2 = false;
                 }
             }
             else if (element[0].EndsWith("containEffectInsideAreaBorders2"))
@@ -12264,11 +12264,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.containEffectInsideAreaBorders2= true;
+                    gv.mod.currentArea.containEffectInsideAreaBorders2 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.containEffectInsideAreaBorders2= false;
+                    gv.mod.currentArea.containEffectInsideAreaBorders2 = false;
                 }
             }
             else if (element[0].EndsWith("FullScreenEffectLayer2IsTop"))
@@ -12288,11 +12288,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.isChanging2= true;
+                    gv.mod.currentArea.isChanging2 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.isChanging2= false;
+                    gv.mod.currentArea.isChanging2 = false;
                 }
             }
             else if (element[0].EndsWith("useCyclicFade2"))
@@ -12300,11 +12300,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.useCyclicFade2= true;
+                    gv.mod.currentArea.useCyclicFade2 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.useCyclicFade2= false;
+                    gv.mod.currentArea.useCyclicFade2 = false;
                 }
             }
             else if (element[0].EndsWith("changeableByWeatherScript2"))
@@ -12312,11 +12312,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (val == "True")
                 {
-                    gv.mod.currentArea.changeableByWeatherScript2= true;
+                    gv.mod.currentArea.changeableByWeatherScript2 = true;
                 }
                 else
                 {
-                    gv.mod.currentArea.changeableByWeatherScript2= false;
+                    gv.mod.currentArea.changeableByWeatherScript2 = false;
                 }
             }
             else if (element[0].EndsWith("fullScreenEffectLayerName2"))
@@ -12324,11 +12324,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerName2= val;
+                    gv.mod.currentArea.fullScreenEffectLayerName2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerName2+= val;
+                    gv.mod.currentArea.fullScreenEffectLayerName2 += val;
                 }
             }
             else if (element[0].EndsWith("directionalOverride2"))
@@ -12336,11 +12336,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.directionalOverride2= val;
+                    gv.mod.currentArea.directionalOverride2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.directionalOverride2+= val;
+                    gv.mod.currentArea.directionalOverride2 += val;
                 }
             }
             else if (element[0].EndsWith("overrideIsNoScrollSource2"))
@@ -12348,11 +12348,11 @@ namespace IBx
                 string val = ConcateString(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideIsNoScrollSource2= val;
+                    gv.mod.currentArea.overrideIsNoScrollSource2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideIsNoScrollSource2+= val;
+                    gv.mod.currentArea.overrideIsNoScrollSource2 += val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationSpeed2"))
@@ -12360,29 +12360,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed2= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed2+= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed2-= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed2*= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationSpeed2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationSpeed2= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationSpeed2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeed2%= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeed2 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationSpeedX2"))
@@ -12390,29 +12390,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX2= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX2+= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX2-= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX2*= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationSpeedX2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationSpeedX2= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedX2%= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedX2 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationSpeedY2"))
@@ -12420,29 +12420,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY2= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY2+= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY2-= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY2*= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationSpeedY2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationSpeedY2= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationSpeedY2%= val;
+                    gv.mod.currentArea.fullScreenAnimationSpeedY2 %= val;
                 }
             }
             else if (element[0].EndsWith("cycleCounter2"))
@@ -12450,29 +12450,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.cycleCounter2= val;
+                    gv.mod.currentArea.cycleCounter2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.cycleCounter2+= val;
+                    gv.mod.currentArea.cycleCounter2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.cycleCounter2-= val;
+                    gv.mod.currentArea.cycleCounter2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.cycleCounter2*= val;
+                    gv.mod.currentArea.cycleCounter2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.cycleCounter2;
                     helpResult /= val;
-                    gv.mod.currentArea.cycleCounter2= helpResult;
+                    gv.mod.currentArea.cycleCounter2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.cycleCounter2%= val;
+                    gv.mod.currentArea.cycleCounter2 %= val;
                 }
             }
             else if (element[0].EndsWith("changeCounter2"))
@@ -12480,29 +12480,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeCounter2= val;
+                    gv.mod.currentArea.changeCounter2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeCounter2+= val;
+                    gv.mod.currentArea.changeCounter2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeCounter2-= val;
+                    gv.mod.currentArea.changeCounter2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeCounter2*= val;
+                    gv.mod.currentArea.changeCounter2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeCounter2;
                     helpResult /= val;
-                    gv.mod.currentArea.changeCounter2= helpResult;
+                    gv.mod.currentArea.changeCounter2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeCounter2%= val;
+                    gv.mod.currentArea.changeCounter2 %= val;
                 }
             }
             else if (element[0].EndsWith("changeLimit2"))
@@ -12510,29 +12510,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeLimit2= val;
+                    gv.mod.currentArea.changeLimit2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeLimit2+= val;
+                    gv.mod.currentArea.changeLimit2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeLimit2-= val;
+                    gv.mod.currentArea.changeLimit2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeLimit2*= val;
+                    gv.mod.currentArea.changeLimit2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeLimit2;
                     helpResult /= val;
-                    gv.mod.currentArea.changeLimit2= helpResult;
+                    gv.mod.currentArea.changeLimit2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeLimit2%= val;
+                    gv.mod.currentArea.changeLimit2 %= val;
                 }
             }
             else if (element[0].EndsWith("changeFrameCounter2"))
@@ -12540,29 +12540,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeFrameCounter2= val;
+                    gv.mod.currentArea.changeFrameCounter2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeFrameCounter2+= val;
+                    gv.mod.currentArea.changeFrameCounter2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeFrameCounter2-= val;
+                    gv.mod.currentArea.changeFrameCounter2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeFrameCounter2*= val;
+                    gv.mod.currentArea.changeFrameCounter2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeFrameCounter2;
                     helpResult /= val;
-                    gv.mod.currentArea.changeFrameCounter2= helpResult;
+                    gv.mod.currentArea.changeFrameCounter2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeFrameCounter2%= val;
+                    gv.mod.currentArea.changeFrameCounter2 %= val;
                 }
             }
             else if (element[0].EndsWith("changeNumberOfFrames2"))
@@ -12570,29 +12570,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames2= val;
+                    gv.mod.currentArea.changeNumberOfFrames2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames2+= val;
+                    gv.mod.currentArea.changeNumberOfFrames2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames2-= val;
+                    gv.mod.currentArea.changeNumberOfFrames2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames2*= val;
+                    gv.mod.currentArea.changeNumberOfFrames2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.changeNumberOfFrames2;
                     helpResult /= val;
-                    gv.mod.currentArea.changeNumberOfFrames2= helpResult;
+                    gv.mod.currentArea.changeNumberOfFrames2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.changeNumberOfFrames2%= val;
+                    gv.mod.currentArea.changeNumberOfFrames2 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationFrameCounterX2"))
@@ -12600,29 +12600,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2+= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2-= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2*= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationFrameCounterX2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2%= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationFrameCounterY2"))
@@ -12630,60 +12630,60 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2+= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2-= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2*= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationFrameCounterY2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2= helpResult;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2%= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 %= val;
                 }
             }
-            
+
             else if (element[0].EndsWith("overrideSpeedX2"))
             {
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideSpeedX2= val;
+                    gv.mod.currentArea.overrideSpeedX2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideSpeedX2+= val;
+                    gv.mod.currentArea.overrideSpeedX2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideSpeedX2-= val;
+                    gv.mod.currentArea.overrideSpeedX2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideSpeedX2*= val;
+                    gv.mod.currentArea.overrideSpeedX2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideSpeedX2;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideSpeedX2= helpResult;
+                    gv.mod.currentArea.overrideSpeedX2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideSpeedX2%= val;
+                    gv.mod.currentArea.overrideSpeedX2 %= val;
                 }
             }
             else if (element[0].EndsWith("overrideSpeedY2"))
@@ -12691,29 +12691,29 @@ namespace IBx
                 float val = CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideSpeedY2= val;
+                    gv.mod.currentArea.overrideSpeedY2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideSpeedY2+= val;
+                    gv.mod.currentArea.overrideSpeedY2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideSpeedY2-= val;
+                    gv.mod.currentArea.overrideSpeedY2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideSpeedY2*= val;
+                    gv.mod.currentArea.overrideSpeedY2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideSpeedY2;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideSpeedY2= helpResult;
+                    gv.mod.currentArea.overrideSpeedY2 = helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideSpeedY2%= val;
+                    gv.mod.currentArea.overrideSpeedY2 %= val;
                 }
             }
 
@@ -12722,29 +12722,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur2= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur2+= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur2-= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur2*= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenEffectChanceToOccur2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur2= (int)helpResult;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur2 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenEffectChanceToOccur2%= val;
+                    gv.mod.currentArea.fullScreenEffectChanceToOccur2 %= val;
                 }
             }
             else if (element[0].EndsWith("numberOfCyclesPerOccurence2"))
@@ -12752,29 +12752,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2+= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2-= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2*= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.numberOfCyclesPerOccurence2;
                     helpResult /= val;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2= (int)helpResult;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence2 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2%= val;
+                    gv.mod.currentArea.numberOfCyclesPerOccurence2 %= val;
                 }
             }
             else if (element[0].EndsWith("fullScreenAnimationFrameCounter2"))
@@ -12782,29 +12782,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2+= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2-= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2*= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.fullScreenAnimationFrameCounter2;
                     helpResult /= val;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2= (int)helpResult;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2%= val;
+                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 %= val;
                 }
             }
             else if (element[0].EndsWith("activateTargetChannelInParallelToThisChannel2"))
@@ -12843,29 +12843,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit2= val;
+                    gv.mod.currentArea.overrideDelayLimit2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit2+= val;
+                    gv.mod.currentArea.overrideDelayLimit2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit2-= val;
+                    gv.mod.currentArea.overrideDelayLimit2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit2*= val;
+                    gv.mod.currentArea.overrideDelayLimit2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideDelayLimit2;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideDelayLimit2= (int)helpResult;
+                    gv.mod.currentArea.overrideDelayLimit2 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideDelayLimit2%= val;
+                    gv.mod.currentArea.overrideDelayLimit2 %= val;
                 }
             }
             else if (element[0].EndsWith("overrideDelayCounter2"))
@@ -12873,29 +12873,29 @@ namespace IBx
                 int val = (int)CalcualteNumberEquation(element[2]);
                 if (element[1] == "=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter2= val;
+                    gv.mod.currentArea.overrideDelayCounter2 = val;
                 }
                 else if (element[1] == "+=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter2+= val;
+                    gv.mod.currentArea.overrideDelayCounter2 += val;
                 }
                 else if (element[1] == "-=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter2-= val;
+                    gv.mod.currentArea.overrideDelayCounter2 -= val;
                 }
                 else if (element[1] == "*=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter2*= val;
+                    gv.mod.currentArea.overrideDelayCounter2 *= val;
                 }
                 else if (element[1] == "/=")
                 {
                     helpResult = gv.mod.currentArea.overrideDelayCounter2;
                     helpResult /= val;
-                    gv.mod.currentArea.overrideDelayCounter2= (int)helpResult;
+                    gv.mod.currentArea.overrideDelayCounter2 = (int)helpResult;
                 }
                 else if (element[1] == "./.=")
                 {
-                    gv.mod.currentArea.overrideDelayCounter2%= val;
+                    gv.mod.currentArea.overrideDelayCounter2 %= val;
                 }
             }
             #endregion
@@ -13441,7 +13441,7 @@ namespace IBx
                     gv.mod.currentArea.numberOfCyclesPerOccurence3 %= val;
                 }
             }
-            
+
             else if (element[0].EndsWith("fullScreenAnimationFrameCounter3"))
             {
                 int val = (int)CalcualteNumberEquation(element[2]);
@@ -14683,7 +14683,7 @@ namespace IBx
                 if (element[1] == "=")
                 {
                     gv.mod.currentArea.overrideSpeedY5 = val;
-                    
+
                 }
                 else if (element[1] == "+=")
                 {
@@ -17421,7 +17421,7 @@ namespace IBx
                     gv.mod.currentArea.numberOfCyclesPerOccurence9 %= val;
                 }
             }
-            
+
             else if (element[0].EndsWith("fullScreenAnimationFrameCounter9"))
             {
                 int val = (int)CalcualteNumberEquation(element[2]);
@@ -18284,7 +18284,7 @@ namespace IBx
                     helpResult /= val;
                     gv.mod.moduleEncountersList[indexNum].MapSizeX = (int)helpResult;
                 }
-                    //yn1: avoided using % because I wasnt sure if this would lead to confusion with already reserved usage of % for object property identification
+                //yn1: avoided using % because I wasnt sure if this would lead to confusion with already reserved usage of % for object property identification
                 else if (element[1] == "./.=")
                 {
                     gv.mod.moduleEncountersList[indexNum].MapSizeX %= val;
@@ -18580,7 +18580,7 @@ namespace IBx
                 {
                     gv.mod.moduleEncountersList[indexNum].OnEndCombatIBScriptParms += val;
                 }
-            }         
+            }
         }
 
         public void CurrentEncounterAssignment(string[] element)
@@ -18908,17 +18908,17 @@ namespace IBx
                 }
             }
         }
-        
+
         #endregion
 
         #region ga Functions
         public void gaTakeItem(string[] parms)
         {
-           
+
         }
         public void gaShowFloatyTextOnMainMap(string[] parms)
         {
-            
+
         }
         #endregion
 
@@ -18995,7 +18995,7 @@ namespace IBx
         public IfBlock CreateIfBlock(string line, int i)
         {
             string conditional = GetBetween(line, '(', ')');
-                        
+
             IfBlock newIB = new IfBlock();
             newIB.ifLineNumber = i;
             newIB.ifConditional = conditional;
@@ -19051,7 +19051,7 @@ namespace IBx
             string[] element = GetLeftMiddleRightSides(removeParenth);
 
             string sLeft = ReplaceParameter(element[0]);
-            
+
             //check to see if it is a number
             double d;
             bool testNumeric = double.TryParse(sLeft, out d);
@@ -19113,9 +19113,9 @@ namespace IBx
                     }
                 }
             }
-            
+
             return false;
-        }        
+        }
         public string ConcateString(string startString)
         {
             List<string> stringParts = new List<string>();
@@ -19132,7 +19132,7 @@ namespace IBx
                     continue;
                 }
                 if (c == '"') //exiting a quote area
-                { 
+                {
                     inQuote = false;
                     part += c;
                     continue;
@@ -19151,7 +19151,7 @@ namespace IBx
                 {
                     part += c;
                     continue;
-                }                
+                }
             }
             //add what ever was left over after the last '+' to the List
             stringParts.Add(part);
@@ -19178,7 +19178,7 @@ namespace IBx
             string[] element = SplitTrimRemoveBlanks(sRightSide);
             float retValue = 0;
 
-            for (int x = 0; x < element.Length;  x++)
+            for (int x = 0; x < element.Length; x++)
             {
                 if ((element[x] != "+") && (element[x] != "-") && (element[x] != "*") && (element[x] != "/") && (element[x] != "./."))
                 {
@@ -19186,7 +19186,7 @@ namespace IBx
                     float numR = (float)Convert.ToDouble(ReplaceParameter(element[x]));
                     if (x > 1) //use last operator and calculate new value
                     {
-                        if (element[x-1] == "+")
+                        if (element[x - 1] == "+")
                         {
                             retValue += numR;
                         }
@@ -19212,15 +19212,15 @@ namespace IBx
                         retValue = numR;
                     }
                 }
-            }            
+            }
             return retValue;
         }
-        
+
         public void AddToLocalNumbers(string varName, float varNum, string assignType)
-        {            
+        {
             //check to see if already in list and replace
             if (localNumbers.ContainsKey(varName))
-            {                
+            {
                 //check to see if it is = or += or -=
                 if (assignType == "=")
                 {
@@ -19257,7 +19257,7 @@ namespace IBx
                     helpResult /= varNum;
                     localNumbers[varName] = (int)helpResult;
                 }
-               
+
             }
             else //if not in list then add
             {
@@ -19284,11 +19284,11 @@ namespace IBx
                 else if (assignType == "+=")
                 {
                     localStrings[varName] += varString;
-                }                
+                }
             }
             else //if not in list then add
             {
-                localStrings.Add(varName, varString);                
+                localStrings.Add(varName, varString);
             }
         }
         public string[] GetLeftMiddleRightSides(string line)
@@ -19317,7 +19317,7 @@ namespace IBx
 
             foreach (char c in str)
             {
-                if ((!startRecording) && (c == start)) 
+                if ((!startRecording) && (c == start))
                 {
                     startRecording = true;
                     continue;
@@ -19359,7 +19359,7 @@ namespace IBx
             string lineJustParms = GetBetweenFunctionParms(line);
             return lineJustParms.Split(',').Select(p => p.Trim()).ToArray();
         }
-        public string ReplaceParameter(string parm) 
+        public string ReplaceParameter(string parm)
         {
             //if parm is a variable, grab the value from the proper Dictionary
             if (parm.StartsWith("@"))
@@ -19403,7 +19403,7 @@ namespace IBx
                     }
                     //check to see if it is a rand(3-16)  
                     if (parmsList[index].StartsWith("rand("))
-                                        {
+                    {
                         string firstNum = parmsList[index].Split('(', '-')[1]; //.Substring(parm.IndexOf("(") + 1, parm.IndexOf("-"));  
                         string lastNum = parmsList[index].Split('-', ')')[1]; //.Substring(parm.IndexOf("-") + 1, parm.IndexOf(")"));  
                         int fNum = Convert.ToInt32(firstNum);
@@ -19411,10 +19411,10 @@ namespace IBx
                         int returnRand = gv.sf.RandInt(fNum, lNum);
                         if (gv.mod.debugMode)
                         {
-                             gv.cc.addLogText("<font color='yellow'>Replaced " + parmsList[index] + " with " + returnRand + "</font><BR>");
+                            gv.cc.addLogText("<font color='yellow'>Replaced " + parmsList[index] + " with " + returnRand + "</font><BR>");
                         }
                         return returnRand + "";
-                                            }
+                    }
                     return parmsList[index];
                 }
                 else
@@ -19448,7 +19448,7 @@ namespace IBx
                     string indexReplaced2 = ReplaceParameter(indexTrimmed2);
                     indexNum2 = (int)Convert.ToDouble(indexReplaced2);
                 }
-                
+
 
                 string index3 = GetBetween(parm, '|', '|');
                 if (index3 != parm)
@@ -19459,12 +19459,12 @@ namespace IBx
                 }
 
                 string index4 = GetBetween(parm, '^', '^');
-                    if (index4 != parm)
-                    {
+                if (index4 != parm)
+                {
                     string indexTrimmed4 = index4.Trim();
                     string indexReplaced4 = ReplaceParameter(indexTrimmed4);
                     indexNum4 = (int)Convert.ToDouble(indexReplaced4);
-                    }
+                }
 
                 #region Player
                 if (parm.StartsWith("%Player"))
@@ -19641,7 +19641,7 @@ namespace IBx
                     {
                         return gv.mod.playerList[indexNum].damageTypeResistanceTotalPoison.ToString();
                     }
-         
+
                     else if (parm.EndsWith("SizeOfKnownSpellsTags"))
                     {
                         return gv.mod.playerList[indexNum].knownSpellsTags.Count.ToString();
@@ -19984,11 +19984,11 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].OnHeartBeatIBScriptParms.ToString();
                     }
-                     else if (parm.EndsWith("inGameAreaName"))
+                    else if (parm.EndsWith("inGameAreaName"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].inGameAreaName.ToString();
                     }
-                    
+
                     #region full screen effect layer 1
                     else if (parm.EndsWith("useFullScreenEffectLayer1"))
                     {
@@ -20030,7 +20030,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders1.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging1"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging1.ToString();
@@ -20141,7 +20141,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders2.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging2"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging2.ToString();
@@ -20363,7 +20363,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders4.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging4"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging4.ToString();
@@ -20474,7 +20474,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders5.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging5"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging5.ToString();
@@ -20585,7 +20585,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders6.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging6"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging6.ToString();
@@ -20696,7 +20696,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders7.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging7"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging7.ToString();
@@ -20807,7 +20807,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders8.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging8"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging8.ToString();
@@ -20918,7 +20918,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders9.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging9"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging9.ToString();
@@ -21029,7 +21029,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].containEffectInsideAreaBorders10.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging10"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].isChanging10.ToString();
@@ -21160,7 +21160,7 @@ namespace IBx
                     }
                     else if (parm.EndsWith("TimePerSquare"))
                     {
-                        return gv.mod.currentArea.TimePerSquare.ToString();
+                        return gv.mod.timePerStepAfterSpeedCalc.ToString();
                     }
                     else if (parm.EndsWith("MusicFileName"))
                     {
@@ -21260,7 +21260,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders1.ToString();
                     }
-                   
+
                     else if (parm.EndsWith("isChanging1"))
                     {
                         return gv.mod.currentArea.isChanging1.ToString();
@@ -21371,7 +21371,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders2.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging2"))
                     {
                         return gv.mod.currentArea.isChanging2.ToString();
@@ -21482,7 +21482,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders3.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging3"))
                     {
                         return gv.mod.currentArea.isChanging3.ToString();
@@ -21593,7 +21593,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders4.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging4"))
                     {
                         return gv.mod.currentArea.isChanging4.ToString();
@@ -21704,7 +21704,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders5.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging5"))
                     {
                         return gv.mod.currentArea.isChanging5.ToString();
@@ -21815,7 +21815,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders6.ToString();
                     }
-                   
+
                     else if (parm.EndsWith("isChanging6"))
                     {
                         return gv.mod.currentArea.isChanging6.ToString();
@@ -21926,7 +21926,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders7.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging7"))
                     {
                         return gv.mod.currentArea.isChanging7.ToString();
@@ -22037,7 +22037,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders8.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging8"))
                     {
                         return gv.mod.currentArea.isChanging8.ToString();
@@ -22148,7 +22148,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders9.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging9"))
                     {
                         return gv.mod.currentArea.isChanging9.ToString();
@@ -22259,7 +22259,7 @@ namespace IBx
                     {
                         return gv.mod.currentArea.containEffectInsideAreaBorders10.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("isChanging10"))
                     {
                         return gv.mod.currentArea.isChanging10.ToString();
@@ -22461,7 +22461,7 @@ namespace IBx
                     {
                         return gv.mod.moduleAreasObjects[indexNum].Props[indexNum2].PropLocalInts.Count.ToString();
                     }
-                    
+
                     else if (parm.EndsWith("SizeOfPropLocalStrings"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].Props[indexNum2].PropLocalStrings.Count.ToString();
@@ -22470,7 +22470,7 @@ namespace IBx
                     else if (parm.EndsWith("SizeOfWayPointList"))
                     {
                         return gv.mod.moduleAreasObjects[indexNum].Props[indexNum2].WayPointList.Count.ToString();
-                    }   
+                    }
                 }
 
                 #endregion
@@ -22931,7 +22931,7 @@ namespace IBx
                     else if (parm.EndsWith("triggerScriptCalledFromSquareLocY"))
                     {
                         return gv.mod.currentEncounter.triggerScriptCalledFromSquareLocY.ToString();
-                    }  
+                    }
                     else if (parm.EndsWith("OnSetupCombatIBScript"))
                     {
                         return gv.mod.moduleEncountersList[indexNum].OnSetupCombatIBScript.ToString();
@@ -22968,7 +22968,7 @@ namespace IBx
                     {
                         return gv.mod.moduleEncountersList[indexNum].encounterTiles.Count.ToString();
                     }
-                    else if (parm.EndsWith("SizeOfEncounterCreatureRefsList")) 
+                    else if (parm.EndsWith("SizeOfEncounterCreatureRefsList"))
                     {
                         return gv.mod.moduleEncountersList[indexNum].encounterCreatureRefsList.Count.ToString();
                     }
@@ -22987,7 +22987,7 @@ namespace IBx
                 }
                 #endregion
 
-                 #region CurrentEncounter
+                #region CurrentEncounter
                 if (parm.StartsWith("%CurrentEncounter"))
                 {
 
@@ -23085,7 +23085,7 @@ namespace IBx
                     }
 
                 }
-                 #endregion
+                #endregion
 
 
 
@@ -23191,7 +23191,7 @@ namespace IBx
                 {
                     return gv.mod.currentEncounter.encounterCreatureList.Count.ToString();
                 }
-          
+
             }
             return parm;
         }

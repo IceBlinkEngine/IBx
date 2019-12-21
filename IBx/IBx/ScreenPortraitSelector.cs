@@ -10,26 +10,26 @@ namespace IBx
     public class ScreenPortraitSelector
     {
         //public gv.module gv.mod;
-	    public GameView gv;
+        public GameView gv;
         public Player pc;
-	    private int ptrPageIndex = 0;
-	    private int ptrSlotIndex = 0;
-	    private int slotsPerPage = 15;
+        private int ptrPageIndex = 0;
+        private int ptrSlotIndex = 0;
+        private int slotsPerPage = 15;
         private int maxPages = 20;
-	    private List<IbbPortrait> btnPortraitSlot = new List<IbbPortrait>();
-	    private IbbButton btnPortraitsLeft = null;
-	    private IbbButton btnPortraitsRight = null;
-	    private IbbButton btnPageIndex = null;
-	    private IbbButton btnAction = null;
+        private List<IbbPortrait> btnPortraitSlot = new List<IbbPortrait>();
+        private IbbButton btnPortraitsLeft = null;
+        private IbbButton btnPortraitsRight = null;
+        private IbbButton btnPageIndex = null;
+        private IbbButton btnAction = null;
         private IbbButton btnExit = null;
         public string callingScreen = "main"; //main, party, inventory
         public List<string> playerPortraitList = new List<string>();
 
         public ScreenPortraitSelector(Module m, GameView g)
-	    {
-		    //gv.mod = m;
-		    gv = g;
-	    }
+        {
+            //gv.mod = m;
+            gv = g;
+        }
 
         public void resetPortraitSelector(string callingScreenToReturnTo, Player p)
         {
@@ -48,24 +48,24 @@ namespace IBx
                 //string[] files;
                 //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits"))
                 //{
-                    //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits", "*.png");
-                    foreach (string file in files)
+                //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits", "*.png");
+                foreach (string file in files)
+                {
+                    try
                     {
-                        try
+                        string filename = Path.GetFileName(file);
+                        if ((filename.EndsWith(".png")) || (filename.EndsWith(".PNG")))
                         {
-                            string filename = Path.GetFileName(file);
-                            if ((filename.EndsWith(".png")) || (filename.EndsWith(".PNG")))
-                            {
-                                string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
-                                playerPortraitList.Add(fileNameWithOutExt);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //MessageBox.Show(ex.ToString());
-                            gv.errorLog(ex.ToString());
+                            string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
+                            playerPortraitList.Add(fileNameWithOutExt);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show(ex.ToString());
+                        gv.errorLog(ex.ToString());
+                    }
+                }
                 //}
             }
             catch (Exception ex)
@@ -76,7 +76,7 @@ namespace IBx
             try
             {
                 //Load from PlayerTokens folder last
-                /*TODO string[] files;
+                /*string[] files;
                 if (Directory.Exists(gv.mainDirectory + "\\PlayerPortraits"))
                 {
                     files = Directory.GetFiles(gv.mainDirectory + "\\PlayerPortraits", "*.png");
@@ -96,7 +96,7 @@ namespace IBx
                         }
                         catch (Exception ex)
                         {
-                            //MessageBox.Show(ex.ToString());
+                            MessageBox.Show(ex.ToString());
                             gv.errorLog(ex.ToString());
                         }
                     }
@@ -109,61 +109,61 @@ namespace IBx
             }
         }
 
-	    public void setControlsStart()
-	    {			
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		    int padW = gv.squareSize/6;
+        public void setControlsStart()
+        {
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+            int padW = gv.squareSize / 6;
 
             if (btnPortraitsLeft == null)
-		    {
-			    btnPortraitsLeft = new IbbButton(gv, 1.0f);
-			    btnPortraitsLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnPortraitsLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-			    btnPortraitsLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnPortraitsLeft.X = 8 * gv.squareSize;
-			    btnPortraitsLeft.Y = (1 * gv.squareSize) - (pH * 2);
+            {
+                btnPortraitsLeft = new IbbButton(gv, 1.0f);
+                btnPortraitsLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnPortraitsLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+                btnPortraitsLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPortraitsLeft.X = 8 * gv.squareSize;
+                btnPortraitsLeft.Y = (1 * gv.squareSize) - (pH * 2);
                 btnPortraitsLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnPortraitsLeft.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		    if (btnPageIndex == null)
-		    {
-			    btnPageIndex = new IbbButton(gv, 1.0f);
-			    btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-			    btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnPageIndex.Text = "1/10";
-			    btnPageIndex.X = 9 * gv.squareSize;
-			    btnPageIndex.Y = (1 * gv.squareSize) - (pH * 2);
+            }
+            if (btnPageIndex == null)
+            {
+                btnPageIndex = new IbbButton(gv, 1.0f);
+                btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+                btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPageIndex.Text = "1/10";
+                btnPageIndex.X = 9 * gv.squareSize;
+                btnPageIndex.Y = (1 * gv.squareSize) - (pH * 2);
                 btnPageIndex.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnPageIndex.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		    if (btnPortraitsRight == null)
-		    {
-			    btnPortraitsRight = new IbbButton(gv, 1.0f);
-			    btnPortraitsRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnPortraitsRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-			    btnPortraitsRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnPortraitsRight.X = 10 * gv.squareSize;
-			    btnPortraitsRight.Y = (1 * gv.squareSize) - (pH * 2);
+            }
+            if (btnPortraitsRight == null)
+            {
+                btnPortraitsRight = new IbbButton(gv, 1.0f);
+                btnPortraitsRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnPortraitsRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+                btnPortraitsRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPortraitsRight.X = 10 * gv.squareSize;
+                btnPortraitsRight.Y = (1 * gv.squareSize) - (pH * 2);
                 btnPortraitsRight.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnPortraitsRight.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		
-		    if (btnAction == null)
-		    {
-			    btnAction = new IbbButton(gv, 1.0f);
+            }
+
+            if (btnAction == null)
+            {
+                btnAction = new IbbButton(gv, 1.0f);
                 btnAction.Text = "USE SELECTED";
                 btnAction.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnAction.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnAction.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnAction.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f) - (gv.squareSize * 4);
-			    btnAction.Y = 9 * gv.squareSize + pH * 2;
+                btnAction.Y = 9 * gv.squareSize + pH * 2;
                 btnAction.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnAction.Width = (int)(gv.ibbwidthL * gv.screenDensity);			
-		    }
+                btnAction.Width = (int)(gv.ibbwidthL * gv.screenDensity);
+            }
             if (btnExit == null)
             {
                 btnExit = new IbbButton(gv, 1.0f);
-                btnExit.Text = "EXIT";
+                btnExit.Text = "Return";
                 btnExit.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
                 btnExit.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnExit.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
@@ -171,88 +171,88 @@ namespace IBx
                 btnExit.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnExit.Width = (int)(gv.ibbwidthL * gv.screenDensity);
             }
-		    for (int y = 0; y < slotsPerPage; y++)
-		    {
-			    IbbPortrait btnNew = new IbbPortrait(gv, 0.8f);
+            for (int y = 0; y < slotsPerPage; y++)
+            {
+                IbbPortrait btnNew = new IbbPortrait(gv, 0.8f);
                 btnNew.ImgBG = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
                 btnNew.Glow = "btn_ptr_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			
-			    if (y < 5)
-			    {
-				    btnNew.X = ((y + 2 + 4) * gv.squareSize) + (padW * (y * 2 + 1)) + gv.oXshift;
-				    btnNew.Y = 2 * gv.squareSize;
-			    }
-			    else if ((y >= 5 ) && (y < 10))
-			    {
-				    btnNew.X = ((y - 5 + 2 + 4) * gv.squareSize) + (padW * ((y - 5) * 2 + 1)) + gv.oXshift;
-				    btnNew.Y = 4 * gv.squareSize + padW;
-			    }
-			    else
-			    {
-				    btnNew.X = ((y - 10 + 2 + 4) * gv.squareSize) + (padW * ((y - 10) * 2 + 1)) + gv.oXshift;
-				    btnNew.Y = 6 * gv.squareSize + (padW * 2);
-			    }
+
+                if (y < 5)
+                {
+                    btnNew.X = ((y + 2 + 4) * gv.squareSize) + (padW * (y * 2 + 1)) + gv.oXshift;
+                    btnNew.Y = 2 * gv.squareSize;
+                }
+                else if ((y >= 5) && (y < 10))
+                {
+                    btnNew.X = ((y - 5 + 2 + 4) * gv.squareSize) + (padW * ((y - 5) * 2 + 1)) + gv.oXshift;
+                    btnNew.Y = 4 * gv.squareSize + padW;
+                }
+                else
+                {
+                    btnNew.X = ((y - 10 + 2 + 4) * gv.squareSize) + (padW * ((y - 10) * 2 + 1)) + gv.oXshift;
+                    btnNew.Y = 6 * gv.squareSize + (padW * 2);
+                }
 
                 btnNew.Height = (int)(170 * gv.screenDensity);
-                btnNew.Width = (int)(110 * gv.screenDensity);	
-			
-			    btnPortraitSlot.Add(btnNew);
-		    }			
-	    }
-	
-	    //INVENTORY SCREEN (COMBAT and MAIN)
+                btnNew.Width = (int)(110 * gv.screenDensity);
+
+                btnPortraitSlot.Add(btnNew);
+            }
+        }
+
+        //INVENTORY SCREEN (COMBAT and MAIN)
         public void redrawPortraitSelector()
         {
-    	    //IF CONTROLS ARE NULL, CREATE THEM
-    	    if (btnAction == null)
-    	    {
-    		    setControlsStart();
-    	    }
-    	
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		
-    	    int locY = 0;
-    	    int locX = pW * 4;
-    	    int textH = (int)gv.drawFontRegHeight;
+            //IF CONTROLS ARE NULL, CREATE THEM
+            if (btnAction == null)
+            {
+                setControlsStart();
+            }
+
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+
+            int locY = 0;
+            int locX = pW * 4;
+            int textH = (int)gv.drawFontRegHeight;
             int spacing = textH;
             int tabX = pW * 4;
-    	    int tabX2 = 5 * gv.squareSize + pW * 2;
-    	    int leftStartY = pH * 4;
-    	    int tabStartY = 5 * gv.squareSize + pW * 10;
-    	
+            int tabX2 = 5 * gv.squareSize + pW * 2;
+            int leftStartY = pH * 4;
+            int tabStartY = 5 * gv.squareSize + pW * 10;
+
             //DRAW TEXT		
-		    locY = (pH * 2);
-		    gv.DrawText("Portrait Selection", locX + (gv.squareSize * 8), locY);
-		    
-		    //DRAW LEFT/RIGHT ARROWS and PAGE INDEX
-		    btnPageIndex.Draw();
-		    btnPortraitsLeft.Draw();
-		    btnPortraitsRight.Draw();		
-		
-		    //DRAW ALL INVENTORY SLOTS		
-		    int cntSlot = 0;
-		    foreach (IbbPortrait btn in btnPortraitSlot)
-		    {
-			    if (cntSlot == ptrSlotIndex) {btn.glowOn = true;}
-			    else {btn.glowOn = false;}
-			    if ((cntSlot + (ptrPageIndex * slotsPerPage)) < playerPortraitList.Count)
-			    {
+            locY = (pH * 2);
+            gv.DrawText("Portrait Selection", locX + (gv.squareSize * 8), locY);
+
+            //DRAW LEFT/RIGHT ARROWS and PAGE INDEX
+            btnPageIndex.Draw();
+            btnPortraitsLeft.Draw();
+            btnPortraitsRight.Draw();
+
+            //DRAW ALL INVENTORY SLOTS		
+            int cntSlot = 0;
+            foreach (IbbPortrait btn in btnPortraitSlot)
+            {
+                if (cntSlot == ptrSlotIndex) { btn.glowOn = true; }
+                else { btn.glowOn = false; }
+                if ((cntSlot + (ptrPageIndex * slotsPerPage)) < playerPortraitList.Count)
+                {
                     btn.Img = playerPortraitList[cntSlot + (ptrPageIndex * slotsPerPage)];
-			    }
-			    else
-			    {
-				    btn.Img = null;
-			    }
-			    btn.Draw();
-			    cntSlot++;
-		    }		
-		    
-		    btnAction.Draw();
+                }
+                else
+                {
+                    btn.Img = null;
+                }
+                btn.Draw();
+                cntSlot++;
+            }
+
+            btnAction.Draw();
             btnExit.Draw();
         }
         public void onTouchPortraitSelector(int eX, int eY, MouseEventType.EventType eventType)
-	    {
+        {
             try
             {
                 btnPortraitsLeft.glowOn = false;
@@ -371,24 +371,24 @@ namespace IBx
             catch
             {
             }
-	    }
+        }
         public void doCleanUp()
-	    {
-		    btnPortraitSlot.Clear();
-		    btnPortraitsLeft = null;
-		    btnPortraitsRight = null;
-		    btnPageIndex = null;
-		    btnAction = null;
+        {
+            btnPortraitSlot.Clear();
+            btnPortraitsLeft = null;
+            btnPortraitsRight = null;
+            btnPageIndex = null;
+            btnAction = null;
             btnExit = null;
-	    }
-	
-	    public int GetIndex()
-	    {
-		    return ptrSlotIndex + (ptrPageIndex * slotsPerPage);
-	    }	
-	    public bool isSelectedPtrSlotInPortraitListRange()
-	    {
+        }
+
+        public int GetIndex()
+        {
+            return ptrSlotIndex + (ptrPageIndex * slotsPerPage);
+        }
+        public bool isSelectedPtrSlotInPortraitListRange()
+        {
             return GetIndex() < playerPortraitList.Count;
-	    }
+        }
     }
 }

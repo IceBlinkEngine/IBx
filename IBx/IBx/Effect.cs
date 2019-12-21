@@ -10,26 +10,30 @@ using Newtonsoft.Json;
 
 namespace IBx
 {
-    public class Effect 
+    public class Effect
     {
+        public bool triggeredEachStepToo = false;
+
         public int modifyShopBuyBackPrice = 0;//is in  
         public int modifyShopSellPrice = 0;//is in
 
         public string name = "newEffect";
-	    public string tag = "newEffectTag";
-	    public string tagOfSender = "senderTag";//not used so far (could be used eg for rmeocing effects immediately once teh effect cretaor dies) 
+        public string tag = "newEffectTag";
+        public string tagOfSender = "senderTag";//not used so far (could be used eg for rmeocing effects immediately once teh effect cretaor dies) 
         public int classLevelOfSender = 0;
         public string description = "";
-	    public string spriteFilename = "held";
-	    public int durationInUnits = 0;//this is in seconds
+        public string spriteFilename = "held";
+        public string squareIndicatorFilename = "fx_webbed";
+        public int durationInUnits = 0;//this is in seconds
+        public int durationOnSquareInUnits = 0;//this is in seconds; this is used to determine hwo the effect can linger on a square
         public int currentDurationInUnits = 0;//likely redundant, used as a check against zero tohugh!
-	    public int startingTimeInUnits = 0;//is in for player and creature
+        public int startingTimeInUnits = 0;//is in for player and creature
 
         public int babModifier = 0; //for Creatures modifies cr_att, for PCs modifies baseAttBonus
-        public int babModifierForRangedAttack = 0;//is in for player and creature
-        public int babModifierForMeleeAttack = 0;//is in for player and creature
-        public int damageModifierForMeleeAttack = 0;//is in for player and creature  
-        public int damageModifierForRangedAttack = 0;//is in for player and creature
+        public int babModifierForRangedAttack = 0;//is in for player only
+        public int babModifierForMeleeAttack = 0;//is in for player only
+        public int damageModifierForMeleeAttack = 0;//is in for player only  
+        public int damageModifierForRangedAttack = 0;//is in for player only
         public int acModifier = 0;////is in for player and creature
 
         public bool isStackableEffect = false;//is in for player and creature
@@ -38,9 +42,9 @@ namespace IBx
         //used for update stats is not relevant in new system
         public bool usedForUpdateStats = false;
 
-	    public string effectLetter = "A";//not implemented yet
-	    public string effectLetterColor = "White";//not implemented yet
-	    public string effectScript = "efGeneric";//is in (for special or old spells)
+        public string effectLetter = "A";//not implemented yet
+        public string effectLetterColor = "White";//not implemented yet
+        public string effectScript = "efGeneric";//is in (for special or old spells)
 
         public string saveCheckType = "none"; //none, reflex, will, fortitude
         public int saveCheckDC = 10;
@@ -124,9 +128,9 @@ namespace IBx
         //cleave and sweep is for pc only
         public int modifyNumberOfEnemiesAttackedOnCleave = 0; //(melee only) cleave attacks are only made if previous attacked enemy goes down.  
         public int modifyNumberOfEnemiesAttackedOnSweepAttack = 0; //(melee only) sweep attack simultaneously attacks multiple enemies in range 
-        
+
         //is for pc only, too 
-        public bool useDexterityForMeleeAttackModifierIfGreaterThanStrength = false;  
+        public bool useDexterityForMeleeAttackModifierIfGreaterThanStrength = false;
         public bool useDexterityForMeleeDamageModifierIfGreaterThanStrength = false;
         public bool negateAttackPenaltyForAdjacentEnemyWithRangedAttack = false;
         public bool allowCastingWithoutTriggeringAoO = false;
@@ -138,36 +142,39 @@ namespace IBx
         public List<LocalImmunityString> traitWorksNeverWhen = new List<LocalImmunityString>(); //is in; items have entries in entriesForPcTags; these entriesForPcTags are checked against by traitWorksOnlyWhen
 
         public Effect()
-	    {
-		
-	    }
-	    public Effect DeepCopy()
-	    {
-		    Effect copy = new Effect();
+        {
+
+        }
+        public Effect DeepCopy()
+        {
+            Effect copy = new Effect();
+            copy.squareIndicatorFilename = this.squareIndicatorFilename;
+            copy.durationOnSquareInUnits = this.durationOnSquareInUnits;
+            copy.triggeredEachStepToo = this.triggeredEachStepToo;
             copy.allowCastingWithoutRiskOfInterruption = this.allowCastingWithoutRiskOfInterruption;
             copy.allowCastingWithoutTriggeringAoO = this.allowCastingWithoutTriggeringAoO;
-		    copy.name = this.name;
-		    copy.tag = this.tag;
-		    copy.tagOfSender = this.tagOfSender;
+            copy.name = this.name;
+            copy.tag = this.tag;
+            copy.tagOfSender = this.tagOfSender;
             copy.classLevelOfSender = this.classLevelOfSender;
-		    copy.description = this.description;
-		    copy.spriteFilename = this.spriteFilename;	
-		    copy.durationInUnits = this.durationInUnits;
+            copy.description = this.description;
+            copy.spriteFilename = this.spriteFilename;
+            copy.durationInUnits = this.durationInUnits;
             copy.currentDurationInUnits = this.currentDurationInUnits;
-		    copy.startingTimeInUnits = this.startingTimeInUnits;
-		    copy.babModifier = this.babModifier;
-		    copy.acModifier = this.acModifier;
+            copy.startingTimeInUnits = this.startingTimeInUnits;
+            copy.babModifier = this.babModifier;
+            copy.acModifier = this.acModifier;
             copy.babModifierForRangedAttack = this.babModifierForRangedAttack;
             copy.babModifierForMeleeAttack = this.babModifierForMeleeAttack;
             copy.damageModifierForMeleeAttack = this.damageModifierForMeleeAttack;
             copy.damageModifierForRangedAttack = this.damageModifierForRangedAttack;
 
             copy.isStackableEffect = this.isStackableEffect;
-		    copy.isStackableDuration = this.isStackableDuration;
-		    copy.usedForUpdateStats = this.usedForUpdateStats;
-		    copy.effectLetter = this.effectLetter;
-		    copy.effectLetterColor = this.effectLetterColor;
-		    copy.effectScript = this.effectScript;
+            copy.isStackableDuration = this.isStackableDuration;
+            copy.usedForUpdateStats = this.usedForUpdateStats;
+            copy.effectLetter = this.effectLetter;
+            copy.effectLetterColor = this.effectLetterColor;
+            copy.effectScript = this.effectScript;
             copy.saveCheckType = this.saveCheckType;
             copy.saveCheckDC = this.saveCheckDC;
             copy.combatLocX = this.combatLocX;
@@ -263,6 +270,6 @@ namespace IBx
 
 
             return copy;
-	    }
+        }
     }
 }

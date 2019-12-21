@@ -12,45 +12,45 @@ namespace IBx
 {
     public class Shop
     {
-	    public string shopTag = "";
-	    public string shopName = "";
-	    public List<ItemRefs> shopItemRefs = new List<ItemRefs>();
-	    public List<ItemRefs> initialShopItemRefs = new List<ItemRefs>();
-        public int buybackPercent = 70;  
+        public string shopTag = "";
+        public string shopName = "";
+        public List<ItemRefs> shopItemRefs = new List<ItemRefs>();
+        public List<ItemRefs> initialShopItemRefs = new List<ItemRefs>();
+        public int buybackPercent = 70;
         public int sellPercent = 100;
-        public int buybackModifier = 0;  
+        public int buybackModifier = 0;
         public int sellModifier = 0;
 
 
 
         public Shop()
-	    {
-		
-	    }
-    
+        {
+
+        }
+
         public bool containsItemWithResRef(String resref)
-	    {
-		    foreach (ItemRefs i in this.shopItemRefs)
-		    {
-			    if (i.resref.Equals(resref)) { return true; }
-		    }
-		    return false;
-	    }
-    
+        {
+            foreach (ItemRefs i in this.shopItemRefs)
+            {
+                if (i.resref.Equals(resref)) { return true; }
+            }
+            return false;
+        }
+
         public bool containsInitialItemWithResRef(String resref)
-	    {
-		    foreach (ItemRefs i in this.initialShopItemRefs)
-		    {
-			    if (i.resref.Equals(resref)) { return true; }
-		    }
-		    return false;
-	    }
-    
+        {
+            foreach (ItemRefs i in this.initialShopItemRefs)
+            {
+                if (i.resref.Equals(resref)) { return true; }
+            }
+            return false;
+        }
+
         public Shop DeepCopy()
         {
             Shop copy = new Shop();
-		    copy.shopTag = this.shopTag;
-		    copy.shopName = this.shopName;
+            copy.shopTag = this.shopTag;
+            copy.shopName = this.shopName;
             copy.buybackPercent = this.buybackPercent;
             copy.sellPercent = this.sellPercent;
             copy.buybackModifier = this.buybackModifier;
@@ -58,7 +58,7 @@ namespace IBx
 
 
             copy.shopItemRefs = new List<ItemRefs>();
-		    foreach (ItemRefs s in this.shopItemRefs)
+            foreach (ItemRefs s in this.shopItemRefs)
             {
                 copy.shopItemRefs.Add(s);
                 copy.shopItemRefs.Add(s.DeepCopy());

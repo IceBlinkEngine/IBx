@@ -17,6 +17,24 @@ namespace IBx
         private IbbButton btnRace = null;
         private IbbButton btnClass = null;
         private IbbButton btnGender = null;
+        private IbbButton btnStrMinus = null;
+        private IbbButton btnStrPlus = null;
+        private IbbButton btnStr = null;
+        private IbbButton btnDexMinus = null;
+        private IbbButton btnDex = null;
+        private IbbButton btnDexPlus = null;
+        private IbbButton btnConMinus = null;
+        private IbbButton btnCon = null;
+        private IbbButton btnConPlus = null;
+        private IbbButton btnIntMinus = null;
+        private IbbButton btnInt = null;
+        private IbbButton btnIntPlus = null;
+        private IbbButton btnWisMinus = null;
+        private IbbButton btnWis = null;
+        private IbbButton btnWisPlus = null;
+        private IbbButton btnChaMinus = null;
+        private IbbButton btnCha = null;
+        private IbbButton btnChaPlus = null;
         private IbbPortrait btnPortrait = null;
         private IbbButton btnToken = null;
 
@@ -52,13 +70,34 @@ namespace IBx
 
         public void resetPC()
         {
+            gv.mod.counterPointsToDistributeLeft = gv.mod.pointPoolSize;
             pc = gv.cc.LoadPlayer(gv.mod.defaultPlayerFilename);
             pc.playerClass = gv.mod.getPlayerClass(pc.classTag);
             pc.race = this.getAllowedRace(pc.raceTag);
             pc.name = "CharacterName";
             pc.tag = "characterName";
             pcCreationIndex = 0;
-            reRollStats(pc);
+            if (gv.mod.useManualPointDistribution)
+            {
+                gv.mod.counterPointsToDistributeLeft = gv.mod.pointPoolSize;
+                pc.baseStr = gv.mod.attributeBaseValue;
+                pc.baseDex = gv.mod.attributeBaseValue;
+                pc.baseInt = gv.mod.attributeBaseValue;
+                pc.baseCha = gv.mod.attributeBaseValue;
+                pc.baseCon = gv.mod.attributeBaseValue;
+                pc.baseWis = gv.mod.attributeBaseValue;
+                gv.sf.UpdateStats(pc);
+                pc.hp = pc.hpMax;
+                pc.sp = pc.spMax;
+            }
+            else
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    gv.mod.counterPointsToDistributeLeft = 0;
+                }
+                reRollStats(pc);
+            }
         }
         public void CreateRaceList()
         {
@@ -100,24 +139,24 @@ namespace IBx
                 //string[] files;
                 //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))
                 //{
-                    //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens", "*.png");
-                    foreach (string file in files)
+                //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens", "*.png");
+                foreach (string file in files)
+                {
+                    try
                     {
-                        try
+                        string filename = Path.GetFileName(file);
+                        if (filename.EndsWith("_pc.png"))
                         {
-                            string filename = Path.GetFileName(file);
-                            if (filename.EndsWith("_pc.png"))
-                            {
-                                string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
-                                playerTokenList.Add(fileNameWithOutExt);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //MessageBox.Show(ex.ToString());
-                            gv.errorLog(ex.ToString());
+                            string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
+                            playerTokenList.Add(fileNameWithOutExt);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show(ex.ToString());
+                        gv.errorLog(ex.ToString());
+                    }
+                }
                 //}
             }
             catch (Exception ex)
@@ -128,7 +167,7 @@ namespace IBx
             try
             {
                 //Load from PlayerTokens folder last
-                /*TODO string[] files;
+                /*string[] files;
                 if (Directory.Exists(gv.mainDirectory + "\\PlayerTokens"))
                 {
                     files = Directory.GetFiles(gv.mainDirectory + "\\PlayerTokens", "*.png");
@@ -148,7 +187,7 @@ namespace IBx
                         }
                         catch (Exception ex)
                         {
-                            //MessageBox.Show(ex.ToString());
+                            MessageBox.Show(ex.ToString());
                             gv.errorLog(ex.ToString());
                         }
                     }
@@ -170,24 +209,24 @@ namespace IBx
                 //string[] files;
                 //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits"))
                 //{
-                    //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits", "*.png");
-                    foreach (string file in files)
+                //files = Directory.GetFiles(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\portraits", "*.png");
+                foreach (string file in files)
+                {
+                    try
                     {
-                        try
+                        string filename = Path.GetFileName(file);
+                        if ((filename.EndsWith(".png")) || (filename.EndsWith(".PNG")))
                         {
-                            string filename = Path.GetFileName(file);
-                            if ((filename.EndsWith(".png")) || (filename.EndsWith(".PNG")))
-                            {
-                                string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
-                                playerPortraitList.Add(fileNameWithOutExt);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            //MessageBox.Show(ex.ToString());
-                            gv.errorLog(ex.ToString());
+                            string fileNameWithOutExt = Path.GetFileNameWithoutExtension(file);
+                            playerPortraitList.Add(fileNameWithOutExt);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show(ex.ToString());
+                        gv.errorLog(ex.ToString());
+                    }
+                }
                 //}
             }
             catch (Exception ex)
@@ -289,6 +328,308 @@ namespace IBx
                 btnGender.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnGender.Width = (int)(gv.ibbwidthL * gv.screenDensity);
             }
+
+            if (btnStrMinus == null)
+            {
+                btnStrMinus = new IbbButton(gv, 1.0f);
+                btnStrMinus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnStrMinus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnStrMinus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 3 * gv.squareSize - 3 * pW;
+                btnStrMinus.Y = 2 * gv.squareSize + gv.squareSize / 2;
+                btnStrMinus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnStrMinus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (checkPhysical("Str"))
+                {
+                    btnStrMinus.Text = "- (" + calculateAttributeChangeCost("Str", false).ToString() + ")";
+                }
+                else
+                {
+                    btnStrMinus.Text = "NA";
+                }
+            }
+
+            if (btnDexMinus == null)
+            {
+                btnDexMinus = new IbbButton(gv, 1.0f);
+                btnDexMinus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnDexMinus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnDexMinus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 3 * gv.squareSize - 3 * pW;
+                btnDexMinus.Y = 3 * gv.squareSize + gv.squareSize / 2 + pH;
+                btnDexMinus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnDexMinus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (checkPhysical("Dex"))
+                {
+                    btnDexMinus.Text = "- (" + calculateAttributeChangeCost("Dex", false).ToString() + ")";
+                }
+                else
+                {
+                    btnDexMinus.Text = "NA";
+                }
+            }
+
+            if (btnDex == null)
+            {
+                btnDex = new IbbButton(gv, 1.0f);
+                btnDex.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnDex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnDex.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 2 * gv.squareSize - 2 * pW;
+                btnDex.Y = 3 * gv.squareSize + gv.squareSize / 2 + pH;
+                btnDex.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnDex.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnDex.Text = "Dex";
+            }
+
+            if (btnDexPlus == null)
+            {
+                btnDexPlus = new IbbButton(gv, 1.0f);
+                btnDexPlus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnDexPlus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnDexPlus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 1 * gv.squareSize - 1 * pW;
+                btnDexPlus.Y = 3 * gv.squareSize + gv.squareSize / 2 + pH;
+                btnDexPlus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnDexPlus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (pc.baseDex < gv.mod.attributeMaxValue)
+                {
+                    btnDexPlus.Text = "+ (" + calculateAttributeChangeCost("Dex", true).ToString() + ")";
+                }
+                else
+                {
+                    btnDexPlus.Text = "NA";
+                }
+            }
+
+            if (btnConMinus == null)
+            {
+                btnConMinus = new IbbButton(gv, 1.0f);
+                btnConMinus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnConMinus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnConMinus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 3 * gv.squareSize - 3 * pW;
+                btnConMinus.Y = 4 * gv.squareSize + gv.squareSize / 2 + 2 * pH;
+                btnConMinus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnConMinus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (checkPhysical("Con"))
+                {
+                    btnConMinus.Text = "- (" + calculateAttributeChangeCost("Con", false).ToString() + ")";
+                }
+                else
+                {
+                    btnConMinus.Text = "NA";
+                }
+            }
+
+            if (btnCon == null)
+            {
+                btnCon = new IbbButton(gv, 1.0f);
+                btnCon.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnCon.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnCon.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 2 * gv.squareSize - 2 * pW;
+                btnCon.Y = 4 * gv.squareSize + gv.squareSize / 2 + 2 * pH;
+                btnCon.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnCon.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnCon.Text = "Con";
+            }
+
+            if (btnConPlus == null)
+            {
+                btnConPlus = new IbbButton(gv, 1.0f);
+                btnConPlus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnConPlus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnConPlus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 1 * gv.squareSize - 1 * pW;
+                btnConPlus.Y = 4 * gv.squareSize + gv.squareSize / 2 + 2 * pH;
+                btnConPlus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnConPlus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (pc.baseCon < gv.mod.attributeMaxValue)
+                {
+                    btnConPlus.Text = "+ (" + calculateAttributeChangeCost("Con", true).ToString() + ")";
+                }
+                else
+                {
+                    btnConPlus.Text = "NA";
+                }
+            }
+
+            if (btnIntMinus == null)
+            {
+                btnIntMinus = new IbbButton(gv, 1.0f);
+                btnIntMinus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnIntMinus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnIntMinus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 3 * gv.squareSize - 3 * pW;
+                btnIntMinus.Y = 5 * gv.squareSize + gv.squareSize / 2 + 3 * pH;
+                btnIntMinus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnIntMinus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (checkMental("Int"))
+                {
+                    btnIntMinus.Text = "- (" + calculateAttributeChangeCost("Int", false).ToString() + ")";
+                }
+                else
+                {
+                    btnIntMinus.Text = "NA";
+                }
+            }
+
+            if (btnInt == null)
+            {
+                btnInt = new IbbButton(gv, 1.0f);
+                btnInt.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnInt.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnInt.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 2 * gv.squareSize - 2 * pW;
+                btnInt.Y = 5 * gv.squareSize + gv.squareSize / 2 + 3 * pH;
+                btnInt.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnInt.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnInt.Text = "Int";
+            }
+
+
+            if (btnIntPlus == null)
+            {
+                btnIntPlus = new IbbButton(gv, 1.0f);
+                btnIntPlus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnIntPlus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnIntPlus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 1 * gv.squareSize - 1 * pW;
+                btnIntPlus.Y = 5 * gv.squareSize + gv.squareSize / 2 + 3 * pH;
+                btnIntPlus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnIntPlus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (pc.baseInt < gv.mod.attributeMaxValue)
+                {
+                    btnIntPlus.Text = "+ (" + calculateAttributeChangeCost("Int", true).ToString() + ")";
+                }
+                else
+                {
+                    btnIntPlus.Text = "NA";
+                }
+            }
+
+            if (btnWisMinus == null)
+            {
+                btnWisMinus = new IbbButton(gv, 1.0f);
+                btnWisMinus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnWisMinus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnWisMinus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 3 * gv.squareSize - 3 * pW;
+                btnWisMinus.Y = 6 * gv.squareSize + gv.squareSize / 2 + 4 * pH;
+                btnWisMinus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnWisMinus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (checkMental("Wis"))
+                {
+                    btnWisMinus.Text = "- (" + calculateAttributeChangeCost("Wis", false).ToString() + ")";
+                }
+                else
+                {
+                    btnWisMinus.Text = "NA";
+                }
+            }
+
+            if (btnWis == null)
+            {
+                btnWis = new IbbButton(gv, 1.0f);
+                btnWis.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnWis.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnWis.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 2 * gv.squareSize - 2 * pW;
+                btnWis.Y = 6 * gv.squareSize + gv.squareSize / 2 + 4 * pH;
+                btnWis.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnWis.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnWis.Text = "Wis";
+            }
+
+            if (btnWisPlus == null)
+            {
+                btnWisPlus = new IbbButton(gv, 1.0f);
+                btnWisPlus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnWisPlus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnWisPlus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 1 * gv.squareSize - 1 * pW;
+                btnWisPlus.Y = 6 * gv.squareSize + gv.squareSize / 2 + 4 * pH;
+                btnWisPlus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnWisPlus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (pc.baseWis < gv.mod.attributeMaxValue)
+                {
+                    btnWisPlus.Text = "+ (" + calculateAttributeChangeCost("Wis", true).ToString() + ")";
+                }
+                else
+                {
+                    btnWisPlus.Text = "NA";
+                }
+            }
+
+            if (btnChaMinus == null)
+            {
+                btnChaMinus = new IbbButton(gv, 1.0f);
+                btnChaMinus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnChaMinus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnChaMinus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 3 * gv.squareSize - 3 * pW;
+                btnChaMinus.Y = 7 * gv.squareSize + gv.squareSize / 2 + 5 * pH;
+                btnChaMinus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnChaMinus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (checkMental("Cha"))
+                {
+                    btnChaMinus.Text = "- (" + calculateAttributeChangeCost("Cha", false).ToString() + ")";
+                }
+                else
+                {
+                    btnChaMinus.Text = "NA";
+                }
+            }
+
+            if (btnCha == null)
+            {
+                btnCha = new IbbButton(gv, 1.0f);
+                btnCha.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnCha.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnCha.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 2 * gv.squareSize - 2 * pW;
+                btnCha.Y = 7 * gv.squareSize + gv.squareSize / 2 + 5 * pH;
+                btnCha.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnCha.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnCha.Text = "Cha";
+            }
+
+            if (btnChaPlus == null)
+            {
+                btnChaPlus = new IbbButton(gv, 1.0f);
+                btnChaPlus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnChaPlus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnChaPlus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 1 * gv.squareSize - 1 * pW;
+                btnChaPlus.Y = 7 * gv.squareSize + gv.squareSize / 2 + 5 * pH;
+                btnChaPlus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnChaPlus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (pc.baseCha < gv.mod.attributeMaxValue)
+                {
+                    btnChaPlus.Text = "+ (" + calculateAttributeChangeCost("Cha", true).ToString() + ")";
+                }
+                else
+                {
+                    btnChaPlus.Text = "NA";
+                }
+            }
+
+            if (btnStrPlus == null)
+            {
+                btnStrPlus = new IbbButton(gv, 1.0f);
+                btnStrPlus.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnStrPlus.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnStrPlus.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 1 * gv.squareSize - 1 * pW;
+                btnStrPlus.Y = 2 * gv.squareSize + gv.squareSize / 2;
+                btnStrPlus.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnStrPlus.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                if (pc.baseStr < gv.mod.attributeMaxValue)
+                {
+                    btnStrPlus.Text = "+ (" + calculateAttributeChangeCost("Str", true).ToString() + ")";
+                }
+                else
+                {
+                    btnStrPlus.Text = "NA";
+                }
+            }
+
+            if (btnStr == null)
+            {
+                btnStr = new IbbButton(gv, 1.0f);
+                btnStr.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnStr.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnStr.X = center - (int)(gv.ibbwidthL * gv.screenDensity) - pW * 1 - 2 * gv.squareSize - 2 * pW;
+                btnStr.Y = 2 * gv.squareSize + gv.squareSize / 2;
+                btnStr.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnStr.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnStr.Text = "Str";
+            }
+
             if (btnClass == null)
             {
                 btnClass = new IbbButton(gv, 1.0f);
@@ -298,7 +639,7 @@ namespace IBx
                 btnClass.Y = 3 * gv.squareSize + gv.squareSize / 2;
                 btnClass.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnClass.Width = (int)(gv.ibbwidthL * gv.screenDensity);
-                
+
             }
             if (btnPlayerGuideOnPcCreation == null)
             {
@@ -347,7 +688,7 @@ namespace IBx
             if (btnAbort == null)
             {
                 btnAbort = new IbbButton(gv, 0.8f);
-                btnAbort.Text = "Abort";
+                btnAbort.Text = "Return";
                 btnAbort.Img = "btn_small"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small);
                 btnAbort.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(getResources(), R.drawable.btn_small_glow);
                 btnAbort.X = 8 * gv.squareSize + padW * 1 + gv.oXshift;
@@ -355,6 +696,248 @@ namespace IBx
                 btnAbort.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnAbort.Width = (int)(gv.ibbwidthR * gv.screenDensity);
             }
+        }
+
+        public int calculateAttributeChangeCost(string attributeName, bool raise)
+        {
+            int cost = 1;
+            if (!raise)
+            {
+                if (attributeName == "Str")
+                {
+                    if (pc.baseStr < gv.mod.twoPointThreshold)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseStr < gv.mod.threePointThreshold)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseStr < gv.mod.fourPointThreshold)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Dex")
+                {
+                    if (pc.baseDex < gv.mod.twoPointThreshold)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseDex < gv.mod.threePointThreshold)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseDex < gv.mod.fourPointThreshold)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Con")
+                {
+                    if (pc.baseCon < gv.mod.twoPointThreshold)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseCon < gv.mod.threePointThreshold)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseCon < gv.mod.fourPointThreshold)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Int")
+                {
+                    if (pc.baseInt < gv.mod.twoPointThreshold)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseInt < gv.mod.threePointThreshold)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseInt < gv.mod.fourPointThreshold)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Wis")
+                {
+                    if (pc.baseWis < gv.mod.twoPointThreshold)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseWis < gv.mod.threePointThreshold)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseWis < gv.mod.fourPointThreshold)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Cha")
+                {
+                    if (pc.baseCha < gv.mod.twoPointThreshold)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseCha < gv.mod.threePointThreshold)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseCha < gv.mod.fourPointThreshold)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+            }
+            //raise
+            else
+            {
+                if (attributeName == "Str")
+                {
+                    if (pc.baseStr < gv.mod.twoPointThreshold - 1)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseStr < gv.mod.threePointThreshold - 1)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseStr < gv.mod.fourPointThreshold - 1)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Dex")
+                {
+                    if (pc.baseDex < gv.mod.twoPointThreshold - 1)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseDex < gv.mod.threePointThreshold - 1)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseDex < gv.mod.fourPointThreshold - 1)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Con")
+                {
+                    if (pc.baseCon < gv.mod.twoPointThreshold - 1)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseCon < gv.mod.threePointThreshold - 1)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseCon < gv.mod.fourPointThreshold - 1)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Int")
+                {
+                    if (pc.baseInt < gv.mod.twoPointThreshold - 1)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseInt < gv.mod.threePointThreshold - 1)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseInt < gv.mod.fourPointThreshold - 1)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Wis")
+                {
+                    if (pc.baseWis < gv.mod.twoPointThreshold - 1)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseWis < gv.mod.threePointThreshold - 1)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseWis < gv.mod.fourPointThreshold - 1)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+                if (attributeName == "Cha")
+                {
+                    if (pc.baseCha < gv.mod.twoPointThreshold - 1)
+                    {
+                        cost = 1;
+                    }
+                    else if (pc.baseCha < gv.mod.threePointThreshold - 1)
+                    {
+                        cost = 2;
+                    }
+                    else if (pc.baseCha < gv.mod.fourPointThreshold - 1)
+                    {
+                        cost = 3;
+                    }
+                    else
+                    {
+                        cost = 4;
+                    }
+                }
+            }
+
+            return cost;
         }
 
         public void redrawPcCreation()
@@ -382,14 +965,76 @@ namespace IBx
             //Page Title
             gv.DrawText("CREATE CHARACTER", pW * 40 + gv.squareSize, pH * 1);
 
-            string color = "white";
+            Color color = Color.White;
 
             int actext = 0;
             if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
             else { actext = 20 - pc.AC; }
             if (gv.mod.useOrbitronFont == true)
             {
-                if (gv.mod.use3d6 && gv.mod.useLuck)
+                if (gv.mod.useManualPointDistribution)
+                {
+                    int backupLocY = locY;
+                    string infoText2 = "Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    gv.DrawText(infoText2, locX + pW - 3 * gv.squareSize - 2 * pW, locY = (spacing) + locY - 2 * gv.squareSize - 4 * pH);
+                    locY = backupLocY;
+
+                    //string infoText = ", Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    string infoText = "Min: " + gv.mod.attributeMinValue;
+                    infoText += ", Max: " + gv.mod.attributeMaxValue;
+                    if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Physical below " + gv.mod.attributeBaseValue + " allowed: " + gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed;
+                    }
+                    if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Mental below " + gv.mod.attributeBaseValue + " allowed: " + gv.mod.numberOfMentalAtttributesBelowBaseAllowed;
+                    }
+
+                    gv.DrawText(infoText, locX + pW, locY += (spacing));
+                }
+                else if (gv.mod.useHybridRollPointDistribution)
+                {
+                    int backupLocY = locY;
+                    string infoText2 = "Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    gv.DrawText(infoText2, locX + pW - 3 * gv.squareSize - 2 * pW, locY = (spacing) + locY - 2 * gv.squareSize - 4 * pH);
+                    locY = backupLocY;
+
+                    string infoText = "";
+                    if (gv.mod.use3d6 && gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 3d6, Luck is high for those who need it";
+                    }
+                    else if (gv.mod.use3d6 && !gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 3d6";
+                    }
+                    else if (!gv.mod.use3d6 && gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 6 + d12, Luck is high for those who need it";
+                    }
+                    else if (!gv.mod.use3d6 && !gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 6 + d12";
+
+                    }
+                    //infoText += "Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    infoText += ", Min: " + gv.mod.attributeMinValue;
+                    infoText += ", Max: " + gv.mod.attributeMaxValue;
+                    /*
+                    if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Physical below " + gv.mod.attributeBaseValue + " allowed: " + gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed;
+                    }
+                    if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Mental below " + gv.mod.attributeBaseValue + " allowed: " + gv.mod.numberOfMentalAtttributesBelowBaseAllowed;
+                    }
+                    */
+
+                    gv.DrawText(infoText, locX + pW, locY += (spacing));
+                }
+                else if (gv.mod.use3d6 && gv.mod.useLuck)
                 {
                     gv.DrawText("Rolling: 3d6, Luck is high for those who need it", locX + pW, locY += (spacing));
                 }
@@ -406,28 +1051,257 @@ namespace IBx
                     gv.DrawText("Rolling: 6 + d12", locX + pW, locY += (spacing));
 
                 }
-                gv.DrawText("STR:   " + pc.baseStr + " + " + (pc.strength - pc.baseStr) + " = " + pc.strength + " (" + ((pc.strength - 10) / 2) + ")", locX + pW, locY += (spacing * 2));
+                //STR              
+                gv.DrawText("STR:", locX + pW, locY += (spacing * 2));
+                gv.DrawText(pc.baseStr.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.strength - pc.baseStr >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                int racial = pc.strength - pc.baseStr;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.strength.ToString(), locX + 13 * pW, locY);
+                if (((pc.strength - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+
                 gv.DrawText("AC: " + actext, tabX2, locY2 += (spacing * 3));
                 gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
-                gv.DrawText("DEX:  " + pc.baseDex + " + " + (pc.dexterity - pc.baseDex) + " = " + pc.dexterity + " (" + ((pc.dexterity - 10) / 2) + ")", locX + pW, locY += spacing);
+                //DEX             
+                gv.DrawText("DEX:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseDex.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.dexterity - pc.baseDex >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.dexterity - pc.baseDex;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.dexterity.ToString(), locX + 13 * pW, locY);
+                if (((pc.dexterity - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+
                 gv.DrawText("HP: " + pc.hp + "/" + pc.hpMax, tabX2, locY2 += spacing);
-                gv.DrawText("CON: " + pc.baseCon + " + " + (pc.constitution - pc.baseCon) + " = " + pc.constitution + " (" + ((pc.constitution - 10) / 2) + ")", locX + pW, locY += spacing);
+                //CON             
+                gv.DrawText("CON:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseCon.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.constitution - pc.baseCon >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.constitution - pc.baseCon;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.constitution.ToString(), locX + 13 * pW, locY);
+                if (((pc.constitution - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
                 gv.DrawText("SP: " + pc.sp + "/" + pc.spMax, tabX2, locY2 += spacing);
-                gv.DrawText("INT:   " + pc.baseInt + " + " + (pc.intelligence - pc.baseInt) + " = " + pc.intelligence + " (" + ((pc.intelligence - 10) / 2) + ")", locX + pW, locY += spacing);
+                //INT             
+                gv.DrawText("INT:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseInt.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.intelligence - pc.baseInt >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.intelligence - pc.baseInt;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.intelligence.ToString(), locX + 13 * pW, locY);
+                if (((pc.intelligence - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
                 gv.DrawText("FORT: " + pc.fortitude + ", Acid: " + pc.damageTypeResistanceTotalAcid + "%" + ", Cold: " + pc.damageTypeResistanceTotalCold + "%" + ", Normal: " + pc.damageTypeResistanceTotalNormal + "%", tabX2, locY2 += spacing);
                 gv.DrawText("REF:   " + pc.reflex + ", Electricity: " + pc.damageTypeResistanceTotalElectricity + "%" + ", Fire: " + pc.damageTypeResistanceTotalFire + "%", tabX2, locY2 += spacing);
                 gv.DrawText("WILL: " + pc.will + ", Magic: " + pc.damageTypeResistanceTotalMagic + "%" + ", Poison: " + pc.damageTypeResistanceTotalPoison + "%", tabX2, locY2 += spacing);
-                gv.DrawText("WIS:  " + pc.baseWis + " + " + (pc.wisdom - pc.baseWis) + " = " + pc.wisdom + " (" + ((pc.wisdom - 10) / 2) + ")", locX + pW, locY += spacing);
-                gv.DrawText("CHA: " + pc.baseCha + " + " + (pc.charisma - pc.baseCha) + " = " + pc.charisma + " (" + ((pc.charisma - 10) / 2) + ")", locX + pW, locY += spacing);
+                //WIS             
+                gv.DrawText("WIS:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseWis.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.wisdom - pc.baseWis >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.wisdom - pc.baseWis;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.wisdom.ToString(), locX + 13 * pW, locY);
+                if (((pc.wisdom - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+
+                //CHA             
+                gv.DrawText("CHA:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseCha.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.charisma - pc.baseCha >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.charisma - pc.baseCha;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.charisma.ToString(), locX + 13 * pW, locY);
+                if (((pc.charisma - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
                 if (gv.mod.useLuck)
                 {
-                    gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+                    if (((pc.luck - 10) / 2) > 0)
+                    {
+                        gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+                    }
+                    else
+                    {
+                        gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+
+                    }
                 }
             }
+
             else
             {
+                if (gv.mod.useManualPointDistribution)
+                {
+                    int backupLocY = locY;
+                    string infoText2 = "Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    gv.DrawText(infoText2, locX + pW - 3 * gv.squareSize - 2 * pW, locY = (spacing) + locY - 2 * gv.squareSize - 4 * pH);
+                    locY = backupLocY;
 
-                if (gv.mod.use3d6 && gv.mod.useLuck)
+                    //string infoText = "Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    string infoText = "Min: " + gv.mod.attributeMinValue;
+                    infoText += ", Max: " + gv.mod.attributeMaxValue;
+                    if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Physical below " + gv.mod.attributeBaseValue + ": " + gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed;
+                    }
+                    if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Mental below " + gv.mod.attributeBaseValue + ": " + gv.mod.numberOfMentalAtttributesBelowBaseAllowed;
+                    }
+
+                    gv.DrawText(infoText, locX + pW, locY += (spacing));
+                }
+                else if (gv.mod.useHybridRollPointDistribution)
+                {
+                    int backupLocY = locY;
+                    string infoText2 = "Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    gv.DrawText(infoText2, locX + pW - 3 * gv.squareSize - 2 * pW, locY = (spacing) + locY - 2 * gv.squareSize - 4 * pH);
+                    locY = backupLocY;
+
+                    string infoText = "";
+                    if (gv.mod.use3d6 && gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 3d6, Luck is high for those who need it";
+                    }
+                    else if (gv.mod.use3d6 && !gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 3d6";
+                    }
+                    else if (!gv.mod.use3d6 && gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 6 + d12, Luck is high for those who need it";
+                    }
+                    else if (!gv.mod.use3d6 && !gv.mod.useLuck)
+                    {
+                        infoText += "Rolling: 6 + d12";
+
+                    }
+                    //infoText += ", Points available: " + gv.mod.counterPointsToDistributeLeft;
+                    infoText += ", Min: " + gv.mod.attributeMinValue;
+                    infoText += ", Max: " + gv.mod.attributeMaxValue;
+                    /*
+                    if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Physical below " + gv.mod.attributeBaseValue + ": " + gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed;
+                    }
+                    if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed < 3)
+                    {
+                        infoText += ", Mental below " + gv.mod.attributeBaseValue + ": " + gv.mod.numberOfMentalAtttributesBelowBaseAllowed;
+                    }
+                    */
+
+                    gv.DrawText(infoText, locX + pW, locY += (spacing));
+                }
+                else if (gv.mod.use3d6 && gv.mod.useLuck)
                 {
                     gv.DrawText("Rolling: 3d6, Luck is high for those who need it", locX + pW, locY += (spacing));
                 }
@@ -444,6 +1318,201 @@ namespace IBx
                     gv.DrawText("Rolling: 6 + d12", locX + pW, locY += (spacing));
 
                 }
+
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+
+                //STR              
+                gv.DrawText("STR:", locX + pW, locY += (spacing * 2));
+                gv.DrawText(pc.baseStr.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.strength - pc.baseStr >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                int racial = pc.strength - pc.baseStr;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.strength.ToString(), locX + 13 * pW, locY);
+                if (((pc.strength - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+
+                gv.DrawText("AC: " + actext, tabX2, locY2 += (spacing * 3));
+                gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
+                //DEX             
+                gv.DrawText("DEX:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseDex.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.dexterity - pc.baseDex >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.dexterity - pc.baseDex;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.dexterity.ToString(), locX + 13 * pW, locY);
+                if (((pc.dexterity - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+
+                pc.hp = pc.hpMax;
+                gv.DrawText("HP: " + pc.hp + "/" + pc.hpMax, tabX2, locY2 += spacing);
+                //CON             
+                gv.DrawText("CON:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseCon.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.constitution - pc.baseCon >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.constitution - pc.baseCon;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.constitution.ToString(), locX + 13 * pW, locY);
+                if (((pc.constitution - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                pc.sp = pc.spMax;
+                gv.DrawText("SP: " + pc.sp + "/" + pc.spMax, tabX2, locY2 += spacing);
+                //INT             
+                gv.DrawText("INT:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseInt.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.intelligence - pc.baseInt >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.intelligence - pc.baseInt;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.intelligence.ToString(), locX + 13 * pW, locY);
+                if (((pc.intelligence - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                gv.DrawText("FORT: " + pc.fortitude + ", Acid: " + pc.damageTypeResistanceTotalAcid + "%" + ", Cold: " + pc.damageTypeResistanceTotalCold + "%" + ", Normal: " + pc.damageTypeResistanceTotalNormal + "%", tabX2, locY2 += spacing);
+                gv.DrawText("REF:   " + pc.reflex + ", Electricity: " + pc.damageTypeResistanceTotalElectricity + "%" + ", Fire: " + pc.damageTypeResistanceTotalFire + "%", tabX2, locY2 += spacing);
+                gv.DrawText("WILL: " + pc.will + ", Magic: " + pc.damageTypeResistanceTotalMagic + "%" + ", Poison: " + pc.damageTypeResistanceTotalPoison + "%", tabX2, locY2 += spacing);
+                //WIS             
+                gv.DrawText("WIS:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseWis.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.wisdom - pc.baseWis >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.wisdom - pc.baseWis;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.wisdom.ToString(), locX + 13 * pW, locY);
+                if (((pc.wisdom - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+
+                //CHA             
+                gv.DrawText("CHA:", locX + pW, locY += (spacing));
+                gv.DrawText(pc.baseCha.ToString(), locX + 3 * pW * 2, locY);
+                if (pc.charisma - pc.baseCha >= 0)
+                {
+                    gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                }
+                else
+                {
+                    gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                }
+                racial = pc.charisma - pc.baseCha;
+                if (racial < 0)
+                {
+                    racial *= -1;
+                }
+                gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                gv.DrawText(" = ", locX + 11 * pW, locY);
+                gv.DrawText(pc.charisma.ToString(), locX + 13 * pW, locY);
+                if (((pc.charisma - 10) / 2) > 0)
+                {
+                    gv.DrawText(" (+" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                else
+                {
+                    gv.DrawText(" (" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                }
+                if (gv.mod.useLuck)
+                {
+                    if (((pc.luck - 10) / 2) > 0)
+                    {
+                        gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+                    }
+                    else
+                    {
+                        gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+                /*
                 gv.DrawText("STR:  " + pc.baseStr + " + " + (pc.strength - pc.baseStr) + " = " + pc.strength + " (" + ((pc.strength - 10) / 2) + ")", locX + pW, locY += (spacing * 2));
                 gv.DrawText("AC: " + actext, tabX2, locY2 += (spacing * 3));
                 gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
@@ -461,6 +1530,7 @@ namespace IBx
                 {
                     gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
                 }
+                */
 
             }
             //Description
@@ -495,10 +1565,130 @@ namespace IBx
                 btnGender.Text = "Female";
             }
             btnGender.Draw();
+            if (gv.mod.useManualPointDistribution || gv.mod.useHybridRollPointDistribution)
+            {
+                if (checkPhysical("Str"))
+                {
+                    btnStrMinus.Text = "- (" + calculateAttributeChangeCost("Str", false).ToString() + ")";
+                }
+                else
+                {
+                    btnStrMinus.Text = "NA";
+                }
+                btnStrMinus.Draw();
+                btnStr.Draw();
+                if (pc.baseStr < gv.mod.attributeMaxValue)
+                {
+                    btnStrPlus.Text = "+ (" + calculateAttributeChangeCost("Str", true).ToString() + ")";
+                }
+                else
+                {
+                    btnStrPlus.Text = "NA";
+                }
+                btnStrPlus.Draw();
+                if (checkPhysical("Dex"))
+                {
+                    btnDexMinus.Text = "- (" + calculateAttributeChangeCost("Dex", false).ToString() + ")";
+                }
+                else
+                {
+                    btnDexMinus.Text = "NA";
+                }
+                btnDexMinus.Draw();
+
+                btnDex.Draw();
+                if (pc.baseDex < gv.mod.attributeMaxValue)
+                {
+                    btnDexPlus.Text = "+ (" + calculateAttributeChangeCost("Dex", true).ToString() + ")";
+                }
+                else
+                {
+                    btnDexPlus.Text = "NA";
+                }
+                btnDexPlus.Draw();
+                if (checkPhysical("Con"))
+                {
+                    btnConMinus.Text = "- (" + calculateAttributeChangeCost("Con", false).ToString() + ")";
+                }
+                else
+                {
+                    btnConMinus.Text = "NA";
+                }
+                btnConMinus.Draw();
+                btnCon.Draw();
+                if (pc.baseCon < gv.mod.attributeMaxValue)
+                {
+                    btnConPlus.Text = "+ (" + calculateAttributeChangeCost("Con", true).ToString() + ")";
+                }
+                else
+                {
+                    btnConPlus.Text = "NA";
+                }
+                btnConPlus.Draw();
+                if (checkMental("Int"))
+                {
+                    btnIntMinus.Text = "- (" + calculateAttributeChangeCost("Int", false).ToString() + ")";
+                }
+                else
+                {
+                    btnIntMinus.Text = "NA";
+                }
+                btnIntMinus.Draw();
+                btnInt.Draw();
+                if (pc.baseInt < gv.mod.attributeMaxValue)
+                {
+                    btnIntPlus.Text = "+ (" + calculateAttributeChangeCost("Int", true).ToString() + ")";
+                }
+                else
+                {
+                    btnIntPlus.Text = "NA";
+                }
+                btnIntPlus.Draw();
+                if (checkMental("Wis"))
+                {
+                    btnWisMinus.Text = "- (" + calculateAttributeChangeCost("Wis", false).ToString() + ")";
+                }
+                else
+                {
+                    btnWisMinus.Text = "NA";
+                }
+                btnWisMinus.Draw();
+                btnWis.Draw();
+                if (pc.baseWis < gv.mod.attributeMaxValue)
+                {
+                    btnWisPlus.Text = "+ (" + calculateAttributeChangeCost("Wis", true).ToString() + ")";
+                }
+                else
+                {
+                    btnWisPlus.Text = "NA";
+                }
+                btnWisPlus.Draw();
+                if (checkMental("Cha"))
+                {
+                    btnChaMinus.Text = "- (" + calculateAttributeChangeCost("Cha", false).ToString() + ")";
+                }
+                else
+                {
+                    btnChaMinus.Text = "NA";
+                }
+                btnChaMinus.Draw();
+                btnCha.Draw();
+                if (pc.baseCha < gv.mod.attributeMaxValue)
+                {
+                    btnChaPlus.Text = "+ (" + calculateAttributeChangeCost("Cha", true).ToString() + ")";
+                }
+                else
+                {
+                    btnChaPlus.Text = "NA";
+                }
+                btnChaPlus.Draw();
+            }
             btnClass.Text = pc.playerClass.name;
             btnClass.Draw();
-
-            btnRollStats.Draw();
+            if (!gv.mod.useManualPointDistribution)
+            {
+                btnRollStats.Draw();
+            }
             btnFinished.Draw();
             gv.cc.btnHelp.Draw();
             btnAbort.Draw();
@@ -517,6 +1707,24 @@ namespace IBx
                 btnBeginnerGuideOnPcCreation.glowOn = false;
                 btnClass.glowOn = false;
                 btnRace.glowOn = false;
+                btnStrMinus.glowOn = false;
+                btnStrPlus.glowOn = false;
+                btnStr.glowOn = false;
+                btnDexMinus.glowOn = false;
+                btnDex.glowOn = false;
+                btnDexPlus.glowOn = false;
+                btnConMinus.glowOn = false;
+                btnCon.glowOn = false;
+                btnConPlus.glowOn = false;
+                btnIntMinus.glowOn = false;
+                btnInt.glowOn = false;
+                btnIntPlus.glowOn = false;
+                btnWisMinus.glowOn = false;
+                btnWis.glowOn = false;
+                btnWisPlus.glowOn = false;
+                btnChaMinus.glowOn = false;
+                btnCha.glowOn = false;
+                btnChaPlus.glowOn = false;
                 btnGender.glowOn = false;
                 btnName.glowOn = false;
 
@@ -526,11 +1734,14 @@ namespace IBx
                     case MouseEventType.EventType.MouseMove:
                         int x = (int)eX;
                         int y = (int)eY;
-                        if (btnRollStats.getImpact(x, y))
+                        if (!gv.mod.useManualPointDistribution)
                         {
-                            btnRollStats.glowOn = true;
+                            if (btnRollStats.getImpact(x, y))
+                            {
+                                btnRollStats.glowOn = true;
+                            }
                         }
-                        else if (btnFinished.getImpact(x, y))
+                        if (btnFinished.getImpact(x, y))
                         {
                             btnFinished.glowOn = true;
                         }
@@ -558,7 +1769,83 @@ namespace IBx
                         {
                             btnGender.glowOn = true;
                         }
-                        else if (btnName.getImpact(x, y))
+
+                        if (gv.mod.useManualPointDistribution)
+                        {
+                            if (btnStrMinus.getImpact(x, y))
+                            {
+                                btnStrMinus.glowOn = true;
+                            }
+                            else if (btnStrPlus.getImpact(x, y))
+                            {
+                                btnStrPlus.glowOn = true;
+                            }
+                            else if (btnStr.getImpact(x, y))
+                            {
+                                btnStr.glowOn = true;
+                            }
+                            else if (btnDexMinus.getImpact(x, y))
+                            {
+                                btnDexMinus.glowOn = true;
+                            }
+                            else if (btnDex.getImpact(x, y))
+                            {
+                                btnDex.glowOn = true;
+                            }
+                            else if (btnDexPlus.getImpact(x, y))
+                            {
+                                btnDexPlus.glowOn = true;
+                            }
+                            else if (btnConMinus.getImpact(x, y))
+                            {
+                                btnConMinus.glowOn = true;
+                            }
+                            else if (btnCon.getImpact(x, y))
+                            {
+                                btnCon.glowOn = true;
+                            }
+                            else if (btnConPlus.getImpact(x, y))
+                            {
+                                btnConPlus.glowOn = true;
+                            }
+                            else if (btnIntMinus.getImpact(x, y))
+                            {
+                                btnIntMinus.glowOn = true;
+                            }
+                            else if (btnInt.getImpact(x, y))
+                            {
+                                btnInt.glowOn = true;
+                            }
+                            else if (btnIntPlus.getImpact(x, y))
+                            {
+                                btnIntPlus.glowOn = true;
+                            }
+                            else if (btnWisMinus.getImpact(x, y))
+                            {
+                                btnWisMinus.glowOn = true;
+                            }
+                            else if (btnWis.getImpact(x, y))
+                            {
+                                btnWis.glowOn = true;
+                            }
+                            else if (btnWisPlus.getImpact(x, y))
+                            {
+                                btnWisPlus.glowOn = true;
+                            }
+                            else if (btnChaMinus.getImpact(x, y))
+                            {
+                                btnChaMinus.glowOn = true;
+                            }
+                            else if (btnCha.getImpact(x, y))
+                            {
+                                btnCha.glowOn = true;
+                            }
+                            else if (btnChaPlus.getImpact(x, y))
+                            {
+                                btnChaPlus.glowOn = true;
+                            }
+                        }
+                        if (btnName.getImpact(x, y))
                         {
                             btnName.glowOn = true;
                         }
@@ -581,6 +1868,24 @@ namespace IBx
                         btnClass.glowOn = false;
                         btnRace.glowOn = false;
                         btnGender.glowOn = false;
+                        btnStrMinus.glowOn = false;
+                        btnStr.glowOn = false;
+                        btnStrPlus.glowOn = false;
+                        btnDexMinus.glowOn = false;
+                        btnDex.glowOn = false;
+                        btnDexPlus.glowOn = false;
+                        btnConMinus.glowOn = false;
+                        btnCon.glowOn = false;
+                        btnConPlus.glowOn = false;
+                        btnIntMinus.glowOn = false;
+                        btnInt.glowOn = false;
+                        btnIntPlus.glowOn = false;
+                        btnWisMinus.glowOn = false;
+                        btnWis.glowOn = false;
+                        btnWisPlus.glowOn = false;
+                        btnChaMinus.glowOn = false;
+                        btnCha.glowOn = false;
+                        btnChaPlus.glowOn = false;
                         btnName.glowOn = false;
 
                         if (btnName.getImpact(x, y))
@@ -618,7 +1923,100 @@ namespace IBx
                                 pc.isMale = true;
                             }
                         }
-                        else if (btnClass.getImpact(x, y))
+                        if (gv.mod.useManualPointDistribution || gv.mod.useHybridRollPointDistribution)
+                        {
+                            if (btnStrMinus.getImpact(x, y))
+                            {
+                                lowerAttribute("Str");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnStr.getImpact(x, y))
+                            {
+                                gv.sf.MessageBoxHtml(gv.cc.stringStrength);
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnStrPlus.getImpact(x, y))
+                            {
+                                raiseAttribute("Str");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnDexMinus.getImpact(x, y))
+                            {
+                                lowerAttribute("Dex");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnDex.getImpact(x, y))
+                            {
+                                gv.sf.MessageBoxHtml(gv.cc.stringDexterity);
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnDexPlus.getImpact(x, y))
+                            {
+                                raiseAttribute("Dex");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnConMinus.getImpact(x, y))
+                            {
+                                lowerAttribute("Con");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnCon.getImpact(x, y))
+                            {
+                                gv.sf.MessageBoxHtml(gv.cc.stringConstitution);
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnConPlus.getImpact(x, y))
+                            {
+                                raiseAttribute("Con");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnIntMinus.getImpact(x, y))
+                            {
+                                lowerAttribute("Int");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnInt.getImpact(x, y))
+                            {
+                                gv.sf.MessageBoxHtml(gv.cc.stringIntelligence);
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnIntPlus.getImpact(x, y))
+                            {
+                                raiseAttribute("Int");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnWisMinus.getImpact(x, y))
+                            {
+                                lowerAttribute("Wis");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnWis.getImpact(x, y))
+                            {
+                                gv.sf.MessageBoxHtml(gv.cc.stringWisdom);
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnWisPlus.getImpact(x, y))
+                            {
+                                raiseAttribute("Wis");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnChaMinus.getImpact(x, y))
+                            {
+                                lowerAttribute("Cha");
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnCha.getImpact(x, y))
+                            {
+                                gv.sf.MessageBoxHtml(gv.cc.stringCharisma);
+                                gv.PlaySound("btn_click");
+                            }
+                            else if (btnChaPlus.getImpact(x, y))
+                            {
+                                raiseAttribute("Cha");
+                                gv.PlaySound("btn_click");
+                            }
+                        }
+                        if (btnClass.getImpact(x, y))
                         {
                             gv.PlaySound("btn_click");
                             pcCreationIndex = 4;
@@ -645,11 +2043,18 @@ namespace IBx
                             gv.screenTokenSelector.resetTokenSelector("pcCreation", pc);
                         }
 
+                        //if (!gv.mod.useManualPointDistribution)
+                        //{
                         else if (btnRollStats.getImpact(x, y))
                         {
-                            gv.PlaySound("btn_click");
-                            reRollStats(pc);
+                            if (!gv.mod.useManualPointDistribution)
+                            {
+                                gv.PlaySound("btn_click");
+                                reRollStats(pc);
+                            }
                         }
+
+                        //}
                         else if (btnFinished.getImpact(x, y))
                         {
                             //hurghxxx
@@ -963,10 +2368,7 @@ namespace IBx
                         break;
                 }
             }
-            catch (Exception ex)
-            {
-                int x = 0;
-            }
+            catch { }
         }
 
         public void tokenLoad(Player p)
@@ -983,54 +2385,483 @@ namespace IBx
 
             //using (TextInputDialog itSel = new TextInputDialog(gv, "Choose a unique Name for this PC."))
             //{
-                //itSel.IceBlinkButtonClose.Visible = true;
-                //itSel.IceBlinkButtonClose.Enabled = true;
-                //itSel.textInput = "Type unique Name Here";
+            //itSel.IceBlinkButtonClose.Visible = true;
+            //itSel.IceBlinkButtonClose.Enabled = true;
+            //itSel.textInput = "Type unique Name Here";
 
-                //var ret = itSel.ShowDialog();
+            //var ret = itSel.ShowDialog();
 
-                
-                    if (myinput.Length > 0)
+
+            if (myinput.Length > 0)
+            {
+                pc.name = myinput;
+                pc.tag = myinput.ToLower();
+                bool foundNameConflict = false;
+                foreach (Player p in gv.mod.playerList)
+                {
+                    if ((p.name == pc.name) || (p.tag == pc.tag))
                     {
-                        pc.name = myinput;
-                        pc.tag = myinput.ToLower();
-                        bool foundNameConflict = false;
-                        foreach (Player p in gv.mod.playerList)
+                        gv.sf.MessageBoxHtml("This name already exists, please choose a different one.");
+                        pc.name = "name";
+                        pc.tag = "name";
+                        //itSel.textInput = "Type unique Name Here";
+                        foundNameConflict = true;
+                        break;
+                    }
+                }
+                if (foundNameConflict == false)
+                {
+                    foreach (Player p in gv.screenPartyBuild.pcList)
+                    {
+                        if ((p.name == pc.name) || (p.tag == pc.tag))
                         {
-                            if ((p.name == pc.name) || (p.tag == pc.tag))
-                            {
-                                gv.sf.MessageBoxHtml("This name already exists, please choose a different one.");
-                                pc.name = "name";
-                                pc.tag = "name";
-                                //itSel.textInput = "Type unique Name Here";
-                                foundNameConflict = true;
-                                break;
-                            }
+                            gv.sf.MessageBoxHtml("This name already exists, please choose a different one.");
+                            pc.name = "name";
+                            pc.tag = "name";
+                            //itSel.textInput = "Type unique Name Here";
+                            break;
                         }
-                        if (foundNameConflict == false)
-                        {
-                            foreach (Player p in gv.screenPartyBuild.pcList)
-                            {
-                                if ((p.name == pc.name) || (p.tag == pc.tag))
-                                {
-                                    gv.sf.MessageBoxHtml("This name already exists, please choose a different one.");
-                                    pc.name = "name";
-                                    pc.tag = "name";
-                                    //itSel.textInput = "Type unique Name Here";
-                                    break;
-                                }
-                            }
-                        }
+                    }
+                }
+            }
+            else
+            {
+                //Toast.makeText(gv.gameContext, "Entering a blank name is not allowed", Toast.LENGTH_SHORT).show();
+            }
+
+            //}
+        }
+
+        public bool checkMental(string attribute)
+        {
+            if (attribute == "Int" && pc.baseInt > gv.mod.attributeMinValue)
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    return true;
+                }
+                if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 2)
+                {
+                    if (pc.baseCha >= gv.mod.attributeBaseValue || pc.baseWis >= gv.mod.attributeBaseValue || pc.baseInt > gv.mod.attributeBaseValue)
+                    {
+                        return true;
                     }
                     else
                     {
-                        //Toast.makeText(gv.gameContext, "Entering a blank name is not allowed", Toast.LENGTH_SHORT).show();
+                        return false;
                     }
-                
-            //}
+                }
+                else if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 1)
+                {
+                    if ((pc.baseCha >= gv.mod.attributeBaseValue && pc.baseWis >= gv.mod.attributeBaseValue) || (pc.baseCha >= gv.mod.attributeBaseValue && pc.baseInt > gv.mod.attributeBaseValue) || (pc.baseWis >= gv.mod.attributeBaseValue && pc.baseInt > gv.mod.attributeBaseValue))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 0)
+                {
+                    if (pc.baseCha >= gv.mod.attributeBaseValue && pc.baseWis >= gv.mod.attributeBaseValue && pc.baseInt > gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            if (attribute == "Wis" && pc.baseWis > gv.mod.attributeMinValue)
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    return true;
+                }
+                if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 2)
+                {
+                    if (pc.baseCha >= gv.mod.attributeBaseValue || pc.baseWis > gv.mod.attributeBaseValue || pc.baseInt >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 1)
+                {
+                    if ((pc.baseCha >= gv.mod.attributeBaseValue && pc.baseWis > gv.mod.attributeBaseValue) || (pc.baseCha >= gv.mod.attributeBaseValue && pc.baseInt >= gv.mod.attributeBaseValue) || (pc.baseWis > gv.mod.attributeBaseValue && pc.baseInt >= gv.mod.attributeBaseValue))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 0)
+                {
+                    if (pc.baseCha >= gv.mod.attributeBaseValue && pc.baseWis > gv.mod.attributeBaseValue && pc.baseInt >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            if (attribute == "Cha" && pc.baseCha > gv.mod.attributeMinValue)
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    return true;
+                }
+                if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 2)
+                {
+                    if (pc.baseCha > gv.mod.attributeBaseValue || pc.baseWis >= gv.mod.attributeBaseValue || pc.baseInt >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 1)
+                {
+                    if ((pc.baseCha > gv.mod.attributeBaseValue && pc.baseWis >= gv.mod.attributeBaseValue) || (pc.baseCha > gv.mod.attributeBaseValue && pc.baseInt >= gv.mod.attributeBaseValue) || (pc.baseWis >= gv.mod.attributeBaseValue && pc.baseInt >= gv.mod.attributeBaseValue))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfMentalAtttributesBelowBaseAllowed == 0)
+                {
+                    if (pc.baseCha > gv.mod.attributeBaseValue && pc.baseWis >= gv.mod.attributeBaseValue && pc.baseInt >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
         }
+
+        public bool checkPhysical(string attribute)
+        {
+            if (attribute == "Str" && pc.baseStr > gv.mod.attributeMinValue)
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    return true;
+                }
+                if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 2)
+                {
+                    if (pc.baseStr > gv.mod.attributeBaseValue || pc.baseDex >= gv.mod.attributeBaseValue || pc.baseCon >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                //todo
+                else if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 1)
+                {
+                    if ((pc.baseStr > gv.mod.attributeBaseValue && pc.baseDex >= gv.mod.attributeBaseValue) || (pc.baseStr > gv.mod.attributeBaseValue && pc.baseCon >= gv.mod.attributeBaseValue) || (pc.baseDex >= gv.mod.attributeBaseValue && pc.baseCon >= gv.mod.attributeBaseValue))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 0)
+                {
+                    if (pc.baseStr > gv.mod.attributeBaseValue && pc.baseDex >= gv.mod.attributeBaseValue && pc.baseCon >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            if (attribute == "Dex" && pc.baseDex > gv.mod.attributeMinValue)
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    return true;
+                }
+                if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 2)
+                {
+                    if (pc.baseStr >= gv.mod.attributeBaseValue || pc.baseDex > gv.mod.attributeBaseValue || pc.baseCon >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                //todo
+                else if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 1)
+                {
+                    if ((pc.baseStr >= gv.mod.attributeBaseValue && pc.baseDex > gv.mod.attributeBaseValue) || (pc.baseStr >= gv.mod.attributeBaseValue && pc.baseCon >= gv.mod.attributeBaseValue) || (pc.baseDex > gv.mod.attributeBaseValue && pc.baseCon >= gv.mod.attributeBaseValue))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 0)
+                {
+                    if (pc.baseStr >= gv.mod.attributeBaseValue && pc.baseDex > gv.mod.attributeBaseValue && pc.baseCon >= gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+
+            }
+
+            if (attribute == "Con" && pc.baseCon > gv.mod.attributeMinValue)
+            {
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    return true;
+                }
+                if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 2)
+                {
+                    if (pc.baseStr >= gv.mod.attributeBaseValue || pc.baseDex >= gv.mod.attributeBaseValue || pc.baseCon > gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                //todo
+                else if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 1)
+                {
+                    if ((pc.baseStr >= gv.mod.attributeBaseValue && pc.baseDex >= gv.mod.attributeBaseValue) || (pc.baseStr >= gv.mod.attributeBaseValue && pc.baseCon > gv.mod.attributeBaseValue) || (pc.baseDex >= gv.mod.attributeBaseValue && pc.baseCon > gv.mod.attributeBaseValue))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (gv.mod.numberOfPhysicalAtttributesBelowBaseAllowed == 0)
+                {
+                    if (pc.baseStr >= gv.mod.attributeBaseValue && pc.baseDex >= gv.mod.attributeBaseValue && pc.baseCon > gv.mod.attributeBaseValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void lowerAttribute(string attribute)
+        {
+            if (attribute == "Str")
+            {
+                if (checkPhysical(attribute))
+                {
+
+                    gv.mod.counterPointsToDistributeLeft += calculateAttributeChangeCost("Str", false);
+                    pc.baseStr--;
+                }
+            }
+
+            if (attribute == "Dex")
+            {
+                if (checkPhysical(attribute))
+                {
+
+                    gv.mod.counterPointsToDistributeLeft += calculateAttributeChangeCost("Dex", false);
+                    pc.baseDex--;
+                }
+            }
+
+            if (attribute == "Con")
+            {
+                if (checkPhysical(attribute))
+                {
+
+                    gv.mod.counterPointsToDistributeLeft += calculateAttributeChangeCost("Con", false);
+                    pc.baseCon--;
+                }
+            }
+
+            if (attribute == "Int")
+            {
+                if (checkMental(attribute))
+                {
+
+                    gv.mod.counterPointsToDistributeLeft += calculateAttributeChangeCost("Int", false);
+                    pc.baseInt--;
+                }
+            }
+
+            if (attribute == "Wis")
+            {
+                if (checkMental(attribute))
+                {
+
+                    gv.mod.counterPointsToDistributeLeft += calculateAttributeChangeCost("Wis", false);
+                    pc.baseWis--;
+                }
+            }
+
+            if (attribute == "Cha")
+            {
+                if (checkMental(attribute))
+                {
+
+                    gv.mod.counterPointsToDistributeLeft += calculateAttributeChangeCost("Cha", false);
+                    pc.baseCha--;
+                }
+            }
+            gv.sf.UpdateStats(pc);
+        }
+
+        public void raiseAttribute(string attribute)
+        {
+            if (attribute == "Str")
+            {
+                if (pc.baseStr < gv.mod.attributeMaxValue)
+                {
+                    if (gv.mod.counterPointsToDistributeLeft >= calculateAttributeChangeCost("Str", true))
+                    {
+                        gv.mod.counterPointsToDistributeLeft -= calculateAttributeChangeCost("Str", true);
+                        pc.baseStr++;
+                    }
+                }
+            }
+
+            if (attribute == "Dex")
+            {
+                if (pc.baseDex < gv.mod.attributeMaxValue)
+                {
+                    if (gv.mod.counterPointsToDistributeLeft >= calculateAttributeChangeCost("Dex", true))
+                    {
+
+                        gv.mod.counterPointsToDistributeLeft -= calculateAttributeChangeCost("Dex", true);
+                        pc.baseDex++;
+                    }
+                }
+            }
+
+            if (attribute == "Con")
+            {
+                if (pc.baseCon < gv.mod.attributeMaxValue)
+                {
+                    if (gv.mod.counterPointsToDistributeLeft >= calculateAttributeChangeCost("Con", true))
+                    {
+
+                        gv.mod.counterPointsToDistributeLeft -= calculateAttributeChangeCost("Con", true);
+                        pc.baseCon++;
+                    }
+                }
+            }
+
+            if (attribute == "Int")
+            {
+                if (pc.baseInt < gv.mod.attributeMaxValue)
+                {
+                    if (gv.mod.counterPointsToDistributeLeft >= calculateAttributeChangeCost("Int", true))
+                    {
+
+                        gv.mod.counterPointsToDistributeLeft -= calculateAttributeChangeCost("Int", true);
+                        pc.baseInt++;
+                    }
+                }
+            }
+
+            if (attribute == "Wis")
+            {
+                if (pc.baseWis < gv.mod.attributeMaxValue)
+                {
+                    if (gv.mod.counterPointsToDistributeLeft >= calculateAttributeChangeCost("Wis", true))
+                    {
+
+                        gv.mod.counterPointsToDistributeLeft -= calculateAttributeChangeCost("Wis", true);
+                        pc.baseWis++;
+                    }
+                }
+            }
+
+            if (attribute == "Cha")
+            {
+                if (pc.baseCha < gv.mod.attributeMaxValue)
+                {
+                    if (gv.mod.counterPointsToDistributeLeft >= calculateAttributeChangeCost("Cha", true))
+                    {
+
+                        gv.mod.counterPointsToDistributeLeft -= calculateAttributeChangeCost("Cha", true);
+                        pc.baseCha++;
+                    }
+                }
+            }
+            gv.sf.UpdateStats(pc);
+        }
+
         public void reRollStats(Player p)
         {
+            gv.mod.counterPointsToDistributeLeft = 0;
             if (gv.mod.use3d6 == true)
             {
                 p.baseStr = gv.sf.RandInt(6) + gv.sf.RandInt(6) + gv.sf.RandInt(6);
@@ -1039,6 +2870,63 @@ namespace IBx
                 p.baseCha = gv.sf.RandInt(6) + gv.sf.RandInt(6) + gv.sf.RandInt(6);
                 p.baseCon = gv.sf.RandInt(6) + gv.sf.RandInt(6) + gv.sf.RandInt(6);
                 p.baseWis = gv.sf.RandInt(6) + gv.sf.RandInt(6) + gv.sf.RandInt(6);
+
+                if (gv.mod.useHybridRollPointDistribution)
+                {
+                    if (p.baseStr < gv.mod.attributeMinValue)
+                    {
+                        p.baseStr = gv.mod.attributeMinValue;
+                    }
+                    if (p.baseStr > gv.mod.attributeMaxValue)
+                    {
+                        p.baseStr = gv.mod.attributeMaxValue;
+                    }
+
+                    if (p.baseDex < gv.mod.attributeMinValue)
+                    {
+                        p.baseDex = gv.mod.attributeMinValue;
+                    }
+                    if (p.baseDex > gv.mod.attributeMaxValue)
+                    {
+                        p.baseDex = gv.mod.attributeMaxValue;
+                    }
+
+                    if (p.baseCon < gv.mod.attributeMinValue)
+                    {
+                        p.baseCon = gv.mod.attributeMinValue;
+                    }
+                    if (p.baseCon > gv.mod.attributeMaxValue)
+                    {
+                        p.baseCon = gv.mod.attributeMaxValue;
+                    }
+
+                    if (p.baseInt < gv.mod.attributeMinValue)
+                    {
+                        p.baseInt = gv.mod.attributeMinValue;
+                    }
+                    if (p.baseInt > gv.mod.attributeMaxValue)
+                    {
+                        p.baseInt = gv.mod.attributeMaxValue;
+                    }
+
+                    if (p.baseWis < gv.mod.attributeMinValue)
+                    {
+                        p.baseWis = gv.mod.attributeMinValue;
+                    }
+                    if (p.baseWis > gv.mod.attributeMaxValue)
+                    {
+                        p.baseWis = gv.mod.attributeMaxValue;
+                    }
+
+                    if (p.baseCha < gv.mod.attributeMinValue)
+                    {
+                        p.baseCha = gv.mod.attributeMinValue;
+                    }
+                    if (p.baseCha > gv.mod.attributeMaxValue)
+                    {
+                        p.baseCha = gv.mod.attributeMaxValue;
+                    }
+                }
                 int sumOfAttributeBoni = ((p.baseStr - 10) / 2) + ((p.baseDex - 10) / 2) + ((p.baseCon - 10) / 2) + ((p.baseInt - 10) / 2) + ((p.baseWis - 10) / 2) + ((p.baseCha - 10) / 2);
                 if (sumOfAttributeBoni > 6)
                 {

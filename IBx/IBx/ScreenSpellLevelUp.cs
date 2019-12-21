@@ -6,15 +6,15 @@ using System.Text;
 
 namespace IBx
 {
-    public class ScreenSpellLevelUp 
+    public class ScreenSpellLevelUp
     {
-	    //private gv.module gv.mod;
-	    private GameView gv;
+        //private gv.module gv.mod;
+        private GameView gv;
 
         public int spellToLearnIndex = 1;
         public int castingPlayerIndex = 0;
-	    private int spellSlotIndex = 0;
-	    private int slotsPerPage = 20;
+        private int spellSlotIndex = 0;
+        private int slotsPerPage = 20;
 
         //added(1)
         private int maxPages = 20;
@@ -28,10 +28,10 @@ namespace IBx
         private IbbButton btnPageIndex = null;
 
         private IbbButton btnHelp = null;
-	    private IbbButton btnSelect = null;
-	    private IbbButton btnExit = null;
-	    List<string> spellsToLearnTagsList = new List<string>();
-	    private Player pc;
+        private IbbButton btnSelect = null;
+        private IbbButton btnExit = null;
+        List<string> spellsToLearnTagsList = new List<string>();
+        public Player pc;
         public bool infoOnly = false; //set to true when called for info only
         public bool isInCombat = false;
         private string stringMessageSpellLevelUp = "";
@@ -39,18 +39,18 @@ namespace IBx
 
         List<SpellAllowed> backupSpellsAllowed = new List<SpellAllowed>();
 
-        public ScreenSpellLevelUp(Module m, GameView g) 
-	    {
-		    //gv.mod = m;
-		    gv = g;
-		    setControlsStart();
-		    pc = new Player();
-		    stringMessageSpellLevelUp = gv.cc.loadTextToString("MessageSpellLevelUp.txt");
-	    }
-	
-	    public void resetPC(bool info_only, Player p, bool inCombat)
-	    {
-		    pc = p;
+        public ScreenSpellLevelUp(Module m, GameView g)
+        {
+            //gv.mod = m;
+            gv = g;
+            setControlsStart();
+            pc = new Player();
+            stringMessageSpellLevelUp = gv.cc.loadTextToString("data/MessageSpellLevelUp.txt");
+        }
+
+        public void resetPC(bool info_only, Player p, bool inCombat)
+        {
+            pc = p;
             infoOnly = info_only;
             isInCombat = inCombat;
             spellToLearnIndex = 1;
@@ -111,42 +111,42 @@ namespace IBx
                         //Spell tr = gv.mod.getSpellByTag(ta.tag);
                         notKnownYet = false;
                     }
-                        //not available(attribues, prequisite trait)
-                        //attributes
-                        /*
-                        if (checkAttributeRequirementsOfTrait(pc, tr))
+                    //not available(attribues, prequisite trait)
+                    //attributes
+                    /*
+                    if (checkAttributeRequirementsOfTrait(pc, tr))
+                    {
+                        //prerequisite traits
+                        if (!tr.prerequisiteTrait.Equals("none"))
                         {
-                            //prerequisite traits
-                            if (!tr.prerequisiteTrait.Equals("none"))
-                            {
-                                //requires prereq so check if you have it
-                                if (pc.knownTraitsTags.Contains(tr.prerequisiteTrait) || pc.learningTraitsTags.Contains(tr.prerequisiteTrait))
-                                {
-                                    notKnownYet = false;
-                                }
-                            }
-                            else
+                            //requires prereq so check if you have it
+                            if (pc.knownTraitsTags.Contains(tr.prerequisiteTrait) || pc.learningTraitsTags.Contains(tr.prerequisiteTrait))
                             {
                                 notKnownYet = false;
                             }
                         }
-                        */
-                        //not known
-                        foreach (string s in pc.knownSpellsTags)
+                        else
                         {
-                            if (s == ta.tag)
-                            {
-                                notKnownYet = false;
-                            }
+                            notKnownYet = false;
                         }
-                        //not just learned
-                        foreach (string s in pc.learningSpellsTags)
+                    }
+                    */
+                    //not known
+                    foreach (string s in pc.knownSpellsTags)
+                    {
+                        if (s == ta.tag)
                         {
-                            if (s == ta.tag)
-                            {
-                                notKnownYet = false;
-                            }
+                            notKnownYet = false;
                         }
+                    }
+                    //not just learned
+                    foreach (string s in pc.learningSpellsTags)
+                    {
+                        if (s == ta.tag)
+                        {
+                            notKnownYet = false;
+                        }
+                    }
 
                     //not already replaced
                     foreach (string s in pc.replacedTraitsOrSpellsByTag)
@@ -310,34 +310,34 @@ namespace IBx
                     {
                         notKnownYet = false;
                     }
-                        /*
-                        Trait tr = gv.mod.getTraitByTag(ta.tag);
-                        if (checkAttributeRequirementsOfTrait(pc, tr))
+                    /*
+                    Trait tr = gv.mod.getTraitByTag(ta.tag);
+                    if (checkAttributeRequirementsOfTrait(pc, tr))
+                    {
+                        //prerequisite traits
+                        if (!tr.prerequisiteTrait.Equals("none"))
                         {
-                            //prerequisite traits
-                            if (!tr.prerequisiteTrait.Equals("none"))
-                            {
-                                //requires prereq so check if you have it
-                                if (pc.knownTraitsTags.Contains(tr.prerequisiteTrait))
-                                {
-                                    notKnownYet = false;
-                                }
-                            }
-                            else
+                            //requires prereq so check if you have it
+                            if (pc.knownTraitsTags.Contains(tr.prerequisiteTrait))
                             {
                                 notKnownYet = false;
                             }
                         }
-                        */
+                        else
+                        {
+                            notKnownYet = false;
+                        }
+                    }
+                    */
 
-                        //is known
-                        foreach (string s in pc.knownSpellsTags)
+                    //is known
+                    foreach (string s in pc.knownSpellsTags)
+                    {
+                        if (s == ta.tag)
                         {
-                            if (s == ta.tag)
-                            {
-                                notKnownYet = false;
-                            }
+                            notKnownYet = false;
                         }
+                    }
 
                     //not already replaced
                     foreach (string s in pc.replacedTraitsOrSpellsByTag)
@@ -375,10 +375,10 @@ namespace IBx
         }
 
         public void setControlsStart()
-	    {			
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		    int padW = gv.squareSize/6;
+        {
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+            int padW = gv.squareSize / 6;
 
             description = new IbbHtmlTextBox(gv, 320, 100, 500, 300);
             description.showBoxBorder = false;
@@ -421,75 +421,75 @@ namespace IBx
             }
 
             if (btnSelect == null)
-		    {
-			    btnSelect = new IbbButton(gv, 0.8f);	
-			    btnSelect.Text = "LEARN SELECTED CHOICE";
-			    btnSelect.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnSelect.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+            {
+                btnSelect = new IbbButton(gv, 0.8f);
+                btnSelect.Text = "LEARN SELECTED CHOICE";
+                btnSelect.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnSelect.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnSelect.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
-			    btnSelect.Y = 9 * gv.squareSize + pH * 2;
+                btnSelect.Y = 9 * gv.squareSize + pH * 2;
                 btnSelect.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnSelect.Width = (int)(gv.ibbwidthL * gv.screenDensity);			
-		    }
-		    if (btnHelp == null)
-		    {
-			    btnHelp = new IbbButton(gv, 0.8f);	
-			    btnHelp.Text = "HELP";
-			    btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
-			    btnHelp.Y = 9 * gv.squareSize + pH * 2;
+                btnSelect.Width = (int)(gv.ibbwidthL * gv.screenDensity);
+            }
+            if (btnHelp == null)
+            {
+                btnHelp = new IbbButton(gv, 0.8f);
+                btnHelp.Text = "HELP";
+                btnHelp.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnHelp.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnHelp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
+                btnHelp.Y = 9 * gv.squareSize + pH * 2;
                 btnHelp.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnHelp.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    if (btnExit == null)
-		    {
-			    btnExit = new IbbButton(gv, 0.8f);	
-			    btnExit.Text = "EXIT";
-			    btnExit.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnExit.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnExit.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
-			    btnExit.Y = 9 * gv.squareSize + pH * 2;
+                btnHelp.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+            }
+            if (btnExit == null)
+            {
+                btnExit = new IbbButton(gv, 0.8f);
+                btnExit.Text = "EXIT";
+                btnExit.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnExit.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnExit.X = (15 * gv.squareSize) - padW * 1 + gv.oXshift;
+                btnExit.Y = 9 * gv.squareSize + pH * 2;
                 btnExit.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnExit.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    for (int y = 0; y < slotsPerPage; y++)
-		    {
-			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			
-			    int x = y % 5;
-			    int yy = y / 5;
-			    btnNew.X = ((x + 4) * gv.squareSize) + (padW * (x+1)) + gv.oXshift;
-			    btnNew.Y = (2 + yy) * gv.squareSize + (padW * yy + padW);
+                btnExit.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+            }
+            for (int y = 0; y < slotsPerPage; y++)
+            {
+                IbbButton btnNew = new IbbButton(gv, 1.0f);
+                btnNew.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+
+                int x = y % 5;
+                int yy = y / 5;
+                btnNew.X = ((x + 4) * gv.squareSize) + (padW * (x + 1)) + gv.oXshift;
+                btnNew.Y = (2 + yy) * gv.squareSize + (padW * yy + padW);
 
                 btnNew.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnNew.Width = (int)(gv.ibbwidthR * gv.screenDensity);	
-			
-			    btnSpellSlots.Add(btnNew);
-		    }			
-	    }
-	
-	    //CAST SELECTOR SCREEN (COMBAT and MAIN)
+                btnNew.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+
+                btnSpellSlots.Add(btnNew);
+            }
+        }
+
+        //CAST SELECTOR SCREEN (COMBAT and MAIN)
         public void redrawSpellLevelUp(bool inPcCreation)
         {
             Player pc = getCastingPlayer();
             btnSelect.Text = "LEARN SELECTED " + gv.mod.getPlayerClass(getCastingPlayer().classTag).spellLabelPlural;
             spellsToLearnTagsList.Clear();
-    	    fillToLearnList();
-    	
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		
-    	    int locY = 0;
-    	    int locX = pW * 4;
+            fillToLearnList();
+
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+
+            int locY = 0;
+            int locX = pW * 4;
             int textH = (int)gv.drawFontRegHeight;
-    	    int spacing = textH;
+            int spacing = textH;
             int tabX = 5 * gv.squareSize + pW * 3;
             int noticeX = 5 * gv.squareSize + pW * 3;
             int noticeY = pH * 1 + spacing;
-    	    int tabStartY = 4 * gv.squareSize + pW * 10;
+            int tabStartY = 4 * gv.squareSize + pW * 10;
 
             if (!infoOnly)
             {
@@ -505,7 +505,7 @@ namespace IBx
                 {
                     maxNumber = gv.mod.getPlayerClass(pc.classTag).traitsToLearnAtLevelTable[pc.classLevel];
                 }
-                gv.DrawText("Select Choice Nr. " + spellToLearnIndex + " of " + maxNumber + " Choice(s) to Learn", noticeX, pH * 1, "gray");
+                gv.DrawText("Select Choice Nr. " + spellToLearnIndex + " of " + maxNumber + " Choice(s) to Learn", noticeX, pH * 1, 1.0f, "gray");
 
                 //gv.DrawText("Select One " + gv.mod.getPlayerClass(pc.classTag).spellLabelSingular + " to Learn", noticeX, pH * 1, 1.0f, Color.Gray);
                 //gv.DrawText("Select " + spellToLearnIndex + " of " + gv.mod.getPlayerClass(pc.classTag).spellsToLearnAtLevelTable[getCastingPlayer().classLevel] + " " + gv.mod.getPlayerClass(pc.classTag).spellLabelPlural + " to Learn", noticeX, pH * 1, 1.0f, Color.Gray);
@@ -524,40 +524,40 @@ namespace IBx
                     if ((pc.knownSpellsTags.Contains(sp.tag)) || (pc.learningSpellsTags.Contains(sp.tag)))
                     {
                         //say that you already know this one
-                        gv.DrawText("Already Known", noticeX, noticeY, "yellow");
+                        gv.DrawText("Already Known", noticeX, noticeY, 1.0f, "yellow");
                     }
                     else //spell not known
                     {
                         //check if available to learn
                         if (isAvailableToLearn(sp.tag))
                         {
-                            gv.DrawText("Available to Learn", noticeX, noticeY, "lime");
+                            gv.DrawText("Available to Learn", noticeX, noticeY, 1.0f, "lime");
                         }
                         else //not available yet
                         {
-                            gv.DrawText(gv.mod.getPlayerClass(pc.classTag).spellLabelSingular + " Not Available to Learn Yet", noticeX, noticeY, "red");
+                            gv.DrawText(gv.mod.getPlayerClass(pc.classTag).spellLabelSingular + " Not Available to Learn Yet", noticeX, noticeY, 1.0f, "red");
                         }
                     }
                 }
-            }	
-		
-		    //DRAW ALL SPELL SLOTS		
-		    int cntSlot = 0;
-		    foreach (IbbButton btn in btnSpellSlots)
-		    {			
-			    ///Player pc = getCastingPlayer();						
-			
-			    if (cntSlot == spellSlotIndex) {btn.glowOn = true;}
-			    else {btn.glowOn = false;}
+            }
+
+            //DRAW ALL SPELL SLOTS		
+            int cntSlot = 0;
+            foreach (IbbButton btn in btnSpellSlots)
+            {
+                ///Player pc = getCastingPlayer();						
+
+                if (cntSlot == spellSlotIndex) { btn.glowOn = true; }
+                else { btn.glowOn = false; }
 
                 //here insert
                 sortSpellsForLevelUp(pc);
 
                 //show only spells for the PC class
                 if ((cntSlot + (tknPageIndex * slotsPerPage)) < backupSpellsAllowed.Count)
-			    {
-				    SpellAllowed sa = backupSpellsAllowed[cntSlot + (tknPageIndex * slotsPerPage)];
-				    Spell sp = gv.mod.getSpellByTag(sa.tag);
+                {
+                    SpellAllowed sa = backupSpellsAllowed[cntSlot + (tknPageIndex * slotsPerPage)];
+                    Spell sp = gv.mod.getSpellByTag(sa.tag);
 
                     if (infoOnly)
                     {
@@ -565,21 +565,21 @@ namespace IBx
                         {
                             btn.Img = "btn_small";
                             btn.Img2 = sp.spellImage;
-                            //gv.cc.DisposeOfBitmap(ref btn.Img3);
-                            //btn.Img3 = ""mandatory_conversation_indicator");
+                            btn.Img3 = null;
                         }
                         else //spell not known yet
                         {
                             btn.Img = "btn_small_off";
                             btn.Img2 = sp.spellImage + "_off";
+                           btn.Img3 = null;
 
                             if (isAvailableToLearn(sp.tag))
                             {
-                                btn.Img3 = "mandatory_conversation_indicator";
+                                btn.Img3 = "yellow_frame";
                             }
                             else
                             {
-                                btn.Img3 = "encounter_indicator";
+                                btn.Img3 = "red_frame";
                             }
                         }
                     }
@@ -589,7 +589,7 @@ namespace IBx
                         {
                             btn.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
                             btn.Img2 = sp.spellImage + "_off";
-                            btn.Img3 = "mandatory_conversation_indicator";
+                            btn.Img3 = "yellow_frame";
                         }
                         else //spell not known yet
                         {
@@ -597,35 +597,35 @@ namespace IBx
                             {
                                 btn.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);	
                                 btn.Img2 = sp.spellImage;
+                                btn.Img3 = null;
                             }
                             else //not available to learn, turn off button
                             {
                                 btn.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
                                 btn.Img2 = sp.spellImage + "_off";
-                                btn.Img3 = "encounter_indicator";
+                                btn.Img3 = "red_frame";
                             }
                         }
-                    }				
-			    }
-			    else //slot is not in spells allowed index range
-			    {
+                    }
+                }
+                else //slot is not in spells allowed index range
+                {
                     btn.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-				    btn.Img2 = null;
+                    btn.Img2 = null;
                     btn.Img3 = null;
-                }			
-			    btn.Draw();
-			    cntSlot++;
-		    }
+                }
+                btn.Draw();
+                cntSlot++;
+            }
 
             //DRAW DESCRIPTION BOX
             locY = tabStartY;
             if (isSelectedSpellSlotInKnownSpellsRange())
             {
                 Spell sp = GetCurrentlySelectedSpell();
-                
+
                 //string textToSpan = "<u>Description</u>" + "<BR>";
                 string textToSpan = "<b><big>" + sp.name + "</big></b><BR>";
-
                 if (sp.isSwiftAction && !sp.usesTurnToActivate)
                 {
                     textToSpan += "Swift action" + "<BR>";
@@ -642,12 +642,10 @@ namespace IBx
                 {
                     textToSpan += "Takes " + sp.castTimeInTurns + " full turn(s)" + "<BR>";
                 }
-
                 if (sp.coolDownTime > 0)
                 {
                     textToSpan += "Cool down time: " + sp.coolDownTime + " turn(s)" + "<BR>";
                 }
-
                 textToSpan += "SP Cost: " + sp.costSP + "<BR>";
                 textToSpan += "HP Cost: " + sp.costHP + "<BR>";
                 textToSpan += "Target Range: " + sp.range + "<BR>";
@@ -685,7 +683,7 @@ namespace IBx
             }
         }
         public void onTouchSpellLevelUp(int eX, int eY, MouseEventType.EventType eventType, bool inPcCreation, bool inCombat)
-	    {
+        {
             try
             {
                 btnHelp.glowOn = false;
@@ -834,13 +832,13 @@ namespace IBx
                 }
             }
             catch { }
-	    }
-    
+        }
+
         public void doSelectedSpellToLearn(bool inPcCreation)
         {
-    	    if (isSelectedSpellSlotInKnownSpellsRange())
-		    {
-			    Spell sp = GetCurrentlySelectedSpell();
+            if (isSelectedSpellSlotInKnownSpellsRange())
+            {
+                Spell sp = GetCurrentlySelectedSpell();
                 if (isAvailableToLearn(sp.tag))
                 {
                     Player pc = getCastingPlayer();
@@ -946,7 +944,7 @@ namespace IBx
                         maxNumber = gv.mod.getPlayerClass(pc.classTag).spellsToLearnAtLevelTable[pc.classLevel];
                     }
 
-                   
+
                     if (spellToLearnIndex <= maxNumber)
                     {
                         gv.screenParty.spellGained += sp.name + ", ";
@@ -1280,10 +1278,10 @@ namespace IBx
                                         }//3
                                     }//2
                                 }//1
-                            //}//2 (is 1 actually)
+                                 //}//2 (is 1 actually)
 
-                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                        }//end of the graet for loo for traits
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                            }//end of the graet for loo for traits
 
 
                             //pc.learningTraitsTags.Clear();
@@ -1293,7 +1291,7 @@ namespace IBx
                             {
                                 pc.knownSpellsTags.Add(pc.learningSpellsTags[counter]);
 
-                               //Spell replacement code
+                                //Spell replacement code
                                 foreach (Spell s in gv.mod.moduleSpellsList)
                                 {
                                     if (s.tag == pc.learningSpellsTags[counter])
@@ -1325,7 +1323,7 @@ namespace IBx
                                     }
                                 }
                             }
-                            
+
                             pc.learningTraitsTags.Clear();
                             pc.learningEffects.Clear();
                             pc.learningSpellsTags.Clear();
@@ -1333,9 +1331,9 @@ namespace IBx
                             gv.screenPcCreation.SaveCharacter(pc);
                             gv.screenPartyBuild.pcList.Add(pc);
                             gv.screenType = "partyBuild";
-                         }
-                         else  
-                         {
+                        }
+                        else
+                        {
 
                             //todo; add the same as above here
                             //****************************************************
@@ -1720,32 +1718,32 @@ namespace IBx
                             gv.screenType = "party";
                             gv.screenParty.spellGained += sp.name + ", ";
                             gv.screenParty.doLevelUpSummary();
-                         }
-                     }
+                        }
+                    }
                 }
                 else
-			    {
-				    gv.sf.MessageBox("Can't learn that spell, try another or exit");
-			    }
-		    }	
+                {
+                    gv.sf.MessageBox("Can't learn that spell, try another or exit");
+                }
+            }
         }
-            
+
         public bool isAvailableToLearn(string spellTag)
         {
-    	    if (spellsToLearnTagsList.Contains(spellTag))
-    	    {
-    		    return true;
-    	    }
-    	    return false;
+            if (spellsToLearnTagsList.Contains(spellTag))
+            {
+                return true;
+            }
+            return false;
         }
-    
+
         public void fillToLearnList()
         {
-    	    spellsToLearnTagsList = getCastingPlayer().getSpellsToLearn();	    
+            spellsToLearnTagsList = getCastingPlayer().getSpellsToLearn();
         }
-    
+
         public Spell GetCurrentlySelectedSpell()
-	    {
+        {
             //SpellAllowed sa = getCastingPlayer().playerClass.spellsAllowed[spellSlotIndex];
             //return gv.mod.getSpellByTag(sa.tag);
             sortSpellsForLevelUp(pc);
@@ -1753,28 +1751,28 @@ namespace IBx
             SpellAllowed ta = backupSpellsAllowed[spellSlotIndex + (tknPageIndex * slotsPerPage)];
             return gv.mod.getSpellByTag(ta.tag);
         }
-	    public bool isSelectedSpellSlotInKnownSpellsRange()
-	    {
+        public bool isSelectedSpellSlotInKnownSpellsRange()
+        {
             //return spellSlotIndex < getCastingPlayer().playerClass.spellsAllowed.Count;
             sortSpellsForLevelUp(pc);
             return (spellSlotIndex + (tknPageIndex * slotsPerPage)) < backupSpellsAllowed.Count;
-        }	
-	    public int getLevelAvailable(string tag)
-	    {
-		    SpellAllowed sa = getCastingPlayer().playerClass.getSpellAllowedByTag(tag);
-		    if (sa != null)
-		    {
-			    return sa.atWhatLevelIsAvailable;
-		    }
-		    return 0;
-	    }
-	    public Player getCastingPlayer()
-	    {
-		    return pc;
-	    }
-	    public void tutorialMessageCastingScreen()
+        }
+        public int getLevelAvailable(string tag)
         {
-		    gv.sf.MessageBoxHtml(this.stringMessageSpellLevelUp);	
+            SpellAllowed sa = getCastingPlayer().playerClass.getSpellAllowedByTag(tag);
+            if (sa != null)
+            {
+                return sa.atWhatLevelIsAvailable;
+            }
+            return 0;
+        }
+        public Player getCastingPlayer()
+        {
+            return pc;
+        }
+        public void tutorialMessageCastingScreen()
+        {
+            gv.sf.MessageBoxHtml(this.stringMessageSpellLevelUp);
         }
 
     }

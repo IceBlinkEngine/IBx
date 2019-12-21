@@ -114,14 +114,17 @@ namespace IBx
             {
                 position.X += velocity.X * elapsed;
                 position.Y += velocity.Y * elapsed;
-                gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 0.5f, false, true, 0);
+                //scheissbrille4
+                //gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 0.5f, false, true, 0);
+                gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 1.2f, true, false, 0);
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
-           
+
             }
             else if (movementMethod == "rain")
             {
                 position.X += velocity.X * elapsed * 1.275f;
                 position.Y += velocity.Y * elapsed * 1.275f;
+                //gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 1.0f, true, false, 0);
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
             }
             else if (movementMethod == "snow")
@@ -133,7 +136,7 @@ namespace IBx
 
                 if (!reverseXShift)
                 {
-                    xShift = xShift + 0.02f - 0.005f + (shiftAdder/10000);
+                    xShift = xShift + 0.02f - 0.005f + (shiftAdder / 10000);
                 }
                 if (xShift >= (0.85 + (limitAdder / 1000)))
                 {
@@ -148,9 +151,10 @@ namespace IBx
                     reverseXShift = false;
                 }
 
-                position.X += (xShift*0.75f);
+                position.X += (xShift * 0.75f);
                 //old approach with sin, doing it via customized values like above for now
                 //position.X += (float)Math.Sin(position.Y);
+                //gv.cc.transformSpritePixelPositionOnContactWithVisibleMainMapBorders(this, 25.0f, true, false, 0);
                 opacity = gv.mod.fullScreenEffectOpacityWeather;
             }
             else if (movementMethod == "sandstorm")
@@ -176,18 +180,19 @@ namespace IBx
             }
             else
             {
-                int x = (totalElapsedTime % (numberOfFrames * millisecondsPerFrame)) ;
+                int x = (totalElapsedTime % (numberOfFrames * millisecondsPerFrame));
                 currentFrameIndex = (x / millisecondsPerFrame) + 1;
             }
             //if ((this.movementMethod == "lightning") && (currentFrameIndex == 1))
-                    
-                    //{
-                //int stop = 0;
-                    //}
+
+            //{
+            //int stop = 0;
+            //}
         }
 
         public void Draw(GameView gv)
         {
+
             IbRect src = new IbRect(currentFrameIndex * frameHeight, 0, frameHeight, frameHeight);
             IbRect dst = new IbRect(0, 0, 0, 0);
             //assumes frames of equal proportions
@@ -219,7 +224,8 @@ namespace IBx
             else
             {
             */
-                dst = new IbRect((int)this.position.X, (int)this.position.Y, (int)(gv.squareSize * this.scaleX), (int)(gv.squareSize * this.scaleY));
+            //snowshift
+            dst = new IbRect((int)this.position.X, (int)this.position.Y, (int)(gv.squareSize * this.scaleX), (int)(gv.squareSize * this.scaleY));
             //}
             float opacityMulti = 1;
             if (this.movementMethod.Contains("fog") || this.movementMethod.Contains("clouds"))
@@ -227,9 +233,27 @@ namespace IBx
                 opacityMulti = 0.64f;
             }
 
-                if (numberOFFramesForAnimationsMadeFromSeveralBitmaps == 0)
+            if (numberOFFramesForAnimationsMadeFromSeveralBitmaps == 0)
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(bitmap), src, dst, angle, false, this.opacity * opacityMulti);
+
+                //if (this.movementMethod == "fog")
+                //{
+                //gv.DrawBitmapParallelToPlayer(gv.cc.GetFromBitmapList(bitmap), src, dst, angle, false, this.opacity * opacityMulti);
+                //}
+
+                if (this.movementMethod == "clouds")
+                {
+                    bool mirror = false;
+                    if (this.mass == 1)
+                    {
+                        mirror = true;
+                    }
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(bitmap), src, dst, angle, mirror, this.opacity * opacityMulti);
+                }
+                else
+                {
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(bitmap), src, dst, angle, false, this.opacity * opacityMulti);
+                }
             }
             else
             {
@@ -237,7 +261,7 @@ namespace IBx
 
                 gv.DrawBitmap(gv.cc.GetFromBitmapList(bitmap + currentFrameIndex.ToString()), src, dst, angle, false, this.opacity * opacityMulti);
 
-            }   
+            }
         }
 
         public void DrawCombat(GameView gv)
@@ -293,5 +317,5 @@ namespace IBx
 
             }
         }
-    }    
+    }
 }

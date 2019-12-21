@@ -6,15 +6,15 @@ using System.Text;
 
 namespace IBx
 {
-    public class ScreenCastSelector 
+    public class ScreenCastSelector
     {
-	   
-	    private GameView gv;
+
+        private GameView gv;
         //private gv.module gv.mod = gv.mod;
 
         public int castingPlayerIndex = 0;
-	    private int spellSlotIndex = 0;
-	    private int slotsPerPage = 20;
+        private int spellSlotIndex = 0;
+        private int slotsPerPage = 20;
 
         private int maxPages = 20;
         private int tknPageIndex = 0;
@@ -26,21 +26,22 @@ namespace IBx
         private IbbButton btnPageIndex = null;
 
         private IbbButton btnHelp = null;
-	    private IbbButton btnSelect = null;
-	    private IbbButton btnExit = null;
-	    private string stringMessageCastSelector = "";
+        private IbbButton btnSelect = null;
+        private IbbButton btnExit = null;
+        private string stringMessageCastSelector = "";
         private IbbHtmlTextBox description;
         public bool isInCombat = false;
 
         List<string> backupKnownSpellTagsInCombat = new List<string>();
         List<string> backupKnownSpellTagsOutsideCombat = new List<string>();
 
-        public ScreenCastSelector(Module m, GameView g) 
-	    {
-		    //mod = m;
-		    gv = g;
-		    stringMessageCastSelector = gv.cc.loadTextToString("MessageCastSelector.txt");
-	    }
+        public ScreenCastSelector(Module m, GameView g)
+        {
+            //mod = m;
+            gv = g;
+            //stringMessageCastSelector = gv.cc.loadTextToString("data/MessageCastSelector.txt");
+            stringMessageCastSelector = gv.cc.loadTextToString("MessageCastSelector.txt");
+        }
 
         public void sortTraitsForLevelUp(Player pc)
         {
@@ -62,7 +63,7 @@ namespace IBx
                     {
                         if (sp.tag == s)
                         {
-                            
+
                             if (sp.useableInSituation.Equals("Always") || sp.useableInSituation.Equals("OutOfCombat"))
                             {
                                 spellsForLearningTags.Add(s);
@@ -262,7 +263,7 @@ namespace IBx
 
                         btn.Img2 = sp.spellImage;
                         btn.Img2Off = sp.spellImage + "_off";
-                        btn.btnState = buttonState.Normal;                        
+                        btn.btnState = buttonState.Normal;
                     }
                     else //slot is not in spells allowed index range
                     {
@@ -306,37 +307,37 @@ namespace IBx
                 cntSlot++;
             }
         }
-	
-	    //CAST SELECTOR SCREEN (COMBAT and MAIN)
+
+        //CAST SELECTOR SCREEN (COMBAT and MAIN)
         public void redrawCastSelector(bool inCombat)
         {
             Player pc = getCastingPlayer();
             isInCombat = inCombat;
-    	    //IF CONTROLS ARE NULL, CREATE THEM
-    	    if (btnSelect == null)
-    	    {
-    		    setControlsStart();
-    	    }
+            //IF CONTROLS ARE NULL, CREATE THEM
+            if (btnSelect == null)
+            {
+                setControlsStart();
+            }
             btnSelect.Text = pc.playerClass.labelForCastAction.ToUpper() + " SELECTED " + gv.mod.getPlayerClass(getCastingPlayer().classTag).spellLabelSingular.ToUpper();
             int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		
-    	    int locY = 0;
-    	    int locX = pW * 4;
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+
+            int locY = 0;
+            int locX = pW * 4;
             //int textH = (int)gv.cc.MeasureString("GetHeight", gv.drawFontReg, gv.Width).Height;
             int textH = (int)gv.drawFontRegHeight;
-            int spacing = textH; 
+            int spacing = textH;
             //int spacing = (int)gv.mSheetTextPaint.getTextSize() + pH;
-    	    int tabX = pW * 4;
-    	    int noticeX = pW * 5;
-    	    int noticeY = pH * 3 + spacing;
-    	    int leftStartY = pH * 3;
-    	    int tabStartY = 4 * gv.squareSize + pW * 10;
+            int tabX = pW * 4;
+            int noticeX = pW * 5;
+            int noticeY = pH * 3 + spacing;
+            int leftStartY = pH * 3;
+            int tabStartY = 4 * gv.squareSize + pW * 10;
 
             //DRAW TEXT		
-		    locY = (gv.squareSize * 0) + (pH * 2);
-		    //gv.mSheetTextPaint.setColor(Color.LTGRAY);
-		    gv.DrawText("Select a " + gv.mod.getPlayerClass(pc.classTag).spellLabelSingular + " to " + gv.mod.getPlayerClass(pc.classTag).labelForCastAction, noticeX, pH * 3);
+            locY = (gv.squareSize * 0) + (pH * 2);
+            //gv.mSheetTextPaint.setColor(Color.LTGRAY);
+            gv.DrawText("Select a " + gv.mod.getPlayerClass(pc.classTag).spellLabelSingular + " to " + gv.mod.getPlayerClass(pc.classTag).labelForCastAction, noticeX, pH * 3);
             //gv.DrawText("Select a " + gv.mod.getPlayerClass(pc.classTag).spellLabelSingular + " to Cast", noticeX, pH * 3, "wh");
             //gv.mSheetTextPaint.setColor(Color.YELLOW);
             gv.DrawText(getCastingPlayer().name + " SP: " + getCastingPlayer().sp + "/" + getCastingPlayer().spMax, pW * 55, leftStartY);
@@ -347,76 +348,45 @@ namespace IBx
             sortTraitsForLevelUp(pc);
 
             if (isSelectedSpellSlotInKnownSpellsRange())
-		    {
-			    Spell sp = GetCurrentlySelectedSpell();
+            {
+                Spell sp = GetCurrentlySelectedSpell();
                 //Player pc = getCastingPlayer();	
 
-                bool swiftBlocked = false;
-                if (sp.isSwiftAction && gv.mod.swiftActionHasBeenUsedThisTurn)
-                {
-                    swiftBlocked = true;
-                }
-
-                bool coolBlocked = false;
-                int coolDownTime = 0;
-                for (int i = 0; i < pc.coolingSpellsByTag.Count; i++)
-                {
-                    if (pc.coolingSpellsByTag[i] == sp.tag)
-                    {
-                        coolBlocked = true;
-                        coolDownTime = pc.coolDownTimes[i];
-                        if (coolDownTime < sp.coolDownTime)
-                        {
-                            coolDownTime++;
-                        }
-                    }
-                }
-
-                if (coolBlocked)
-                {
-                    gv.DrawText("This is still cooling down for " + coolDownTime + " turns(s).", noticeX, noticeY, "red");
-                }
-                else if (swiftBlocked)
-                {
-                    gv.DrawText("Swift action already used this turn.", noticeX, noticeY, "red");
-                }
-
-                else if ((pc.sp >= sp.costSP) && ((pc.hp - 1) >= sp.costHP) && !gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Contains(sp.tag))
+                if ((pc.sp >= sp.costSP) && ((pc.hp - 1) >= sp.costHP))
                 {
                     //gv.mSheetTextPaint.setColor(Color.GREEN);
                     gv.DrawText("Available", noticeX, noticeY, "lime");
                 }
-                else if (!gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Contains(sp.tag)) //if known but not enough spell points, "Insufficient SP to Cast" in yellow
+                else //if known but not enough spell points, "Insufficient SP to Cast" in yellow
                 {
                     //gv.mSheetTextPaint.setColor(Color.YELLOW);
                     gv.DrawText("Insufficient SP or HP", noticeX, noticeY, "red");
                 }
-                else
-                {
-                    gv.DrawText("This can only be used once per turn.", noticeX, noticeY, "red");
-                }
-		    }		
-		
-		    //DRAW ALL SPELL SLOTS		
-		    int cntSlot = 0;
-		    foreach (IbbButton btn in btnSpellSlots)
-		    {			
-			    //Player pc = getCastingPlayer();						
-			
-			    if (cntSlot == spellSlotIndex) {btn.glowOn = true;}
-			    else {btn.glowOn = false;}
+            }
+
+            //DRAW ALL SPELL SLOTS		
+            int cntSlot = 0;
+            foreach (IbbButton btn in btnSpellSlots)
+            {
+                //Player pc = getCastingPlayer();						
+
+                if (cntSlot == spellSlotIndex) { btn.glowOn = true; }
+                else { btn.glowOn = false; }
                 if (isInCombat)
                 {
                     if ((cntSlot + (tknPageIndex * slotsPerPage)) < backupKnownSpellTagsInCombat.Count)
                     {
                         Spell sp = gv.mod.getSpellByTag(backupKnownSpellTagsInCombat[cntSlot + (tknPageIndex * slotsPerPage)]);
                         //TraitAllowed ta = backupTraitsAllowed[cntSlot + (tknPageIndex * slotsPerPage)];
+                        //gv.cc.DisposeOfBitmap(ref btn.Img2);
                         btn.Img2 = sp.spellImage;
-                         btn.Img2Off = sp.spellImage + "_off";
+                        //gv.cc.DisposeOfBitmap(ref btn.Img2Off);
+                        btn.Img2Off = sp.spellImage + "_off";
                         btn.btnState = buttonState.Normal;
                     }
                     else
                     {
+                        //gv.cc.DisposeOfBitmap(ref btn.Img);
                         btn.Img = "btn_small_off";
                         btn.Img2 = null;
                         btn.Img2Off = null;
@@ -432,12 +402,15 @@ namespace IBx
                     {
                         Spell sp = gv.mod.getSpellByTag(backupKnownSpellTagsOutsideCombat[cntSlot + (tknPageIndex * slotsPerPage)]);
                         //TraitAllowed ta = backupTraitsAllowed[cntSlot + (tknPageIndex * slotsPerPage)];
+                        //gv.cc.DisposeOfBitmap(ref btn.Img2);
                         btn.Img2 = sp.spellImage;
+                        //gv.cc.DisposeOfBitmap(ref btn.Img2Off);
                         btn.Img2Off = sp.spellImage + "_off";
                         btn.btnState = buttonState.Normal;
                     }
                     else
                     {
+                        //gv.cc.DisposeOfBitmap(ref btn.Img);
                         btn.Img = "btn_small_off";
                         btn.Img2 = null;
                         btn.Img2Off = null;
@@ -447,45 +420,23 @@ namespace IBx
                 }
 
                 btn.Draw();
-			    cntSlot++;
-		    }
-		
-		    //DRAW DESCRIPTION BOX
-		    locY = tabStartY;		
-		    if (isSelectedSpellSlotInKnownSpellsRange())
-		    {
-			    Spell sp = GetCurrentlySelectedSpell();
-			    //string textToSpan = "<u>Description</u>" + "<BR>" + "<BR>";
-	            string textToSpan = "<b><i><big>" + sp.name + "</big></i></b><BR>";
-                if (sp.isSwiftAction && !sp.usesTurnToActivate)
-                {
-                    textToSpan += "Swift action" + "<BR>";
-                }
-                else if (sp.onlyOncePerTurn && !sp.usesTurnToActivate)
-                {
-                    textToSpan += "Free action, not repeatable" + "<BR>";
-                }
-                else if (!sp.onlyOncePerTurn && !sp.usesTurnToActivate)
-                {
-                    textToSpan += "Free action, repeatable" + "<BR>";
-                }
-                else if (sp.castTimeInTurns > 0)
-                {
-                    textToSpan += "Takes " + sp.castTimeInTurns + " full turn(s)" + "<BR>";
-                }
+                cntSlot++;
+            }
 
-                if (sp.coolDownTime > 0)
-                {
-                    textToSpan += "Cool down time: " + sp.coolDownTime + " turn(s)" + "<BR>";
-                }
-
+            //DRAW DESCRIPTION BOX
+            locY = tabStartY;
+            if (isSelectedSpellSlotInKnownSpellsRange())
+            {
+                Spell sp = GetCurrentlySelectedSpell();
+                //string textToSpan = "<u>Description</u>" + "<BR>" + "<BR>";
+                string textToSpan = "<b><i><big>" + sp.name + "</big></i></b><BR>";
                 textToSpan += "SP Cost: " + sp.costSP + "<BR>";
                 textToSpan += "HP Cost: " + sp.costHP + "<BR>";
                 textToSpan += "Target Range: " + sp.range + "<BR>";
-	            textToSpan += "Area of Effect Radius: " + sp.aoeRadius + "<BR>";
-	            textToSpan += "Available at Level: " + getLevelAvailable(sp.tag) + "<BR>";
-	            textToSpan += "<BR>";
-	            textToSpan += sp.description;
+                textToSpan += "Area of Effect Radius: " + sp.aoeRadius + "<BR>";
+                textToSpan += "Available at Level: " + getLevelAvailable(sp.tag) + "<BR>";
+                textToSpan += "<BR>";
+                textToSpan += sp.description;
 
                 description.tbXloc = 11 * gv.squareSize;
                 description.tbYloc = 2 * gv.squareSize;
@@ -494,42 +445,42 @@ namespace IBx
                 description.logLinesList.Clear();
                 description.AddHtmlTextToLog(textToSpan);
                 description.onDrawLogBox();
-		    }
-		
-		    btnHelp.Draw();	
-		    btnExit.Draw();	
-		    btnSelect.Draw();
+            }
+
+            btnHelp.Draw();
+            btnExit.Draw();
+            btnSelect.Draw();
             btnTokensLeft.Draw();
             btnTokensRight.Draw();
             btnPageIndex.Draw();
         }
         public void onTouchCastSelector(int eX, int eY, MouseEventType.EventType eventType, bool inCombat)
-	    {
-		    btnHelp.glowOn = false;
-		    btnExit.glowOn = false;
-		    btnSelect.glowOn = false;
+        {
+            btnHelp.glowOn = false;
+            btnExit.glowOn = false;
+            btnSelect.glowOn = false;
             btnTokensLeft.glowOn = false;
             btnTokensRight.glowOn = false;
             btnPageIndex.glowOn = false;
 
             switch (eventType)
-		    {
-		    case MouseEventType.EventType.MouseDown:
-		    case MouseEventType.EventType.MouseMove:
-			    int x = (int) eX;
-			    int y = (int) eY;
-			    if (btnHelp.getImpact(x, y))
-			    {
-				    btnHelp.glowOn = true;
-			    }
-			    else if (btnSelect.getImpact(x, y))
-			    {
-				    btnSelect.glowOn = true;
-			    }
-			    else if (btnExit.getImpact(x, y))
-			    {
-				    btnExit.glowOn = true;
-			    }
+            {
+                case MouseEventType.EventType.MouseDown:
+                case MouseEventType.EventType.MouseMove:
+                    int x = (int)eX;
+                    int y = (int)eY;
+                    if (btnHelp.getImpact(x, y))
+                    {
+                        btnHelp.glowOn = true;
+                    }
+                    else if (btnSelect.getImpact(x, y))
+                    {
+                        btnSelect.glowOn = true;
+                    }
+                    else if (btnExit.getImpact(x, y))
+                    {
+                        btnExit.glowOn = true;
+                    }
                     else if (btnTokensLeft.getImpact(x, y))
                     {
                         btnTokensLeft.glowOn = true;
@@ -543,26 +494,26 @@ namespace IBx
                         btnPageIndex.glowOn = true;
                     }
                     break;
-			
-		    case MouseEventType.EventType.MouseUp:
-			    x = (int) eX;
-			    y = (int) eY;
-			
-			    btnHelp.glowOn = false;
-			    //btnInfo.glowOn = false;
-			    btnExit.glowOn = false;
-			    btnSelect.glowOn = false;
+
+                case MouseEventType.EventType.MouseUp:
+                    x = (int)eX;
+                    y = (int)eY;
+
+                    btnHelp.glowOn = false;
+                    //btnInfo.glowOn = false;
+                    btnExit.glowOn = false;
+                    btnSelect.glowOn = false;
                     btnTokensLeft.glowOn = false;
                     btnTokensRight.glowOn = false;
                     btnPageIndex.glowOn = false;
 
                     for (int j = 0; j < slotsPerPage; j++)
-			    {
-				    if (btnSpellSlots[j].getImpact(x, y))
-				    {
-					    spellSlotIndex = j;
-				    }
-			    }
+                    {
+                        if (btnSpellSlots[j].getImpact(x, y))
+                        {
+                            spellSlotIndex = j;
+                        }
+                    }
 
                     if (btnTokensLeft.getImpact(x, y))
                     {
@@ -582,76 +533,60 @@ namespace IBx
                     }
 
                     else if (btnHelp.getImpact(x, y))
-			    {
-				    tutorialMessageCastingScreen();
-			    }
-			    else if (btnSelect.getImpact(x, y))
-			    {
-				    doSelectedSpell(inCombat);
-			    }
-			    else if (btnExit.getImpact(x, y))
-			    {
-				    if (inCombat)
-				    {
-					    if (gv.screenCombat.canMove)
-					    {
-						    gv.screenCombat.currentCombatMode = "move";
-					    }
-					    else
-					    {
-						    gv.screenCombat.currentCombatMode = "attack";
-					    }
-					    gv.screenType = "combat";
-					    doCleanUp();
-				    }
-				    else
-				    {
-					    gv.screenType = "main";	
-					    doCleanUp();
-				    }							
-			    }
-			    break;		
-		    }
-	    }
-    
+                    {
+                        tutorialMessageCastingScreen();
+                    }
+                    else if (btnSelect.getImpact(x, y))
+                    {
+                        doSelectedSpell(inCombat);
+                    }
+                    else if (btnExit.getImpact(x, y))
+                    {
+                        if (inCombat)
+                        {
+                            if (gv.screenCombat.canMove)
+                            {
+                                gv.screenCombat.currentCombatMode = "move";
+                            }
+                            else
+                            {
+                                gv.screenCombat.currentCombatMode = "attack";
+                            }
+                            gv.screenType = "combat";
+                            doCleanUp();
+                        }
+                        else
+                        {
+                            gv.screenType = "main";
+                            doCleanUp();
+                        }
+                    }
+                    break;
+            }
+        }
+
         public void doCleanUp()
-	    {
-    	    btnSpellSlots.Clear();
-    	    btnHelp = null;
-    	    btnSelect = null;
-    	    btnExit = null;
+        {
+            btnSpellSlots.Clear();
+            btnHelp = null;
+            btnSelect = null;
+            btnExit = null;
             btnTokensLeft = null;
             btnTokensRight = null;
             btnPageIndex = null;
         }
-    
+
         public async void doSelectedSpell(bool inCombat)
-	    {            
-		    if (isSelectedSpellSlotInKnownSpellsRange())
-		    {
-			    //only allow to cast spells that you know and are usable on this map
-			    if (getCastingPlayer().knownSpellsTags.Contains(GetCurrentlySelectedSpell().tag))
-			    {
-				    if (inCombat) //Combat Map
-				    {
+        {
+            if (isSelectedSpellSlotInKnownSpellsRange())
+            {
+                //only allow to cast spells that you know and are usable on this map
+                if (getCastingPlayer().knownSpellsTags.Contains(GetCurrentlySelectedSpell().tag))
+                {
+                    if (inCombat) //Combat Map
+                    {
                         gv.screenCombat.dontEndTurn = false;
-
-                        bool swiftBlocked = false;
-                        if (GetCurrentlySelectedSpell().isSwiftAction && gv.mod.swiftActionHasBeenUsedThisTurn)
-                        {
-                            swiftBlocked = true;
-                        }
-
-                        bool coolBlocked = false;
-                        for (int i = 0; i < getCastingPlayer().coolingSpellsByTag.Count; i++)
-                        {
-                            if (getCastingPlayer().coolingSpellsByTag[i] == GetCurrentlySelectedSpell().tag)
-                            {
-                                coolBlocked = true;
-                            }
-                        }
-
-                        if ((getCastingPlayer().sp >= GetCurrentlySelectedSpell().costSP) && (getCastingPlayer().hp > GetCurrentlySelectedSpell().costHP) && !gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Contains(GetCurrentlySelectedSpell().tag) && !swiftBlocked && !coolBlocked)
+                        if ((getCastingPlayer().sp >= GetCurrentlySelectedSpell().costSP) && (getCastingPlayer().hp > GetCurrentlySelectedSpell().costHP))
                         {
                             //AoO code
                             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
@@ -753,21 +688,6 @@ namespace IBx
                                 {
                                     gv.cc.currentSelectedSpell = GetCurrentlySelectedSpell();
                                     getCastingPlayer().thisCasterCanBeInterrupted = GetCurrentlySelectedSpell().canBeInterrupted;
-                                    /*
-                                    if (GetCurrentlySelectedSpell().onlyOncePerTurn)
-                                    {
-                                        gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Add(GetCurrentlySelectedSpell().tag);
-                                    }
-                                    if (GetCurrentlySelectedSpell().isSwiftAction)
-                                    {
-                                        gv.mod.swiftActionHasBeenUSedThisTurn = true;
-                                    }
-                                    if (GetCurrentlySelectedSpell().coolDownTime > 0)
-                                    {
-                                        getCastingPlayer().coolingSpellsByTag.Add(GetCurrentlySelectedSpell().tag);
-                                        getCastingPlayer().coolDownTimes.Add(GetCurrentlySelectedSpell().coolDownTime);
-                                    }
-                                    */
                                     gv.screenType = "combat";
                                     gv.screenCombat.currentCombatMode = "cast";
                                     doCleanUp();
@@ -805,20 +725,20 @@ namespace IBx
                                     doCleanUp();
                                 }
                             }
-					    }
-					    else
-					    {
-						    //Toast.makeText(gv.gameContext, "Not Enough SP for that spell", Toast.LENGTH_SHORT).show();
-					    }
-				    }
-				    else //Adventure Map
-				    {
-					    //only cast if useable on adventure maps
-					    if ((GetCurrentlySelectedSpell().useableInSituation.Equals("Always")) || (GetCurrentlySelectedSpell().useableInSituation.Equals("OutOfCombat")))
-					    {						
-						    if ((getCastingPlayer().sp >= GetCurrentlySelectedSpell().costSP) && (getCastingPlayer().hp > GetCurrentlySelectedSpell().costHP))
-						    {
-							    gv.cc.currentSelectedSpell = GetCurrentlySelectedSpell();
+                        }
+                        else
+                        {
+                            //Toast.makeText(gv.gameContext, "Not Enough SP for that spell", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else //Adventure Map
+                    {
+                        //only cast if useable on adventure maps
+                        if ((GetCurrentlySelectedSpell().useableInSituation.Equals("Always")) || (GetCurrentlySelectedSpell().useableInSituation.Equals("OutOfCombat")))
+                        {
+                            if ((getCastingPlayer().sp >= GetCurrentlySelectedSpell().costSP) && (getCastingPlayer().hp > GetCurrentlySelectedSpell().costHP))
+                            {
+                                gv.cc.currentSelectedSpell = GetCurrentlySelectedSpell();
                                 //ask for target
                                 // selected to USE ITEM
 
@@ -838,7 +758,7 @@ namespace IBx
                                     pcNames.Add("cancel");
                                     foreach (Player p in gv.mod.playerList)
                                     {
-                                        pcNames.Add(p.name);
+                                        pcNames.Add(p.name + " (" + p.hp + "/" + p.hpMax + " HP)");
                                     }
 
                                     //If only one PC, do not show select PC dialog...just go to cast selector
@@ -862,70 +782,58 @@ namespace IBx
                                     int selectedIndex = gv.GetSelectedIndex(selected, pcNames);
                                     //using (ItemListSelector pcSel = new ItemListSelector(gv, pcNames, gv.mod.getPlayerClass(getCastingPlayer().classTag).spellLabelSingular + " Target"))
                                     //{
-                                        //pcSel.ShowDialog();
-                                        Player pc = getCastingPlayer();
-                                        if (selectedIndex > 0)
+                                    //pcSel.ShowDialog();
+                                    Player pc = getCastingPlayer();
+                                    if (selectedIndex > 0)
+                                    {
+                                        try
                                         {
-                                            try
-                                            {
-                                                Player target = gv.mod.playerList[selectedIndex - 1];
-                                                gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, true, false);
-                                                gv.screenType = "main";
-                                                doCleanUp();
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                gv.sf.MessageBox("error with Pc Selector screen: " + ex.ToString());
-                                                gv.errorLog(ex.ToString());
-                                            }
+                                            Player target = gv.mod.playerList[selectedIndex - 1];
+                                            gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, true, false);
+                                            gv.screenType = "main";
+                                            doCleanUp();
                                         }
-                                        else if (selectedIndex == 0) // selected "cancel"
+                                        catch (Exception ex)
                                         {
-                                            //do nothing
+                                            gv.sf.MessageBox("error with Pc Selector screen: " + ex.ToString());
+                                            gv.errorLog(ex.ToString());
                                         }
+                                    }
+                                    else if (selectedIndex == 0) // selected "cancel"
+                                    {
+                                        //do nothing
+                                    }
                                     //}
                                 }//closing else or target self
-						    }
-						    else
-						    {
-							    //Toast.makeText(gv.gameContext, "Not Enough SP for that spell", Toast.LENGTH_SHORT).show();
-						    }
-					    }
-				    }
-			    }
-		    }            
-	    }
-        public void doSpellTarget(int selectedIndex)
-        {
-            Player pc = getCastingPlayer();
-            if (selectedIndex > 0)
-            {
-                Player target = gv.mod.playerList[selectedIndex - 1];
-                doSpellTarget(pc, target);
-            }
-            else if (selectedIndex == 0) // selected "cancel"
-            {
-                //do nothing
+                            }
+                            else
+                            {
+                                //Toast.makeText(gv.gameContext, "Not Enough SP for that spell", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
             }
         }
-        public void doSpellTarget(Player pc, Player target)
-        {  
-            try  
-            {  
-                gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, !isInCombat, false);  
-                gv.screenType = "main";  
-                doCleanUp();  
-            }  
-            catch (Exception ex)  
-            {  
-                gv.sf.MessageBoxHtml("error with Pc Selector screen: " + ex.ToString());  
-                gv.errorLog(ex.ToString());  
-            }  
-        }  
 
-    
+        public void doSpellTarget(Player pc, Player target)
+        {
+            try
+            {
+                gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, !isInCombat, false);
+                gv.screenType = "main";
+                doCleanUp();
+            }
+            catch (Exception ex)
+            {
+                gv.sf.MessageBoxHtml("error with Pc Selector screen: " + ex.ToString());
+                gv.errorLog(ex.ToString());
+            }
+        }
+
+
         public Spell GetCurrentlySelectedSpell()
-	    {
+        {
             //SpellAllowed sa = getCastingPlayer().playerClass.spellsAllowed[spellSlotIndex];
             //return gv.mod.getSpellByTag(sa.tag);
             if (isInCombat)
@@ -936,9 +844,9 @@ namespace IBx
             {
                 return gv.mod.getSpellByTag(backupKnownSpellTagsOutsideCombat[spellSlotIndex + (tknPageIndex * slotsPerPage)]);
             }
-	    }
+        }
         public bool isSelectedSpellSlotInKnownSpellsRange()
-	    {
+        {
             //return spellSlotIndex < getCastingPlayer().playerClass.spellsAllowed.Count;
             if (isInCombat)
             {
@@ -950,21 +858,21 @@ namespace IBx
             }
         }
         public int getLevelAvailable(String tag)
-	    {
-		    SpellAllowed sa = getCastingPlayer().playerClass.getSpellAllowedByTag(tag);
-		    if (sa != null)
-		    {
-			    return sa.atWhatLevelIsAvailable;
-		    }
-		    return 0;
-	    }
-	    public Player getCastingPlayer()
-	    {
-		    return gv.mod.playerList[castingPlayerIndex];
-	    }
-	    public void tutorialMessageCastingScreen()
         {
-		    gv.sf.MessageBoxHtml(this.stringMessageCastSelector);	
+            SpellAllowed sa = getCastingPlayer().playerClass.getSpellAllowedByTag(tag);
+            if (sa != null)
+            {
+                return sa.atWhatLevelIsAvailable;
+            }
+            return 0;
+        }
+        public Player getCastingPlayer()
+        {
+            return gv.mod.playerList[castingPlayerIndex];
+        }
+        public void tutorialMessageCastingScreen()
+        {
+            gv.sf.MessageBoxHtml(this.stringMessageCastSelector);
         }
     }
 }

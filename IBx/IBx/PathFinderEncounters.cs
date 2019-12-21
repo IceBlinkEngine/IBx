@@ -15,14 +15,14 @@ namespace IBx
         public GameView gv;
 
         public PathFinderEncounters(GameView g, Module m)
-        {  
-            mod = m;  
+        {
+            mod = m;
             gv = g;
         }
 
 
-    //called from outside to get next move location
-    public List<Coordinate> findNewPoint(Creature crt, Coordinate end, bool ignorePcAndCreatures)
+        //called from outside to get next move location
+        public List<Coordinate> findNewPoint(Creature crt, Coordinate end, bool ignorePcAndCreatures)
         {
             pathNodes.Clear();
             foundEnd = false;
@@ -32,81 +32,81 @@ namespace IBx
 
             //need to add choke point code that makes narrow points impssable for wide, tall and large cretaures
             //alos add code for blocking vmoing to close t map borders
-            
+
             if (crt.creatureSize != 1)
             {
                 int bound0 = grid.GetUpperBound(0);
                 int bound1 = grid.GetUpperBound(1);
 
-                for (int x = 0;x <= bound0; x++)
+                for (int x = 0; x <= bound0; x++)
                 {
                     for (int y = 0; y <= bound1; y++)
                     {
                         //if (grid[x, y] != 4)
                         //{     //found a wall, now block additional squares for our oersized mover
-                            if (grid[x, y] == 1)
+                        if (grid[x, y] == 1)
+                        {
+                            //wide (x+1)
+                            if (crt.creatureSize == 2)
                             {
-                                //wide (x+1)
-                                if (crt.creatureSize == 2)
+                                //cannot stand left of blocked square
+                                if (x > 0)
                                 {
-                                    //cannot stand left of blocked square
-                                    if (x > 0)
-                                    {
                                     if (grid[x - 1, y] != 4)
                                     {
                                         grid[x - 1, y] = 1;
                                     }
-                                    }
                                 }
+                            }
 
-                                //tall (y+1)
-                                if (crt.creatureSize == 3)
+                            //tall (y+1)
+                            if (crt.creatureSize == 3)
+                            {
+                                //cannot stand high of blocked square
+                                if (y > 0)
                                 {
-                                    //cannot stand high of blocked square
-                                    if (y > 0)
-                                    {
-                                    if (grid[x, y-1] != 4)
-                                    {
-                                        grid[x, y - 1] = 1;
-                                    }
-                                    }
-
-                                }
-
-
-                                //large (x+1, y+1)
-                                if (crt.creatureSize == 4)
-                                {
-                                    //cannot stand left of blocked square
-                                    if (x > 0)
-                                    {
-                                    if (grid[x-1, y] != 4)
-                                    {
-                                        grid[x - 1, y] = 1;
-                                    }
-                                    }
-
-                                    //cannot stand high of blocked square
-                                    if (y > 0)
-                                    {
                                     if (grid[x, y - 1] != 4)
                                     {
                                         grid[x, y - 1] = 1;
                                     }
-                                    }
+                                }
 
-                                    //cannot stand diagonally left and high
-                                    if ((x > 0) && (y > 0))
+                            }
+
+
+                            //large (x+1, y+1)
+                            if (crt.creatureSize == 4)
+                            {
+                                //cannot stand left of blocked square
+                                if (x > 0)
+                                {
+                                    if (grid[x - 1, y] != 4)
                                     {
+                                        grid[x - 1, y] = 1;
+                                    }
+                                }
+
+                                //cannot stand high of blocked square
+                                if (y > 0)
+                                {
+                                    if (grid[x, y - 1] != 4)
+                                    {
+                                        grid[x, y - 1] = 1;
+                                    }
+                                }
+
+                                //cannot stand diagonally left and high
+                                if ((x > 0) && (y > 0))
+                                {
                                     if (grid[x - 1, y - 1] != 4)
                                     {
                                         grid[x - 1, y - 1] = 1;
-                                    }
                                     }
                                 }
                             }
                         }
                     }
+                }
                 //} 
             }
             if (!ignorePcAndCreatures)
@@ -454,7 +454,7 @@ namespace IBx
             {
                 if (grid[mod.nonAllowedDiagonalSquareX, mod.nonAllowedDiagonalSquareY] != 4)
                 {
-                        grid[mod.nonAllowedDiagonalSquareX, mod.nonAllowedDiagonalSquareY] = 1;
+                    grid[mod.nonAllowedDiagonalSquareX, mod.nonAllowedDiagonalSquareY] = 1;
                 }
                 mod.nonAllowedDiagonalSquareX = -1;
                 mod.nonAllowedDiagonalSquareY = -1;
@@ -486,7 +486,7 @@ namespace IBx
             gv.mod.alternativeEnd.X = -1;
             gv.mod.alternativeEnd.Y = -1;
 
-            buildPath(crt,end);
+            buildPath(crt, end);
 
             if (!foundEnd)
             {
@@ -637,22 +637,22 @@ namespace IBx
                             {//3
                                 if (gv.screenCombat.CalcDistance(crt, pathNodes[1].X, pathNodes[1].Y, p.combatLocX, p.combatLocY) <= 1)
                                 {//4
-                                    //boy (x+1,y)
-                                    //if (gv.mod.currentEncounter.encounterTiles[gv.mod.alternativeEnd.Y * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y, crt))
-                                    //{//5
-                                        //body (x,y+1)
-                                        if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y + 1, crt))
-                                        {//6
-                                            // body (x+1, y+1)
-                                            //if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y + 1, crt))
-                                            //{//7
-                                                // body (x, y)
-                                                if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y, crt))
-                                                {//8
-                                                    remove = false;
-                                                }//8
-                                            //}//7
-                                        }//6
+                                 //boy (x+1,y)
+                                 //if (gv.mod.currentEncounter.encounterTiles[gv.mod.alternativeEnd.Y * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y, crt))
+                                 //{//5
+                                 //body (x,y+1)
+                                    if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y + 1, crt))
+                                    {//6
+                                     // body (x+1, y+1)
+                                     //if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y + 1, crt))
+                                     //{//7
+                                     // body (x, y)
+                                        if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y, crt))
+                                        {//8
+                                            remove = false;
+                                        }//8
+                                         //}//7
+                                    }//6
                                     //}//5
                                 }//4
                             }//3
@@ -688,19 +688,19 @@ namespace IBx
                                     //boy (x+1,y)
                                     if (gv.mod.currentEncounter.encounterTiles[gv.mod.alternativeEnd.Y * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y, crt))
                                     {//5
-                                        //body (x,y+1)
-                                        //if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y + 1, crt))
-                                        //{//6
-                                            // body (x+1, y+1)
-                                            //if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y + 1, crt))
-                                            //{//7
-                                                // body (x, y)
-                                                if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y, crt))
-                                                {//8
-                                                    remove = false;
-                                                }//8
-                                            //}//7
-                                        //}//6
+                                     //body (x,y+1)
+                                     //if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y + 1, crt))
+                                     //{//6
+                                     // body (x+1, y+1)
+                                     //if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y + 1) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X + 1].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X + 1, gv.mod.alternativeEnd.Y + 1, crt))
+                                     //{//7
+                                     // body (x, y)
+                                        if (gv.mod.currentEncounter.encounterTiles[(gv.mod.alternativeEnd.Y) * gv.mod.currentEncounter.MapSizeX + gv.mod.alternativeEnd.X].Walkable && !containsPCorCrt(gv.mod.alternativeEnd.X, gv.mod.alternativeEnd.Y, crt))
+                                        {//8
+                                            remove = false;
+                                        }//8
+                                         //}//7
+                                         //}//6
                                     }//5
                                 }//4
                             }//3
@@ -804,7 +804,7 @@ namespace IBx
             {
                 for (int y = 0; y < mod.currentEncounter.MapSizeY; y++)
                 {
-                    values[x,y] = 9999;
+                    values[x, y] = 9999;
                 }
             }
         }
@@ -822,42 +822,42 @@ namespace IBx
                         if (values[x, y] == next)
                         {
 
-                            if ((x + 1 < mod.currentEncounter.MapSizeX) && (evaluateValue(x + 1, y, next, crt,"E",end)))
+                            if ((x + 1 < mod.currentEncounter.MapSizeX) && (evaluateValue(x + 1, y, next, crt, "E", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((x - 1 >= 0) && (evaluateValue(x - 1, y, next, crt,"W",end)))
+                            if ((x - 1 >= 0) && (evaluateValue(x - 1, y, next, crt, "W", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((y + 1 < mod.currentEncounter.MapSizeY) && (evaluateValue(x, y + 1, next, crt,"S",end)))
+                            if ((y + 1 < mod.currentEncounter.MapSizeY) && (evaluateValue(x, y + 1, next, crt, "S", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((y - 1 >= 0) && (evaluateValue(x, y - 1, next, crt,"N",end)))
+                            if ((y - 1 >= 0) && (evaluateValue(x, y - 1, next, crt, "N", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((x + 1 < mod.currentEncounter.MapSizeX) && (y + 1 < mod.currentEncounter.MapSizeY) && (evaluateValue(x + 1, y + 1, next, crt,"SE",end)))
+                            if ((x + 1 < mod.currentEncounter.MapSizeX) && (y + 1 < mod.currentEncounter.MapSizeY) && (evaluateValue(x + 1, y + 1, next, crt, "SE", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((x - 1 >= 0) && (y - 1 >= 0) && (evaluateValue(x - 1, y - 1, next, crt, "NW",end)))
+                            if ((x - 1 >= 0) && (y - 1 >= 0) && (evaluateValue(x - 1, y - 1, next, crt, "NW", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((x - 1 >= 0) && (y + 1 < mod.currentEncounter.MapSizeY) && (evaluateValue(x - 1, y + 1, next, crt,"SW",end)))
+                            if ((x - 1 >= 0) && (y + 1 < mod.currentEncounter.MapSizeY) && (evaluateValue(x - 1, y + 1, next, crt, "SW", end)))
                             {
                                 foundEnd = true;
                                 return;
                             }
-                            if ((x + 1 < mod.currentEncounter.MapSizeX) && (y - 1 >= 0) && (evaluateValue(x + 1, y - 1, next, crt,"NE",end)))
+                            if ((x + 1 < mod.currentEncounter.MapSizeX) && (y - 1 >= 0) && (evaluateValue(x + 1, y - 1, next, crt, "NE", end)))
                             {
                                 foundEnd = true;
                                 return;
@@ -869,7 +869,7 @@ namespace IBx
             }
         }
 
-        public bool containsPCorCrt (int x, int y, Creature pfcrt)
+        public bool containsPCorCrt(int x, int y, Creature pfcrt)
         {
             foreach (Player p in gv.mod.playerList)
             {
@@ -1570,16 +1570,16 @@ namespace IBx
 
             //}
             */
-            //first remedy attempt for too comprhensive 4 chekcing
+                //first remedy attempt for too comprhensive 4 chekcing
             }
-                //check if open and replace if lower, applied in any case
-                if ((grid[x, y] == 0) || (grid[x, y] == 4))
+            //check if open and replace if lower, applied in any case
+            if ((grid[x, y] == 0) || (grid[x, y] == 4))
+            {
+                if (values[x, y] > next + 1)
                 {
-                    if (values[x, y] > next + 1)
-                    {
-                        values[x, y] = next + 1;
-                    }
+                    values[x, y] = next + 1;
                 }
+            }
             //}
             return false; //didn't find end
         }
@@ -1605,8 +1605,8 @@ namespace IBx
                 */
                 //if (crt.creatureSize == 1)
                 //{
-                    val = values[p.X + 1, p.Y];
-                    lowest = new Coordinate(p.X + 1, p.Y);
+                val = values[p.X + 1, p.Y];
+                lowest = new Coordinate(p.X + 1, p.Y);
                 //}
                 /*
                 if (crt.creatureSize == 2)
@@ -1677,8 +1677,8 @@ namespace IBx
 
                 //if (crt.creatureSize == 1)
                 //{
-                    val = values[p.X - 1, p.Y];
-                    lowest = new Coordinate(p.X - 1, p.Y);
+                val = values[p.X - 1, p.Y];
+                lowest = new Coordinate(p.X - 1, p.Y);
                 //}
                 /*
                 if (crt.creatureSize == 2)
@@ -1742,141 +1742,141 @@ namespace IBx
                 //val = values[p.X, p.Y + 1];
                 //lowest = new Coordinate(p.X, p.Y + 1);
 
-                    //*****************************************
-                    //if (crt.creatureSize == 1)
-                    //{
-                        val = values[p.X, p.Y + 1];
-                        lowest = new Coordinate(p.X, p.Y + 1);
-                    //}
-                    /*
-                    if (crt.creatureSize == 2)
+                //*****************************************
+                //if (crt.creatureSize == 1)
+                //{
+                val = values[p.X, p.Y + 1];
+                lowest = new Coordinate(p.X, p.Y + 1);
+                //}
+                /*
+                if (crt.creatureSize == 2)
+                {
+                    if ((p.X + 1 < maxX) && (p.Y + 1 < maxY))
                     {
-                        if ((p.X + 1 < maxX) && (p.Y + 1 < maxY))
+                        if ((!containsPCorCrt(p.X + 1, p.Y+1, crt) && isWalkable(p.X + 1, p.Y+1)) || (end.X == p.X + 1 && end.Y == p.Y+1))
                         {
-                            if ((!containsPCorCrt(p.X + 1, p.Y+1, crt) && isWalkable(p.X + 1, p.Y+1)) || (end.X == p.X + 1 && end.Y == p.Y+1))
-                            {
-                                val = values[p.X, p.Y + 1];
-                                lowest = new Coordinate(p.X, p.Y + 1);
-                            }
+                            val = values[p.X, p.Y + 1];
+                            lowest = new Coordinate(p.X, p.Y + 1);
                         }
                     }
-
-                    if (crt.creatureSize == 3)
-                    {
-                        if (p.Y + 2 < maxY)
-                        {
-                            if ((!containsPCorCrt(p.X, p.Y + 2, crt) && isWalkable(p.X, p.Y + 2)) || (end.X == p.X && end.Y == p.Y + 2))
-                            {
-                                val = values[p.X, p.Y + 1];
-                                lowest = new Coordinate(p.X, p.Y + 1);
-                            }
-                        }
-                    }
-
-                    if (crt.creatureSize == 4)
-                    {
-                        if (p.X + 1 < maxX)
-                        {
-                            if ((!containsPCorCrt(p.X + 1, p.Y+1, crt) && isWalkable(p.X + 1, p.Y+1)) || (end.X == p.X + 1 && end.Y == p.Y+1))
-                            {
-                                val = values[p.X, p.Y + 1];
-                                lowest = new Coordinate(p.X, p.Y + 1);
-                            }
-                        }
-
-                        if (p.Y + 2 < maxY)
-                        {
-                            if ((!containsPCorCrt(p.X, p.Y + 2, crt) && isWalkable(p.X, p.Y + 2)) || (end.X == p.X && end.Y == p.Y + 2))
-                            {
-                                val = values[p.X, p.Y + 1];
-                                lowest = new Coordinate(p.X, p.Y + 1);
-                            }
-                        }
-
-                        if ((p.Y + 2 < maxY) && (p.X + 1 < maxX))
-                        {
-                            if ((!containsPCorCrt(p.X + 1, p.Y + 2, crt) && isWalkable(p.X + 1, p.Y + 2)) || (end.X == p.X + 1 && end.Y == p.Y + 2))
-                            {
-                                val = values[p.X, p.Y + 1];
-                                lowest = new Coordinate(p.X, p.Y + 1);
-                            }
-                        }
-                    }
-
-                    //*********************************************
-                    */
                 }
+
+                if (crt.creatureSize == 3)
+                {
+                    if (p.Y + 2 < maxY)
+                    {
+                        if ((!containsPCorCrt(p.X, p.Y + 2, crt) && isWalkable(p.X, p.Y + 2)) || (end.X == p.X && end.Y == p.Y + 2))
+                        {
+                            val = values[p.X, p.Y + 1];
+                            lowest = new Coordinate(p.X, p.Y + 1);
+                        }
+                    }
+                }
+
+                if (crt.creatureSize == 4)
+                {
+                    if (p.X + 1 < maxX)
+                    {
+                        if ((!containsPCorCrt(p.X + 1, p.Y+1, crt) && isWalkable(p.X + 1, p.Y+1)) || (end.X == p.X + 1 && end.Y == p.Y+1))
+                        {
+                            val = values[p.X, p.Y + 1];
+                            lowest = new Coordinate(p.X, p.Y + 1);
+                        }
+                    }
+
+                    if (p.Y + 2 < maxY)
+                    {
+                        if ((!containsPCorCrt(p.X, p.Y + 2, crt) && isWalkable(p.X, p.Y + 2)) || (end.X == p.X && end.Y == p.Y + 2))
+                        {
+                            val = values[p.X, p.Y + 1];
+                            lowest = new Coordinate(p.X, p.Y + 1);
+                        }
+                    }
+
+                    if ((p.Y + 2 < maxY) && (p.X + 1 < maxX))
+                    {
+                        if ((!containsPCorCrt(p.X + 1, p.Y + 2, crt) && isWalkable(p.X + 1, p.Y + 2)) || (end.X == p.X + 1 && end.Y == p.Y + 2))
+                        {
+                            val = values[p.X, p.Y + 1];
+                            lowest = new Coordinate(p.X, p.Y + 1);
+                        }
+                    }
+                }
+
+                //*********************************************
+                */
+            }
 
 
             if ((p.Y - 1 >= 0) && (values[p.X, p.Y - 1] < val))
             {
                 //Liu
-                 //val = values[p.X, p.Y - 1];
+                //val = values[p.X, p.Y - 1];
                 //lowest = new Coordinate(p.X, p.Y - 1);
-                    //***************************************
-                    //if (crt.creatureSize == 1)
-                    //{
-                        val = values[p.X, p.Y - 1];
-                        lowest = new Coordinate(p.X, p.Y - 1);
-                    //}
-                    /*
-                    if (crt.creatureSize == 2)
+                //***************************************
+                //if (crt.creatureSize == 1)
+                //{
+                val = values[p.X, p.Y - 1];
+                lowest = new Coordinate(p.X, p.Y - 1);
+                //}
+                /*
+                if (crt.creatureSize == 2)
+                {
+                    if ((p.X + 1 < maxX) && (p.Y - 1 >= 0))
                     {
-                        if ((p.X + 1 < maxX) && (p.Y - 1 >= 0))
+                        if ((!containsPCorCrt(p.X + 1, p.Y - 1, crt) && isWalkable(p.X + 1, p.Y - 1)) || (end.X == p.X + 1 && end.Y == p.Y - 1))
                         {
-                            if ((!containsPCorCrt(p.X + 1, p.Y - 1, crt) && isWalkable(p.X + 1, p.Y - 1)) || (end.X == p.X + 1 && end.Y == p.Y - 1))
-                            {
-                                val = values[p.X, p.Y - 1];
-                                lowest = new Coordinate(p.X, p.Y - 1);
-                            }
+                            val = values[p.X, p.Y - 1];
+                            lowest = new Coordinate(p.X, p.Y - 1);
                         }
                     }
-
-                    if (crt.creatureSize == 3)
-                    {
-                        if (p.Y < maxY)
-                        {
-                            if ((!containsPCorCrt(p.X, p.Y, crt) && isWalkable(p.X, p.Y)) || (end.X == p.X && end.Y == p.Y))
-                            {
-                                val = values[p.X, p.Y - 1];
-                                lowest = new Coordinate(p.X, p.Y - 1);
-                            }
-                        }
-                    }
-
-                    if (crt.creatureSize == 4)
-                    {
-                        if ((p.X + 1 < maxX) && (p.Y - 1 >= 0))
-                        {
-                            if ((!containsPCorCrt(p.X + 1, p.Y - 1, crt) && isWalkable(p.X + 1, p.Y - 1)) || (end.X == p.X + 1 && end.Y == p.Y - 1))
-                            {
-                                val = values[p.X, p.Y - 1];
-                                lowest = new Coordinate(p.X, p.Y - 1);
-                            }
-                        }
-
-                        if (p.Y  < maxY)
-                        {
-                            if ((!containsPCorCrt(p.X, p.Y, crt) && isWalkable(p.X, p.Y)) || (end.X == p.X && end.Y == p.Y))
-                            {
-                                val = values[p.X, p.Y - 1];
-                                lowest = new Coordinate(p.X, p.Y - 1);
-                            }
-                        }
-
-                        if ((p.Y < maxY) && (p.X + 1 < maxX))
-                        {
-                            if ((!containsPCorCrt(p.X + 1, p.Y, crt) && isWalkable(p.X + 1, p.Y)) || (end.X == p.X + 1 && end.Y == p.Y))
-                            {
-                                val = values[p.X, p.Y - 1];
-                                lowest = new Coordinate(p.X, p.Y - 1);
-                            }
-                        }
-                    }
-
-                    //*********************************************
-                    */
                 }
+
+                if (crt.creatureSize == 3)
+                {
+                    if (p.Y < maxY)
+                    {
+                        if ((!containsPCorCrt(p.X, p.Y, crt) && isWalkable(p.X, p.Y)) || (end.X == p.X && end.Y == p.Y))
+                        {
+                            val = values[p.X, p.Y - 1];
+                            lowest = new Coordinate(p.X, p.Y - 1);
+                        }
+                    }
+                }
+
+                if (crt.creatureSize == 4)
+                {
+                    if ((p.X + 1 < maxX) && (p.Y - 1 >= 0))
+                    {
+                        if ((!containsPCorCrt(p.X + 1, p.Y - 1, crt) && isWalkable(p.X + 1, p.Y - 1)) || (end.X == p.X + 1 && end.Y == p.Y - 1))
+                        {
+                            val = values[p.X, p.Y - 1];
+                            lowest = new Coordinate(p.X, p.Y - 1);
+                        }
+                    }
+
+                    if (p.Y  < maxY)
+                    {
+                        if ((!containsPCorCrt(p.X, p.Y, crt) && isWalkable(p.X, p.Y)) || (end.X == p.X && end.Y == p.Y))
+                        {
+                            val = values[p.X, p.Y - 1];
+                            lowest = new Coordinate(p.X, p.Y - 1);
+                        }
+                    }
+
+                    if ((p.Y < maxY) && (p.X + 1 < maxX))
+                    {
+                        if ((!containsPCorCrt(p.X + 1, p.Y, crt) && isWalkable(p.X + 1, p.Y)) || (end.X == p.X + 1 && end.Y == p.Y))
+                        {
+                            val = values[p.X, p.Y - 1];
+                            lowest = new Coordinate(p.X, p.Y - 1);
+                        }
+                    }
+                }
+
+                //*********************************************
+                */
+            }
 
             //***************************************
 

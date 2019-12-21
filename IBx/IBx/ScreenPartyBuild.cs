@@ -34,7 +34,7 @@ namespace IBx
             //gv.mod = m;
             gv = g;
             setControlsStart();
-            stringMessagePartyBuild = gv.cc.loadTextToString("MessagePartyBuild.txt");
+            stringMessagePartyBuild = gv.cc.loadTextToString("data/MessagePartyBuild.txt");
             //create a list of character .json files from saves/gv.modulefoldername/characters and the default PC
             //loadPlayerList();
         }
@@ -45,6 +45,7 @@ namespace IBx
             {
                 if (cntPCs < gv.mod.playerList.Count)
                 {
+                    //gv.cc.DisposeOfBitmap(ref btn.Img2);
                     btn.Img2 = gv.mod.playerList[cntPCs].tokenFilename;
                 }
                 else
@@ -61,19 +62,19 @@ namespace IBx
             //string[] files;
             //if (Directory.Exists(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters"))
             //{
-                //files = Directory.GetFiles(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters", "*.json");
-                foreach (string file in files)
+            //files = Directory.GetFiles(gv.mainDirectory + "\\saves\\" + gv.mod.moduleName + "\\characters", "*.json");
+            foreach (string file in files)
+            {
+                try
                 {
-                    try
-                    {
-                        AddCharacterToList(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        //MessageBox.Show(ex.ToString());
-                        gv.errorLog(ex.ToString());
-                    }
+                    AddCharacterToList(file);
                 }
+                catch (Exception ex)
+                {
+                    //MessageBox.Show(ex.ToString());
+                    gv.errorLog(ex.ToString());
+                }
+            }
             //}
         }
         public void AddCharacterToList(string filename)
@@ -81,6 +82,8 @@ namespace IBx
             try
             {
                 Player newPc = LoadPlayer(filename); //ex: filename = "ezzbel.json"
+                //newPc.token = gv.cc.LoadBitmap(newPc.tokenFilename);
+                //newPc.portrait = gv.cc.LoadBitmap(newPc.portraitFilename);
                 newPc.playerClass = gv.mod.getPlayerClass(newPc.classTag);
                 newPc.race = gv.mod.getRace(newPc.raceTag);
                 //check to see if already in party before adding
@@ -112,7 +115,7 @@ namespace IBx
             Player toReturn = null;
             // deserialize JSON directly from a file
             string json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\characters\\" + filename);
-            using (StringReader sr = new StringReader(json))            
+            using (StringReader sr = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 toReturn = (Player)serializer.Deserialize(sr, typeof(Player));
@@ -273,8 +276,8 @@ namespace IBx
             // Measure string.
             float stringSize = gv.MeasureString(text);
             int ulX = (gv.screenWidth / 2) - ((int)stringSize / 2);
-            gv.DrawText(text, ulX, pH * 3);
-            
+            gv.DrawText(text, ulX, pH * 3, 1.0f, "white");
+
             //DRAW EACH PC BUTTON
             this.refreshPlayerTokens();
 
@@ -300,6 +303,7 @@ namespace IBx
 
             if (pcList.Count > 0)
             {
+                //gv.cc.DisposeOfBitmap(ref btnPcListIndex.Img2);
                 btnPcListIndex.Img2 = pcList[pcIndex].tokenFilename;
             }
             else
@@ -341,7 +345,10 @@ namespace IBx
                 foreach (string s in pc.knownTraitsTags)
                 {
                     Trait tr = gv.mod.getTraitByTag(s);
-                    allTraits += tr.name + ", ";
+                    if (tr != null)
+                    {
+                        allTraits += tr.name + ", ";
+                    }
                 }
                 gv.DrawText(gv.mod.getPlayerClass(pc.classTag).traitLabelPlural + ": " + allTraits, locX, locY += spacing);
 
@@ -353,6 +360,196 @@ namespace IBx
                 int locY2 = 0;
                 if (gv.mod.useOrbitronFont == true)
                 {
+                    locX = tabX - 3 * gv.squareSize;
+                    locY += leftStartY;
+                    //tabX2 = 0;
+                    locY2 += leftStartY - spacing * 3;
+                    //STR              
+                    gv.DrawText("STR:", locX + pW, locY);
+                    gv.DrawText(pc.baseStr.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.strength - pc.baseStr >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    int racial = pc.strength - pc.baseStr;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.strength.ToString(), locX + 13 * pW, locY);
+                    if (((pc.strength - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+
+                    gv.DrawText("AC: " + actext, tabX2, locY2 += (spacing * 3));
+                    gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
+                    //DEX             
+                    gv.DrawText("DEX:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseDex.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.dexterity - pc.baseDex >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.dexterity - pc.baseDex;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.dexterity.ToString(), locX + 13 * pW, locY);
+                    if (((pc.dexterity - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+
+                    gv.DrawText("HP: " + pc.hp + "/" + pc.hpMax, tabX2, locY2 += spacing);
+                    //CON             
+                    gv.DrawText("CON:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseCon.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.constitution - pc.baseCon >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.constitution - pc.baseCon;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.constitution.ToString(), locX + 13 * pW, locY);
+                    if (((pc.constitution - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    gv.DrawText("SP: " + pc.sp + "/" + pc.spMax, tabX2, locY2 += spacing);
+                    //INT             
+                    gv.DrawText("INT:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseInt.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.intelligence - pc.baseInt >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.intelligence - pc.baseInt;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.intelligence.ToString(), locX + 13 * pW, locY);
+                    if (((pc.intelligence - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    gv.DrawText("FORT: " + pc.fortitude + ", Acid: " + pc.damageTypeResistanceTotalAcid + "%" + ", Cold: " + pc.damageTypeResistanceTotalCold + "%" + ", Normal: " + pc.damageTypeResistanceTotalNormal + "%", tabX2, locY2 += spacing);
+                    gv.DrawText("REF:   " + pc.reflex + ", Electricity: " + pc.damageTypeResistanceTotalElectricity + "%" + ", Fire: " + pc.damageTypeResistanceTotalFire + "%", tabX2, locY2 += spacing);
+                    gv.DrawText("WILL: " + pc.will + ", Magic: " + pc.damageTypeResistanceTotalMagic + "%" + ", Poison: " + pc.damageTypeResistanceTotalPoison + "%", tabX2, locY2 += spacing);
+                    //WIS             
+                    gv.DrawText("WIS:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseWis.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.wisdom - pc.baseWis >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.wisdom - pc.baseWis;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.wisdom.ToString(), locX + 13 * pW, locY);
+                    if (((pc.wisdom - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+
+                    //CHA             
+                    gv.DrawText("CHA:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseCha.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.charisma - pc.baseCha >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.charisma - pc.baseCha;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.charisma.ToString(), locX + 13 * pW, locY);
+                    if (((pc.charisma - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    if (gv.mod.useLuck)
+                    {
+                        if (((pc.luck - 10) / 2) > 0)
+                        {
+                            gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+                        }
+                        else
+                        {
+                            gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+
+                        }
+                    }
+
+                    /*
                     gv.DrawText("STR:   " + pc.baseStr + " + " + (pc.strength - pc.baseStr) + " = " + pc.strength + " (" + ((pc.strength - 10) / 2) + ")", tabX - 3 * gv.squareSize, locY += leftStartY);
                     gv.DrawText("AC: " + actext, tabX2, locY2 += leftStartY);
                     //gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
@@ -371,9 +568,199 @@ namespace IBx
                     {
                         gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, tabX - 3 * gv.squareSize, locY += spacing);
                     }
+                    */
                 }
                 else
                 {
+                    locX = tabX - 3 * gv.squareSize;
+                    locY += leftStartY;
+                    //tabX2 = 0;
+                    locY2 += leftStartY - spacing * 3;
+                    //STR              
+                    gv.DrawText("STR:", locX + pW, locY);
+                    gv.DrawText(pc.baseStr.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.strength - pc.baseStr >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    int racial = pc.strength - pc.baseStr;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.strength.ToString(), locX + 13 * pW, locY);
+                    if (((pc.strength - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+
+                    gv.DrawText("AC: " + actext, tabX2, locY2 += (spacing * 3));
+                    gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
+                    //DEX             
+                    gv.DrawText("DEX:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseDex.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.dexterity - pc.baseDex >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.dexterity - pc.baseDex;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.dexterity.ToString(), locX + 13 * pW, locY);
+                    if (((pc.dexterity - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+
+                    gv.DrawText("HP: " + pc.hp + "/" + pc.hpMax, tabX2, locY2 += spacing);
+                    //CON             
+                    gv.DrawText("CON:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseCon.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.constitution - pc.baseCon >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.constitution - pc.baseCon;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.constitution.ToString(), locX + 13 * pW, locY);
+                    if (((pc.constitution - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    gv.DrawText("SP: " + pc.sp + "/" + pc.spMax, tabX2, locY2 += spacing);
+                    //INT             
+                    gv.DrawText("INT:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseInt.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.intelligence - pc.baseInt >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.intelligence - pc.baseInt;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.intelligence.ToString(), locX + 13 * pW, locY);
+                    if (((pc.intelligence - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    gv.DrawText("FORT: " + pc.fortitude + ", Acid: " + pc.damageTypeResistanceTotalAcid + "%" + ", Cold: " + pc.damageTypeResistanceTotalCold + "%" + ", Normal: " + pc.damageTypeResistanceTotalNormal + "%", tabX2, locY2 += spacing);
+                    gv.DrawText("REF:   " + pc.reflex + ", Electricity: " + pc.damageTypeResistanceTotalElectricity + "%" + ", Fire: " + pc.damageTypeResistanceTotalFire + "%", tabX2, locY2 += spacing);
+                    gv.DrawText("WILL: " + pc.will + ", Magic: " + pc.damageTypeResistanceTotalMagic + "%" + ", Poison: " + pc.damageTypeResistanceTotalPoison + "%", tabX2, locY2 += spacing);
+                    //WIS             
+                    gv.DrawText("WIS:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseWis.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.wisdom - pc.baseWis >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.wisdom - pc.baseWis;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.wisdom.ToString(), locX + 13 * pW, locY);
+                    if (((pc.wisdom - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+
+                    //CHA             
+                    gv.DrawText("CHA:", locX + pW, locY += (spacing));
+                    gv.DrawText(pc.baseCha.ToString(), locX + 3 * pW * 2, locY);
+                    if (pc.charisma - pc.baseCha >= 0)
+                    {
+                        gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+                    }
+                    racial = pc.charisma - pc.baseCha;
+                    if (racial < 0)
+                    {
+                        racial *= -1;
+                    }
+                    gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+                    gv.DrawText(" = ", locX + 11 * pW, locY);
+                    gv.DrawText(pc.charisma.ToString(), locX + 13 * pW, locY);
+                    if (((pc.charisma - 10) / 2) > 0)
+                    {
+                        gv.DrawText(" (+" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    else
+                    {
+                        gv.DrawText(" (" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+                    }
+                    if (gv.mod.useLuck)
+                    {
+                        if (((pc.luck - 10) / 2) > 0)
+                        {
+                            gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+                        }
+                        else
+                        {
+                            gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+
+                        }
+                    }
+                    /*
                     gv.DrawText("STR:  " + pc.baseStr + " + " + (pc.strength - pc.baseStr) + " = " + pc.strength + " (" + ((pc.strength - 10) / 2) + ")", tabX - 3 * gv.squareSize, locY += leftStartY);
                     gv.DrawText("AC: " + actext, tabX2, locY2 += leftStartY);
                     gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + gv.sf.CalcPcMeleeAttackAttributeModifier(pc)) + "/" + (((pc.strength - 10) / 2) + gv.sf.CalcPcMeleeDamageModifier(pc)) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2) + gv.sf.CalcPcRangedAttackModifier(pc)), tabX2, locY2 += spacing);
@@ -391,6 +778,7 @@ namespace IBx
                     {
                         gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, tabX - 3 * gv.squareSize, locY += spacing);
                     }
+                    */
                 }
             }
         }
@@ -467,6 +855,8 @@ namespace IBx
                             if ((pcList.Count > 0) && (gv.mod.playerList.Count < gv.mod.numberOfPlayerMadePcsAllowed))
                             {
                                 Player copyPC = pcList[pcIndex].DeepCopy();
+                                //copyPC.token = gv.cc.LoadBitmap(copyPC.tokenFilename);
+                                //copyPC.portrait = gv.cc.LoadBitmap(copyPC.portraitFilename);
                                 copyPC.playerClass = gv.mod.getPlayerClass(copyPC.classTag);
                                 copyPC.race = gv.mod.getRace(copyPC.raceTag);
                                 gv.mod.playerList.Add(copyPC);
@@ -480,6 +870,8 @@ namespace IBx
                             if (gv.mod.playerList.Count > 0)
                             {
                                 Player copyPC = gv.mod.playerList[partyScreenPcIndex].DeepCopy();
+                                //copyPC.token = gv.cc.LoadBitmap(copyPC.tokenFilename);
+                                //copyPC.portrait = gv.cc.LoadBitmap(copyPC.portraitFilename);
                                 copyPC.playerClass = gv.mod.getPlayerClass(copyPC.classTag);
                                 copyPC.race = gv.mod.getRace(copyPC.raceTag);
                                 pcList.Add(copyPC);
@@ -536,6 +928,10 @@ namespace IBx
                                 gv.mod.PlayerLocationY = gv.mod.startingPlayerPositionY;
                                 gv.mod.playerList[0].mainPc = true;
                                 gv.mod.playerList[0].nonRemoveablePc = true;
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    gv.sf.UpdateStats(p);
+                                }
                                 gv.log.tagStack.Clear();
                                 gv.log.logLinesList.Clear();
                                 gv.log.currentTopLineIndex = 0;

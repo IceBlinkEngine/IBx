@@ -37,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Effect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EffectTagForDropDownList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Encounter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Faction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatyText.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FloatyTextByPixel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FormattedLine.cs" />

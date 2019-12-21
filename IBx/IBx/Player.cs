@@ -10,6 +10,29 @@ namespace IBx
 {
     public class Player
     {
+        [JsonIgnore]
+        public string convoCode = "";
+
+        [JsonIgnore]
+        public bool hasDelayedAlready = false;
+
+        [JsonIgnore]
+        public List<String> tagsOfEffectsToRemoveOnMove = new List<String>();
+
+        public List<int> hasNewChatOption = new List<int>();
+
+        //public string guildIdentifier = "Guild";//e.g. "Guild:"
+        public string guildName = "none";// e.g. "Church: West Corinth Trading Company", "Guild: Stonemasons", "Desperados"
+        //public string guildRankIdentifier = "Rank";//e.g. "Rank:"
+        public string guildRankName = "none";// e.g. "Initiate (Rank 1)", "Mastermason"
+        public int guildRank = 0;
+
+        public int hpThisUpdate = 0;
+        public int hpLastUpdate = 0;
+        public int spThisUpdate = 0;
+        public int spLastUpdate = 0;
+
+        public int powerOfThisPc = 0;
         public string tokenFilename = "blank.png";
         public string portraitFilename = "F0404_L";
         //[JsonIgnore]
@@ -39,7 +62,7 @@ namespace IBx
         public PlayerClass playerClass = new PlayerClass();
         public List<string> knownSpellsTags = new List<string>();
         public List<string> knownTraitsTags = new List<string>();
-        public List<string> learningSpellsTags = new List<string>();  
+        public List<string> learningSpellsTags = new List<string>();
         public List<string> learningTraitsTags = new List<string>();
         public List<Effect> learningEffects = new List<Effect>();
 
@@ -124,6 +147,52 @@ namespace IBx
         public Player DeepCopy()
         {
             Player copy = new Player();
+
+            copy.hpThisUpdate = this.hpThisUpdate;
+            copy.hpLastUpdate = this.hpLastUpdate;
+            copy.spThisUpdate = this.spThisUpdate;
+            copy.spLastUpdate = this.spLastUpdate;
+
+            /*if (this.portrait != null)
+            {
+                copy.portrait = this.portrait;
+            }
+
+            if (this.token != null)
+            {
+                copy.token = this.token;
+            }*/
+            foreach (String et in this.tagsOfEffectsToRemoveOnMove)
+            {
+                copy.tagsOfEffectsToRemoveOnMove.Add(et);
+            }
+
+            copy.learningSpellsTags.Clear();
+            foreach (String s in this.learningSpellsTags)
+            {
+                copy.learningSpellsTags.Add(s);
+            }
+
+            copy.learningTraitsTags.Clear();
+            foreach (String s in this.learningTraitsTags)
+            {
+                copy.learningTraitsTags.Add(s);
+            }
+
+            /*
+            copy.learningEffects.Clear();
+            foreach (String s in this.learningEffects)
+            {
+                copy.learningTraitsTags.Add(s);
+            }
+            */
+
+            //public List<string> learningSpellsTags = new List<string>();
+            //public List<string> learningTraitsTags = new List<string>();
+            //public List<Effect> learningEffects = new List<Effect>();
+
+
+            copy.powerOfThisPc = this.powerOfThisPc;
             copy.stayDurationInTurns = this.stayDurationInTurns;
             copy.playerSize = this.playerSize;  //1=normal, 2=wide, 3=tall, 4=large  
             copy.isTemporaryAllyForThisEncounterOnly = this.isTemporaryAllyForThisEncounterOnly;
@@ -205,6 +274,12 @@ namespace IBx
                 copy.knownSpellsTags.Add(s);
             }
 
+            copy.hasNewChatOption = new List<int>();
+            foreach (int i in this.hasNewChatOption)
+            {
+                copy.hasNewChatOption.Add(i);
+            }
+
             copy.coolingSpellsByTag = new List<string>();
             foreach (string s in this.coolingSpellsByTag)
             {
@@ -259,6 +334,8 @@ namespace IBx
                 copy.knownUsableTraitsTags.Add(s);
             }
 
+
+
             copy.effectsList = new List<Effect>();
             foreach (Effect ef in this.effectsList)
             {
@@ -276,6 +353,35 @@ namespace IBx
             }
             return false;
         }
+
+        public bool hasNewChatOptionMethod()
+        {
+            //add script for turning this on and off
+            //script - add: p1 (name of pc), p2 (identifier number for this chat option, unique for this pc)
+            //script - remove: p1 (name of pc), p2 (identifier number for this chat option, unique for this pc)
+            //bool openChatOption = false;
+            if (this.hasNewChatOption.Count > 0)
+            {
+                return true;
+            }
+            return false;
+            /*
+            foreach (int i in hasNewChatOption)
+            {
+                if (i != 0)
+                {
+                    openChatOption = true;
+                }
+            }
+            
+            if (openChatOption)
+            {
+                    return true;
+            }
+            return false;
+            */
+        }
+
         public void LevelUp()
         {
             // change level by one, level++
@@ -319,6 +425,12 @@ namespace IBx
                     return true;
                 }
             }
+            /*
+            if (this.charStatus == "Held")
+            {
+                return true;
+            }
+            */
             return false;
         }
         public bool isImmobile()
@@ -543,8 +655,8 @@ namespace IBx
                     if (sa.atWhatLevelIsAvailable <= this.classLevel)
                     {
                         if (!hasSpellAlready(sa))
-                        {           
-                                    spellTagsList.Add(sa.tag);       
+                        {
+                            spellTagsList.Add(sa.tag);
                         }
                     }
                 }

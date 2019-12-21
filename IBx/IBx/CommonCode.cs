@@ -15,6 +15,10 @@ namespace IBx
         //this class is handled differently than Android version
         public GameView gv;
 
+
+        public bool EncCalled = false;
+        public string TagOFPropToKill = "none";
+        public bool isTraitUsage = false;
         public float weatherSoundMultiplier = 2.7f;
         public bool blockSecondPropTriggersCall = false;
         public List<FloatyText> floatyTextList = new List<FloatyText>();
@@ -57,6 +61,15 @@ namespace IBx
         public string slot4 = "";
         public string slot5 = "";
 
+        public SKBitmap encounter_indicator;
+        public SKBitmap mandatory_conversation_indicator;
+        public SKBitmap optional_conversation_indicator;
+        public SKBitmap challengeHidden;
+        public SKBitmap challengeSkull;
+        public SKBitmap isChasingSymbol;
+        public SKBitmap slowSymbol;
+        public SKBitmap swiftSymbol;
+
         public SKBitmap title;
         public SKBitmap bmpMap;
         public SKBitmap walkPass;
@@ -77,12 +90,20 @@ namespace IBx
         public SKBitmap longShadowCorner;
         public SKBitmap shortShadow;
         public SKBitmap shortShadowCorner;
+        public SKBitmap longShadowCornerHalf;
+        public SKBitmap longShadowCornerHalfMirror;
         public SKBitmap shortShadowCorner2;
         public SKBitmap smallStairNEMirror;
         public SKBitmap smallStairNENormal;
         public SKBitmap corner3;
         public SKBitmap entranceLightNorth2;
-        
+
+        public SKBitmap tooHigh;
+        public SKBitmap tooDeep;
+
+
+
+
         public SKBitmap hitSymbol;
         public SKBitmap missSymbol;
         public SKBitmap highlight_green;
@@ -136,9 +157,9 @@ namespace IBx
         public SKBitmap facing9;
         //off for now
         //public Bitmap tint_rain;
-        public Dictionary<string, SKBitmap> commonBitmapList = new Dictionary<string, SKBitmap>();
+
         //public Dictionary<string, SKBitmap> tileBitmapList = new Dictionary<string, SKBitmap>();
-        //public Dictionary<string, Bitmap> commonBitmapList = new Dictionary<string, Bitmap>();
+        public Dictionary<string, SKBitmap> commonBitmapList = new Dictionary<string, SKBitmap>();
         //public Dictionary<string, System.Drawing.Bitmap> tileGDIBitmapList = new Dictionary<string, System.Drawing.Bitmap>();
 
         public Spell currentSelectedSpell = new Spell();
@@ -147,12 +168,23 @@ namespace IBx
         public string floatyText = "";
         public string floatyText2 = "";
         public string floatyText3 = "";
+        public string floatyText4 = "";
+        public string floatyText0 = "";
+        public string floatyTextA = "";
+        public string floatyTextB = "";
+
         public Coordinate floatyTextLoc = new Coordinate();
         public int creatureIndex = 0;
         public bool calledConvoFromProp = false;
         public bool calledEncounterFromProp = false;
         public int currentPlayerIndexUsingItem = 0;
 
+        public string stringStrength = "";
+        public string stringDexterity = "";
+        public string stringConstitution = "";
+        public string stringIntelligence = "";
+        public string stringWisdom = "";
+        public string stringCharisma = "";
         public string stringBeginnersGuide = "";
         public string stringPlayersGuide = "";
         public string stringPcCreation = "";
@@ -234,6 +266,7 @@ namespace IBx
             gv.screenCombat.saveUILayout();
         }
 
+        /*
         public void setBridgeStateForMovingProps()
         {
             //note: player bridge state is handled by gv.mod.currentArea.PlayerIsUnderBridge
@@ -261,6 +294,7 @@ namespace IBx
                 }
             }
         }
+        */
 
         public void QuickSave()
         {
@@ -268,7 +302,7 @@ namespace IBx
             gv.screenCombat.saveUILayout();
 
             string filename = "\\saves\\" + gv.mod.moduleName + "\\quicksave.json";
-            
+
             //make backup of each encounter's tiles and then clear them
             List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();
             foreach (Encounter enc in gv.mod.moduleEncountersList)
@@ -301,7 +335,6 @@ namespace IBx
                 backupListOfAreaTileLists.Add(interimList);
                 a.Tiles.Clear();
             }
-
             string json = JsonConvert.SerializeObject(gv.mod, Newtonsoft.Json.Formatting.Indented);
             gv.SaveText(filename, json);
 
@@ -336,9 +369,9 @@ namespace IBx
             gv.screenCombat.saveUILayout();
 
             string filepath = "\\saves\\" + gv.mod.moduleName + "\\" + filename;
-            
+
             //make backup of each encounter's tiles and then clear them
-            List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();   
+            List<List<TileEnc>> backupListOfEncTileLists = new List<List<TileEnc>>();
             foreach (Encounter enc in gv.mod.moduleEncountersList)
             {
                 List<TileEnc> interimList = new List<TileEnc>();
@@ -369,7 +402,6 @@ namespace IBx
                 backupListOfAreaTileLists.Add(interimList);
                 a.Tiles.Clear();
             }
-
             string json = JsonConvert.SerializeObject(gv.mod, Newtonsoft.Json.Formatting.Indented);
             gv.SaveText(filepath, json);
 
@@ -411,52 +443,52 @@ namespace IBx
             int selectedIndex = gv.GetSelectedIndex(selected, actionList);
             //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Are you sure you wish to exit to Main Menu?"))
             //{
-                //itSel.IceBlinkButtonClose.Enabled = true;
-                //itSel.IceBlinkButtonClose.Visible = true;
-                //itSel.setupAll(gv);
-                //var ret = itSel.ShowDialog();
+            //itSel.IceBlinkButtonClose.Enabled = true;
+            //itSel.IceBlinkButtonClose.Visible = true;
+            //itSel.setupAll(gv);
+            //var ret = itSel.ShowDialog();
 
-                if (selectedIndex == 0)
+            if (selectedIndex == 0)
+            {
+                //go to launcher screen  
+                if (gv.fixedModule.Equals("")) //this is the IceBlink Engine app  
                 {
-                    //go to launcher screen  
-                    if (gv.fixedModule.Equals("")) //this is the IceBlink Engine app  
+                    //gv.createScreens();
+                    if (gv.screenLauncher == null)
                     {
-                        //gv.createScreens();
-                        if (gv.screenLauncher == null)
-                        {
-                            gv.screenLauncher = new ScreenLauncher(gv.mod, gv);
-                        }
-                        if (gv.screenPartyBuild == null)
-                        {
-                            gv.screenPartyBuild = new ScreenPartyBuild(gv.mod, gv);
-                        }
-                        if (gv.screenPcCreation == null)
-                        {
-                            gv.screenPcCreation = new ScreenPcCreation(gv.mod, gv);
-                        }
-                        if (gv.screenTitle == null)
-                        {
-                            gv.screenTitle = new ScreenTitle(gv.mod, gv);
-                        }
+                        gv.screenLauncher = new ScreenLauncher(gv.mod, gv);
+                    }
+                    if (gv.screenPartyBuild == null)
+                    {
+                        gv.screenPartyBuild = new ScreenPartyBuild(gv.mod, gv);
+                    }
+                    if (gv.screenPcCreation == null)
+                    {
+                        gv.screenPcCreation = new ScreenPcCreation(gv.mod, gv);
+                    }
+                    if (gv.screenTitle == null)
+                    {
+                        gv.screenTitle = new ScreenTitle(gv.mod, gv);
+                    }
 
-                        gv.screenLauncher.loadModuleFiles();
-                        gv.screenType = "launcher";
-                    }
-                    else //this is a fixed module  
-                    {
-                        gv.mod = gv.cc.LoadModule(gv.fixedModule + "/" + gv.fixedModule + ".mod");
-                        gv.resetGame();
-                        gv.cc.LoadSaveListItems();
-                        gv.screenType = "title";
-                    }
+                    gv.screenLauncher.loadModuleFiles();
+                    gv.screenType = "launcher";
                 }
-                if (selectedIndex == 1)
+                else //this is a fixed module  
                 {
-                    //keep playing 
+                    gv.mod = gv.cc.LoadModule(gv.fixedModule + "/" + gv.fixedModule + ".mod", false);
+                    gv.resetGame();
+                    gv.cc.LoadSaveListItems();
+                    gv.screenType = "title";
                 }
+            }
+            if (selectedIndex == 1)
+            {
+                //keep playing 
+            }
             //}            
         }
-         
+
         public async void doSavesDialog()
         {
             List<string> saveList = new List<string> { slot0, slot1, slot2, slot3, slot4, slot5, "Return to Main Menu" };
@@ -464,108 +496,108 @@ namespace IBx
             int selectedIndex = gv.GetSelectedIndex(selected, saveList);
             //using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a slot to save game."))
             //{
-                //itSel.IceBlinkButtonClose.Enabled = true;
-                //itSel.IceBlinkButtonClose.Visible = true;
-                //itSel.setupAll(gv);
-                //var ret = itSel.ShowDialog();
+            //itSel.IceBlinkButtonClose.Enabled = true;
+            //itSel.IceBlinkButtonClose.Visible = true;
+            //itSel.setupAll(gv);
+            //var ret = itSel.ShowDialog();
 
-                if (selectedIndex == 0)
+            if (selectedIndex == 0)
+            {
+                try
                 {
-                    try
-                    {
-                        QuickSave();
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
-                        gv.errorLog(ex.ToString());
-                    }
+                    QuickSave();
                 }
-                else if (selectedIndex == 1)
+                catch (Exception ex)
                 {
-                    Player pc = gv.mod.playerList[0];
-                    gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
-                    slot1 = gv.mod.saveName;
-                    try
-                    {
-                        SaveGame("slot1.json");
-                        SaveGameInfo("slot1info.json");
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
-                        gv.errorLog(ex.ToString());
-                    }
+                    gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
+                    gv.errorLog(ex.ToString());
                 }
-                else if (selectedIndex == 2)
+            }
+            else if (selectedIndex == 1)
+            {
+                Player pc = gv.mod.playerList[0];
+                gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
+                slot1 = gv.mod.saveName;
+                try
                 {
-                    Player pc = gv.mod.playerList[0];
-                    gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
-                    slot2 = gv.mod.saveName;
-                    try
-                    {
-                        SaveGame("slot2.json");
-                        SaveGameInfo("slot2info.json");
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
-                        gv.errorLog(ex.ToString());
-                    }
+                    SaveGame("slot1.json");
+                    SaveGameInfo("slot1info.json");
                 }
-                else if (selectedIndex == 3)
+                catch (Exception ex)
                 {
-                    Player pc = gv.mod.playerList[0];
-                    gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
-                    slot3 = gv.mod.saveName;
-                    try
-                    {
-                        SaveGame("slot3.json");
-                        SaveGameInfo("slot3info.json");
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
-                        gv.errorLog(ex.ToString());
-                    }
+                    gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
+                    gv.errorLog(ex.ToString());
                 }
-                else if (selectedIndex == 4)
+            }
+            else if (selectedIndex == 2)
+            {
+                Player pc = gv.mod.playerList[0];
+                gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
+                slot2 = gv.mod.saveName;
+                try
                 {
-                    Player pc = gv.mod.playerList[0];
-                    gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
-                    slot4 = gv.mod.saveName;
-                    try
-                    {
-                        SaveGame("slot4.json");
-                        SaveGameInfo("slot4info.json");
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
-                        gv.errorLog(ex.ToString());
-                    }
+                    SaveGame("slot2.json");
+                    SaveGameInfo("slot2info.json");
                 }
-                else if (selectedIndex == 5)
+                catch (Exception ex)
                 {
-                    Player pc = gv.mod.playerList[0];
-                    gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
-                    slot5 = gv.mod.saveName;
-                    try
-                    {
-                        SaveGame("slot5.json");
-                        SaveGameInfo("slot5info.json");
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
-                        gv.errorLog(ex.ToString());
-                    }
+                    gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
+                    gv.errorLog(ex.ToString());
                 }
-                else if (selectedIndex == 6)
+            }
+            else if (selectedIndex == 3)
+            {
+                Player pc = gv.mod.playerList[0];
+                gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
+                slot3 = gv.mod.saveName;
+                try
                 {
-                    //ask if they really want to exit, remind to save first  
-                    doVerifyReturnToMain();
+                    SaveGame("slot3.json");
+                    SaveGameInfo("slot3info.json");
                 }
+                catch (Exception ex)
+                {
+                    gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
+                    gv.errorLog(ex.ToString());
+                }
+            }
+            else if (selectedIndex == 4)
+            {
+                Player pc = gv.mod.playerList[0];
+                gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
+                slot4 = gv.mod.saveName;
+                try
+                {
+                    SaveGame("slot4.json");
+                    SaveGameInfo("slot4info.json");
+                }
+                catch (Exception ex)
+                {
+                    gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
+                    gv.errorLog(ex.ToString());
+                }
+            }
+            else if (selectedIndex == 5)
+            {
+                Player pc = gv.mod.playerList[0];
+                gv.mod.saveName = pc.name + ", Level:" + pc.classLevel + ", XP:" + pc.XP + ", WorldTime:" + gv.mod.WorldTime;
+                slot5 = gv.mod.saveName;
+                try
+                {
+                    SaveGame("slot5.json");
+                    SaveGameInfo("slot5info.json");
+                }
+                catch (Exception ex)
+                {
+                    gv.sf.MessageBox("Failed to Save: Not enough free memory(RAM) on device, try and free up some memory and try again.");
+                    gv.errorLog(ex.ToString());
+                }
+            }
+            else if (selectedIndex == 6)
+            {
+                //ask if they really want to exit, remind to save first  
+                doVerifyReturnToMain();
+            }
             //}            
         }
         public async void doLoadSaveGameDialog()
@@ -575,101 +607,101 @@ namespace IBx
             int selectedIndex = gv.GetSelectedIndex(selected, saveList);
             //using (ItemListSelector itSel = new ItemListSelector(gv, saveList, "Choose a Saved Game to Load."))
             //{
-                //itSel.IceBlinkButtonClose.Visible = true;
-                //itSel.IceBlinkButtonClose.Enabled = true;
-                //itSel.ShowDialog();
+            //itSel.IceBlinkButtonClose.Visible = true;
+            //itSel.IceBlinkButtonClose.Enabled = true;
+            //itSel.ShowDialog();
 
-                if (selectedIndex == 0)
+            if (selectedIndex == 0)
+            {
+                bool result = LoadSave("autosave.json");
+                if (result)
                 {
-                    bool result = LoadSave("autosave.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    gv.screenType = "main";
+                    doUpdate();
                 }
-                else if (selectedIndex == 1)
+                else
                 {
-                    bool result = LoadSave("quicksave.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                 }
-                else if (selectedIndex == 2)
+            }
+            else if (selectedIndex == 1)
+            {
+                bool result = LoadSave("quicksave.json");
+                if (result)
                 {
-                    bool result = LoadSave("slot1.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    gv.screenType = "main";
+                    doUpdate();
                 }
-                else if (selectedIndex == 3)
+                else
                 {
-                    bool result = LoadSave("slot2.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                 }
-                else if (selectedIndex == 4)
+            }
+            else if (selectedIndex == 2)
+            {
+                bool result = LoadSave("slot1.json");
+                if (result)
                 {
-                    bool result = LoadSave("slot3.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    gv.screenType = "main";
+                    doUpdate();
                 }
-                else if (selectedIndex == 5)
+                else
                 {
-                    bool result = LoadSave("slot4.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
                 }
-                else if (selectedIndex == 6)
+            }
+            else if (selectedIndex == 3)
+            {
+                bool result = LoadSave("slot2.json");
+                if (result)
                 {
-                    bool result = LoadSave("slot5.json");
-                    if (result)
-                    {
-                        gv.screenType = "main";
-                        doUpdate();
-                    }
-                    else
-                    {
-                        //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
-                    }
+                    gv.screenType = "main";
+                    doUpdate();
                 }
+                else
+                {
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else if (selectedIndex == 4)
+            {
+                bool result = LoadSave("slot3.json");
+                if (result)
+                {
+                    gv.screenType = "main";
+                    doUpdate();
+                }
+                else
+                {
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else if (selectedIndex == 5)
+            {
+                bool result = LoadSave("slot4.json");
+                if (result)
+                {
+                    gv.screenType = "main";
+                    doUpdate();
+                }
+                else
+                {
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else if (selectedIndex == 6)
+            {
+                bool result = LoadSave("slot5.json");
+                if (result)
+                {
+                    gv.screenType = "main";
+                    doUpdate();
+                }
+                else
+                {
+                    //Toast.makeText(gv.gameContext, "Save file not found", Toast.LENGTH_SHORT).show();
+                }
+            }
             //}            
         }
         public ModuleInfo LoadModuleInfo(string filename)
@@ -721,6 +753,34 @@ namespace IBx
             gv.mod.arrivalSquareY = saveMod.arrivalSquareY;
             gv.mod.currentLightUnitsLeft = saveMod.currentLightUnitsLeft;
 
+            gv.mod.stopMoves = saveMod.stopMoves;
+            gv.mod.drawPartyDirection = saveMod.drawPartyDirection;
+
+            gv.mod.currentlyOnOwnZone = saveMod.currentlyOnOwnZone;
+            gv.mod.currentlyOnMotherZone = saveMod.currentlyOnMotherZone;
+            gv.mod.currentlyOnGrandMotherZone = saveMod.currentlyOnGrandMotherZone;
+
+            gv.mod.showOverviewButtonOwnZoneMap = saveMod.showOverviewButtonOwnZoneMap;
+            gv.mod.showOverviewButtonMotherZoneMap = saveMod.showOverviewButtonMotherZoneMap;
+            gv.mod.showOverviewButtonGrandMotherZoneMap = saveMod.showOverviewButtonGrandMotherZoneMap;
+
+            gv.mod.alreadyDeleted = saveMod.alreadyDeleted;
+            gv.mod.currentPropTag = saveMod.currentPropTag;
+
+            //public List<String> partyLightEnergyName = new List<String>();
+            //public List<int> partyLightEnergyUnitsLeft = new List<int>();
+            gv.mod.partyLightOn = saveMod.partyLightOn;
+            gv.mod.partyLightName = saveMod.partyLightName;
+            gv.mod.partyLightEnergyName.Clear();
+            foreach (string s in saveMod.partyLightEnergyName)
+            {
+                gv.mod.partyLightEnergyName.Add(s);
+            }
+            gv.mod.partyLightEnergyUnitsLeft.Clear();
+            foreach (int s in saveMod.partyLightEnergyUnitsLeft)
+            {
+                gv.mod.partyLightEnergyUnitsLeft.Add(s);
+            }
             //U  "playerList": [], (use all save)  Update PCs later further down
             gv.mod.playerList = new List<Player>();
             foreach (Player pc in saveMod.playerList)
@@ -748,23 +808,22 @@ namespace IBx
             //U  "partyJournalCompleted": [], (use tags from save to get all from new)
             // NOT CURRENTLY USED
             //U  "partyInventoryTagList": [], (use all save) update Items later on down
-            gv.mod.partyInventoryRefsList.Clear();
-
             gv.mod.addedItemsRefs.Clear();
             foreach (string s in saveMod.addedItemsRefs)
             {
                 gv.mod.addedItemsRefs.Add(s);
             }
-
+            gv.mod.partyInventoryRefsList.Clear();
             foreach (ItemRefs s in saveMod.partyInventoryRefsList)
             {
+                //do not add items currently equipped
+                //dschungel
                 bool allowAdding = true;
-
                 foreach (Player p in gv.mod.playerList)
                 {
                     if (p.AmmoRefs.tag == s.tag)
                     {
-                        allowAdding = false;
+                        //allowAdding = false;
                         break;
                     }
                     if (p.BodyRefs.tag == s.tag)
@@ -814,13 +873,14 @@ namespace IBx
                     }
                 }
 
-                    if (allowAdding)
-                    {
-                        gv.mod.partyInventoryRefsList.Add(s.DeepCopy());
-                    }
+                if (allowAdding)
+                {
+                    gv.mod.partyInventoryRefsList.Add(s.DeepCopy());
+                }
             }
             //U  "moduleShopsList": [], (have an original shop items tags list and the current tags list to see what to add or delete from the save tags list)
             this.updateShops(saveMod);
+            this.updateFactions(saveMod);
             //  "moduleName": "Lanterna2", Don't need to update
             //  "moduleAreasList": [], Don't need to update
             //U  "moduleAreasObjects": [],
@@ -828,6 +888,7 @@ namespace IBx
             //                (tiles: use save "visible" to update new)
             //                (props: have an original props tags list and the current tags list to see what to add or delete from the save tags list)		               
             this.updateAreas(saveMod);
+            this.updatePropsWaitingForRespawn(saveMod);
             //
             //U  "currentArea": {},
             //gv.mod.setCurrentArea(saveMod.currentArea.Filename, gv);
@@ -838,6 +899,25 @@ namespace IBx
             }
 
             //U  "moduleContainersList": [], (have an original containers items tags list and the current tags list to see what to add or delete from the save tags list)
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                for (int i = 0; i < a.newHeights.Count; i++)
+                {
+                    gv.sf.calculateHeightShadows(a.changedHeightTilesCoordX[i], a.changedHeightTilesCoordY[i], a);
+                }
+                for (int i = 0; i < a.newEWBridgeState.Count; i++)
+                {
+                    gv.sf.calculateHeightShadows(a.changedEWBridgeTilesCoordX[i], a.changedEWBridgeTilesCoordY[i], a);
+                }
+                for (int i = 0; i < a.newNSBridgeState.Count; i++)
+                {
+                    gv.sf.calculateHeightShadows(a.changedNSBridgeTilesCoordX[i], a.changedNSBridgeTilesCoordY[i], a);
+                }
+                for (int i = 0; i < a.newRampState.Count; i++)
+                {
+                    gv.sf.calculateHeightShadows(a.changedRampTilesCoordX[i], a.changedRampTilesCoordY[i], a);
+                }
+            }
             this.updateContainers(saveMod);
             //U  "moduleConvoSavedValuesList": [], (use all save)
             gv.mod.moduleConvoSavedValuesList.Clear();
@@ -905,7 +985,7 @@ namespace IBx
             {
                 gv.mod.WorldTime += saveMod.WorldTime;
             }
-            
+
             gv.mod.nextIdNumber = saveMod.nextIdNumber;
             //U  "PlayerLocationY": 2, (use all save)
             gv.mod.PlayerLocationY = saveMod.PlayerLocationY;
@@ -957,6 +1037,7 @@ namespace IBx
             LoadEffects();
             LoadSpells();
             LoadTraits();
+            LoadFactions();
             LoadWeathers();
             LoadWeatherEffects();
             LoadCreatures();
@@ -973,6 +1054,8 @@ namespace IBx
 
             gv.createScreens();
             gv.screenMainMap.resetMiniMapBitmap();
+            gv.cc.resetLightAndDarkness();
+            gv.cc.doIllumination();
             return true;
         }
         public Module LoadSaveGameModule(string filename)
@@ -986,7 +1069,49 @@ namespace IBx
                 JsonSerializer serializer = new JsonSerializer();
                 toReturn = (Module)serializer.Deserialize(sr, typeof(Module));
             }
+
+            foreach (Area a in toReturn.moduleAreasObjects)
+            {
+                foreach (Prop p in a.Props)
+                {
+                    if (p.MoverType == "daily")
+                    {
+                        int gkg = 1;
+                    }
+                }
+            }
             return toReturn;
+        }
+
+        public void updatePropsWaitingForRespawn(Module saveMod)
+        {
+            if (saveMod.propsWaitingForRespawn != null)
+            {
+                gv.mod.propsWaitingForRespawn.Clear();
+                Prop AddMe = new Prop();
+                foreach (Prop WFRProp in saveMod.propsWaitingForRespawn)
+                {
+                    AddMe = WFRProp.DeepCopy();
+                    gv.mod.propsWaitingForRespawn.Add(AddMe);
+                }
+            }
+        }
+
+        public void updateFactions(Module saveMod)
+        {
+            if (saveMod.moduleFactionsList != null)
+            {
+                foreach (Faction f in gv.mod.moduleFactionsList)
+                {
+                    for (int i = 0; i < saveMod.moduleFactionsList.Count; i++)
+                    {
+                        if (saveMod.moduleFactionsList[i].tag == f.tag)
+                        {
+                            f.strength = saveMod.moduleFactionsList[i].strength;
+                        }
+                    }
+                }
+            }
         }
         public void updateContainers(Module saveMod)
         {
@@ -1083,6 +1208,14 @@ namespace IBx
             {
                 foreach (Area sar in saveMod.moduleAreasObjects)
                 {
+                    foreach (Prop p in sar.Props)
+                    {
+                        if (p.MoverType == "daily")
+                        {
+                            int jhk = 0;
+                        }
+                    }
+
                     if (sar.Filename.Equals(ar.Filename)) //sar is saved game, ar is new game from toolset version
                     {
                         //locals
@@ -1098,6 +1231,278 @@ namespace IBx
                         }
 
                         //tiles
+
+                        //heigth level and shadows changed (graps whole tile data)
+                        if (sar.newHeights != null)
+                        {
+                            for (int i = 0; i < sar.newHeights.Count; i++)
+                            {
+                                for (int j = 0; j < ar.Tiles.Count; j++)
+                                {
+                                    int orgX = j % (ar.MapSizeX);
+                                    int orgY = j / (ar.MapSizeX);
+                                    int saveX = sar.changedHeightTilesCoordX[i];
+                                    int saveY = sar.changedHeightTilesCoordY[i]; ;
+
+                                    if (orgX == saveX && orgY == saveY)
+                                    {
+                                        ar.Tiles[j].heightLevel = sar.newHeights[i];
+                                        ar.newHeights = sar.newHeights;
+                                        ar.changedHeightTilesCoordX = sar.changedHeightTilesCoordX;
+                                        ar.changedHeightTilesCoordY = sar.changedHeightTilesCoordY;
+                                        //ar.Tiles[j].isEWBridge = sar.changedHeightTiles[i].isEWBridge;
+                                        //ar.Tiles[j].isNSBridge = sar.changedHeightTiles[i].isNSBridge;
+                                        /*
+                                        ar.Tiles[j].isInShortShadeN = sar.changedHeightTiles[i].isInShortShadeN;
+        ar.Tiles[j].isInShortShadeE = sar.changedHeightTiles[i].isInShortShadeE;
+        ar.Tiles[j].isInShortShadeS = sar.changedHeightTiles[i].isInShortShadeS;
+        ar.Tiles[j].isInShortShadeW = sar.changedHeightTiles[i].isInShortShadeW;
+        ar.Tiles[j].isInShortShadeNE = sar.changedHeightTiles[i].isInShortShadeNE;
+        ar.Tiles[j].isInShortShadeSE = sar.changedHeightTiles[i].isInShortShadeSE;
+        ar.Tiles[j].isInShortShadeSW = sar.changedHeightTiles[i].isInShortShadeSW;
+        ar.Tiles[j].isInShortShadeNW = sar.changedHeightTiles[i].isInShortShadeNW;
+
+        ar.Tiles[j].isInLongShadeN = sar.changedHeightTiles[i].isInLongShadeN;
+        ar.Tiles[j].isInLongShadeE = sar.changedHeightTiles[i].isInLongShadeE;
+        ar.Tiles[j].isInLongShadeS = sar.changedHeightTiles[i].isInLongShadeS;
+        ar.Tiles[j].isInLongShadeW = sar.changedHeightTiles[i].isInLongShadeW;
+        ar.Tiles[j].isInLongShadeNE = sar.changedHeightTiles[i].isInLongShadeNE;
+        ar.Tiles[j].isInLongShadeSE = sar.changedHeightTiles[i].isInLongShadeSE;
+        ar.Tiles[j].isInLongShadeSW = sar.changedHeightTiles[i].isInLongShadeSW;
+        ar.Tiles[j].isInLongShadeNW = sar.changedHeightTiles[i].isInLongShadeNW;
+
+        ar.Tiles[j].isInMaxShadeN = sar.changedHeightTiles[i].isInMaxShadeN;
+        ar.Tiles[j].isInMaxShadeE = sar.changedHeightTiles[i].isInMaxShadeE;
+        ar.Tiles[j].isInMaxShadeS = sar.changedHeightTiles[i].isInMaxShadeS;
+        ar.Tiles[j].isInMaxShadeW = sar.changedHeightTiles[i].isInMaxShadeW;
+        ar.Tiles[j].isInMaxShadeNE = sar.changedHeightTiles[i].isInMaxShadeNE;
+        ar.Tiles[j].isInMaxShadeSE = sar.changedHeightTiles[i].isInMaxShadeSE;
+        ar.Tiles[j].isInMaxShadeSW = sar.changedHeightTiles[i].isInMaxShadeSW;
+        ar.Tiles[j].isInMaxShadeNW = sar.changedHeightTiles[i].isInMaxShadeNW;
+
+        ar.Tiles[j].hasHighlightN = sar.changedHeightTiles[i].hasHighlightN;
+                                        ar.Tiles[j].highlightStrengthN = sar.changedHeightTiles[i].highlightStrengthN;
+        ar.Tiles[j].hasHighlightE = sar.changedHeightTiles[i].hasHighlightE;
+                                        ar.Tiles[j].highlightStrengthE = sar.changedHeightTiles[i].highlightStrengthE;
+        ar.Tiles[j].hasHighlightS = sar.changedHeightTiles[i].hasHighlightS;
+                                        ar.Tiles[j].highlightStrengthS = sar.changedHeightTiles[i].highlightStrengthS;
+        ar.Tiles[j].hasHighlightW = sar.changedHeightTiles[i].hasHighlightW;
+                                        ar.Tiles[j].highlightStrengthW = sar.changedHeightTiles[i].highlightStrengthW;
+
+        ar.Tiles[j].hasDownStairShadowN = sar.changedHeightTiles[i].hasDownStairShadowN;
+        ar.Tiles[j].hasDownStairShadowE = sar.changedHeightTiles[i].hasDownStairShadowE;
+        ar.Tiles[j].hasDownStairShadowS = sar.changedHeightTiles[i].hasDownStairShadowS;
+        ar.Tiles[j].hasDownStairShadowW = sar.changedHeightTiles[i].hasDownStairShadowW;
+
+                                        ar.Tiles[j].numberOfHeightLevelsThisTileisHigherThanNeighbourN = sar.changedHeightTiles[i].numberOfHeightLevelsThisTileisHigherThanNeighbourN;
+                                        ar.Tiles[j].numberOfHeightLevelsThisTileisHigherThanNeighbourE = sar.changedHeightTiles[i].numberOfHeightLevelsThisTileisHigherThanNeighbourE;
+                                        ar.Tiles[j].numberOfHeightLevelsThisTileisHigherThanNeighbourS = sar.changedHeightTiles[i].numberOfHeightLevelsThisTileisHigherThanNeighbourS;
+                                        ar.Tiles[j].numberOfHeightLevelsThisTileisHigherThanNeighbourW = sar.changedHeightTiles[i].numberOfHeightLevelsThisTileisHigherThanNeighbourW;
+
+        ar.Tiles[j].inSmallStairNEHorizontal = sar.changedHeightTiles[i].inSmallStairNEHorizontal;
+        ar.Tiles[j].inSmallStairNEVertical = sar.changedHeightTiles[i].inSmallStairNEVertical;
+        ar.Tiles[j].inSmallStairSEHorizontal = sar.changedHeightTiles[i].inSmallStairSEHorizontal;
+        ar.Tiles[j].inSmallStairSEVertical = sar.changedHeightTiles[i].inSmallStairSEVertical;
+        ar.Tiles[j].inSmallStairSWHorizontal = sar.changedHeightTiles[i].inSmallStairSWHorizontal;
+        ar.Tiles[j].inSmallStairSWVertical = sar.changedHeightTiles[i].inSmallStairSWVertical;
+        ar.Tiles[j].inSmallStairNWHorizontal = sar.changedHeightTiles[i].inSmallStairNWHorizontal;
+        ar.Tiles[j].inSmallStairNWVertical = sar.changedHeightTiles[i].inSmallStairNWVertical;
+
+        ar.Tiles[j].drawEntranceLights = sar.changedHeightTiles[i].drawEntranceLights;
+
+        ar.Tiles[j].hasEntranceLightNorth = sar.changedHeightTiles[i].hasEntranceLightNorth;
+        ar.Tiles[j].hasEntranceLightEast = sar.changedHeightTiles[i].hasEntranceLightEast;
+        ar.Tiles[j].hasEntranceLightSouth = sar.changedHeightTiles[i].hasEntranceLightSouth;
+        ar.Tiles[j].hasEntranceLightWest = sar.changedHeightTiles[i].hasEntranceLightWest;
+
+        ar.Tiles[j].inRampShadowWest1Short = sar.changedHeightTiles[i].inRampShadowWest1Short;
+        ar.Tiles[j].inRampShadowWest1Long = sar.changedHeightTiles[i].inRampShadowWest1Long;
+        ar.Tiles[j].inRampShadowWest2Short = sar.changedHeightTiles[i].inRampShadowWest2Short;
+        ar.Tiles[j].inRampShadowWest2Long = sar.changedHeightTiles[i].inRampShadowWest2Long;
+
+        ar.Tiles[j].inRampShadowEast3Short = sar.changedHeightTiles[i].inRampShadowEast3Short;
+        ar.Tiles[j].inRampShadowEast3Long = sar.changedHeightTiles[i].inRampShadowEast3Long;
+        ar.Tiles[j].inRampShadowEast4Short = sar.changedHeightTiles[i].inRampShadowEast4Short;
+        ar.Tiles[j].inRampShadowEast4Long = sar.changedHeightTiles[i].inRampShadowEast4Long;
+
+        ar.Tiles[j].inRampShadowNorth5Short = sar.changedHeightTiles[i].inRampShadowNorth5Short;
+        ar.Tiles[j].inRampShadowNorth5Long = sar.changedHeightTiles[i].inRampShadowNorth5Long;
+        ar.Tiles[j].inRampShadowNorth6Short = sar.changedHeightTiles[i].inRampShadowNorth6Short;
+        ar.Tiles[j].inRampShadowNorth6Long = sar.changedHeightTiles[i].inRampShadowNorth6Long;
+
+        ar.Tiles[j].inRampShadowSouth7Short = sar.changedHeightTiles[i].inRampShadowSouth7Short;
+        ar.Tiles[j].inRampShadowSouth7Long = sar.changedHeightTiles[i].inRampShadowSouth7Long;
+        ar.Tiles[j].inRampShadowSouth8Short = sar.changedHeightTiles[i].inRampShadowSouth8Short;
+        ar.Tiles[j].inRampShadowSouth8Long = sar.changedHeightTiles[i].inRampShadowSouth8Long;
+        */
+                                    }
+                                }
+
+                            }
+                        }
+
+                        //bridges
+                        if (sar.newEWBridgeState != null)
+                        {
+                            for (int i = 0; i < sar.newEWBridgeState.Count; i++)
+                            {
+                                for (int j = 0; j < ar.Tiles.Count; j++)
+                                {
+                                    int orgX = j % (ar.MapSizeX);
+                                    int orgY = j / (ar.MapSizeX);
+                                    int saveX = sar.changedEWBridgeTilesCoordX[i];
+                                    int saveY = sar.changedEWBridgeTilesCoordY[i]; ;
+
+                                    if (orgX == saveX && orgY == saveY)
+                                    {
+                                        ar.Tiles[j].isEWBridge = sar.newEWBridgeState[i];
+                                        ar.newEWBridgeState = sar.newEWBridgeState;
+                                        ar.changedEWBridgeTilesCoordX = sar.changedEWBridgeTilesCoordX;
+                                        ar.changedEWBridgeTilesCoordY = sar.changedEWBridgeTilesCoordY;
+                                    }
+                                }
+
+                            }
+                        }
+
+                        if (sar.newNSBridgeState != null)
+                        {
+
+                            {
+                                for (int i = 0; i < sar.newNSBridgeState.Count; i++)
+                                {
+                                    for (int j = 0; j < ar.Tiles.Count; j++)
+                                    {
+                                        int orgX = j % (ar.MapSizeX);
+                                        int orgY = j / (ar.MapSizeX);
+                                        int saveX = sar.changedNSBridgeTilesCoordX[i];
+                                        int saveY = sar.changedNSBridgeTilesCoordY[i]; ;
+
+                                        if (orgX == saveX && orgY == saveY)
+                                        {
+                                            ar.Tiles[j].isNSBridge = sar.newNSBridgeState[i];
+                                            ar.newNSBridgeState = sar.newNSBridgeState;
+                                            ar.changedNSBridgeTilesCoordX = sar.changedNSBridgeTilesCoordX;
+                                            ar.changedNSBridgeTilesCoordY = sar.changedNSBridgeTilesCoordY;
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                        //ramps/stairs
+                        if (sar.newRampState != null)
+                        {
+                            for (int i = 0; i < sar.newRampState.Count; i++)
+                            {
+                                for (int j = 0; j < ar.Tiles.Count; j++)
+                                {
+                                    int orgX = j % (ar.MapSizeX);
+                                    int orgY = j / (ar.MapSizeX);
+                                    int saveX = sar.changedRampTilesCoordX[i];
+                                    int saveY = sar.changedRampTilesCoordY[i]; ;
+
+                                    if (orgX == saveX && orgY == saveY)
+                                    {
+                                        if (sar.newRampState[i] == "Off" || sar.newRampState[i] == "off" || sar.newRampState[i] == "none" || sar.newRampState[i] == "None" || sar.newRampState[i] == null)
+                                        {
+                                            ar.Tiles[j].isRamp = false;
+                                            ar.Tiles[j].hasDownStairShadowE = false;
+                                            ar.Tiles[j].hasDownStairShadowS = false;
+                                            ar.Tiles[j].hasDownStairShadowW = false;
+                                            ar.Tiles[j].hasDownStairShadowN = false;
+                                            if (sar.drawRampSymbol[i])
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = true;
+                                            }
+                                            else
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = false;
+                                            }
+                                        }
+                                        //N
+                                        else if (sar.newRampState[i] == "N" || sar.newRampState[i] == "n")
+                                        {
+                                            ar.Tiles[j].isRamp = true;
+                                            ar.Tiles[j].hasDownStairShadowE = false;
+                                            ar.Tiles[j].hasDownStairShadowS = true;
+                                            ar.Tiles[j].hasDownStairShadowW = false;
+                                            ar.Tiles[j].hasDownStairShadowN = false;
+                                            if (sar.drawRampSymbol[i])
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = true;
+                                            }
+                                            else
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = false;
+                                            }
+                                        }
+                                        //E
+                                        else if (sar.newRampState[i] == "E" || sar.newRampState[i] == "e")
+                                        {
+                                            ar.Tiles[j].isRamp = true;
+                                            ar.Tiles[j].hasDownStairShadowE = false;
+                                            ar.Tiles[j].hasDownStairShadowS = false;
+                                            ar.Tiles[j].hasDownStairShadowW = true;
+                                            ar.Tiles[j].hasDownStairShadowN = false;
+                                            if (sar.drawRampSymbol[i])
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = true;
+                                            }
+                                            else
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = false;
+                                            }
+                                        }
+
+                                        //S
+                                        else if (sar.newRampState[i] == "S" || sar.newRampState[i] == "s")
+                                        {
+                                            ar.Tiles[j].isRamp = true;
+                                            ar.Tiles[j].hasDownStairShadowE = false;
+                                            ar.Tiles[j].hasDownStairShadowS = false;
+                                            ar.Tiles[j].hasDownStairShadowW = false;
+                                            ar.Tiles[j].hasDownStairShadowN = true;
+                                            if (sar.drawRampSymbol[i])
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = true;
+                                            }
+                                            else
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = false;
+                                            }
+                                        }
+
+                                        //W
+                                        else if (sar.newRampState[i] == "W" || sar.newRampState[i] == "w")
+                                        {
+                                            ar.Tiles[j].isRamp = true;
+                                            ar.Tiles[j].hasDownStairShadowE = true;
+                                            ar.Tiles[j].hasDownStairShadowS = false;
+                                            ar.Tiles[j].hasDownStairShadowW = false;
+                                            ar.Tiles[j].hasDownStairShadowN = false;
+                                            if (sar.drawRampSymbol[i])
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = true;
+                                            }
+                                            else
+                                            {
+                                                ar.Tiles[j].drawDownStairShadows = false;
+                                            }
+                                        }
+
+                                        ar.newRampState = sar.newRampState;
+                                        ar.drawRampSymbol = sar.drawRampSymbol;
+                                        ar.changedRampTilesCoordX = sar.changedRampTilesCoordX;
+                                        ar.changedRampTilesCoordY = sar.changedRampTilesCoordY;
+                                    }
+                                }
+
+                            }
+                        }
+
+                        //visibility
                         bool isOldSave = false;
                         try
                         {
@@ -1121,6 +1526,112 @@ namespace IBx
                             if (ar.Tiles[index].Visible)
                             {
                                 ar.Tiles[index].opacity = 0;
+                            }
+                        }
+
+                        //walkability
+                        if (sar.toggledSquaresWalkable != null)
+                        {
+                            foreach (Coordinate coord in sar.toggledSquaresWalkable)
+                            {
+                                ar.Tiles[coord.Y * ar.MapSizeX + coord.X].Walkable = true;
+                            }
+                        }
+
+                        if (sar.toggledSquaresWalkableFalse != null)
+                        {
+                            foreach (Coordinate coord in sar.toggledSquaresWalkableFalse)
+                            {
+                                ar.Tiles[coord.Y * ar.MapSizeX + coord.X].Walkable = false;
+                            }
+                        }
+
+                        //LoS
+                        if (sar.toggledSquaresLoS != null)
+                        {
+                            foreach (Coordinate coord in sar.toggledSquaresLoS)
+                            {
+                                ar.Tiles[coord.Y * ar.MapSizeX + coord.X].LoSBlocked = true;
+                            }
+                        }
+
+                        if (sar.toggledSquaresLoSFalse != null)
+                        {
+                            foreach (Coordinate coord in sar.toggledSquaresLoSFalse)
+                            {
+                                ar.Tiles[coord.Y * ar.MapSizeX + coord.X].LoSBlocked = false;
+                            }
+                        }
+
+                        //tile graphics
+                        //Layer0
+                        if (sar.toggledSquaresLayer0FilenameCoords != null && sar.toggledSquaresLayer0FilenameNames != null)
+                        {
+                            for (int i = 0; i < sar.toggledSquaresLayer0FilenameCoords.Count; i++)
+                            {
+                                ar.Tiles[sar.toggledSquaresLayer0FilenameCoords[i].Y * ar.MapSizeX + sar.toggledSquaresLayer0FilenameCoords[i].X].Layer0Filename = sar.toggledSquaresLayer0FilenameNames[i];
+                            }
+                        }
+
+                        //Layer1
+                        if (sar.toggledSquaresLayer1FilenameCoords != null && sar.toggledSquaresLayer1FilenameNames != null)
+                        {
+                            for (int i = 0; i < sar.toggledSquaresLayer1FilenameCoords.Count; i++)
+                            {
+                                ar.Tiles[sar.toggledSquaresLayer1FilenameCoords[i].Y * ar.MapSizeX + sar.toggledSquaresLayer1FilenameCoords[i].X].Layer1Filename = sar.toggledSquaresLayer1FilenameNames[i];
+                            }
+                        }
+
+                        //Layer2
+                        if (sar.toggledSquaresLayer2FilenameCoords != null && sar.toggledSquaresLayer2FilenameNames != null)
+                        {
+                            for (int i = 0; i < sar.toggledSquaresLayer2FilenameCoords.Count; i++)
+                            {
+                                ar.Tiles[sar.toggledSquaresLayer2FilenameCoords[i].Y * ar.MapSizeX + sar.toggledSquaresLayer2FilenameCoords[i].X].Layer2Filename = sar.toggledSquaresLayer2FilenameNames[i];
+                            }
+                        }
+
+                        //Layer3
+                        if (sar.toggledSquaresLayer3FilenameCoords != null && sar.toggledSquaresLayer3FilenameNames != null)
+                        {
+                            for (int i = 0; i < sar.toggledSquaresLayer3FilenameCoords.Count; i++)
+                            {
+                                ar.Tiles[sar.toggledSquaresLayer3FilenameCoords[i].Y * ar.MapSizeX + sar.toggledSquaresLayer3FilenameCoords[i].X].Layer3Filename = sar.toggledSquaresLayer3FilenameNames[i];
+                            }
+                        }
+
+                        //Layer4
+                        if (sar.toggledSquaresLayer4FilenameCoords != null && sar.toggledSquaresLayer4FilenameNames != null)
+                        {
+                            for (int i = 0; i < sar.toggledSquaresLayer4FilenameCoords.Count; i++)
+                            {
+                                ar.Tiles[sar.toggledSquaresLayer4FilenameCoords[i].Y * ar.MapSizeX + sar.toggledSquaresLayer4FilenameCoords[i].X].Layer4Filename = sar.toggledSquaresLayer4FilenameNames[i];
+                            }
+                        }
+
+                        //Layer5
+                        if (sar.toggledSquaresLayer5FilenameCoords != null && sar.toggledSquaresLayer5FilenameNames != null)
+                        {
+                            for (int i = 0; i < sar.toggledSquaresLayer5FilenameCoords.Count; i++)
+                            {
+                                ar.Tiles[sar.toggledSquaresLayer5FilenameCoords[i].Y * ar.MapSizeX + sar.toggledSquaresLayer5FilenameCoords[i].X].Layer5Filename = sar.toggledSquaresLayer5FilenameNames[i];
+                            }
+                        }
+
+                        //Secret Passages (through height levels)
+                        if (sar.toggledSquaresIsSecretPassage != null)
+                        {
+                            foreach (Coordinate coord in sar.toggledSquaresIsSecretPassage)
+                            {
+                                ar.Tiles[coord.Y * ar.MapSizeX + coord.X].isSecretPassage = true;
+                            }
+                        }
+
+                        if (sar.toggledSquaresIsSecretPassageFalse != null)
+                        {
+                            foreach (Coordinate coord in sar.toggledSquaresIsSecretPassageFalse)
+                            {
+                                ar.Tiles[coord.Y * ar.MapSizeX + coord.X].isSecretPassage = false;
                             }
                         }
 
@@ -1156,24 +1667,53 @@ namespace IBx
                         for (int index = ar.Props.Count - 1; index >= 0; index--)
                         {
                             Prop prp = ar.Props[index];
+                            if (prp.MoverType == "daily")
+                            {
+                                int ggk = 0;
+                            }
                             bool foundOne = false;
                             foreach (Prop sprp in sar.Props) //sprp is the saved game prop
                             {
+                                if (sprp.MoverType == "daily")
+                                {
+                                    int ggk = 0;
+                                }
+
+                                //if prop is found in any savegame area, do remove it from any toolset mod area
+
+
                                 if (prp.PropTag.Equals(sprp.PropTag))
                                 {
+                                    //louis
                                     foundOne = true; //the prop tag exists in the saved game
                                     //replace the one in the toolset with the one from the saved game
                                     ar.Props.RemoveAt(index);
+                                    /*
+                                    for (int i = gv.mod.moduleAreasObjects.Count - 1; i >= 0; i--)
+                                    {
+                                        for (int j = gv.mod.moduleAreasObjects[i].Props.Count - 1; j >= 0; j--)
+                                        {
+                                            if (gv.mod.moduleAreasObjects[i].Props[j].PropTag == prp.PropTag)
+                                            {
+                                                if (gv.mod.moduleAreasObjects[i].Props[j].MoverType == "daily")
+                                                {
+                                                    gv.mod.moduleAreasObjects[i].Props.RemoveAt(j);
+                                                }
+                                            }
+                                        }
+                                    } 
+                                    */
                                     ar.Props.Add(sprp.DeepCopy());
                                     //prp = sprp.DeepCopy();
                                     break;
                                 }
                             }
-                            if (!foundOne) //didn't find the prop tag in the saved game
+                            if (!foundOne) //didn't find the prop tag in this AREA of saved game
                             {
                                 if (sar.InitialAreaPropTagsList.Contains(prp.PropTag))
                                 {
                                     //was once on the map, but was deleted so remove from the newMod prop list
+                                    //also deletes time driven mover props on other areas
                                     ar.Props.RemoveAt(index);
                                 }
                                 else
@@ -1182,6 +1722,28 @@ namespace IBx
                                 }
                             }
                         }
+
+                        //new routine for adding props that only exist in savegame, but not in toolset version of mod
+                        //like newly spawned props or time rdivne movers who have chnaged maps
+                        for (int index = sar.Props.Count - 1; index >= 0; index--)
+                        {
+                            Prop sprp = sar.Props[index];
+
+                            bool foundOne = false;
+                            foreach (Prop prp in ar.Props) //sprp is the saved game prop
+                            {
+                                if (sprp.PropTag.Equals(prp.PropTag))
+                                {
+                                    foundOne = true;
+                                    break;
+                                }
+                            }
+                            if (!foundOne)
+                            {
+                                ar.Props.Add(sprp.DeepCopy());
+                            }
+                        }
+
                         //triggers
                         foreach (Trigger tr in ar.Triggers)
                         {
@@ -1206,10 +1768,18 @@ namespace IBx
             //load player Bitmap, race, class, known spells, equipped items
             foreach (Player pc in gv.mod.playerList)
             {
+                //try { pc.token = LoadBitmap(pc.tokenFilename); }
+                //catch (Exception ex)
+                //{
+                //    gv.sf.MessageBox("Karl Error 102End");
+                //    gv.errorLog(ex.ToString());
+                //}
+                //try { pc.portrait = LoadBitmap(pc.portraitFilename); }
+                //catch (Exception ex) { gv.sf.MessageBox("Karl Error 103End"); gv.errorLog(ex.ToString()); }
                 try { pc.race = gv.mod.getRace(pc.raceTag).DeepCopy(); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
+                catch (Exception ex) { gv.sf.MessageBox("Karl Error 104End"); gv.errorLog(ex.ToString()); }
                 try { pc.playerClass = gv.mod.getPlayerClass(pc.classTag).DeepCopy(); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
+                catch (Exception ex) { gv.sf.MessageBox("Karl Error 105End"); gv.errorLog(ex.ToString()); }
                 //may not need this(deleted already) as it is not used anywhere, only knownspellstags is used
             }
         }
@@ -1218,10 +1788,14 @@ namespace IBx
             //load player Bitmap, race, class, known spells, equipped items
             foreach (Player pc in gv.mod.partyRosterList)
             {
+                //try { pc.token = LoadBitmap(pc.tokenFilename); }
+                //catch (Exception ex) { gv.sf.MessageBox("Karl Error 106End"); gv.errorLog(ex.ToString()); }
+                //try { pc.portrait = LoadBitmap(pc.portraitFilename); }
+                //catch (Exception ex) { gv.sf.MessageBox("Karl Error 107End"); gv.errorLog(ex.ToString()); }
                 try { pc.race = gv.mod.getRace(pc.raceTag).DeepCopy(); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
+                catch (Exception ex) { gv.sf.MessageBox("Karl Error 108End"); gv.errorLog(ex.ToString()); }
                 try { pc.playerClass = gv.mod.getPlayerClass(pc.classTag).DeepCopy(); }
-                catch (Exception ex) { gv.errorLog(ex.ToString()); }
+                catch (Exception ex) { gv.sf.MessageBox("Karl Error 109End"); gv.errorLog(ex.ToString()); }
                 //may not need this as it is not used anywhere, only knownspellstags is used
             }
         }
@@ -1238,9 +1812,10 @@ namespace IBx
             {
                 gv.mod.playerList[0].mainPc = true;
                 gv.mod.playerList[0].nonRemoveablePc = true;
+
             }
         }
-        public Module LoadModule(string folderAndFilename)
+        public Module LoadModule(string folderAndFilename, bool fullPath)
         {
             Module toReturn = null;
             string s = gv.GetModuleFileString(folderAndFilename);
@@ -1258,7 +1833,7 @@ namespace IBx
             {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleRacesList = (List<Race>)serializer.Deserialize(file, typeof(List<Race>));
-            }            
+            }
         }
         public void LoadPlayerClasses()
         {
@@ -1334,6 +1909,18 @@ namespace IBx
             }
         }
 
+        //todo, stored info in faction tret correctly
+        public void LoadFactions()
+        {
+            string json = gv.LoadStringFromEitherFolder("\\data\\factions.json", "\\modules\\" + gv.mod.moduleName + "\\data\\factions.json");
+            using (StringReader file = new StringReader(json))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                gv.mod.moduleFactionsList = (List<Faction>)serializer.Deserialize(file, typeof(List<Faction>));
+                //int i = 0;
+            }
+        }
+
         public void LoadWeathers()
         {
             try
@@ -1383,7 +1970,7 @@ namespace IBx
         {
             string json = gv.LoadStringFromEitherFolder("\\data\\encounters.json", "\\modules\\" + gv.mod.moduleName + "\\data\\encounters.json");
             using (StringReader file = new StringReader(json))
-            { 
+            {
                 JsonSerializer serializer = new JsonSerializer();
                 gv.mod.moduleEncountersList = (List<Encounter>)serializer.Deserialize(file, typeof(List<Encounter>));
             }
@@ -1409,7 +1996,7 @@ namespace IBx
             btnInventory = null;
             btnHelp = null;
             tglSound = null;
-        }        
+        }
         public void setPanelsStart()
         {
             int mapSize = gv.playerOffsetY + gv.playerOffsetY + 1;
@@ -1606,7 +2193,7 @@ namespace IBx
             int tabY1 = gv.cc.pnlPortraits.LocY + 0 * gv.squareSize + gv.squareSize / 2;
             int tabY2 = gv.cc.pnlPortraits.LocY + 2 * gv.squareSize + gv.squareSize / 2;
             int tabY3 = gv.cc.pnlPortraits.LocY + 4 * gv.squareSize + gv.squareSize / 2;
-                        
+
             if (!gv.useLargeLayout)
             {
                 scale = 0.75f;
@@ -1742,6 +2329,11 @@ namespace IBx
 
         public void addLogText(string color, string text)
         {
+            if (!text.Contains("<BR>"))
+            {
+                text += "<BR>";
+            }
+
             if (color.Equals("red"))
             {
                 gv.log.AddHtmlTextToLog("<font color='red'>" + text + "</font>");
@@ -1794,7 +2386,7 @@ namespace IBx
         }
         public void addLogText(string text)
         {
-            gv.log.AddHtmlTextToLog(text);		
+            gv.log.AddHtmlTextToLog(text);
         }
         public void addFloatyText(Coordinate coorInSquares, string value)
         {
@@ -1810,6 +2402,11 @@ namespace IBx
             int x = ((coorInSquares.X * gv.squareSize) + (gv.squareSize / 2) + gv.oXshift) - (txtH / 2);
             int y = ((coorInSquares.Y * gv.squareSize) + (gv.squareSize / 2) + txtH) - (txtH / 2);
             Coordinate coor = new Coordinate(x, y);
+            if (value.Contains("Round"))
+            {
+                coor.X = gv.screenWidth / 2;
+                coor.Y = gv.screenHeight / 2;
+            }
             floatyTextList.Add(new FloatyText(coor, value, color));
         }
         public void addFloatyText(Coordinate coorInSquares, string value, int shiftUp)
@@ -2001,655 +2598,2907 @@ namespace IBx
 
         public void SwitchToNextAvailablePartyLeader()
         {
-            int idx = 0;
-            foreach (Player pc in gv.mod.playerList)
+            if (!gv.mod.showPartyToken)
             {
-                if (!pc.isDead())
+                int idx = 0;
+                foreach (Player pc in gv.mod.playerList)
                 {
-                    gv.mod.selectedPartyLeader = idx;
-                    return;
+                    if (pc.hp >= 0)
+                    {
+                        gv.mod.selectedPartyLeader = idx;
+                        return;
+                    }
+                    idx++;
                 }
-                idx++;
+                gv.screenMainMap.updateTraitsPanel();
             }
         }
+
+        public int getTraitPower(string tag, string methodOfChecking)
+        {
+            int itemMod = 0;
+            int skillMod = 0;
+            int attMod = 0;
+            Trait tr = new Trait();
+            foreach (Player p in gv.mod.playerList)
+            {
+                p.powerOfThisPc = 0;
+            }
+
+            for (int i = 0; i <= gv.mod.playerList.Count - 1; i++)
+            {
+                string foundLargest = "none";
+                int largest = 0;
+                foreach (string s in gv.mod.playerList[i].knownTraitsTags)
+                {
+                    if (s.StartsWith(tag))
+                    {
+                        if (s.Equals(tag))
+                        {
+                            if (foundLargest.Equals("none"))
+                            {
+                                foundLargest = s;
+                            }
+                        }
+                        else //get the number at the end 
+                        {
+                            string c = s.Substring(s.Length - 1, 1);
+                            int j = Convert.ToInt32(c);
+                            if (j > largest)
+                            {
+                                largest = j;
+                                foundLargest = s;
+                            }
+                        }
+                    }
+                }
+
+                skillMod = 0;
+                //Trait tr = new Trait();
+                if (!foundLargest.Equals("none"))
+                {
+                    //PC has trait skill so do calculation check
+                    tr = gv.mod.getTraitByTag(foundLargest);
+                    skillMod = tr.skillModifier;
+                }
+                else
+                {
+
+                    foreach (Trait t in gv.mod.moduleTraitsList)
+                    {
+                        if (t.tag.Contains(tag))
+                        {
+                            tr = gv.mod.getTraitByTag(t.tag);
+                            break;
+                        }
+                    }
+                }
+
+                attMod = 0;
+                if (tr.skillModifierAttribute.Equals("str") || tr.skillModifierAttribute.Equals("strength") || tr.skillModifierAttribute.Equals("Str") || tr.skillModifierAttribute.Equals("Strength"))
+                {
+                    attMod = (gv.mod.playerList[i].strength - 10) / 2;
+                }
+                else if (tr.skillModifierAttribute.Equals("dex") || tr.skillModifierAttribute.Equals("dexterity") || tr.skillModifierAttribute.Equals("Dex") || tr.skillModifierAttribute.Equals("Dexterity"))
+                {
+                    attMod = (gv.mod.playerList[i].dexterity - 10) / 2;
+                }
+                else if (tr.skillModifierAttribute.Equals("int") || tr.skillModifierAttribute.Equals("intelligance") || tr.skillModifierAttribute.Equals("Int") || tr.skillModifierAttribute.Equals("Intelligence"))
+                {
+                    attMod = (gv.mod.playerList[i].intelligence - 10) / 2;
+                }
+                else if (tr.skillModifierAttribute.Equals("cha") || tr.skillModifierAttribute.Equals("charisma") || tr.skillModifierAttribute.Equals("Cha") || tr.skillModifierAttribute.Equals("Charisma"))
+                {
+                    attMod = (gv.mod.playerList[i].charisma - 10) / 2;
+                }
+                else if (tr.skillModifierAttribute.Equals("con") || tr.skillModifierAttribute.Equals("constitution") || tr.skillModifierAttribute.Equals("Con") || tr.skillModifierAttribute.Equals("Constitution"))
+                {
+                    attMod = (gv.mod.playerList[i].constitution - 10) / 2;
+                }
+                else if (tr.skillModifierAttribute.Equals("wis") || tr.skillModifierAttribute.Equals("wisdom") || tr.skillModifierAttribute.Equals("Wis") || tr.skillModifierAttribute.Equals("Wisdom"))
+                {
+                    attMod = (gv.mod.playerList[i].wisdom - 10) / 2;
+                }
+
+                itemMod = 0;
+
+                if (gv.mod.playerList[i].BodyRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].BodyRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].RingRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].RingRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].MainHandRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].MainHandRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].OffHandRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].OffHandRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].HeadRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].HeadRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].GlovesRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].GlovesRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].NeckRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].NeckRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].Ring2Refs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].Ring2Refs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                if (gv.mod.playerList[i].FeetRefs.resref != "none")
+                {
+                    Item itm = gv.mod.getItemByResRefForInfo(gv.mod.playerList[i].FeetRefs.resref);
+                    if (itm != null)
+                    {
+                        if (itm.tagOfTraitInfluenced.Contains(tag))
+                        {
+                            itemMod += itm.traitSkillRollModifier;
+                        }
+                    }
+                }
+
+                gv.mod.playerList[i].powerOfThisPc = attMod + skillMod + itemMod;
+                if (tr.tag == "newTraitTag")
+                {
+                    gv.mod.playerList[i].powerOfThisPc = 0;
+                }
+            }
+
+            int power = 0;
+
+            if (methodOfChecking == "highest" || methodOfChecking == "Highest" || methodOfChecking == "-2")
+            {
+                int highestFound = -100;
+                foreach (Player p in gv.mod.playerList)
+                {
+                    if (p.hp > 0)
+                    {
+                        if (p.powerOfThisPc > highestFound)
+                        {
+                            power = p.powerOfThisPc;
+                            highestFound = p.powerOfThisPc;
+                        }
+                    }
+                }
+            }
+
+            else if (methodOfChecking == "lowest" || methodOfChecking == "Lowest" || methodOfChecking == "-3")
+            {
+                int lowestFound = 10000;
+                foreach (Player p in gv.mod.playerList)
+                {
+                    if (p.powerOfThisPc < lowestFound)
+                    {
+                        power = p.powerOfThisPc;
+                        lowestFound = p.powerOfThisPc;
+                    }
+                }
+            }
+
+            else if (methodOfChecking == "average" || methodOfChecking == "Average" || methodOfChecking == "-4" || methodOfChecking == "oneMustSucceed" || methodOfChecking == "OneMustSucceed" || methodOfChecking == "-6" || methodOfChecking == "allMustSucceed" || methodOfChecking == "AllMustSucceed" || methodOfChecking == "-5")
+            {
+                int sumOfPower = 0;
+                foreach (Player p in gv.mod.playerList)
+                {
+                    sumOfPower += p.powerOfThisPc;
+                }
+                power = sumOfPower / gv.mod.playerList.Count;
+            }
+            //default: leader
+            else
+            {
+                power = gv.mod.playerList[gv.mod.selectedPartyLeader].powerOfThisPc;
+            }
+
+            return power;
+        }
+
+        /*
+        public void determineMapOverviewButtonsShown()
+        {
+
+            bool showOwnZoneButton = false;
+            bool showMotherZoneButton = false;
+            bool showGrandmotherZoneButton = false;
+
+            //zoomed two levels in (close)
+            if (zoomLevel == 2)
+            {
+                //now we have to find out whether current area's zone name OR as current area's ingame name are different from none/"" 
+                if (gv.mod.currentArea.zoneName != "none" && gv.mod.currentArea.zoneName != "")
+                {
+                    zoom0Line = gv.mod.currentArea.zoneName + "[L" + gv.mod.currentArea.zoneFloorLevel + "," + gv.mod.currentArea.zoneX + "," + gv.mod.currentArea.zoneY + "]";
+                }
+
+                if (gv.mod.currentArea.inGameAreaName != "none" && gv.mod.currentArea.inGameAreaName != "")
+                {
+                    if (gv.mod.currentArea.zoneName != "none" && gv.mod.currentArea.zoneName != "")
+                    {
+                        zoom0Line += ": ";
+                    }
+                    zoom0Line += gv.mod.currentArea.inGameAreaName + "(" + gv.mod.PlayerLocationX + "," + gv.mod.PlayerLocationY + ")";
+                }
+
+                //now build info for zoom1Line (read in zoneMotherArea name from current area, then use motehr area to get zone of mother area 
+                if (gv.mod.currentArea.zoneMotherAreaName != "none" && gv.mod.currentArea.zoneMotherAreaName != "")
+                {
+                    foreach (Area a in gv.mod.moduleAreasObjects)
+                    {
+                        if (a.Filename == gv.mod.currentArea.zoneMotherAreaName)
+                        {
+                            if (a.zoneName != "none" && a.zoneName != "")
+                            {
+                                zoom1Line = a.zoneName + "[L" + a.zoneFloorLevel + "," + a.zoneX + "," + a.zoneY + "]";
+                                zoom1Line += ": ";
+                            }
+                            zoom1Line += a.inGameAreaName + "(" + gv.mod.currentArea.zoneMotherAreaX + "," + gv.mod.currentArea.zoneMotherAreaX + ")";
+
+
+
+                            //integrate grandma here, so we can work with a
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                            //now build info for zoom2Line (read in zoneMotherArea name from mother area, then use hits grandma area to get zone of grandma area 
+                            if (a.zoneMotherAreaName != "none" && a.zoneMotherAreaName != "")
+                            {
+                                foreach (Area grandA in gv.mod.moduleAreasObjects)
+                                {
+                                    if (grandA.Filename == a.zoneMotherAreaName)
+                                    {
+                                        if (grandA.zoneName != "none" && grandA.zoneName != "")
+                                        {
+                                            zoom2Line = grandA.zoneName + "[L" + grandA.zoneFloorLevel + "," + grandA.zoneX + "," + grandA.zoneY + "]";
+                                            zoom2Line += ": ";
+                                        }
+                                        zoom2Line += grandA.inGameAreaName + "(" + a.zoneMotherAreaX + "," + a.zoneMotherAreaX + ")";
+                                    }
+                                }
+                            }
+                        }
+
+
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    }
+                }
+
+
+                //now draw the lines for date&time top and location info below 
+                //two lines: date on top and current area's zone name as well as current area's ingame name
+                if (gv.mod.useMinimalisticUI)
+                {
+                    //draw black frames around font
+                    for (int x = -2; x <= 2; x++)
+                    {
+                        for (int y = -2; y <= 2; y++)
+                        {
+                            gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y - gv.pS - (int)(2.5 * gv.pS * 2 + 0.5 * gv.pS), 600, 100), 1.0f, Color.Black);
+                            gv.DrawText(zoom2Line, new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS) - (int)(2.5 * gv.pS * 2), 600, 100), 1.0f, Color.Black);
+                            gv.DrawText(zoom1Line, new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS) - (int)(2.5 * gv.pS * 1) + gv.pS, 600, 100), 1.0f, Color.Black);
+                            gv.DrawText(zoom0Line, new IbRect(gv.oXshift + x + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + y + (int)(2.5 * gv.pS) - (int)(2.5 * gv.pS * 0) + 2 * gv.pS, 600, 100), 1.0f, Color.Black);
+                        }
+                    }
+                    //draw font itself (white)
+                    gv.DrawText(hour + ":" + sMinute + ", " + gv.mod.weekDayNameToDisplay + ", " + gv.mod.monthDayCounterNumberToDisplay + gv.mod.monthDayCounterAddendumToDisplay + " of " + gv.mod.monthNameToDisplay + " " + gv.mod.currentYear.ToString(), new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH - gv.pS - (int)(2.5 * gv.pS * 2 + 0.5 * gv.pS), 600, 100), 1.0f, Color.White);
+                    gv.DrawText(zoom2Line, new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS) - (int)(2.5 * gv.pS * 2), 600, 100), 1.0f, Color.White);
+                    gv.DrawText(zoom1Line, new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS) - (int)(2.5 * gv.pS * 1) + gv.pS, 600, 100), 1.0f, Color.White);
+                    gv.DrawText(zoom0Line, new IbRect(gv.oXshift + (gv.playerOffsetY - 5) * gv.squareSize + 2 * gv.pS, gv.playerOffsetX * gv.squareSize - txtH + (int)(2.5 * gv.pS) - (int)(2.5 * gv.pS * 0) + 2 * gv.pS, 600, 100), 1.0f, Color.White);
+                }
+            }
+        }
+        */
+
+        public void writeBmpNearbyNameList()
+        {
+
+            Coordinate targetCoord = new Coordinate();
+            Coordinate partyCoord = new Coordinate();
+            partyCoord.X = gv.mod.PlayerLocationX;
+            partyCoord.Y = gv.mod.PlayerLocationY;
+            //sebastian2
+            //todo long range version
+            foreach (int i in gv.cc.getNearbyAreasLongRange())
+            {
+                //if (gv.mod.moduleAreasObjects[i].Filename == gv.mod.currentArea.Filename)
+                //{
+
+                //tile graphics
+                for (int j = 0; j < gv.mod.moduleAreasObjects[i].Tiles.Count; j++)
+                {
+                    targetCoord = recalcTileCoord(i, j % gv.mod.moduleAreasObjects[i].MapSizeX, j / gv.mod.moduleAreasObjects[i].MapSizeY);
+                    //targetCoord.Y = j / gv.mod.moduleAreasObjects[i].MapSizeY;
+                    if (getDistance(partyCoord, targetCoord) <= 13)
+                    {
+                        if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.moduleAreasObjects[i].Tiles[j].Layer0Filename))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(gv.mod.moduleAreasObjects[i].Tiles[j].Layer0Filename);
+                        }
+                        if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.moduleAreasObjects[i].Tiles[j].Layer1Filename))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(gv.mod.moduleAreasObjects[i].Tiles[j].Layer1Filename);
+                        }
+                        if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.moduleAreasObjects[i].Tiles[j].Layer2Filename))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(gv.mod.moduleAreasObjects[i].Tiles[j].Layer2Filename);
+                        }
+                        if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.moduleAreasObjects[i].Tiles[j].Layer3Filename))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(gv.mod.moduleAreasObjects[i].Tiles[j].Layer3Filename);
+                        }
+                        if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.moduleAreasObjects[i].Tiles[j].Layer4Filename))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(gv.mod.moduleAreasObjects[i].Tiles[j].Layer4Filename);
+                        }
+                        if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.moduleAreasObjects[i].Tiles[j].Layer5Filename))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(gv.mod.moduleAreasObjects[i].Tiles[j].Layer5Filename);
+                        }
+                    }
+
+                }
+
+                //prop graphics
+                foreach (Prop p in gv.mod.moduleAreasObjects[i].Props)
+                {
+                    //sebastian
+                    //p.relocX
+                    targetCoord.X = p.relocX;
+                    targetCoord.Y = p.relocY;
+                    if (getDistance(partyCoord, targetCoord) <= 13)
+                    {
+                        if (!gv.mod.bmpNearbyNameList.Contains(p.ImageFileName))
+                        {
+                            gv.mod.bmpNearbyNameList.Add(p.ImageFileName);
+                        }
+                    }
+                }
+                //}
+
+
+            }
+        }
+
 
         public void doUpdate()
         {
-            gv.realTimeTimerMilliSecondsEllapsed = 0;
-            handleRationsAndLightSources();
-            //setBridgeStateForMovingProps();
-            gv.mod.EncounterOfTurnDone = false;
-            setToBorderPixDistancesMainMap();
-            if (gv.mod.useAllTileSystem)
+
+            //mainUiLayout.panelList;
+            foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
             {
-                resetLightAndDarkness();
-            }
-            #region tile loading on demand
-            if (gv.mod.useAllTileSystem)
-            {
-                //cull all down if too high value is reached (last resort)
-                /*
-                if (gv.mod.loadedTileBitmaps.Count > 400)
+                foreach (IB2ToggleButton tgl in pnl.toggleList)
                 {
-                    try
+                    if (tgl.tag == "tglSound")
                     {
-                        foreach (Bitmap bm in gv.mod.loadedTileBitmaps)
+                        //IB2ToggleButton tgl = mainUiLayout.GetToggleByTag(rtn);
+                        //if (tgl == null) { return; }
+                        if (!tgl.toggleOn)
                         {
-                            bm.Dispose();
+                            //tgl.toggleOn = false;
+                            gv.mod.playMusic = false;
+                            gv.mod.playSoundFx = false;
+                            //TODO gv.screenCombat.tglSoundFx.toggleOn = false;
+                            gv.stopMusic();
+                            gv.stopAmbient();
+                            //gv.cc.addLogText("lime", "Music Off, SoundFX Off");
+                        }
+                        else
+                        {
+                            //tgl.toggleOn = true;
+                            gv.mod.playMusic = true;
+                            gv.mod.playSoundFx = true;
+                            //TODO gv.screenCombat.tglSoundFx.toggleOn = true;
+
+
+                            gv.startMusic();
+                            gv.startAmbient();
+
+
+                            //gv.cc.addLogText("lime", "Music On, SoundFX On");
+                        }
+                        //music on
+                    }
+                }
+            }
+
+            /*
+            if (!gv.mod.isScrollingNow && gv.elapsed3 < 20 && gv.mod.calledByRealTimeTimer)
+            {
+                writeBmpNearbyNameList();
+                foreach (string name in gv.mod.bmpNearbyNameList)
+                {
+                    if (!gv.mod.loadedTileBitmapsNames.Contains(name))
+                    {
+                        //sebastian3
+                        gv.mod.loadedTileBitmapsNames.Add(name);
+                        gv.mod.loadedTileBitmaps.Add(gv.cc.LoadBitmap(name));
+                        //tile.tileBitmap5 = gv.cc.LoadBitmap(tile.Layer5Filename);
+
+                    }
+                }
+            }
+            */
+
+
+            if (gv.mod.overrideVisibilityRange != -1)
+            {
+                gv.mod.currentArea.AreaVisibleDistance = gv.mod.overrideVisibilityRange;
+            }
+            //gv.mod.uCounter++;
+            gv.mod.findNewPointCounter = 0;
+            foreach (Prop p in gv.mod.currentArea.Props)
+            {
+                //if (p.LocationX != gv.mod.PlayerLocationX || p.LocationY != gv.mod.PlayerLocationY)
+                {
+                    p.blockConvoForOneTurn = false;
+                }
+            }
+            gv.mod.lastWorldTime = gv.mod.WorldTime;
+            if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX || gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || gv.mod.calledByRealTimeTimer || gv.mod.calledByWaiting)
+            {
+                gv.mod.calledByWaiting = false;
+                /*
+                gv.cc.floatyText = "";
+                gv.cc.floatyText2 = "";
+                gv.cc.floatyText3 = "";
+                gv.cc.floatyText4 = "";
+                gv.cc.floatyText0 = "";
+                gv.cc.floatyTextA = "";
+                gv.cc.floatyTextB = "";
+                */
+                /*
+                long current2 = gv.gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
+
+                //mühlheim
+
+                gv.elapsed2 = (int)(current2 - gv.previousTime2); //calculate the total ms elapsed since the last time through the game loop
+                if (gv.elapsed2 <750)
+                {
+                    gv.mod.scrollingOverhang = (7.5f * gv.elapsed2 / 250f);
+                }
+                else
+                {
+                    gv.mod.scrollingOverhang = 0;
+                }
+                */
+
+
+
+                //if (gv.mod.scrollingOverhang > 50)
+                //{
+                //gv.mod.scrollingOverhang = 50;
+                //}
+
+                //if (gv.mod.scrollingOverhang < -199)
+                //{
+                //gv.mod.scrollingOverhang = -199;
+                //}
+                //gv.mod.blockMainKeyboard = true;
+                //bool blockUpdate = false;
+                //if (gv.mod.useScrollingSystem && gv.mod.isScrollingNow)
+                //{
+                //blockUpdate = true;
+                //}
+                //blockUpdate = false;
+                //gv.mod.PlayerLastLoca tionX = gv.mod.PlayerLocationX;
+                //gv.mod.PlayerLastLocationY = gv.mod.PlayerLocationY;
+
+                //bool showPortrtaitsThisUpdate = false;
+                //if (!blockUpdate)
+                //{
+                if (gv.mod.showPortrtaitsThisUpdate)
+                {
+                    gv.mod.showPortrtaitsThisUpdate = false;
+                }
+                foreach (Player p in gv.mod.playerList)
+                {
+                    if (gv.mod.hideInterfaceNextMove)
+                    {
+                        if (p.hp != p.hpLastUpdate)
+                        {
+                            gv.mod.showPortrtaitsThisUpdate = true;
+                            break;
                         }
 
-                        //these two lists keep an exact order so each bitmap stored in one corrsponds with a name in the other
-                        gv.mod.loadedTileBitmaps.Clear();
-                        gv.mod.loadedTileBitmapsNames.Clear();
+                        if (p.sp != p.spLastUpdate)
+                        {
+                            gv.mod.showPortrtaitsThisUpdate = true;
+                            break;
+                        }
                     }
-                    catch
-                    {
-
-                    }
-
                 }
 
-                if (gv.mod.loadedTileBitmaps.Count > 250)
+                if (gv.mod.showPortrtaitsThisUpdate)
                 {
-                    int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 10) + 2);
-                    try
+                    //todo: code for showing portraits (hiding should happen on move in f mode)
+                    foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
                     {
-                        if (gv.mod.loadedTileBitmaps != null)
+                        if (pnl.tag != "arrowPanel")
                         {
-                            //remove 12 entries per move, 3 more than usual 9 squares uncovered
-                            for (int i = 0; i < cullNumber; i++)
+                            //hides right
+                            if (pnl.hidingXIncrement > 0)
                             {
-                                gv.mod.loadedTileBitmaps[i].Dispose();
-                                gv.mod.loadedTileBitmaps.RemoveAt(i);
-                                gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                if (pnl.currentLocX > pnl.shownLocX)
+                                {
+                                    pnl.showing = true;
+                                }
+                                else
+                                {
+                                    //pnl.hiding = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    int i = 1;
+                }
+
+                foreach (Player p in gv.mod.playerList)
+                {
+                    p.hpLastUpdate = p.hp;
+                    p.spLastUpdate = p.sp;
+                }
+
+                gv.mod.permanentPartyText = "none";
+                //if (!blockUpdate)
+                //{
+                //aegon2
+                gv.sf.ThisProp = null;
+                gv.cc.calledEncounterFromProp = false;
+                gv.cc.calledConvoFromProp = false;
+                //}
+                //to do?: update states of overview map buttons (show/no show)?
+                //or will just adding the script functionality be enough? Likely...
+
+                //set party speed, based on traits of current leader
+                //maybe also influenced means of transportation?
+                //also make speed relevant for time passed
+                //get diagonal neighbours
+                string NeighbourNE = "";
+                string NeighbourNW = "";
+                string NeighbourSE = "";
+                string NeighbourSW = "";
+
+                if (gv.mod.currentArea.northernNeighbourArea != "none" || gv.mod.currentArea.easternNeighbourArea != "none" || gv.mod.currentArea.westernNeighbourArea != "none" || gv.mod.currentArea.southernNeighbourArea != "none")
+                {
+                    foreach (Area a in gv.mod.moduleAreasObjects)
+                    {
+                        if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                        {
+                            if (a.easternNeighbourArea != "none" && a.easternNeighbourArea != "" && a.easternNeighbourArea != "None")
+                            {
+                                NeighbourNE = a.easternNeighbourArea;
+                            }
+
+                            if (a.westernNeighbourArea != "none" && a.westernNeighbourArea != "" && a.westernNeighbourArea != "None")
+                            {
+                                NeighbourNW = a.westernNeighbourArea;
+                            }
+                        }
+
+                        if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                        {
+                            if (a.northernNeighbourArea != "none" && a.northernNeighbourArea != "" && a.northernNeighbourArea != "None")
+                            {
+                                NeighbourNE = a.northernNeighbourArea;
+                            }
+
+                            if (a.southernNeighbourArea != "none" && a.southernNeighbourArea != "" && a.southernNeighbourArea != "None")
+                            {
+                                NeighbourSE = a.southernNeighbourArea;
+                            }
+                        }
+
+                        if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                        {
+                            if (a.easternNeighbourArea != "none" && a.easternNeighbourArea != "" && a.easternNeighbourArea != "None")
+                            {
+                                NeighbourSE = a.easternNeighbourArea;
+                            }
+
+                            if (a.westernNeighbourArea != "none" && a.westernNeighbourArea != "" && a.westernNeighbourArea != "None")
+                            {
+                                NeighbourSW = a.westernNeighbourArea;
+                            }
+                        }
+
+                        if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                        {
+                            if (a.northernNeighbourArea != "none" && a.northernNeighbourArea != "" && a.northernNeighbourArea != "None")
+                            {
+                                NeighbourNW = a.northernNeighbourArea;
+                            }
+
+                            if (a.southernNeighbourArea != "none" && a.southernNeighbourArea != "" && a.southernNeighbourArea != "None")
+                            {
+                                NeighbourSW = a.southernNeighbourArea;
+                            }
+                        }
+                    }
+                }
+
+                //wolfwood12
+                //might disable this reset of positions?
+                //only disable for movers, just in case
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    if (a.Filename == gv.mod.currentArea.easternNeighbourArea || a.Filename == gv.mod.currentArea.westernNeighbourArea || a.Filename == gv.mod.currentArea.northernNeighbourArea || a.Filename == gv.mod.currentArea.southernNeighbourArea || a.Filename == NeighbourNE || a.Filename == NeighbourNW || a.Filename == NeighbourSE || a.Filename == NeighbourSW)
+                    {
+                        for (int i = a.Props.Count - 1; i >= 0; i--)
+                        {
+                            //ouside bretahing world this affects all props
+                            //insde breathing world this affects only the non-movers
+                            //if (!gv.mod.isBreathingWorld || !a.Props[i].isMover)
+                            //{
+                            //clear the lists with pixel destination coordinates of props
+                            //suspect1
+
+                            //diagdebug
+                            //if (a.Filename == "Outdoor_16")
+                            //{
+                            //int fsdsdas = 1;
+                            //}
+                            a.Props[i].destinationPixelPositionXList.Clear();
+                            a.Props[i].destinationPixelPositionXList = new List<int>();
+                            a.Props[i].destinationPixelPositionYList.Clear();
+                            a.Props[i].destinationPixelPositionYList = new List<int>();
+                            a.Props[i].pixelMoveSpeed = 1;
+
+                            //we need to use modified x and y posiitons
+                            int modX = 0;
+                            int modY = 0;
+
+                            if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                            {
+                                modX = a.Props[i].LocationX;
+                                //modY = a.Props[i].LocationY - (gv.mod.currentArea.MapSizeY - gv.mod.PlayerLocationY);
+                                //modY = a.Props[i].LocationY - (gv.mod.currentArea.MapSizeY - gv.mod.PlayerLocationY);
+                                modY = a.Props[i].LocationY - a.MapSizeY;
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                            {
+                                modX = a.Props[i].LocationX;
+                                modY = a.Props[i].LocationY + a.MapSizeY;
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                            {
+                                modY = a.Props[i].LocationY;
+                                //modY = a.Props[i].LocationY - (gv.mod.currentArea.MapSizeY - gv.mod.PlayerLocationY);
+                                //modY = a.Props[i].LocationY - (gv.mod.currentArea.MapSizeY - gv.mod.PlayerLocationY);
+                                modX = a.Props[i].LocationX - a.MapSizeX;
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                            {
+                                modY = a.Props[i].LocationY;
+                                modX = a.Props[i].LocationX + a.MapSizeX;
+                            }
+
+                            if (a.Filename == NeighbourNE)
+                            {
+                                modY = a.Props[i].LocationY - a.MapSizeY;
+                                modX = a.Props[i].LocationX + a.MapSizeX;
+                            }
+
+                            if (a.Filename == NeighbourNW)
+                            {
+                                modY = a.Props[i].LocationY - a.MapSizeY;
+                                modX = a.Props[i].LocationX - a.MapSizeX;
+                            }
+                            if (a.Filename == NeighbourSE)
+                            {
+                                modY = a.Props[i].LocationY + a.MapSizeY;
+                                modX = a.Props[i].LocationX + a.MapSizeX;
+                            }
+                            if (a.Filename == NeighbourSW)
+                            {
+                                modY = a.Props[i].LocationY + a.MapSizeY;
+                                modX = a.Props[i].LocationX - a.MapSizeX;
+                            }
+                            //hooray
+
+                            //a.Props[i].LocationY
+                            //set the currentPixel position of the props
+                            int xOffSetInSquares = modX - gv.mod.PlayerLocationX;
+                            int yOffSetInSquares = modY - gv.mod.PlayerLocationY;
+                            int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
+                            int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
+
+                            a.Props[i].currentPixelPositionX = playerPositionXInPix + (xOffSetInSquares * gv.squareSize);
+                            a.Props[i].currentPixelPositionY = playerPositionYInPix + (yOffSetInSquares * gv.squareSize);
+
+                            //}
+                        }
+                    }
+                }
+
+                string method = "leader";
+                foreach (Trait t in gv.mod.moduleTraitsList)
+                {
+                    if (t.tag.Contains(gv.mod.tagOfMovementSpeedTrait))
+                    {
+                        method = t.methodOfChecking;
+                    }
+                }
+                int speed = gv.cc.getTraitPower(gv.mod.tagOfMovementSpeedTrait, method);
+                speed += gv.mod.vehicleAdditionalSpeed;
+
+                if (gv.mod.absoluteVehicleSpeed != 0)
+                {
+                    speed = gv.mod.absoluteVehicleSpeed;
+                }
+
+                speed += gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].speedModifier;
+
+                gv.mod.partySpeed = speed;
+
+                if (gv.mod.partyIsSearching)
+                {
+                    gv.mod.partySpeed = 0;
+                }
+
+                //set gv.mod.timePerStepAfterSpeedCalc based on area setting and gv.mod.partySpeed
+
+                if (gv.mod.partySpeed < 5)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = gv.mod.currentArea.TimePerSquare;
+                }
+                else if (gv.mod.partySpeed >= 5 && gv.mod.partySpeed <= 9)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 9) / 10;
+                }
+                else if (gv.mod.partySpeed >= 10 && gv.mod.partySpeed <= 14)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 8) / 10;
+                }
+                else if (gv.mod.partySpeed >= 15 && gv.mod.partySpeed <= 19)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 7) / 10;
+                }
+                else if (gv.mod.partySpeed >= 20 && gv.mod.partySpeed <= 24)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 6) / 10;
+                }
+                else if (gv.mod.partySpeed >= 25 && gv.mod.partySpeed <= 29)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 5) / 10;
+                }
+                else if (gv.mod.partySpeed >= 30 && gv.mod.partySpeed <= 34)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 4) / 10;
+                }
+                else if (gv.mod.partySpeed >= 35)
+                {
+                    gv.mod.timePerStepAfterSpeedCalc = (gv.mod.currentArea.TimePerSquare * 3) / 10;
+                }
+
+                gv.mod.realTimeTimerStopped = false;
+                gv.screenCombat.allDone = false;
+                foreach (GlobalInt g in gv.mod.moduleGlobalInts)
+                {
+                    if (g.Key.Contains("AutomaticCountDown") && !gv.mod.currentArea.isOverviewMap)
+                    {
+                        if (g.Value > 0)
+                        {
+                            g.Value -= gv.mod.timePerStepAfterSpeedCalc;
+                        }
+                    }
+                }
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                //two checks on update function: 1. Respawn check (adds back to areas prop lsit from propsWaitingForRespawn) and 2. faction limit check (sets is isAcive and isShown)
+
+                //add another third check (afterwards) to doupdate that kills off props whose master is on propsWaitingForRespawn (has been killed)
+
+                //on worldtim emethod for each prop in propsWaitingForRespawn the wait time is increased accordingly 
+
+                //here (doPropTriggers, deletepropwhenenciunteriswon): add killed - respawing props, when max number of respawn is not reached - to the new list <prop> propsWaitingForRespawn list of module
+                //this is done regardless of master death (Can change: master respawn) or min-max faction strength requirement (faction strength changes all the time)
+
+                //props are only returned from propsWaitingForRespawn (during respawn check on doupdate) when:
+                //1. respawn time is reached AND
+                //2. target square on home area can be found (free or look for sqaure around it) AND
+                //3. master lives: lives means is himself in prop list (not killed) and also isActive
+                //upon retun the props wait time is set to zero again
+
+                //isActive and isShown are set to false for props outside faction strength min max (called: faction limit check)
+                //and to true if inside, check on every update (faction limit check)
+                //this means they can respawn when outside faction str min max, but will do so inactive
+
+                //question: do respawn for current map or for all maps? Pending! Best for all areas (both respawn and faction limit check), so world time driven movers work with the system
+
+                //grant cretaures a faction property, too, and implement system for buffs and debuffs based on the relevant faction'sstrength
+                //maybe use effect system for this and make it all configurable in the faction editor
+
+
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                Area tempLand = new Area();
+                //1. respawn check XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                for (int i = gv.mod.propsWaitingForRespawn.Count - 1; i >= 0; i--)
+                {
+                    if ((gv.mod.propsWaitingForRespawn[i].respawnTimeInHours * 60) <= gv.mod.propsWaitingForRespawn[i].respawnTimeInMinutesPassedAlready && (gv.mod.propsWaitingForRespawn[i].spawnArea != null))
+                    {
+                        //remember setting time to zero if successful
+                        bool noObstruction = true;
+                        bool masterLives = false;
+                        //find the rae that the props has to be respawned in
+                        foreach (Area a in gv.mod.moduleAreasObjects)
+                        {
+                            if (a.Filename == gv.mod.propsWaitingForRespawn[i].spawnArea && gv.mod.propsWaitingForRespawn[i].spawnArea != "none" && gv.mod.propsWaitingForRespawn[i].spawnArea != "")
+                            {
+                                tempLand = a;
+                                //is other prop blocking the location? Also does master live?
+                                foreach (Prop blockerP in a.Props)
+                                {
+                                    //obstruction
+                                    if (blockerP.LocationX == gv.mod.propsWaitingForRespawn[i].LocationX && blockerP.LocationY == gv.mod.propsWaitingForRespawn[i].LocationY)
+                                    {
+                                        if (blockerP.isMover || blockerP.HasCollision)
+                                        {
+                                            noObstruction = false;
+                                        }
+                                    }
+
+                                    //master
+                                    if (gv.mod.propsWaitingForRespawn[i].thisPropsMaster != null)
+                                    {
+                                        if (blockerP.nameAsMaster == gv.mod.propsWaitingForRespawn[i].thisPropsMaster)
+                                        {
+                                            if (blockerP.isActive)
+                                            {
+                                                masterLives = true;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //is tile not walkable?
+                                if (!a.Tiles[gv.mod.propsWaitingForRespawn[i].LocationY * a.MapSizeX + gv.mod.propsWaitingForRespawn[i].LocationX].Walkable)
+                                {
+                                    noObstruction = false;
+                                }
+
+                                //is party on location?
+                                if ((gv.mod.PlayerLocationX == gv.mod.propsWaitingForRespawn[i].LocationX) && (gv.mod.PlayerLocationY == gv.mod.propsWaitingForRespawn[i].LocationY))
+                                {
+                                    noObstruction = false;
+                                }
+
+                            }
+                        }//end of area loop
+
+                        if (gv.mod.propsWaitingForRespawn[i].thisPropsMaster == null || gv.mod.propsWaitingForRespawn[i].thisPropsMaster == "" || gv.mod.propsWaitingForRespawn[i].thisPropsMaster == "none")
+                        {
+                            masterLives = true;
+                        }
+
+                        if (noObstruction && masterLives)
+                        {
+                            //todo reset more proeprties?
+                            gv.mod.propsWaitingForRespawn[i].wasKilled = false;
+
+                            gv.mod.propsWaitingForRespawn[i].respawnTimeInMinutesPassedAlready = 0;
+                            gv.mod.propsWaitingForRespawn[i].numberOfRespawnsThatHappenedAlready++;
+
+                            gv.mod.propsWaitingForRespawn[i].LocationX = gv.mod.propsWaitingForRespawn[i].spawnLocationX;
+                            gv.mod.propsWaitingForRespawn[i].LocationY = gv.mod.propsWaitingForRespawn[i].spawnLocationY;
+                            gv.mod.propsWaitingForRespawn[i].LocationZ = gv.mod.propsWaitingForRespawn[i].spawnLocationZ;
+                            gv.mod.propsWaitingForRespawn[i].lastLocationX = gv.mod.propsWaitingForRespawn[i].spawnLocationX;
+                            gv.mod.propsWaitingForRespawn[i].lastLocationY = gv.mod.propsWaitingForRespawn[i].spawnLocationY;
+                            gv.mod.propsWaitingForRespawn[i].lastLocationZ = gv.mod.propsWaitingForRespawn[i].spawnLocationZ;
+                            gv.mod.propsWaitingForRespawn[i].priorLastLocationX = gv.mod.propsWaitingForRespawn[i].spawnLocationX;
+                            gv.mod.propsWaitingForRespawn[i].priorLastLocationY = gv.mod.propsWaitingForRespawn[i].spawnLocationY;
+                            gv.mod.propsWaitingForRespawn[i].WayPointListCurrentIndex = 0;
+                            gv.mod.propsWaitingForRespawn[i].CurrentMoveToTarget = new Coordinate(0, 0);
+                            gv.mod.propsWaitingForRespawn[i].isCurrentlyChasing = false;
+                            gv.mod.propsWaitingForRespawn[i].ChaserStartChasingTime = 0;
+                            gv.mod.propsWaitingForRespawn[i].ReturningToPost = false;
+                            gv.mod.propsWaitingForRespawn[i].passOneMove = false;
+                            gv.mod.propsWaitingForRespawn[i].randomMoverTimerForNextTarget = 0;
+                            gv.mod.propsWaitingForRespawn[i].lengthOfLastPath = 0;
+                            gv.mod.propsWaitingForRespawn[i].wasTriggeredLastUpdate = false;
+                            gv.mod.propsWaitingForRespawn[i].destinationPixelPositionXList.Clear();
+                            gv.mod.propsWaitingForRespawn[i].destinationPixelPositionYList.Clear();
+                            gv.mod.propsWaitingForRespawn[i].currentPixelPositionX = 0;
+                            gv.mod.propsWaitingForRespawn[i].currentPixelPositionY = 0;
+                            gv.mod.propsWaitingForRespawn[i].inactiveTimer = 0;
+                            gv.mod.propsWaitingForRespawn[i].currentFrameNumber = 0;
+                            gv.mod.propsWaitingForRespawn[i].animationDelayCounter = 0;
+                            gv.mod.propsWaitingForRespawn[i].updateTicksNeededTillNextFrame = 0;
+                            gv.mod.propsWaitingForRespawn[i].animationComplete = false;
+                            gv.mod.propsWaitingForRespawn[i].normalizedTime = 0;
+                            gv.mod.propsWaitingForRespawn[i].cycleCounter = 0;
+
+                            //gv.cc.DisposeOfBitmap(ref gv.mod.propsWaitingForRespawn[i].token);
+                            //gv.mod.propsWaitingForRespawn[i].token = gv.cc.LoadBitmap(gv.mod.propsWaitingForRespawn[i].ImageFileName);
+
+                            //factionsystem
+                            if (gv.mod.propsWaitingForRespawn[i].factionTag != null && gv.mod.propsWaitingForRespawn[i].factionTag != "" && gv.mod.propsWaitingForRespawn[i].factionTag != "none")
+                            {
+                                foreach (Faction f in gv.mod.moduleFactionsList)
+                                {
+                                    if (f.tag == gv.mod.propsWaitingForRespawn[i].factionTag)
+                                    {
+                                        if (gv.mod.propsWaitingForRespawn[i].requiredFactionStrength <= f.strength && gv.mod.propsWaitingForRespawn[i].maxFactionStrength >= f.strength)
+                                        {
+                                            gv.mod.propsWaitingForRespawn[i].isActive = true;
+                                            gv.mod.propsWaitingForRespawn[i].isShown = true;
+                                            if (gv.mod.propsWaitingForRespawn[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != null && gv.mod.propsWaitingForRespawn[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                                            {
+
+                                                gv.sf.SetGlobalInt(gv.mod.propsWaitingForRespawn[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "0");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            gv.mod.propsWaitingForRespawn[i].isActive = false;
+                                            gv.mod.propsWaitingForRespawn[i].isShown = false;
+                                            if (gv.mod.propsWaitingForRespawn[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != null && gv.mod.propsWaitingForRespawn[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                                            {
+                                                gv.sf.SetGlobalInt(gv.mod.propsWaitingForRespawn[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                                            }
+                                            gv.mod.propsWaitingForRespawn[i].pendingFactionStrengthEffectReversal = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (gv.mod.propsWaitingForRespawn[i].isActive && gv.mod.propsWaitingForRespawn[i].isShown)
+                            {
+                                gv.mod.propsWaitingForRespawn[i].pendingFactionStrengthEffectReversal = false;
+                                foreach (Faction f in gv.mod.moduleFactionsList)
+                                {
+                                    if (f.tag == gv.mod.propsWaitingForRespawn[i].factionTag)
+                                    {
+                                        f.strength += gv.mod.propsWaitingForRespawn[i].worthForOwnFaction;
+                                    }
+                                    if (f.tag == gv.mod.propsWaitingForRespawn[i].otherFactionAffectedOnDeath1)
+                                    {
+                                        f.strength -= gv.mod.propsWaitingForRespawn[i].effectOnOtherFactionOnDeath1;
+                                    }
+                                    if (f.tag == gv.mod.propsWaitingForRespawn[i].otherFactionAffectedOnDeath2)
+                                    {
+                                        f.strength -= gv.mod.propsWaitingForRespawn[i].effectOnOtherFactionOnDeath2;
+                                    }
+                                    if (f.tag == gv.mod.propsWaitingForRespawn[i].otherFactionAffectedOnDeath3)
+                                    {
+                                        f.strength -= gv.mod.propsWaitingForRespawn[i].effectOnOtherFactionOnDeath3;
+                                    }
+                                    if (f.tag == gv.mod.propsWaitingForRespawn[i].otherFactionAffectedOnDeath4)
+                                    {
+                                        f.strength -= gv.mod.propsWaitingForRespawn[i].effectOnOtherFactionOnDeath4;
+                                    }
+                                }
+                            }
+
+                            tempLand.Props.Add(gv.mod.propsWaitingForRespawn[i]);
+                            gv.mod.propsWaitingForRespawn.Remove(gv.mod.propsWaitingForRespawn[i]);
+
+                        }
+                    }
+                }
+
+                //2. faction system XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    foreach (Prop p in a.Props)
+                    {
+                        //drop out because of faction requirements
+                        if (p.factionTag != null && p.factionTag != "" && p.factionTag != "none")
+                        {
+                            foreach (Faction f in gv.mod.moduleFactionsList)
+                            {
+                                if (f.tag == p.factionTag)
+                                {
+                                    if (p.requiredFactionStrength <= f.strength && p.maxFactionStrength >= f.strength)
+                                    {
+                                        p.isActive = true;
+                                        p.isShown = true;
+                                        if (p.keyOfGlobalVarToSetTo1OnDeathOrInactivity != null && p.keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                                        {
+                                            gv.sf.SetGlobalInt(p.keyOfGlobalVarToSetTo1OnDeathOrInactivity, "0");
+                                        }
+
+                                        if (p.pendingFactionStrengthEffectReversal)
+                                        {
+                                            p.pendingFactionStrengthEffectReversal = false;
+                                            foreach (Faction f2 in gv.mod.moduleFactionsList)
+                                            {
+                                                if (f2.tag == p.factionTag)
+                                                {
+                                                    f2.strength += p.worthForOwnFaction;
+                                                }
+                                                if (f2.tag == p.otherFactionAffectedOnDeath1)
+                                                {
+                                                    f2.strength -= p.effectOnOtherFactionOnDeath1;
+                                                }
+                                                if (f2.tag == p.otherFactionAffectedOnDeath2)
+                                                {
+                                                    f2.strength -= p.effectOnOtherFactionOnDeath2;
+                                                }
+                                                if (f2.tag == p.otherFactionAffectedOnDeath3)
+                                                {
+                                                    f2.strength -= p.effectOnOtherFactionOnDeath3;
+                                                }
+                                                if (f2.tag == p.otherFactionAffectedOnDeath4)
+                                                {
+                                                    f2.strength -= p.effectOnOtherFactionOnDeath4;
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        p.isActive = false;
+                                        p.isShown = false;
+                                        if (p.keyOfGlobalVarToSetTo1OnDeathOrInactivity != null && p.keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                                        {
+                                            gv.sf.SetGlobalInt(p.keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        //make inactive because master of this prop is incative?
+                        //Not needed, as one can simply set min and max faction strength requirements the same as for the master
+                    }
+                }
+
+                //3. kill if master has been slain dead (instant ones) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    for (int i = a.Props.Count - 1; i >= 0; i--)
+                    {
+                        //check for killing
+                        if (a.Props[i].instantDeathOnMasterDeath)
+                        {
+                            bool masterIsGone = true;
+                            bool breakInnerAreaLoop = false;
+                            //to do: is master gone?
+                            foreach (Area a2 in gv.mod.moduleAreasObjects)
+                            {
+                                foreach (Prop deadMaster in a2.Props)
+                                {
+                                    if (deadMaster.nameAsMaster == a.Props[i].thisPropsMaster)
+                                    {
+                                        masterIsGone = false;
+                                        breakInnerAreaLoop = true;
+                                        break;
+                                    }
+                                }
+                                if (breakInnerAreaLoop)
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (masterIsGone)
+                            {
+                                //add to respawn if posisble
+                                if ((a.Props[i].respawnTimeInHours > 0) && ((a.Props[i].numberOfRespawnsThatHappenedAlready < a.Props[i].maxNumberOfRespawns) || (a.Props[i].maxNumberOfRespawns == -1)))
+                                {
+                                    if (a.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != null && a.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                                    {
+                                        gv.sf.SetGlobalInt(a.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                                    }
+                                    gv.mod.propsWaitingForRespawn.Add(a.Props[i]);
+
+                                }
+
+                                //to kill effect
+                                foreach (Faction f in gv.mod.moduleFactionsList)
+                                {
+                                    if (f.tag == a.Props[i].factionTag)
+                                    {
+                                        f.strength -= a.Props[i].worthForOwnFaction;
+                                    }
+                                    if (f.tag == a.Props[i].otherFactionAffectedOnDeath1)
+                                    {
+                                        f.strength += a.Props[i].effectOnOtherFactionOnDeath1;
+                                    }
+                                    if (f.tag == a.Props[i].otherFactionAffectedOnDeath2)
+                                    {
+                                        f.strength += a.Props[i].effectOnOtherFactionOnDeath2;
+                                    }
+                                    if (f.tag == a.Props[i].otherFactionAffectedOnDeath3)
+                                    {
+                                        f.strength += a.Props[i].effectOnOtherFactionOnDeath3;
+                                    }
+                                    if (f.tag == a.Props[i].otherFactionAffectedOnDeath4)
+                                    {
+                                        f.strength += a.Props[i].effectOnOtherFactionOnDeath4;
+                                    }
+                                }
+
+                                //remove frm its area list
+                                a.Props.Remove(a.Props[i]);
+                            }
+                        }
+                    }
+                }
+
+
+                //code for gcCheck, controlinng prop isActive and isShown -> eg night time only props
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    foreach (Prop p in a.Props)
+                    {
+                        bool availableForGcCheck = false;
+
+                        //is faction prop
+                        if (p.factionTag != null && p.factionTag != "" && p.factionTag != "none" && p.factionTag != "None")
+                        {
+                            //prop is in its faction strength window
+                            if (p.isActive && p.isShown)
+                            {
+                                availableForGcCheck = true;
+                            }
+                            else
+                            {
+                                availableForGcCheck = false;
+                            }
+                        }
+                        //no faction prop
+                        else
+                        {
+                            availableForGcCheck = true;
+                        }
+
+                        if (availableForGcCheck && (p.firstGcScriptName != "none" || p.secondGcScriptName != "none" || p.thirdGcScriptName != "none"))
+                        {
+                            gv.mod.currentPropTag = p.PropTag;
+                            bool firstConditionMet = false;
+                            bool secondConditionMet = false;
+                            bool thirdConditionMet = false;
+
+                            if (p.firstGcScriptName != null && p.firstGcScriptName != "none" && p.firstGcScriptName != "None")
+                            {
+                                gv.sf.gcController(p.firstGcScriptName, p.firstGcParm1, p.firstGcParm2, p.firstGcParm3, p.firstGcParm4);
+                                firstConditionMet = gv.mod.returnCheck;
+                                if (p.firstCheckForConditionFail)
+                                {
+                                    if (firstConditionMet)
+                                    {
+                                        firstConditionMet = false;
+                                    }
+                                    else
+                                    {
+                                        firstConditionMet = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                firstConditionMet = true;
+                            }
+
+                            if (p.secondGcScriptName != null && p.secondGcScriptName != "none" && p.secondGcScriptName != "None")
+                            {
+                                gv.sf.gcController(p.secondGcScriptName, p.secondGcParm1, p.secondGcParm2, p.secondGcParm3, p.secondGcParm4);
+                                secondConditionMet = gv.mod.returnCheck;
+                                if (p.secondCheckForConditionFail)
+                                {
+                                    if (secondConditionMet)
+                                    {
+                                        secondConditionMet = false;
+                                    }
+                                    else
+                                    {
+                                        secondConditionMet = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                secondConditionMet = true;
+                            }
+
+                            if (p.thirdGcScriptName != null && p.thirdGcScriptName != "none" && p.thirdGcScriptName != "None")
+                            {
+                                gv.sf.gcController(p.thirdGcScriptName, p.thirdGcParm1, p.thirdGcParm2, p.thirdGcParm3, p.thirdGcParm4);
+                                thirdConditionMet = gv.mod.returnCheck;
+                                if (p.thirdCheckForConditionFail)
+                                {
+                                    if (thirdConditionMet)
+                                    {
+                                        thirdConditionMet = false;
+                                    }
+                                    else
+                                    {
+                                        thirdConditionMet = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                thirdConditionMet = true;
+                            }
+
+                            //all conditions must be met
+                            if (p.allConditionsMustBeTrue)
+                            {
+                                if (firstConditionMet && secondConditionMet && thirdConditionMet)
+                                {
+                                    p.isActive = true;
+                                    p.isShown = true;
+                                }
+                                else
+                                {
+                                    p.isActive = false;
+                                    p.isShown = false;
+                                }
+                            }
+                            //meeting one condiion is enough
+                            else
+                            {
+                                if (firstConditionMet || secondConditionMet || thirdConditionMet)
+                                {
+                                    p.isActive = true;
+                                    p.isShown = true;
+                                }
+                                else
+                                {
+                                    p.isActive = false;
+                                    p.isShown = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                gv.realTimeTimerMilliSecondsEllapsed = 0;
+                //wolfwood
+                //gv.screenMainMap.updateTraitsPanel();
+                handleRationsAndLightSources();
+                //setBridgeStateForMovingProps();
+                gv.mod.EncounterOfTurnDone = false;
+                setToBorderPixDistancesMainMap();
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                /*
+                if (gv.mod.useAllTileSystem)
+                {
+                    resetLightAndDarkness();
+                }
+                */
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                gv.screenMainMap.setExplored();
+                gv.screenMainMap.setExploredForConnectedDiscoveryTriggers();
+
+                #region tile loading on demand
+
+                if (gv.mod.useAllTileSystem)
+                {
+                    //addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+
+                    /*
+                    //if (gv.mod.loadedTileBitmaps.Count > 1500 && gv.mod.calledByRealTimeTimer)
+                    if (gv.mod.loadedTileBitmaps.Count > 650)
+                    {
+                        int cullNumber = gv.mod.loadedTileBitmaps.Count - 650;
+                        //addLogText("white", cullNumber.ToString());
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+
+
+
+
+
+
+
+
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    //gv.mod.loadedTileBitmaps[i].Dispose();
+                                    //gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                    //gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    //if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    //{
+                                    gv.mod.loadedTileBitmaps[0].Dispose();
+                                    gv.mod.loadedTileBitmaps.RemoveAt(0);
+                                    gv.mod.loadedTileBitmapsNames.RemoveAt(0);
+                                    //}
+                                    //else
+                                    //{
+                                    //cullNumber++;
+                                    //}
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+                                }
 
                             }
 
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
                         }
-                        //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            gv.sf.MessageBox("Karl Error 112End");
+                            int i = 10;
+                        }
+
                     }
-                    catch
+
+                    //850
+                    if (gv.mod.loadedTileBitmaps.Count > 3000)
                     {
-                        //addLogText("red", "caught error");
+
+                        int cullNumber = gv.mod.loadedTileBitmaps.Count - 500;
+
+                        addLogText("white", cullNumber.ToString());
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    //gv.mod.loadedTileBitmaps[i].Dispose();
+                                    //gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                    //gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    //if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    //{
+                                    gv.mod.loadedTileBitmaps[0].Dispose();
+                                    gv.mod.loadedTileBitmaps.RemoveAt(0);
+                                    gv.mod.loadedTileBitmapsNames.RemoveAt(0);
+                                    //}
+                                    //else
+                                    //{
+                                    //cullNumber++;
+                                    //}
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+                                }
+
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        }
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            gv.sf.MessageBox("Karl Error 113End");
+                            int i = 10;
+                        }
+                    }
+                    */
+
+                    /*
+                    //*********************************************
+                    if (gv.mod.loadedTileBitmaps.Count < 500)
+                    {
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", "No Culling");
+                        }
+                    }
+                    else
+                    //if (gv.mod.loadedTileBitmaps.Count > 500)
+                    {
+                        //addLogText("yellow", "Disposing tiles.");
+                        //divided by 10
+                        //gut 10
+                        int cullNumber = (gv.mod.loadedTileBitmaps.Count - 500) / 100 + 2;
+                        if (gv.mod.loadedTileBitmaps.Count > 1000)
+                        {
+                            cullNumber += 3;
+                        }
+                        if (gv.mod.loadedTileBitmaps.Count > 1500)
+                        {
+                            cullNumber += 4;
+                        }
+                        if (gv.mod.loadedTileBitmaps.Count > 2000)
+                        {
+                            cullNumber += 5;
+                        }
+                        if (gv.mod.loadedTileBitmaps.Count > 2500)
+                        {
+                            cullNumber += 6;
+                        }
+                        if (gv.mod.loadedTileBitmaps.Count > 3000)
+                        {
+                            cullNumber += 7;
+                        }
+                        if (gv.mod.loadedTileBitmaps.Count > 3500)
+                        {
+                            cullNumber += 8;
+                        }
+                        if (gv.mod.loadedTileBitmaps.Count > 4000)
+                        {
+                            cullNumber += 9;
+                        }
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", cullNumber.ToString());
+                        }
+                        //int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 15) + 2);
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    //gv.mod.loadedTileBitmaps[i].Dispose();
+                                    //gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                    //gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    {
+                                        gv.mod.loadedTileBitmaps[i].Dispose();
+                                        gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                        gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    }
+                                    else
+                                    {
+                                        cullNumber++;
+                                    }
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+
+                                }
+
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        }
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            int i = 10;
+                        }
+                    }
+                    */
+                    //**************************************************
+                    /* remove end
+                    if (gv.mod.loadedTileBitmaps.Count > 2500)
+                    {
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", "All Culled");
+                        }
+                        try
+                        {
+                            foreach (Bitmap bm in gv.mod.loadedTileBitmaps)
+                            {
+                                bm.Dispose();
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corrsponds with a name in the other
+                            gv.mod.loadedTileBitmaps.Clear();
+                            gv.mod.loadedTileBitmapsNames.Clear();
+                        }
+                        catch
+                        {
+                            int i = 10;
+                        }
+
+
+                    }
+                    //250
+                    //gut 1000
+                    if (gv.mod.loadedTileBitmaps.Count < 750)
+                    {
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", "No Culling");
+                        }
+                    }
+                    else if (gv.mod.loadedTileBitmaps.Count < 1000)
+                    //if (gv.mod.loadedTileBitmaps.Count > 500)
+                    {
+                        //addLogText("yellow", "Disposing tiles.");
+                        //divided by 10
+                        //gut 10
+                        int cullNumber = ((90 / 15) + 2);
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", cullNumber.ToString());
+                        }
+                        //int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 15) + 2);
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    //gv.mod.loadedTileBitmaps[i].Dispose();
+                                    //gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                    //gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    {
+                                        gv.mod.loadedTileBitmaps[i].Dispose();
+                                        gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                        gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    }
+                                    else
+                                    {
+                                        cullNumber++;
+                                    }
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+
+                                }
+
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        }
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            int i = 10;
+                        }
+                    }
+                    else if (gv.mod.loadedTileBitmaps.Count < 1500)
+                    //if (gv.mod.loadedTileBitmaps.Count > 500)
+                    {
+                        //addLogText("yellow", "Disposing tiles.");
+                        //divided by 10
+                        //gut 10
+                        int cullNumber = ((150 / 15) + 2);
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", cullNumber.ToString());
+                        }
+                        //int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 15) + 2);
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    //sebastian
+                                    if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    {
+                                        gv.mod.loadedTileBitmaps[i].Dispose();
+                                        gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                        gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    }
+                                    else
+                                    {
+                                        cullNumber++;
+                                    }
+
+
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+
+                                }
+
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        }
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            int i = 10;
+                        }
+                    }
+
+                    else if (gv.mod.loadedTileBitmaps.Count < 2000)
+                        //if (gv.mod.loadedTileBitmaps.Count > 500)
+                    {
+                        //addLogText("yellow", "Disposing tiles.");
+                        //divided by 10
+                        //gut 10
+                        int cullNumber = ((250 / 15) + 2);
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", cullNumber.ToString());
+                        }
+                        //int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 15) + 2);
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    {
+                                        gv.mod.loadedTileBitmaps[i].Dispose();
+                                        gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                        gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    }
+                                    else
+                                    {
+                                        cullNumber++;
+                                    }
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+
+                                }
+
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        }
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            int i = 10;
+                        }
+                    }
+
+                    else if (gv.mod.loadedTileBitmaps.Count < 2500)
+                    //if (gv.mod.loadedTileBitmaps.Count > 500)
+                    {
+                        //addLogText("yellow", "Disposing tiles.");
+                        //divided by 10
+                        //gut 10
+                        int cullNumber = ((400 / 15) + 2);
+                        //if (gv.mod.debugMode)
+                        {
+                            addLogText("white", gv.mod.loadedTileBitmaps.Count.ToString());
+                            addLogText("white", cullNumber.ToString());
+                        }
+                        //int cullNumber = ((gv.mod.loadedTileBitmaps.Count / 15) + 2);
+                        try
+                        {
+                            if (gv.mod.loadedTileBitmaps != null)
+                            {
+                                //remove 12 entries per move, 3 more than usual 9 squares uncovered
+                                for (int i = 0; i < cullNumber; i++)
+                                {
+                                    if (!gv.mod.bmpNearbyNameList.Contains(gv.mod.loadedTileBitmapsNames[i]))
+                                    {
+                                        gv.mod.loadedTileBitmaps[i].Dispose();
+                                        gv.mod.loadedTileBitmaps.RemoveAt(i);
+                                        gv.mod.loadedTileBitmapsNames.RemoveAt(i);
+                                    }
+                                    else
+                                    {
+                                        cullNumber++;
+                                    }
+
+                                    //addLogText("red", "Removal Counter is:" + i.ToString());
+
+                                }
+
+                            }
+
+                            //these two lists keep an exact order so each bitmap stored in one corresponds with a name in the other
+                        }
+                        catch
+                        {
+                            //addLogText("red", "caught error");
+                            int i = 10;
+                        }
+                    }
+
+                    //addLogText("red", "number of tiles in cache, after cull:" + gv.mod.loadedTileBitmaps.Count);
+                    //normal cleanup while moving
+                    //restoreold
+
+                //put end here
+                */
+                }
+
+                #endregion
+
+                //reset the timer interval, important for synching with party move
+                if (gv.mod.useRealTimeTimer == true)
+                {
+                    //gv.realTimeTimer.Stop();
+                    //gv.realTimeTimer.Start();
+                }
+
+                //in case whole party is unconscious and bleeding, end the game (outside combat here)
+                bool endGame = true;
+                foreach (Player pc in gv.mod.playerList)
+                {
+                    if (pc.hp >= 0)
+                    {
+                        endGame = false;
+                        break;
+                    }
+                }
+
+                if (endGame == true)
+                {
+                    gv.resetGame();
+                    gv.screenType = "title";
+                    gv.sf.MessageBox("Everybody is unconscious and bleeding - your party has been defeated!");
+                    return;
+                }
+                /*
+                #region handling chances for full screen animation effects, edit: for all 10 channels now
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive1 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence1 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur1)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive2 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence2 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur2)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive3 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence3 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur3)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive4 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence4 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur4)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive5 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence5 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur5)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive6 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence6 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur6)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive7 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence7 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur7)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive8 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence8 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur8)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive9 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence9 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur9)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive10 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence10 != 0))
+                            {
+                                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur10)
+                                {
+                                    gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 1)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 2)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 3)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 4)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 5)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 6)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 7)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 8)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 9)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
+                                    }
+                                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 10)
+                                    {
+                                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                                    }
+                                }
+                            }
+                #endregion
+                  */
+                //CLEAN UP START SCREENS IF DONE WITH THEM
+                if (gv.screenLauncher != null)
+                {
+                    gv.screenLauncher = null;
+                    gv.screenPartyBuild = null;
+                    gv.screenPcCreation = null;
+                    gv.screenTitle = null;
+                }
+
+                if ((gv.mod.PlayerLocationX != gv.mod.arrivalSquareX) || (gv.mod.PlayerLocationY != gv.mod.arrivalSquareY))
+                {
+                    gv.mod.justTransitioned = false;
+                    gv.mod.justTransitioned2 = false;
+                    gv.mod.arrivalSquareX = 1000000;
+                    gv.mod.arrivalSquareY = 1000000;
+                }
+
+
+                gv.sf.dsWorldTime();
+                //IBScript Module heartbeat
+                gv.cc.doIBScriptBasedOnFilename(gv.mod.OnHeartBeatIBScript, gv.mod.OnHeartBeatIBScriptParms);
+                //IBScript Area heartbeat
+                gv.cc.doIBScriptBasedOnFilename(gv.mod.currentArea.OnHeartBeatIBScript, gv.mod.currentArea.OnHeartBeatIBScriptParms);
+                //apply effects
+                applyEffects();
+                //do Prop heartbeat
+                doPropHeartBeat();
+                //script hook for the weather script (channels 5 to 10) 
+                if (gv.mod.currentArea.areaWeatherName != "")
+                {
+                    doWeather();
+                }
+                //script hook for full screen effects on channels 1 to 4 (also called in doTransitionBasedOnAreaLocation)
+                doChannelScripts();
+                //do weather sounds
+                if (gv.mod.currentArea.areaWeatherName != "")
+                {
+                    doWeatherSound();
+                }
+
+                blockSecondPropTriggersCall = false;
+                //do Conversation and/or Encounter if on Prop (check before props move)
+                gv.triggerPropIndex = 0;
+                gv.triggerIndex = 0;
+
+                //enter code for stealthing props here; using their isVisible state (might be buggy as sued in otehr contexts a lot)
+                //do a compaartive roll between  spot enemy skill of party and steath value of prop (use taht as dc number, so make it 10 higher than expected party spot enemy skill)?
+                //stealtehd prop will be invisbel this way, but can stioll ahrm the party, move, trigger interaction etc.
+                //use stealth value -*1 for no participation in stealth system, ie always visible
+                //dont forget to this properly for neighbouring maps
+                // doPropStealth();
+
+                //scrollingWystem: removed one line below
+                if (gv.mod.useScrollingSystem)
+                {
+                    if (gv.mod.doTriggerInspiteOfScrolling)
+                    {
+                        if (gv.screenType == "main")
+                        {
+                            doPropTriggers();
+                        }
+                    }
+                }
+                else
+                {
+                    doPropTriggers();
+                }
+
+                //move any props that are active and only if they are not on the party location
+                //anatomy
+                doPropTriggersMovers();
+                if (!gv.mod.isBreathingWorld)
+                {
+                    doPropMoves();
+                }
+                else
+                {
+                    doPropMovesNearby();
+                }
+
+                //if (gv.mod.PlayerLocationX != gv.mod.PlayerLastLocationX || gv.mod.PlayerLocationY != gv.mod.PlayerLastLocationY)
+                //{
+                //doPropTriggersMovers();
+                //}
+
+                foreach (Prop p in gv.mod.currentArea.Props)
+                {
+                    p.moved2 = false;
+                }
+
+                if (gv.mod.useAllTileSystem)
+                {
+                    if (!gv.mod.useScrollingSystem || !gv.mod.partyLightOn)
+                    {
+                        resetLightAndDarkness();
+                    }
+                }
+
+                //set illumination level of tiles based on party and prop position
+                if (gv.mod.useAllTileSystem)
+                {
+                    if (gv.mod.useScrollingSystem)
+                    {
+                        consumePartyLightEnergy();
+                    }
+                    if (!gv.mod.useScrollingSystem || !gv.mod.partyLightOn)
+                    {
+                        doIllumination();
+                    }
+                }
+
+                //doPropTriggers();
+
+                //move any props that are active and only if they are not on the party location
+                //doPropMoves();
+
+
+                doPropStealth();
+                //do Conversation and/or Encounter if on Prop (check after props move)
+
+                //scrollingSystem: removed 6 lines below
+                /*
+                if (!blockSecondPropTriggersCall)
+                {
+                    gv.triggerPropIndex = 0;
+                    gv.triggerIndex = 0;
+                    doPropTriggers();
+                }
+                */
+                //scrollingSystem: added 1 line below
+                /*
+                if (gv.mod.useScrollingSystem)
+                {
+                    while (gv.mod.isScrollingNow)
+                    {
+                        int i = 0;
+                        //halt update progress while scrolling
+                        //todo: stop real tiem timer?
                     }
                 }
                 */
-            }
-            #endregion
-
-            //reset the timer interval, important for synching with party move
-            if (gv.mod.useRealTimeTimer == true)
-            {
-                //gv.realTimeTimer.Stop();
-                //gv.realTimeTimer.Start();
-            }
-
-            //in case whole party is unconscious and bleeding, end the game (outside combat here)
-            bool endGame = true;
-            foreach (Player pc in gv.mod.playerList)
-            {
-                if (pc.hp >= 0)
+                if (!gv.mod.useScrollingSystem)
                 {
-                    endGame = false;
-                    break;
+                    doPropTriggers();
                 }
+
+
+                //move any  props that are active and only if they are not on the party location
+                //doPropMoves();
+
+                //check for levelup available and switch button image
+                checkLevelUpAvailable(); //move this to on update and use a plus overlay in top left
+                if (!gv.mod.calledByRealTimeTimer)
+                {
+                    adjustSpriteMainMapPositionToMakeItMoveIdependentlyFromPlayer();
+                }
+                //}
+                //gv.mod.blockMainKeyboard = false;
+
+                //mühlheim
+                //gv.previousTime2 = current2;
+
+
+                //if (gv.mod.scrollingTimer < 0)
+                //{
+
+                //}
+
             }
 
-            if (endGame == true)
+        }
+
+        //enter code for stealthing props here; using their isVisible state (might be buggy as sued in otehr contexts a lot)
+        //do a compaartive roll between  spot enemy skill of party and steath value of prop (use taht as dc number, so make it 10 higher than expected party spot enemy skill)?
+        //stealtehd prop will be invisbel this way, but can stioll ahrm the party, move, trigger interaction etc.
+        //use stealth value -*1 for no participation in stealth system, ie always visible
+        //dont forget to this properly for neighbouring maps
+
+        //Problem: diagonal neighbours- here and for the recent mosue over code  
+        //aegon
+        public void consumePartyLightEnergy()
+        {
+            int dawn = 5 * 60;
+            int sunrise = 6 * 60;
+            int day = 7 * 60;
+            int sunset = 17 * 60;
+            int dusk = 18 * 60;
+            int night = 20 * 60;
+            int time = gv.mod.WorldTime % 1440;
+
+            bool consumeLightEnergy = false;
+            if ((time >= dawn) && (time < sunrise))
             {
-                gv.resetGame();
-                gv.screenType = "title";
-                gv.sf.MessageBox("Everybody is unconscious and bleeding - your party has been defeated!");
-                return;
+                //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f / flickerReduction * flicker / 100f);
+                //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f);
+            }
+            else if ((time >= sunrise) && (time < day))
+            {
+                //gv.DrawBitmap(gv.cc.tint_sunrise, src, dst, 0, false, 1.0f);
+            }
+            else if ((time >= day) && (time < sunset))
+            {
+                //no tint for day
+            }
+            else if ((time >= sunset) && (time < dusk))
+            {
+                //gv.DrawBitmap(gv.cc.tint_sunset, src, dst, 0, false, 1.0f);
+            }
+            else if ((time >= dusk) && (time < night))
+            {
+                //gv.DrawBitmap(gv.cc.tint_dusk, src, dst, 0, false, 1.0f);
+            }
+            else if ((time >= night) || (time < dawn))
+            {
+                //berlin
+                consumeLightEnergy = true;
             }
 
-            #region handling chances for full screen animation effects, edit: for all 10 channels now
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive1 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence1 != 0))
+            if (!gv.mod.currentArea.UseDayNightCycle)
             {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur1)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel1 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
+                consumeLightEnergy = true;
             }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive2 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence2 != 0))
+
+            if (!gv.mod.currentArea.useLightSystem)
             {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur2)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel2 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
+                consumeLightEnergy = false;
             }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive3 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence3 != 0))
+
+            if (consumeLightEnergy && gv.mod.partyLightEnergyName.Count >= 1 && gv.mod.partyLightOn)
             {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur3)
+                for (int i = gv.mod.partyLightEnergyName.Count - 1; i >= 0; i--)
                 {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 1)
+                    if (gv.mod.partyLightEnergyName[i] == gv.mod.partyLightName)
                     {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel3 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
+                        if (gv.mod.partyLightEnergyUnitsLeft[i] > 0)
+                        {
+                            if (!gv.mod.currentArea.isOverviewMap)
+                            {
+                                gv.mod.partyLightEnergyUnitsLeft[i]--;
+                            }
+                            gv.mod.currentLightUnitsLeft = gv.mod.partyLightEnergyUnitsLeft[i];
+                        }
+                        else
+                        {
+                            foreach (ItemRefs it in gv.mod.partyInventoryRefsList)
+                            {
+                                if (it.name == gv.mod.partyLightName)
+                                {
+                                    if (it.quantity > 1)
+                                    {
+                                        if (!gv.mod.currentArea.isOverviewMap)
+                                        {
+                                            it.quantity--;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        gv.mod.partyInventoryRefsList.Remove(it);
+                                    }
+                                    break;
+                                }
+                            }
+
+                            gv.mod.partyLightEnergyName.RemoveAt(i);
+                            gv.mod.partyLightEnergyUnitsLeft.RemoveAt(i);
+                            gv.mod.partyLightOn = false;
+                            gv.mod.partyLightColor = "";
+                            gv.mod.partyLightName = "";
+                        }
                     }
                 }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive4 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence4 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur4)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel4 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-
-                }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive5 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence5 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur5)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel5 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive6 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence6 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur6)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel6 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive7 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence7 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur7)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel7 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive8 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence8 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur8)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel8 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive9 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence9 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur9)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel9 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
-            }
-            if ((gv.mod.currentArea.fullScreenEffectLayerIsActive10 == false) && (gv.mod.currentArea.numberOfCyclesPerOccurence10 != 0))
-            {
-                if (gv.sf.RandInt(100) < gv.mod.currentArea.fullScreenEffectChanceToOccur10)
-                {
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 1)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 2)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 3)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 4)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 5)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 6)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 7)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 8)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 9)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    }
-                    if (gv.mod.currentArea.activateTargetChannelInParallelToThisChannel10 == 10)
-                    {
-                        gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    }
-                }
-            }
-            #endregion
-           
-            //CLEAN UP START SCREENS IF DONE WITH THEM
-            if (gv.screenLauncher != null)
-            {
-                gv.screenLauncher = null;
-                gv.screenPartyBuild = null;
-                gv.screenPcCreation = null;
-                gv.screenTitle = null;
-            }
-
-            if ((gv.mod.PlayerLocationX != gv.mod.arrivalSquareX) || (gv.mod.PlayerLocationY != gv.mod.arrivalSquareY))
-            {
-                gv.mod.justTransitioned = false;
-                gv.mod.justTransitioned2 = false;
-                gv.mod.arrivalSquareX = 1000000;
-                gv.mod.arrivalSquareY = 1000000;
-            }
-       
-
-            gv.sf.dsWorldTime();
-            //IBScript Module heartbeat
-            gv.cc.doIBScriptBasedOnFilename(gv.mod.OnHeartBeatIBScript, gv.mod.OnHeartBeatIBScriptParms);
-            //IBScript Area heartbeat
-            gv.cc.doIBScriptBasedOnFilename(gv.mod.currentArea.OnHeartBeatIBScript, gv.mod.currentArea.OnHeartBeatIBScriptParms);
-            //apply effects
-            applyEffects();
-            //do Prop heartbeat
-            doPropHeartBeat();
-            //script hook for the weather script (channels 5 to 10) 
-            if (gv.mod.currentArea.areaWeatherName != "")
-            {
-                doWeather();
-            }
-            //script hook for full screen effects on channels 1 to 4 (also called in doTransitionBasedOnAreaLocation)
-            doChannelScripts();
-            //do weather sounds
-            if (gv.mod.currentArea.areaWeatherName != "")
-            {
-                doWeatherSound();
-            }
-
-            blockSecondPropTriggersCall = false;
-            //do Conversation and/or Encounter if on Prop (check before props move)
-            gv.triggerPropIndex = 0;
-            gv.triggerIndex = 0;
-            doPropTriggers();
-
-            //move any props that are active and only if they are not on the party location
-            doPropMoves();
-
-            //set illumination level of tiles based on party and prop position
-            if (gv.mod.useAllTileSystem)
-            {
-                doIllumination();
-            }
-            //do Conversation and/or Encounter if on Prop (check after props move)
-            if (!blockSecondPropTriggersCall)
-            {
-                gv.triggerPropIndex = 0;
-                gv.triggerIndex = 0;
-                doPropTriggers();
-            }
-
-            //move any props that are active and only if they are not on the party location
-            //doPropMoves();
-
-            //check for levelup available and switch button image
-            checkLevelUpAvailable(); //move this to on update and use a plus overlay in top left
-            if (!gv.mod.calledByRealTimeTimer)
-            {
-                adjustSpriteMainMapPositionToMakeItMoveIdependentlyFromPlayer();
             }
         }
 
+        public void doPropStealth()
+        {
+            //get diagonal neighbours
+            string NeighbourNE = "";
+            string NeighbourNW = "";
+            string NeighbourSE = "";
+            string NeighbourSW = "";
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    if (a.easternNeighbourArea != "none" && a.easternNeighbourArea != "" && a.easternNeighbourArea != "None")
+                    {
+                        NeighbourNE = a.easternNeighbourArea;
+                    }
+
+                    if (a.westernNeighbourArea != "none" && a.westernNeighbourArea != "" && a.westernNeighbourArea != "None")
+                    {
+                        NeighbourNW = a.westernNeighbourArea;
+                    }
+                }
+
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    if (a.northernNeighbourArea != "none" && a.northernNeighbourArea != "" && a.northernNeighbourArea != "None")
+                    {
+                        NeighbourNE = a.northernNeighbourArea;
+                    }
+
+                    if (a.southernNeighbourArea != "none" && a.southernNeighbourArea != "" && a.southernNeighbourArea != "None")
+                    {
+                        NeighbourSE = a.southernNeighbourArea;
+                    }
+                }
+
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    if (a.easternNeighbourArea != "none" && a.easternNeighbourArea != "" && a.easternNeighbourArea != "None")
+                    {
+                        NeighbourSE = a.easternNeighbourArea;
+                    }
+
+                    if (a.westernNeighbourArea != "none" && a.westernNeighbourArea != "" && a.westernNeighbourArea != "None")
+                    {
+                        NeighbourSW = a.westernNeighbourArea;
+                    }
+                }
+
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    if (a.northernNeighbourArea != "none" && a.northernNeighbourArea != "" && a.northernNeighbourArea != "None")
+                    {
+                        NeighbourNW = a.northernNeighbourArea;
+                    }
+
+                    if (a.southernNeighbourArea != "none" && a.southernNeighbourArea != "" && a.southernNeighbourArea != "None")
+                    {
+                        NeighbourSW = a.southernNeighbourArea;
+                    }
+                }
+            }
+
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                if (a.Filename == gv.mod.currentArea.Filename || a.Filename == gv.mod.currentArea.easternNeighbourArea || a.Filename == gv.mod.currentArea.westernNeighbourArea || a.Filename == gv.mod.currentArea.northernNeighbourArea || a.Filename == gv.mod.currentArea.southernNeighbourArea || a.Filename == NeighbourNE || a.Filename == NeighbourNW || a.Filename == NeighbourSE || a.Filename == NeighbourSW)
+                {
+                    foreach (Prop p in a.Props)
+                    {
+                        if (p.stealth != -1)
+                        {
+                            //skill roll script
+                            //visible state
+                            string traitMethod = "leader";
+                            foreach (Trait t in gv.mod.moduleTraitsList)
+                            {
+                                if (t.tag.Contains(gv.mod.tagOfSpotEnemyTrait))
+                                {
+                                    traitMethod = t.methodOfChecking;
+                                }
+                            }
+                            int parm1 = gv.mod.selectedPartyLeader;
+                            if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                            {
+                                parm1 = gv.mod.selectedPartyLeader;
+                            }
+                            else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                            {
+                                parm1 = -2;
+                            }
+                            else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                            {
+                                parm1 = -3;
+                            }
+                            else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                            {
+                                parm1 = -4;
+                            }
+                            else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                            {
+                                parm1 = -5;
+                            }
+                            else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                            {
+                                parm1 = -6;
+                            }
+
+                            int darkAdder = 0;
+                            int tileAdder = 0;
+                            Coordinate pcCoord = new Coordinate();
+                            Coordinate propCoord = new Coordinate();
+                            pcCoord.X = gv.mod.PlayerLocationX;
+                            pcCoord.Y = gv.mod.PlayerLocationY;
+                            if (a.Filename == gv.mod.currentArea.Filename)
+                            {
+                                propCoord.X = p.LocationX;
+                                propCoord.Y = p.LocationY;
+                                tileAdder = gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in gv.mod.currentArea.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", gv.mod.currentArea.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", gv.mod.currentArea.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                            {
+                                propCoord.X = p.LocationX;
+                                propCoord.Y = p.LocationY - a.MapSizeY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == NeighbourNE)
+                            {
+                                propCoord.X = gv.mod.currentArea.MapSizeX + p.LocationX;
+                                propCoord.Y = p.LocationY - a.MapSizeY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                            {
+                                propCoord.X = gv.mod.currentArea.MapSizeX + p.LocationX;
+                                propCoord.Y = p.LocationY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == NeighbourSE)
+                            {
+                                propCoord.X = gv.mod.currentArea.MapSizeX + p.LocationX;
+                                propCoord.Y = gv.mod.currentArea.MapSizeY + p.LocationY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                            {
+                                propCoord.X = p.LocationX;
+                                propCoord.Y = gv.mod.currentArea.MapSizeY + p.LocationY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == NeighbourSW)
+                            {
+                                propCoord.X = p.LocationX - a.MapSizeX;
+                                propCoord.Y = gv.mod.currentArea.MapSizeY + p.LocationY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                            {
+                                propCoord.X = p.LocationX - a.MapSizeX; ;
+                                propCoord.Y = p.LocationY;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            if (a.Filename == NeighbourNW)
+                            {
+                                propCoord.X = p.LocationX - a.MapSizeX;
+                                propCoord.Y = p.LocationY - a.MapSizeY; ;
+                                tileAdder = a.Tiles[p.LocationY * a.MapSizeX + p.LocationX].stealthModifier;
+                                foreach (Prop p5 in a.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
+                                    {
+                                        if (p5.LocationX == p.LocationX && p5.LocationY == p.LocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
+                                    }
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "night", a.Filename))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckPropByTagIsInDarknessPerArea(p.PropTag, "noLight", a.Filename))
+                                {
+                                    darkAdder = 12;
+                                }
+                            }
+
+                            //factor in lit state and tile stealtModifier
+                            int checkModifier = (gv.cc.getDistance(pcCoord, propCoord) - 1) * 2 + darkAdder + tileAdder;
+
+                            if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfSpotEnemyTrait, p.stealth + checkModifier, true, true))
+                            {
+                                p.isStealthed = false;
+                            }
+                            else
+                            {
+                                p.isStealthed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                if (a.Filename == gv.mod.currentArea.Filename || a.Filename == gv.mod.currentArea.northernNeighbourArea || a.Filename == gv.mod.currentArea.easternNeighbourArea || a.Filename == gv.mod.currentArea.southernNeighbourArea || a.Filename == gv.mod.currentArea.westernNeighbourArea)
+            }
+            */
+        }
 
         public void handleRationsAndLightSources()
         {
@@ -2694,7 +5543,7 @@ namespace IBx
             //code for discardign surplus resource items
             bool discardedRations = false;
             bool discardedLightSources = false;
-            for (int i = gv.mod.partyInventoryRefsList.Count-1; i >= 0; i--)
+            for (int i = gv.mod.partyInventoryRefsList.Count - 1; i >= 0; i--)
             //foreach (ItemRefs itRef in gv.mod.partyInventoryRefsList)
             {
                 //code for capping number of rations and light sources
@@ -2717,8 +5566,8 @@ namespace IBx
                 }
             }
 
-             for (int i = gv.mod.partyInventoryRefsList.Count-1; i >= 0; i--)
-             {
+            for (int i = gv.mod.partyInventoryRefsList.Count - 1; i >= 0; i--)
+            {
                 if (gv.mod.partyInventoryRefsList[i].isLightSource)
                 {
                     int lightSourceCounter = 0;
@@ -2777,7 +5626,10 @@ namespace IBx
             {
                 if (gv.mod.minutesSinceLastRationConsumed < 1440)
                 {
-                    gv.mod.minutesSinceLastRationConsumed += gv.mod.currentArea.TimePerSquare;
+                    if (!gv.mod.currentArea.isOverviewMap)
+                    {
+                        gv.mod.minutesSinceLastRationConsumed += gv.mod.timePerStepAfterSpeedCalc;
+                    }
                 }
                 else
                 {
@@ -2805,7 +5657,9 @@ namespace IBx
                     }
                     if (!foundRation)
                     {
+                        //deprived
                         gv.screenMainMap.addFloatyText(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, "Very deprived by lack of supplies... HP & SP lost", "red", 4000);
+                        gv.cc.addLogText("red", "Very deprived by lack of supplies... HP & SP lost");
                         foreach (Player p in gv.mod.playerList)
                         {
                             int healthReduction = (int)(p.hpMax / (100f / gv.mod.maxHPandSPPercentageLostOnHunger));
@@ -2840,6 +5694,7 @@ namespace IBx
                             {
                                 p.sp = 0;
                             }
+
                         }
                     }
                     //prepare final warning
@@ -2847,7 +5702,7 @@ namespace IBx
                     foreach (ItemRefs it in gv.mod.partyInventoryRefsList)
                     {
                         if (it.isRation)
-                        { 
+                        {
                             gv.mod.numberOfRationsRemaining += it.quantity;
                         }
                     }
@@ -2864,12 +5719,12 @@ namespace IBx
 
                 }
             }
-                //always have correct ration count
-                gv.mod.numberOfRationsRemaining = 0;
-                foreach (ItemRefs it in gv.mod.partyInventoryRefsList)
+            //always have correct ration count
+            gv.mod.numberOfRationsRemaining = 0;
+            foreach (ItemRefs it in gv.mod.partyInventoryRefsList)
+            {
+                if (it.isRation)
                 {
-                    if (it.isRation)
-                    {
                     //gv.mod.numberOfRationsRemaining = it.quantity;
                     if (it.quantity <= 1)
                     {
@@ -2879,17 +5734,18 @@ namespace IBx
                     {
                         gv.mod.numberOfRationsRemaining += it.quantity;
                     }
-                    }
                 }
+            }
         }
+
 
         public void resetLightAndDarkness()
         {
 
             //if (gv.mod.arrivalSquareX != 1000000)
             //{
-                //gv.mod.PlayerLocationX = gv.mod.arrivalSquareX;
-                //gv.mod.PlayerLocationY = gv.mod.arrivalSquareY;
+            //gv.mod.PlayerLocationX = gv.mod.arrivalSquareX;
+            //gv.mod.PlayerLocationY = gv.mod.arrivalSquareY;
             //}
 
             //XXXXXXXXXXXXXXXXXXXXXXXXX
@@ -3076,9 +5932,9 @@ namespace IBx
             int maxY = gv.mod.PlayerLocationY + gv.playerOffsetY;
             if (maxY > this.gv.mod.currentArea.MapSizeY - 1 + seamlessModififierMaxY) { maxY = this.gv.mod.currentArea.MapSizeY - 1 + seamlessModififierMaxY; }
 
-            for (int xx = minX; xx <= maxX; xx++)
+            for (int xx = minX - 3; xx <= maxX + 3; xx++)
             {
-                for (int yy = minY; yy <= maxY; yy++)
+                for (int yy = minY - 3; yy <= maxY + 3; yy++)
                 {
                     //YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
                     bool situationFound = false;
@@ -3097,6 +5953,20 @@ namespace IBx
                             int transformedY = gv.mod.moduleAreasObjects[indexOfNorthWesternNeighbour].MapSizeY + yy;
                             tile = gv.mod.moduleAreasObjects[indexOfNorthWesternNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfNorthWesternNeighbour].MapSizeX + transformedX];
                             index = indexOfNorthWesternNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3113,6 +5983,20 @@ namespace IBx
                             int transformedY = yy - gv.mod.currentArea.MapSizeY;
                             tile = gv.mod.moduleAreasObjects[indexOfSouthWesternNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfSouthWesternNeighbour].MapSizeX + transformedX];
                             index = indexOfSouthWesternNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3129,6 +6013,20 @@ namespace IBx
                             int transformedY = yy - gv.mod.currentArea.MapSizeY;
                             tile = gv.mod.moduleAreasObjects[indexOfSouthEasternNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfSouthEasternNeighbour].MapSizeX + transformedX];
                             index = indexOfSouthEasternNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3145,6 +6043,20 @@ namespace IBx
                             int transformedY = gv.mod.moduleAreasObjects[indexOfNorthEasternNeighbour].MapSizeY + yy;
                             tile = gv.mod.moduleAreasObjects[indexOfNorthEasternNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfNorthEasternNeighbour].MapSizeX + transformedX];
                             index = indexOfNorthEasternNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3161,6 +6073,20 @@ namespace IBx
                             int transformedY = yy;
                             tile = gv.mod.moduleAreasObjects[indexOfWesternNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfWesternNeighbour].MapSizeX + transformedX];
                             index = indexOfWesternNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3177,6 +6103,20 @@ namespace IBx
                             int transformedY = yy - gv.mod.currentArea.MapSizeY;
                             tile = gv.mod.moduleAreasObjects[indexOfSouthernNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfSouthernNeighbour].MapSizeX + transformedX];
                             index = indexOfSouthernNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3193,6 +6133,20 @@ namespace IBx
                             int transformedY = yy;
                             tile = gv.mod.moduleAreasObjects[indexOfEasternNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfEasternNeighbour].MapSizeX + transformedX];
                             index = indexOfEasternNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3209,6 +6163,20 @@ namespace IBx
                             int transformedY = gv.mod.moduleAreasObjects[indexOfNorthernNeighbour].MapSizeY + yy;
                             tile = gv.mod.moduleAreasObjects[indexOfNorthernNeighbour].Tiles[transformedY * gv.mod.moduleAreasObjects[indexOfNorthernNeighbour].MapSizeX + transformedX];
                             index = indexOfNorthernNeighbour;
+                            foreach (Prop p in gv.mod.moduleAreasObjects[index].Props)
+                            {
+                                if (p.isDoor && p.LocationX == transformedX && p.LocationY == transformedY)
+                                {
+                                    if (p.isActive)
+                                    {
+                                        tile.LoSBlocked = true;
+                                    }
+                                    else
+                                    {
+                                        tile.LoSBlocked = false;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -3219,7 +6187,20 @@ namespace IBx
                     if (!situationFound)
                     {
                         tile = gv.mod.currentArea.Tiles[yy * gv.mod.currentArea.MapSizeX + xx];
-                        //mod.currentArea.Tiles[yy * mod.currentArea.MapSizeX + xx].Visible = true;
+                        foreach (Prop p in gv.mod.currentArea.Props)
+                        {
+                            if (p.isDoor && p.LocationX == xx && p.LocationY == yy)
+                            {
+                                if (p.isActive)
+                                {
+                                    tile.LoSBlocked = true;
+                                }
+                                else
+                                {
+                                    tile.LoSBlocked = false;
+                                }
+                            }
+                        }
                     }
 
                     if (drawTile)
@@ -3246,109 +6227,107 @@ namespace IBx
 
         }
 
+        //walkedaway
+        //maybe intgrate resetligthanddarkness
+        //do extar call of doillumiantion and reset lightanddarkenss after half of scrollign timer has run (instaed of directly after move)
+        //thsi midway shift migth look more smoothly
+
         public void doIllumination()
         {
-            
-            
-            int dawn = 5 * 60;
-            int sunrise = 6 * 60;
-            int day = 7 * 60;
-            int sunset = 17 * 60;
-            int dusk = 18 * 60;
-            int night = 20 * 60;
-            int time = gv.mod.WorldTime % 1440;
 
-            bool consumeLightEnergy = false;
-            if ((time >= dawn) && (time < sunrise))
-                                        {
-                                            //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f / flickerReduction * flicker / 100f);
-                                            //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f);
-                                        }
-                                        else if ((time >= sunrise) && (time < day))
-                                        {
-                                            //gv.DrawBitmap(gv.cc.tint_sunrise, src, dst, 0, false, 1.0f);
-                                        }
-                                        else if ((time >= day) && (time < sunset))
-                                        {
-                                            //no tint for day
-                                        }
-                                        else if ((time >= sunset) && (time < dusk))
-                                        {
-                                            //gv.DrawBitmap(gv.cc.tint_sunset, src, dst, 0, false, 1.0f);
-                                        }
-                                        else if ((time >= dusk) && (time < night))
-                                        {
-                                            //gv.DrawBitmap(gv.cc.tint_dusk, src, dst, 0, false, 1.0f);
-                                        }
-            else if ((time >= night) || (time < dawn))
-            {
-                consumeLightEnergy = true;
-            }
+            /*
+                int dawn = 5 * 60;
+                int sunrise = 6 * 60;
+                int day = 7 * 60;
+                int sunset = 17 * 60;
+                int dusk = 18 * 60;
+                int night = 20 * 60;
+                int time = gv.mod.WorldTime % 1440;
 
-            if (!gv.mod.currentArea.UseDayNightCycle)
-            {
-                consumeLightEnergy = true;
-            }
-
-            if (!gv.mod.currentArea.useLightSystem)
-            {
-                consumeLightEnergy = false;
-            }
-
-            if (consumeLightEnergy && gv.mod.partyLightEnergyName.Count >= 1 && gv.mod.partyLightOn)
-            {
-                for (int i = gv.mod.partyLightEnergyName.Count - 1; i >= 0; i--)
+                bool consumeLightEnergy = false;
+                if ((time >= dawn) && (time < sunrise))
                 {
-                    if (gv.mod.partyLightEnergyName[i] == gv.mod.partyLightName)
+                    //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f / flickerReduction * flicker / 100f);
+                    //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= sunrise) && (time < day))
+                {
+                    //gv.DrawBitmap(gv.cc.tint_sunrise, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= day) && (time < sunset))
+                {
+                    //no tint for day
+                }
+                else if ((time >= sunset) && (time < dusk))
+                {
+                    //gv.DrawBitmap(gv.cc.tint_sunset, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= dusk) && (time < night))
+                {
+                    //gv.DrawBitmap(gv.cc.tint_dusk, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= night) || (time < dawn))
+                {
+                    //berlin
+                    consumeLightEnergy = true;
+                }
+
+                if (!gv.mod.currentArea.UseDayNightCycle)
+                {
+                    consumeLightEnergy = true;
+                }
+
+                if (!gv.mod.currentArea.useLightSystem)
+                {
+                    consumeLightEnergy = false;
+                }
+
+                if (consumeLightEnergy && gv.mod.partyLightEnergyName.Count >= 1 && gv.mod.partyLightOn)
+                {
+                    for (int i = gv.mod.partyLightEnergyName.Count - 1; i >= 0; i--)
                     {
-                        if (gv.mod.partyLightEnergyUnitsLeft[i] > 0)
+                        if (gv.mod.partyLightEnergyName[i] == gv.mod.partyLightName)
                         {
-                            gv.mod.partyLightEnergyUnitsLeft[i]--;
-                            gv.mod.currentLightUnitsLeft = gv.mod.partyLightEnergyUnitsLeft[i]; 
-                        }
-                        else 
-                        {
-                            foreach(ItemRefs it in gv.mod.partyInventoryRefsList)
+                            if (gv.mod.partyLightEnergyUnitsLeft[i] > 0)
                             {
-                                if (it.name == gv.mod.partyLightName)
+                                if (!gv.mod.currentArea.isOverviewMap)
                                 {
-                                    if (it.quantity > 1)
-                                    {
-                                        it.quantity--;
-                                    }
-                                    else
-                                    {
-                                        gv.mod.partyInventoryRefsList.Remove(it);
-                                    }
-                                    break;
+                                    gv.mod.partyLightEnergyUnitsLeft[i]--;
                                 }
+                                gv.mod.currentLightUnitsLeft = gv.mod.partyLightEnergyUnitsLeft[i];
                             }
-                            
-                            gv.mod.partyLightEnergyName.RemoveAt(i);
-                            gv.mod.partyLightEnergyUnitsLeft.RemoveAt(i);
-                            gv.mod.partyLightOn = false;
-                            gv.mod.partyLightColor = "";
-                            gv.mod.partyLightName = "";
+                            else
+                            {
+                                foreach (ItemRefs it in gv.mod.partyInventoryRefsList)
+                                {
+                                    if (it.name == gv.mod.partyLightName)
+                                    {
+                                        if (it.quantity > 1)
+                                        {
+                                            if (!gv.mod.currentArea.isOverviewMap)
+                                            {
+                                                it.quantity--;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            gv.mod.partyInventoryRefsList.Remove(it);
+                                        }
+                                        break;
+                                    }
+                                }
+
+                                gv.mod.partyLightEnergyName.RemoveAt(i);
+                                gv.mod.partyLightEnergyUnitsLeft.RemoveAt(i);
+                                gv.mod.partyLightOn = false;
+                                gv.mod.partyLightColor = "";
+                                gv.mod.partyLightName = "";
+                            }
                         }
                     }
                 }
-                //gv.mod.partyLightEnergyName.Add(gv.mod.partyLightName);
-                //gv.mod.partyLightEnergyUnitsLeft.Add(250);
-            }
-            
-            
-            /*
-            int backupPlayerLocationX = gv.mod.PlayerLocationX;
-            int backupPlayerLocationY = gv.mod.PlayerLocationY;
+                */
 
-            if (gv.mod.justTransitioned)
-            {
-                gv.mod.PlayerLocationX = gv.mod.arrivalSquareX;
-                gv.mod.PlayerLocationY = gv.mod.arrivalSquareY;
-            }
-            */
-
-            //XXXXXXXXXXXXXXXXXXXXXXXXX
             int indexOfNorthernNeighbour = -1;
             int indexOfSouthernNeighbour = -1;
             int indexOfEasternNeighbour = -1;
@@ -3364,10 +6343,6 @@ namespace IBx
             int seamlessModififierMinY = 0;
             int seamlessModififierMaxY = 0;
 
-            
-
-            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-            
             for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
             {
                 if (gv.mod.moduleAreasObjects[i].Filename == gv.mod.currentArea.Filename)
@@ -3375,7 +6350,6 @@ namespace IBx
                     indexOfCurrentArea = i;
                 }
             }
-
 
             if ((gv.mod.currentArea.northernNeighbourArea != ""))
             {
@@ -3841,161 +6815,161 @@ namespace IBx
                     }
                     */
 
-                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
 
-                    /*
-                    //XXXXXXXXXXXXXXXXXXX
-                    bool situationFound = false;
+            /*
+            //XXXXXXXXXXXXXXXXXXX
+            bool situationFound = false;
 
-                    //northwest
-                    if (indexOfNorthWesternNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfNorthWesternNeighbour].Filename))
-                        //if ((seamlessModififierMinX > 0) && (seamlessModififierMinY > 0) && !situationFound)
-                        {
-                            try
-                            {
-                                //continue here, good road
-                                //hurgh 4444
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].isCentreOfLightCircle = true;
-                                if (p.LocationY + 1 <= (gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY - 1))
-                                {
-                                    gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY + 1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
-                                }
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY+1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY+1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY-1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY-1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY-1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
-
-                                gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].lightRadius = 1;
-                            }
-                            catch
-                            { }
-                            //situationFound = true;
-                            //p.LocationX = p.LocationX - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX;
-                            //p.LocationY = p.LocationY - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY;
-
-                        }
-                    }
-
-                    //northeast
-                    if (indexOfNorthEasternNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfNorthEasternNeighbour].Filename))
-
-                        //if ((seamlessModififierMaxX > 0) && (seamlessModififierMinY > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationX = p.LocationX + gv.mod.currentArea.MapSizeX;
-                            p.LocationY = p.LocationY - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY;
-
-                        }
-                    }
-
-                    //southwest
-                    if (indexOfSouthWesternNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfSouthWesternNeighbour].Filename))
-
-                        //if ((seamlessModififierMinX > 0) && (seamlessModififierMaxY > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationX = p.LocationX - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX;
-                            p.LocationY = p.LocationY + gv.mod.currentArea.MapSizeY;
-
-                        }
-                    }
-
-                    //southeast
-                    if (indexOfSouthEasternNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfSouthEasternNeighbour].Filename))
-
-                        //if ((seamlessModififierMaxX > 0) && (seamlessModififierMaxY > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationX = p.LocationX + gv.mod.currentArea.MapSizeX;
-                            p.LocationY = p.LocationY + gv.mod.currentArea.MapSizeY;
-
-                        }
-                    }
-
-                    //north
-                    if (indexOfNorthernNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfNorthernNeighbour].Filename))
-
-                        //if ((seamlessModififierMinY > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationY = p.LocationY - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY;
-
-                        }
-                    }
-
-                    //south
-                    if (indexOfSouthernNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfSouthernNeighbour].Filename))
-
-                        //if ((seamlessModififierMaxY > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationY = p.LocationY + gv.mod.currentArea.MapSizeY;
-
-                        }
-                    }
-
-                    //west
-                    if (indexOfWesternNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfWesternNeighbour].Filename))
-
-                        //if ((seamlessModififierMinX > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationX = p.LocationX - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX;
-                        }
-                    }
-
-                    //east
-                    if (indexOfEasternNeighbour != -1)
-                    {
-                        if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfEasternNeighbour].Filename))
-
-                        //if ((seamlessModififierMaxX > 0) && !situationFound)
-                        {
-                            situationFound = true;
-                            p.LocationX = p.LocationX + gv.mod.currentArea.MapSizeX;
-                        }
-                    }
-
-                    //hurgh555
+            //northwest
+            if (indexOfNorthWesternNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfNorthWesternNeighbour].Filename))
+                //if ((seamlessModififierMinX > 0) && (seamlessModififierMinY > 0) && !situationFound)
+                {
                     try
                     {
-                        gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].isCentreOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
-                        gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].lightRadius = 1;
+                        //continue here, good road
+                        //hurgh 4444
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].isCentreOfLightCircle = true;
+                        if (p.LocationY + 1 <= (gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY - 1))
+                        {
+                            gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY + 1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
+                        }
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY+1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY+1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY-1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY-1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[(p.LocationY-1) * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
+
+                        gv.mod.moduleAreasObjects[relevantIndices[i]].Tiles[p.LocationY * gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX + p.LocationX].lightRadius = 1;
                     }
                     catch
                     { }
+                    //situationFound = true;
+                    //p.LocationX = p.LocationX - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX;
+                    //p.LocationY = p.LocationY - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY;
 
-                    
                 }
             }
-    */
+
+            //northeast
+            if (indexOfNorthEasternNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfNorthEasternNeighbour].Filename))
+
+                //if ((seamlessModififierMaxX > 0) && (seamlessModififierMinY > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationX = p.LocationX + gv.mod.currentArea.MapSizeX;
+                    p.LocationY = p.LocationY - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY;
+
+                }
+            }
+
+            //southwest
+            if (indexOfSouthWesternNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfSouthWesternNeighbour].Filename))
+
+                //if ((seamlessModififierMinX > 0) && (seamlessModififierMaxY > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationX = p.LocationX - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX;
+                    p.LocationY = p.LocationY + gv.mod.currentArea.MapSizeY;
+
+                }
+            }
+
+            //southeast
+            if (indexOfSouthEasternNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfSouthEasternNeighbour].Filename))
+
+                //if ((seamlessModififierMaxX > 0) && (seamlessModififierMaxY > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationX = p.LocationX + gv.mod.currentArea.MapSizeX;
+                    p.LocationY = p.LocationY + gv.mod.currentArea.MapSizeY;
+
+                }
+            }
+
+            //north
+            if (indexOfNorthernNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfNorthernNeighbour].Filename))
+
+                //if ((seamlessModififierMinY > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationY = p.LocationY - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeY;
+
+                }
+            }
+
+            //south
+            if (indexOfSouthernNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfSouthernNeighbour].Filename))
+
+                //if ((seamlessModififierMaxY > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationY = p.LocationY + gv.mod.currentArea.MapSizeY;
+
+                }
+            }
+
+            //west
+            if (indexOfWesternNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfWesternNeighbour].Filename))
+
+                //if ((seamlessModififierMinX > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationX = p.LocationX - gv.mod.moduleAreasObjects[relevantIndices[i]].MapSizeX;
+                }
+            }
+
+            //east
+            if (indexOfEasternNeighbour != -1)
+            {
+                if (gv.mod.moduleAreasObjects[relevantIndices[i]].Filename.Contains(gv.mod.moduleAreasObjects[indexOfEasternNeighbour].Filename))
+
+                //if ((seamlessModififierMaxX > 0) && !situationFound)
+                {
+                    situationFound = true;
+                    p.LocationX = p.LocationX + gv.mod.currentArea.MapSizeX;
+                }
+            }
+
+            //hurgh555
+            try
+            {
+                gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].isCentreOfLightCircle = true;
+                gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
+                gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].lightRadius = 1;
+            }
+            catch
+            { }
+
+
+        }
+    }
+*/
             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             //illuminate around props, new
@@ -4588,6 +7562,7 @@ namespace IBx
                                     if ((xx >= 0) && (yy >= 0) && (xx <= gv.mod.moduleAreasObjects[relevantIndices[h]].MapSizeX - 1) && (yy <= gv.mod.moduleAreasObjects[relevantIndices[h]].MapSizeY - 1))
                                     {
                                         addedTileToListAlready = true;
+                                        //ubierring
                                         tilesOfThisLightSource.Add(gv.mod.moduleAreasObjects[relevantIndices[h]].Tiles[yy * gv.mod.moduleAreasObjects[relevantIndices[h]].MapSizeX + xx]);
                                         gv.mod.moduleAreasObjects[relevantIndices[h]].Tiles[yy * gv.mod.moduleAreasObjects[relevantIndices[h]].MapSizeX + xx].tileLightSourceTag.Add(p.PropTag);
                                         gv.mod.moduleAreasObjects[relevantIndices[h]].Tiles[yy * gv.mod.moduleAreasObjects[relevantIndices[h]].MapSizeX + xx].lightSourceFocalHaloIntensity.Add(p.focalIntensity);
@@ -4643,7 +7618,7 @@ namespace IBx
                         //4: NE,NW,SE,SW
                         //5: N,S,E,W
                         //6: center
-
+                        //ubierring
                         for (int tCount = 0; tCount <= 24; tCount++)
                         {
                             if (tCount == 0)
@@ -5712,17 +8687,18 @@ namespace IBx
                     }
                 }
             }
-        
-    //addedTileToListAlready = true;
 
-    /*
-    if (gv.mod.justTransitioned)
-    {
-        gv.mod.PlayerLocationX = backupPlayerLocationX;
-        gv.mod.PlayerLocationY = backupPlayerLocationY;
-    }
-    */
-}
+            //addedTileToListAlready = true;
+
+            /*
+            if (gv.mod.justTransitioned)
+            {
+                gv.mod.PlayerLocationX = backupPlayerLocationX;
+                gv.mod.PlayerLocationY = backupPlayerLocationY;
+            }
+            */
+
+        }
 
 
         public void doIlluminationOld()
@@ -5734,7 +8710,7 @@ namespace IBx
                 {
                     gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].isCentreOfLightCircle = true;
                     gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
-                    gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX -1].isOtherPartOfLightCircle = true;
+                    gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX - 1].isOtherPartOfLightCircle = true;
                     gv.mod.currentArea.Tiles[(p.LocationY + 1) * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
                     gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX].isOtherPartOfLightCircle = true;
                     gv.mod.currentArea.Tiles[(p.LocationY - 1) * gv.mod.currentArea.MapSizeX + p.LocationX + 1].isOtherPartOfLightCircle = true;
@@ -5744,7 +8720,7 @@ namespace IBx
                     gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].lightRadius = 1;
                 }
                 catch
-                { }
+                { gv.sf.MessageBox("Karl Error 114End"); }
             }
             try
             {
@@ -5763,7 +8739,7 @@ namespace IBx
                 gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].lightRadius = 1;
             }
             catch
-            { }
+            { gv.sf.MessageBox("Karl Error 115End"); }
         }
 
         public void adjustSpriteMainMapPositionToMakeItMoveIdependentlyFromPlayer()
@@ -5771,44 +8747,108 @@ namespace IBx
             float horizontalAdjustment = 0;
             float verticalAdjustment = 0;
 
+
             if ((gv.mod.PlayerLocationX != gv.mod.PlayerLastLocationX) || (gv.mod.PlayerLocationY != gv.mod.PlayerLastLocationY))
             {
                 //moved east
-                if (gv.mod.PlayerLocationX == gv.mod.PlayerLastLocationX + 1)
+                if (gv.mod.PlayerLocationX == gv.mod.PlayerLastLocationX + 1 || gv.mod.justWentEast)
                 {
                     horizontalAdjustment = -gv.squareSize;
                 }
 
                 //moved west
-                if (gv.mod.PlayerLocationX == gv.mod.PlayerLastLocationX - 1)
+                if (gv.mod.PlayerLocationX == gv.mod.PlayerLastLocationX - 1 || gv.mod.justWentWest)
                 {
                     horizontalAdjustment = gv.squareSize;
                 }
 
                 //moved south
-                if (gv.mod.PlayerLocationY == gv.mod.PlayerLastLocationY + 1)
+                if (gv.mod.PlayerLocationY == gv.mod.PlayerLastLocationY + 1 || gv.mod.justWentSouth)
                 {
                     verticalAdjustment = -gv.squareSize;
                 }
 
                 //moved north
-                if (gv.mod.PlayerLocationY == gv.mod.PlayerLastLocationY - 1)
+                if (gv.mod.PlayerLocationY == gv.mod.PlayerLastLocationY - 1 || gv.mod.justWentNorth)
                 {
                     verticalAdjustment = gv.squareSize;
                 }
             }
 
+            /*
+            foreach 
+                (Sprite spr in gv.screenMainMap.spriteList)
+            {
+                if (spr.movementMethod == "fog")
+                {
+
+                }
+            }
+            */
+
             if ((horizontalAdjustment != 0) || (verticalAdjustment != 0))
             {
                 foreach (Sprite spr in gv.screenMainMap.spriteList)
                 {
-                    if (spr.movesIndependentlyFromPlayerPosition)
+                    //if (spr.movesIndependentlyFromPlayerPosition)
+                    //{
+
+                    if (gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX || gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY)
                     {
+
+                        //scheissbrille4
+                        //if (spr.movementMethod != "fog")
+                        //{
                         spr.position.X += horizontalAdjustment;
                         spr.position.Y += verticalAdjustment;
+                        //}
+
+
+
+                        /*
+                        //sabrina4
+                        if (mod.useScrollingSystem)
+                        {
+                            if (this.screenType == "main")
+                            {
+                                if (mod.isScrollingNow && !isParty)
+                                {
+                                    if (mod.scrollingDirection == "up")
+                                    {
+                                        target.Y = target.Y - (int)(squareSize * (mod.scrollingTimer / 100f));
+                                    }
+
+                                    if (mod.scrollingDirection == "down")
+                                    {
+                                        target.Y = target.Y + (int)(squareSize * (mod.scrollingTimer / 100f));
+                                    }
+
+                                    if (mod.scrollingDirection == "left")
+                                    {
+                                        target.X = target.X - (int)(squareSize * (mod.scrollingTimer / 100f));
+                                    }
+
+                                    if (mod.scrollingDirection == "right")
+                                    {
+                                        target.X = target.X + (int)(squareSize * (mod.scrollingTimer / 100f));
+                                    }
+                                }
+                            }
+                        }
+                        */
+
+
+                        //}
+
                     }
+
+                    //}
                 }
             }
+            gv.mod.justWentNorth = false;
+            gv.mod.justWentSouth = false;
+            gv.mod.justWentEast = false;
+            gv.mod.justWentWest = false;
         }
 
 
@@ -5867,19 +8907,19 @@ namespace IBx
             float scaledSpriteDimension = spr.frameHeight * scaler;
             //if (!spr.movementMethod.Contains("fog"))
             //{
-                float capSize = 0;
-                if (gv.screenWidth > gv.screenHeight)
-                {
-                    capSize = gv.screenHeight;
-                }
-                else
-                {
-                    capSize = gv.screenWidth;
-                }
-                if (scaledSpriteDimension > capSize)
-                {
-                    scaledSpriteDimension = capSize;
-                }
+            float capSize = 0;
+            if (gv.screenWidth > gv.screenHeight)
+            {
+                capSize = gv.screenHeight;
+            }
+            else
+            {
+                capSize = gv.screenWidth;
+            }
+            if (scaledSpriteDimension > capSize)
+            {
+                scaledSpriteDimension = capSize;
+            }
             //}
 
             float visibleMapWidth = (2 * gv.playerOffsetX + 1) * gv.squareSize - ((gv.playerOffsetX * gv.squareSize) - gv.mod.pixDistanceToBorderWest) - ((gv.playerOffsetX * gv.squareSize) - gv.mod.pixDistanceToBorderEast);
@@ -5895,7 +8935,7 @@ namespace IBx
             extraDistanceBeforeReappearanceOrBumpEast = 0;
             extraDistanceBeforeReappearanceOrBumpSouth = 0;
             extraDistanceBeforeReappearanceOrBumpNorth = 0;
-            
+
             bool isLeavingEast = false;
             bool isLeavingWest = false;
             bool isLeavingNorth = false;
@@ -5996,63 +9036,121 @@ namespace IBx
                     }
                 }
 
+                //sebastianstraße
+                if (movesOnGlobe && (spr.movementMethod.Contains("snow") || spr.movementMethod.Contains("rain")))
+                {
+                    if (isLeavingEast)
+                    {
+                        spr.position.X = -25 - scaledSpriteDimension;
+                    }
+                    if (isLeavingWest)
+                    {
+                        spr.position.X = gv.screenWidth + 25;
+                    }
+                }
+
+                if (movesOnGlobe && spr.movementMethod.Contains("fog"))
+                {
+                    if (isLeavingNorth)
+                    {
+                        spr.position.Y = gv.screenHeight + 50;
+                        //spr.position.Y = -50;
+                    }
+                    if (isLeavingSouth)
+                    {
+                        spr.position.Y = -50 - scaledSpriteDimension;
+                        //spr.position.Y = gv.screenHeight + scaledSpriteDimension + 50;
+                    }
+                    if (isLeavingEast)
+                    {
+                        spr.position.X = -50 - scaledSpriteDimension;
+                    }
+                    if (isLeavingWest)
+                    {
+                        spr.position.X = gv.screenWidth + 50;
+                    }
+                }
+
+
+
+
                 //like fog
                 if (movesAsBumper)
                 {
                     spr.velocity.X = -spr.velocity.X;
                     spr.velocity.Y = -spr.velocity.Y;
-                    spr.position.X += 2*spr.velocity.X;
-                    spr.position.Y += 2*spr.velocity.Y;
+                    spr.position.X += 2 * spr.velocity.X;
+                    spr.position.Y += 2 * spr.velocity.Y;
                     //to do: modifiy angle of speed vector randomly after bump 
                 }
             }
         }
 
         public void checkLevelUpAvailable()
-        {            
+        {
             if (gv.mod.playerList.Count > 0)
             {
                 if (gv.mod.playerList[0].IsReadyToAdvanceLevel()) { gv.cc.ptrPc0.levelUpOn = true; }
                 else { gv.cc.ptrPc0.levelUpOn = false; }
+
+                //kvbkoeln
+                if (gv.mod.playerList[0].hasNewChatOptionMethod()) { gv.cc.ptrPc0.newChatOptionOn = true; }
+                else { gv.cc.ptrPc0.newChatOptionOn = false; }
             }
             if (gv.mod.playerList.Count > 1)
             {
                 if (gv.mod.playerList[1].IsReadyToAdvanceLevel()) { gv.cc.ptrPc1.levelUpOn = true; }
                 else { gv.cc.ptrPc1.levelUpOn = false; }
+
+                if (gv.mod.playerList[1].hasNewChatOptionMethod()) { gv.cc.ptrPc1.newChatOptionOn = true; }
+                else { gv.cc.ptrPc1.newChatOptionOn = false; }
             }
             if (gv.mod.playerList.Count > 2)
             {
                 if (gv.mod.playerList[2].IsReadyToAdvanceLevel()) { gv.cc.ptrPc2.levelUpOn = true; }
                 else { gv.cc.ptrPc2.levelUpOn = false; }
+
+                if (gv.mod.playerList[2].hasNewChatOptionMethod()) { gv.cc.ptrPc2.newChatOptionOn = true; }
+                else { gv.cc.ptrPc2.newChatOptionOn = false; }
             }
             if (gv.mod.playerList.Count > 3)
             {
                 if (gv.mod.playerList[3].IsReadyToAdvanceLevel()) { gv.cc.ptrPc3.levelUpOn = true; }
                 else { gv.cc.ptrPc3.levelUpOn = false; }
+
+                if (gv.mod.playerList[3].hasNewChatOptionMethod()) { gv.cc.ptrPc3.newChatOptionOn = true; }
+                else { gv.cc.ptrPc3.newChatOptionOn = false; }
             }
             if (gv.mod.playerList.Count > 4)
             {
                 if (gv.mod.playerList[4].IsReadyToAdvanceLevel()) { gv.cc.ptrPc4.levelUpOn = true; }
                 else { gv.cc.ptrPc4.levelUpOn = false; }
+
+                if (gv.mod.playerList[4].hasNewChatOptionMethod()) { gv.cc.ptrPc4.newChatOptionOn = true; }
+                else { gv.cc.ptrPc4.newChatOptionOn = false; }
             }
             if (gv.mod.playerList.Count > 5)
             {
                 if (gv.mod.playerList[5].IsReadyToAdvanceLevel()) { gv.cc.ptrPc5.levelUpOn = true; }
                 else { gv.cc.ptrPc5.levelUpOn = false; }
+
+                if (gv.mod.playerList[5].hasNewChatOptionMethod()) { gv.cc.ptrPc5.newChatOptionOn = true; }
+                else { gv.cc.ptrPc5.newChatOptionOn = false; }
             }
         }
 
         public void doWeatherSound()
         {
-            #region weatherSounds
-            /*
+            //#region weatherSounds
+            /* TODO
             //Note that in doTransitionBasedOnAreaLocation() method another weather code part is located
             //the whole system uses three sound channels, ie three instances of mediaplayer (defined in gameview, set to loop there):
             //sound channel 1 (weatherSounds1 media player) is for different degreees of rain effects
             //sound channel 2 (weatherSounds2 media player) is for different degreees of wind(cloud) and sandStorm effects
             //sound channel 3 (weatherSounds3 media player) is for the lightning effect 
             //requires a switch on module levelset to true as well as the ingame toggle for music&sound on
-            if ((gv.mod.useWeatherSound) && (gv.mod.playMusic))
+            //fortefake
+            if ((gv.mod.useWeatherSound) && (gv.mod.playSoundFx))
             {
                 //soundName is used to store the relevant name on the different checks for wind, sandStorm, rain and lightning
                 string soundName = "";
@@ -6191,6 +9289,12 @@ namespace IBx
                     gv.weatherSounds2.settings.volume = (int)(55 * weatherSoundMultiplier);
                     if (((gv.mod.weatherSoundsName2 != "heavyCloud") && (gv.mod.weatherSoundsName2 != "HeavyCloud")) || (gv.mod.resetWeatherSound))
                     {
+                        /*
+                        if (gv.mod.resetWeatherSound)
+                        {
+                            gv.mod.resetWeatherSound = false;
+                        }
+                        
                         gv.mod.weatherSoundsName2 = "heavyCloud";
                         soundName = gv.mod.weatherSoundsName2;
 
@@ -6229,6 +9333,13 @@ namespace IBx
                     gv.weatherSounds2.settings.volume = (int)(23 * weatherSoundMultiplier);
                     if (((gv.mod.weatherSoundsName2 != "lightCloud") && (gv.mod.weatherSoundsName2 != "LightCloud")) || (gv.mod.resetWeatherSound))
                     {
+                        /*
+                        if (gv.mod.resetWeatherSound)
+                        {
+                            gv.mod.resetWeatherSound = false;
+                        }
+                        
+
                         gv.mod.weatherSoundsName2 = "lightCloud";
                         soundName = gv.mod.weatherSoundsName2;
 
@@ -6267,6 +9378,13 @@ namespace IBx
                     gv.weatherSounds2.settings.volume = (int)(30 * weatherSoundMultiplier);
                     if (((gv.mod.weatherSoundsName2 != "cloud") && (gv.mod.weatherSoundsName2 != "Cloud")) || (gv.mod.resetWeatherSound))
                     {
+                        /*
+                        if (gv.mod.resetWeatherSound)
+                        {
+                            gv.mod.resetWeatherSound = false;
+                        }
+                        
+
                         gv.mod.weatherSoundsName2 = "cloud";
                         soundName = gv.mod.weatherSoundsName2;
 
@@ -6410,7 +9528,46 @@ namespace IBx
                         }
                     }
                 }
-                                
+
+                /*
+                //set up lightning
+                if ((gv.mod.currentWeatherName.Contains("lightning")) || (gv.mod.currentWeatherName.Contains("Lightning")))
+                {
+                    isLightning = true;
+                    gv.weatherSounds3.settings.volume = (int)(50 * weatherSoundMultiplier);
+                    if (gv.mod.weatherSoundsName3 != "lightning")
+                    {
+                        gv.mod.weatherSoundsName3 = "lightning";
+                        soundName = gv.mod.weatherSoundsName3;
+
+                        if (File.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName))
+                        {
+                            gv.weatherSounds3.URL = gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName;
+                        }
+                        else if (File.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName + ".mp3"))
+                        {
+                            gv.weatherSounds3.URL = gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\music\\" + soundName + ".mp3";
+                        }
+                        else if (File.Exists(gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName))
+                        {
+                            gv.weatherSounds3.URL = gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName;
+                        }
+                        else if (File.Exists(gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName + ".mp3"))
+                        {
+                            gv.weatherSounds3.URL = gv.mainDirectory + "\\default\\NewModule\\music\\" + soundName + ".mp3";
+                        }
+                        else
+                        {
+                            gv.weatherSounds3.URL = "";
+                        }
+                        if ((gv.weatherSounds3.URL != "") && (gv.weatherSounds3 != null))
+                        {
+                            gv.weatherSounds3.controls.play();
+                        }
+                    }
+                }
+                
+
                 //mute the not used channels
                 if (isRaining == false)
                 {
@@ -6441,21 +9598,45 @@ namespace IBx
                     gv.weatherSounds2.controls.play();
                     //}
                 }
-                                
-                if (!gv.mod.playMusic || gv.mod.currentArea.areaWeatherName == "" || gv.mod.currentArea.areaWeatherName == "none")
+                /*
+                if (isLightning == false)
                 {
-                    gv.weatherSounds1.controls.stop();
-                    gv.weatherSounds2.controls.stop();
+                    //if ((gv.weatherSounds3.URL != "") && (gv.weatherSounds3 != null))
+                    //{
                     gv.weatherSounds3.controls.stop();
-                }            
-            }
-            */
-            #endregion
+                    //}
+                }
+                else
+                {
+                    //if ((gv.weatherSounds3.URL != "") && (gv.weatherSounds3 != null))
+                    //{
+                    gv.weatherSounds3.controls.play();
+                    //}
+                }
+                
+                //fortefake
+                //moved 6 to one bracket outer
+                //if (!gv.mod.playMusic || gv.mod.currentArea.areaWeatherName == "" || gv.mod.currentArea.areaWeatherName == "none")
+                //{
+                //gv.weatherSounds1.controls.stop();
+                //gv.weatherSounds2.controls.stop();
+                //gv.weatherSounds3.controls.stop();
+                //}
+                
+                #endregion
+            }*/
+            /*if (!gv.mod.playMusic || gv.mod.currentArea.areaWeatherName == "" || gv.mod.currentArea.areaWeatherName == "none")
+            {
+                gv.weatherSounds1.controls.stop();
+                gv.weatherSounds2.controls.stop();
+                gv.weatherSounds3.controls.stop();
+            }*/            
         }
+
         public void doPropHeartBeat()
         {
             foreach (Prop prp in gv.mod.currentArea.Props)
-            { 
+            {
                 gv.sf.ThisProp = prp;
                 //IBScript Prop heartbeat
                 gv.cc.doIBScriptBasedOnFilename(prp.OnHeartBeatIBScript, prp.OnHeartBeatIBScriptParms);
@@ -6486,8 +9667,186 @@ namespace IBx
 
             //if ((gv.mod.currentArea.areaWeatherName != "") && (gv.mod.currentArea.areaWeatherName != "none"))
             //{
-                //fill the weather lists again with fresh data from the long lists
-                //note: this is done on each update call, mostly overwriting samey data
+            //fill the weather lists again with fresh data from the long lists
+            //note: this is done on each update call, mostly overwriting samey data
+            //iterate through the module's list of weather objects
+            for (int i = 0; i < gv.mod.moduleWeathersList.Count; i++)
+            {
+                if (gv.mod.currentArea.areaWeatherName == gv.mod.moduleWeathersList[i].name)
+                {
+                    for (int j = 0; j < gv.mod.moduleWeathersList[i].weatherTypeLists.Count; j++)
+                    {
+                        if (gv.mod.moduleWeathersList[i].weatherTypeLists[j].name == "entryList")
+                        {
+                            for (int k = 0; k < gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems.Count; k++)
+                            {
+                                gv.mod.listOfEntryWeatherNames.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].weatherEffectName);
+                                gv.mod.listOfEntryWeatherChances.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].chance);
+                                gv.mod.listOfEntryWeatherDurations.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].duration);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            #region check if current weather exists in this area
+            //check whether the current weather is still in the entry list of current area (which should contain all weathers possible in an area)
+            bool doesCurrentWeatherExistHere = false;
+            foreach (string weatherName in gv.mod.listOfEntryWeatherNames)
+            {
+                if (weatherName == gv.mod.currentWeatherName)
+                {
+                    doesCurrentWeatherExistHere = true;
+                    break;
+                }
+            }
+
+            //there is a current weather, the area allows weather and the particular current weather does not exist in this area anyhow
+            if ((gv.mod.currentWeatherName != "") && (gv.mod.currentArea.areaWeatherName != "") && (!doesCurrentWeatherExistHere))
+            {
+                //maintain weather from previous map for a few update calls (if new area allos weather at all)
+                //otherwise area borders will become weather borders which is bad for the seamlessness illusion 
+                if (gv.mod.justTransitioned2 == true)
+                {
+                    gv.mod.oldWeatherName = gv.mod.currentWeatherName;
+                    if (gv.mod.useRealTimeTimer == true)
+                    {
+                        gv.mod.maintainWeatherFromLastAreaTimer = gv.sf.RandInt(30) + 30;
+                    }
+                    else
+                    {
+                        gv.mod.maintainWeatherFromLastAreaTimer = gv.sf.RandInt(15) + 15;
+                    }
+                    gv.mod.justTransitioned2 = false;
+
+                    //make sure the run out time is not longer than the anyhow remaining time of the old weather
+                    if ((gv.mod.currentWeatherDuration > gv.mod.maintainWeatherFromLastAreaTimer))
+                    {
+                        gv.mod.currentWeatherDuration = (int)gv.mod.maintainWeatherFromLastAreaTimer;
+                    }
+                }
+                if (gv.mod.currentWeatherName.Contains("snow") || gv.mod.currentWeatherName.Contains("Snow") || gv.mod.currentWeatherName.Contains("rain") || gv.mod.currentWeatherName.Contains("Rain") || gv.mod.currentWeatherName.Contains("sand") || gv.mod.currentWeatherName.Contains("Sand"))
+                {
+                    gv.mod.isInitialParticleWave = true;
+                }
+            }
+            #endregion
+
+            //if (gv.mod.currentArea.areaWeatherName == "")
+            //{
+            //gv.mod.currentWeatherDuration = 0;
+            //}
+
+            //initialize a fresh weather
+            //hurgh9             
+            if ((gv.mod.currentWeatherName == "") && (gv.mod.oldWeatherName == "") && (gv.mod.currentArea.areaWeatherName != ""))
+            {
+                //determine random number between 1 and 100 for choosing entry weather type
+                int rollRandom = gv.sf.RandInt(100);
+                int addedChances = 0;
+
+                for (int i = 0; i < gv.mod.listOfEntryWeatherChances.Count; i++)
+                {
+                    addedChances += gv.mod.listOfEntryWeatherChances[i];
+                    if (rollRandom <= addedChances)
+                    {
+                        gv.mod.currentWeatherName = gv.mod.listOfEntryWeatherNames[i];
+                        if (gv.mod.currentWeatherName.Contains("Sandstorm") || gv.mod.currentWeatherName.Contains("sandStorm") || gv.mod.currentWeatherName.Contains("sandstorm") || gv.mod.currentWeatherName.Contains("SandStorm"))
+                        {
+                            gv.mod.sandStormDirectionX = (float)(gv.sf.RandInt(100) + 150) / 500f;
+                            gv.mod.sandStormDirectionY = (float)(gv.sf.RandInt(100) + 150) / 500f;
+                            int deciderX = gv.sf.RandInt(2);
+                            if (deciderX == 1)
+                            {
+                                gv.mod.sandStormDirectionX = gv.mod.sandStormDirectionX * -1;
+                            }
+                            int deciderY = gv.sf.RandInt(2);
+                            if (deciderY == 1)
+                            {
+                                gv.mod.sandStormDirectionY = gv.mod.sandStormDirectionY * -1;
+                            }
+
+                            if ((deciderX == 1) && (deciderY == 1))
+                            {
+                                gv.mod.sandStormBlowingTo = "NW";
+                            }
+                            if ((deciderX == 1) && (deciderY == 2))
+                            {
+                                gv.mod.sandStormBlowingTo = "SW";
+                            }
+                            if ((deciderX == 2) && (deciderY == 1))
+                            {
+                                gv.mod.sandStormBlowingTo = "NE";
+                            }
+                            if ((deciderX == 2) && (deciderY == 2))
+                            {
+                                gv.mod.sandStormBlowingTo = "SE";
+                            }
+                        }
+
+                        if (gv.mod.currentWeatherName.Contains("snow") || gv.mod.currentWeatherName.Contains("Snow") || gv.mod.currentWeatherName.Contains("rain") || gv.mod.currentWeatherName.Contains("Rain") || gv.mod.currentWeatherName.Contains("sand") || gv.mod.currentWeatherName.Contains("Sand"))
+                        {
+                            gv.mod.isInitialParticleWave = true;
+                        }
+
+
+
+                        gv.mod.currentWeatherDuration = gv.mod.listOfEntryWeatherDurations[i];
+                        float rollRandom2 = gv.sf.RandInt(100);
+                        if (gv.mod.useRealTimeTimer == true)
+                        {
+                            gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((200f + rollRandom2) / 100f));
+                        }
+                        else
+                        {
+                            gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((100f + rollRandom2) / 100f));
+                        }
+
+                        doesCurrentWeatherExistHere = true;
+                        gv.mod.howLongWeatherHasRun = 0;
+                        gv.mod.fullScreenEffectOpacityWeather = 0;
+                        //gv.mod.currentArea.rememberedWeatherName = gv.mod.currentWeatherName;
+                        //gv.mod.currentArea.rememberedWeatherDuration = gv.mod.currentWeatherDuration;
+                        break;
+                    }
+                }
+            }
+
+            //reduce duration by 1, more for areas that consume more time per step, also for fade out
+            gv.mod.currentWeatherDuration -= (1 * gv.mod.currentArea.weatherDurationMultiplierForScale);
+
+            //fade in counter
+            gv.mod.howLongWeatherHasRun += (1 * gv.mod.currentArea.weatherDurationMultiplierForScale);
+
+            float changeThreshold = (5 * gv.mod.currentArea.weatherDurationMultiplierForScale);
+
+            //Fade in
+            if (gv.mod.howLongWeatherHasRun <= changeThreshold)
+            {
+                gv.mod.fullScreenEffectOpacityWeather = 1f * (gv.mod.howLongWeatherHasRun / changeThreshold);
+            }
+
+            //Fade out
+            if (gv.mod.currentWeatherDuration <= changeThreshold)
+            {
+                gv.mod.fullScreenEffectOpacityWeather = 1f * (gv.mod.currentWeatherDuration / changeThreshold);
+            }
+
+            #region weather duration has ended, setup new weather
+            //weather duration has ended 
+            if (gv.mod.currentWeatherDuration <= 0)
+            {
+                gv.mod.oldWeatherName = "";
+                gv.mod.currentWeatherName = "";
+
+                //TODO gv.weatherSounds1.controls.stop();
+                //gv.weatherSounds2.controls.stop();
+                //gv.weatherSounds3.controls.stop();
+
+                gv.mod.howLongWeatherHasRun = 0;
+                gv.mod.fullScreenEffectOpacityWeather = 0;
+
                 //iterate through the module's list of weather objects
                 for (int i = 0; i < gv.mod.moduleWeathersList.Count; i++)
                 {
@@ -6495,13 +9854,13 @@ namespace IBx
                     {
                         for (int j = 0; j < gv.mod.moduleWeathersList[i].weatherTypeLists.Count; j++)
                         {
-                            if (gv.mod.moduleWeathersList[i].weatherTypeLists[j].name == "entryList")
+                            if (gv.mod.moduleWeathersList[i].weatherTypeLists[j].name == gv.mod.currentWeatherName)
                             {
                                 for (int k = 0; k < gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems.Count; k++)
                                 {
-                                    gv.mod.listOfEntryWeatherNames.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].weatherEffectName);
-                                    gv.mod.listOfEntryWeatherChances.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].chance);
-                                    gv.mod.listOfEntryWeatherDurations.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].duration);
+                                    gv.mod.listOfExitWeatherNames.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].weatherEffectName);
+                                    gv.mod.listOfExitWeatherChances.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].chance);
+                                    gv.mod.listOfExitWeatherDurations.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].duration);
                                 }
                                 break;
                             }
@@ -6509,349 +9868,187 @@ namespace IBx
                     }
                 }
 
-#region check if current weather exists in this area
-                //check whether the current weather is still in the entry list of current area (which should contain all weathers possible in an area)
-                bool doesCurrentWeatherExistHere = false;
-                foreach (string weatherName in gv.mod.listOfEntryWeatherNames)
+                //determine random number between 1 and 100 for choosing entry weather type
+                int rollRandom = gv.sf.RandInt(100);
+                int addedChances = 0;
+                bool foundWeather = false;
+
+                for (int i = 0; i < gv.mod.listOfExitWeatherChances.Count; i++)
                 {
-                    if (weatherName == gv.mod.currentWeatherName)
+                    addedChances += gv.mod.listOfExitWeatherChances[i];
+                    if (rollRandom <= addedChances)
                     {
-                        doesCurrentWeatherExistHere = true;
-                        break;
-                    }
-                }
-
-                //there is a current weather, the area allows weather and the particular current weather does not exist in this area anyhow
-                if ((gv.mod.currentWeatherName != "") && (gv.mod.currentArea.areaWeatherName != "") && (!doesCurrentWeatherExistHere))
-                {
-                    //maintain weather from previous map for a few update calls (if new area allos weather at all)
-                    //otherwise area borders will become weather borders which is bad for the seamlessness illusion 
-                    if (gv.mod.justTransitioned2 == true)
-                    {
-                        gv.mod.oldWeatherName = gv.mod.currentWeatherName;
-                        if (gv.mod.useRealTimeTimer == true)
+                        gv.mod.currentWeatherName = gv.mod.listOfExitWeatherNames[i];
+                        if (gv.mod.currentWeatherName.Contains("Sandstorm") || gv.mod.currentWeatherName.Contains("sandStorm") || gv.mod.currentWeatherName.Contains("sandstorm") || gv.mod.currentWeatherName.Contains("SandStorm"))
                         {
-                            gv.mod.maintainWeatherFromLastAreaTimer = gv.sf.RandInt(30) + 30;
-                        }
-                        else
-                        {
-                            gv.mod.maintainWeatherFromLastAreaTimer = gv.sf.RandInt(15) + 15;
-                        }
-                        gv.mod.justTransitioned2 = false;
-
-                        //make sure the run out time is not longer than the anyhow remaining time of the old weather
-                        if ((gv.mod.currentWeatherDuration > gv.mod.maintainWeatherFromLastAreaTimer))
-                        {
-                            gv.mod.currentWeatherDuration = (int)gv.mod.maintainWeatherFromLastAreaTimer;
-                        }
-                    }
-                }
-#endregion
-
-                //if (gv.mod.currentArea.areaWeatherName == "")
-                //{
-                //gv.mod.currentWeatherDuration = 0;
-                //}
-
-                //initialize a fresh weather
-                //hurgh9             
-                if ((gv.mod.currentWeatherName == "") && (gv.mod.oldWeatherName == "") && (gv.mod.currentArea.areaWeatherName != ""))
-                {
-                    //determine random number between 1 and 100 for choosing entry weather type
-                    int rollRandom = gv.sf.RandInt(100);
-                    int addedChances = 0;
-
-                    for (int i = 0; i < gv.mod.listOfEntryWeatherChances.Count; i++)
-                    {
-                        addedChances += gv.mod.listOfEntryWeatherChances[i];
-                        if (rollRandom <= addedChances)
-                        {
-                            gv.mod.currentWeatherName = gv.mod.listOfEntryWeatherNames[i];
-                            if (gv.mod.currentWeatherName.Contains("Sandstorm") || gv.mod.currentWeatherName.Contains("sandStorm") || gv.mod.currentWeatherName.Contains("sandstorm") || gv.mod.currentWeatherName.Contains("SandStorm"))
+                            gv.mod.sandStormDirectionX = (float)(gv.sf.RandInt(100) + 150) / 500f;
+                            gv.mod.sandStormDirectionY = (float)(gv.sf.RandInt(100) + 150) / 500f;
+                            int deciderX = gv.sf.RandInt(2);
+                            if (deciderX == 1)
                             {
-                                gv.mod.sandStormDirectionX = (float)(gv.sf.RandInt(100) + 150) / 500f;
-                                gv.mod.sandStormDirectionY = (float)(gv.sf.RandInt(100) + 150) / 500f;
-                                int deciderX = gv.sf.RandInt(2);
-                                if (deciderX == 1)
-                                {
-                                    gv.mod.sandStormDirectionX = gv.mod.sandStormDirectionX * -1;
-                                }
-                                int deciderY = gv.sf.RandInt(2);
-                                if (deciderY == 1)
-                                {
-                                    gv.mod.sandStormDirectionY = gv.mod.sandStormDirectionY * -1;
-                                }
-
-                                if ((deciderX == 1) && (deciderY == 1))
-                                {
-                                    gv.mod.sandStormBlowingTo = "NW";
-                                }
-                                if ((deciderX == 1) && (deciderY == 2))
-                                {
-                                    gv.mod.sandStormBlowingTo = "SW";
-                                }
-                                if ((deciderX == 2) && (deciderY == 1))
-                                {
-                                    gv.mod.sandStormBlowingTo = "NE";
-                                }
-                                if ((deciderX == 2) && (deciderY == 2))
-                                {
-                                    gv.mod.sandStormBlowingTo = "SE";
-                                }
+                                gv.mod.sandStormDirectionX = gv.mod.sandStormDirectionX * -1;
+                            }
+                            int deciderY = gv.sf.RandInt(2);
+                            if (deciderY == 1)
+                            {
+                                gv.mod.sandStormDirectionY = gv.mod.sandStormDirectionY * -1;
                             }
 
-                            gv.mod.currentWeatherDuration = gv.mod.listOfEntryWeatherDurations[i];
-                            float rollRandom2 = gv.sf.RandInt(100);
-                            if (gv.mod.useRealTimeTimer == true)
+                            if ((deciderX == 1) && (deciderY == 1))
                             {
-                                gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((200f + rollRandom2) / 100f));
+                                gv.mod.sandStormBlowingTo = "NW";
                             }
-                            else
+                            if ((deciderX == 1) && (deciderY == 2))
                             {
-                                gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((100f + rollRandom2) / 100f));
+                                gv.mod.sandStormBlowingTo = "SW";
+                            }
+                            if ((deciderX == 2) && (deciderY == 1))
+                            {
+                                gv.mod.sandStormBlowingTo = "NE";
+                            }
+                            if ((deciderX == 2) && (deciderY == 2))
+                            {
+                                gv.mod.sandStormBlowingTo = "SE";
                             }
 
-                            doesCurrentWeatherExistHere = true;
-                            gv.mod.howLongWeatherHasRun = 0;
-                            gv.mod.fullScreenEffectOpacityWeather = 0;
-                            //gv.mod.currentArea.rememberedWeatherName = gv.mod.currentWeatherName;
-                            //gv.mod.currentArea.rememberedWeatherDuration = gv.mod.currentWeatherDuration;
-                            break;
+
                         }
-                    }
-                }
-
-                //reduce duration by 1, more for areas that consume more time per step, also for fade out
-                gv.mod.currentWeatherDuration -= (1 * gv.mod.currentArea.weatherDurationMultiplierForScale);
-
-                //fade in counter
-                gv.mod.howLongWeatherHasRun += (1 * gv.mod.currentArea.weatherDurationMultiplierForScale);
-
-                float changeThreshold = (5 * gv.mod.currentArea.weatherDurationMultiplierForScale);
-
-                //Fade in
-                if (gv.mod.howLongWeatherHasRun <= changeThreshold)
-                {
-                    gv.mod.fullScreenEffectOpacityWeather = 1f * (gv.mod.howLongWeatherHasRun / changeThreshold);
-                }
-
-                //Fade out
-                if (gv.mod.currentWeatherDuration <= changeThreshold)
-                {
-                    gv.mod.fullScreenEffectOpacityWeather = 1f * (gv.mod.currentWeatherDuration / changeThreshold);
-                }
-
-                #region weather duration has ended, setup new weather
-                //weather duration has ended 
-                if (gv.mod.currentWeatherDuration <= 0)
-                {
-                    gv.mod.oldWeatherName = "";
-                    gv.mod.currentWeatherName = "";
-
-                    //TODO gv.weatherSounds1.controls.stop();
-                    //TODO gv.weatherSounds2.controls.stop();
-                    //TODO gv.weatherSounds3.controls.stop();
-
-                    gv.mod.howLongWeatherHasRun = 0;
-                    gv.mod.fullScreenEffectOpacityWeather = 0;
-
-                    //iterate through the module's list of weather objects
-                    for (int i = 0; i < gv.mod.moduleWeathersList.Count; i++)
-                    {
-                        if (gv.mod.currentArea.areaWeatherName == gv.mod.moduleWeathersList[i].name)
+                        if (gv.mod.currentWeatherName.Contains("snow") || gv.mod.currentWeatherName.Contains("Snow") || gv.mod.currentWeatherName.Contains("rain") || gv.mod.currentWeatherName.Contains("Rain") || gv.mod.currentWeatherName.Contains("sand") || gv.mod.currentWeatherName.Contains("Sand"))
                         {
-                            for (int j = 0; j < gv.mod.moduleWeathersList[i].weatherTypeLists.Count; j++)
-                            {
-                                if (gv.mod.moduleWeathersList[i].weatherTypeLists[j].name == gv.mod.currentWeatherName)
-                                {
-                                    for (int k = 0; k < gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems.Count; k++)
-                                    {
-                                        gv.mod.listOfExitWeatherNames.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].weatherEffectName);
-                                        gv.mod.listOfExitWeatherChances.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].chance);
-                                        gv.mod.listOfExitWeatherDurations.Add(gv.mod.moduleWeathersList[i].weatherTypeLists[j].weatherTypeListItems[k].duration);
-                                    }
-                                    break;
-                                }
-                            }
+                            gv.mod.isInitialParticleWave = true;
                         }
-                    }
 
-                    //determine random number between 1 and 100 for choosing entry weather type
-                    int rollRandom = gv.sf.RandInt(100);
-                    int addedChances = 0;
-                    bool foundWeather = false;
-
-                    for (int i = 0; i < gv.mod.listOfExitWeatherChances.Count; i++)
-                    {
-                        addedChances += gv.mod.listOfExitWeatherChances[i];
-                        if (rollRandom <= addedChances)
-                        {
-                            gv.mod.currentWeatherName = gv.mod.listOfExitWeatherNames[i];
-                            if (gv.mod.currentWeatherName.Contains("Sandstorm") || gv.mod.currentWeatherName.Contains("sandStorm") || gv.mod.currentWeatherName.Contains("sandstorm") || gv.mod.currentWeatherName.Contains("SandStorm"))
-                            {
-                                gv.mod.sandStormDirectionX = (float)(gv.sf.RandInt(100) + 150) / 500f;
-                                gv.mod.sandStormDirectionY = (float)(gv.sf.RandInt(100) + 150) / 500f;
-                                int deciderX = gv.sf.RandInt(2);
-                                if (deciderX == 1)
-                                {
-                                    gv.mod.sandStormDirectionX = gv.mod.sandStormDirectionX * -1;
-                                }
-                                int deciderY = gv.sf.RandInt(2);
-                                if (deciderY == 1)
-                                {
-                                    gv.mod.sandStormDirectionY = gv.mod.sandStormDirectionY * -1;
-                                }
-
-                                if ((deciderX == 1) && (deciderY == 1))
-                                {
-                                    gv.mod.sandStormBlowingTo = "NW";
-                                }
-                                if ((deciderX == 1) && (deciderY == 2))
-                                {
-                                    gv.mod.sandStormBlowingTo = "SW";
-                                }
-                                if ((deciderX == 2) && (deciderY == 1))
-                                {
-                                    gv.mod.sandStormBlowingTo = "NE";
-                                }
-                                if ((deciderX == 2) && (deciderY == 2))
-                                {
-                                    gv.mod.sandStormBlowingTo = "SE";
-                                }
-
-
-                            }
-                            gv.mod.currentWeatherDuration = gv.mod.listOfExitWeatherDurations[i];
-                            float rollRandom2 = gv.sf.RandInt(100);
-                            gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((50f + rollRandom2) / 100f));
-                            doesCurrentWeatherExistHere = true;
-                            foundWeather = true;
-                            break;
-                        }
-                    }
-
-                    //fail safe catch, take first weather from the respective exit list
-                    if ((foundWeather == false) && (gv.mod.listOfExitWeatherChances.Count > 0))
-                    {
-                        gv.mod.currentWeatherName = gv.mod.listOfExitWeatherNames[0];
-                        gv.mod.currentWeatherDuration = gv.mod.listOfExitWeatherDurations[0];
+                        gv.mod.currentWeatherDuration = gv.mod.listOfExitWeatherDurations[i];
                         float rollRandom2 = gv.sf.RandInt(100);
                         gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((50f + rollRandom2) / 100f));
                         doesCurrentWeatherExistHere = true;
                         foundWeather = true;
+                        break;
                     }
-
                 }
-                #endregion
 
-                gv.mod.isRaining = false;
-                gv.mod.isCloudy = false;
-                gv.mod.isFoggy = false;
-                gv.mod.isSnowing = false;
-                gv.mod.isLightning = false;
-                gv.mod.isSandstorm = false;
-
-
-                if (gv.mod.currentArea.areaWeatherName != "")
+                //fail safe catch, take first weather from the respective exit list
+                if ((foundWeather == false) && (gv.mod.listOfExitWeatherChances.Count > 0))
                 {
-                    if (gv.mod.currentWeatherName.Contains("lightRain") || gv.mod.currentWeatherName.Contains("LightRain"))
-                    {
-                        gv.mod.isRaining = true;
-                        gv.rainType = "lightRain";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("heavyRain") || gv.mod.currentWeatherName.Contains("HeavyRain"))
-                    {
-                        gv.mod.isRaining = true;
-                        gv.rainType = "heavyRain";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("rain") || gv.mod.currentWeatherName.Contains("Rain"))
-                    {
-                        gv.mod.isRaining = true;
-                        gv.rainType = "rain";
-                    }
-
-                    if (gv.mod.currentWeatherName.Contains("lightSnow") || gv.mod.currentWeatherName.Contains("LightSnow"))
-                    {
-                        gv.mod.isSnowing = true;
-                        gv.snowType = "lightSnow";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("heavySnow") || gv.mod.currentWeatherName.Contains("HeavySnow"))
-                    {
-                        gv.mod.isSnowing = true;
-                        gv.snowType = "heavySnow";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("snow") || gv.mod.currentWeatherName.Contains("Snow"))
-                    {
-                        gv.mod.isSnowing = true;
-                        gv.snowType = "snow";
-                    }
-
-
-                    if (gv.mod.currentWeatherName.Contains("lightSandStorm") || gv.mod.currentWeatherName.Contains("LightSandStorm"))
-                    {
-                        gv.mod.isSandstorm = true;
-                        gv.sandstormType = "lightSandStorm";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("heavySandStorm") || gv.mod.currentWeatherName.Contains("HeavySandStorm"))
-                    {
-                        gv.mod.isSandstorm = true;
-                        gv.sandstormType = "heavySandStorm";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("sandStorm") || gv.mod.currentWeatherName.Contains("SandStorm"))
-                    {
-                        gv.mod.isSandstorm = true;
-                        gv.sandstormType = "sandStorm";
-                    }
-
-                    if (gv.mod.currentWeatherName.Contains("heavyClouds") || gv.mod.currentWeatherName.Contains("HeavyClouds"))
-                    {
-                        gv.mod.isCloudy = true;
-                        gv.cloudType = "heavyCloud";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("lightClouds") || gv.mod.currentWeatherName.Contains("LightClouds"))
-                    {
-                        gv.mod.isCloudy = true;
-                        gv.cloudType = "lightCloud";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("clouds") || gv.mod.currentWeatherName.Contains("Clouds"))
-                    {
-                        gv.mod.isCloudy = true;
-                        gv.cloudType = "cloud";
-                    }
-
-                    if (gv.mod.currentWeatherName.Contains("heavyFog") || gv.mod.currentWeatherName.Contains("HeavyFog"))
-                    {
-                        gv.mod.isFoggy = true;
-                        gv.fogType = "heavyFog";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("lightFog") || gv.mod.currentWeatherName.Contains("LightFog"))
-                    {
-                        gv.mod.isFoggy = true;
-                        gv.fogType = "lightFog";
-                    }
-                    else if (gv.mod.currentWeatherName.Contains("fog") || gv.mod.currentWeatherName.Contains("Fog"))
-                    {
-                        gv.mod.isFoggy = true;
-                        gv.fogType = "fog";
-                    }
-
-                    if (gv.mod.currentWeatherName.Contains("lightning") || gv.mod.currentWeatherName.Contains("Lightning"))
-                    {
-                        gv.mod.isLightning = true;
-                    }
+                    gv.mod.currentWeatherName = gv.mod.listOfExitWeatherNames[0];
+                    gv.mod.currentWeatherDuration = gv.mod.listOfExitWeatherDurations[0];
+                    float rollRandom2 = gv.sf.RandInt(100);
+                    gv.mod.currentWeatherDuration = (int)(gv.mod.currentWeatherDuration * ((50f + rollRandom2) / 100f));
+                    doesCurrentWeatherExistHere = true;
+                    foundWeather = true;
                 }
 
-                if (gv.mod.debugMode)
-                {
-                    gv.cc.addLogText("lime", gv.mod.currentWeatherName);
-                }
-
-                //hurgh7
-                //gv.mod.currentWeatherName = "sandStorm";
-                //gv.mod.isSandstorm = true;
             }
+            #endregion
+
+            gv.mod.isRaining = false;
+            gv.mod.isCloudy = false;
+            gv.mod.isFoggy = false;
+            gv.mod.isSnowing = false;
+            gv.mod.isLightning = false;
+            gv.mod.isSandstorm = false;
+
+
+            if (gv.mod.currentArea.areaWeatherName != "")
+            {
+                if (gv.mod.currentWeatherName.Contains("lightRain") || gv.mod.currentWeatherName.Contains("LightRain"))
+                {
+                    gv.mod.isRaining = true;
+                    gv.rainType = "lightRain";
+                }
+                else if (gv.mod.currentWeatherName.Contains("heavyRain") || gv.mod.currentWeatherName.Contains("HeavyRain"))
+                {
+                    gv.mod.isRaining = true;
+                    gv.rainType = "heavyRain";
+                }
+                else if (gv.mod.currentWeatherName.Contains("rain") || gv.mod.currentWeatherName.Contains("Rain"))
+                {
+                    gv.mod.isRaining = true;
+                    gv.rainType = "rain";
+                }
+
+                if (gv.mod.currentWeatherName.Contains("lightSnow") || gv.mod.currentWeatherName.Contains("LightSnow"))
+                {
+                    gv.mod.isSnowing = true;
+                    gv.snowType = "lightSnow";
+                }
+                else if (gv.mod.currentWeatherName.Contains("heavySnow") || gv.mod.currentWeatherName.Contains("HeavySnow"))
+                {
+                    gv.mod.isSnowing = true;
+                    gv.snowType = "heavySnow";
+                }
+                else if (gv.mod.currentWeatherName.Contains("snow") || gv.mod.currentWeatherName.Contains("Snow"))
+                {
+                    gv.mod.isSnowing = true;
+                    gv.snowType = "snow";
+                }
+
+
+                if (gv.mod.currentWeatherName.Contains("lightSandStorm") || gv.mod.currentWeatherName.Contains("LightSandStorm"))
+                {
+                    gv.mod.isSandstorm = true;
+                    gv.sandstormType = "lightSandStorm";
+                }
+                else if (gv.mod.currentWeatherName.Contains("heavySandStorm") || gv.mod.currentWeatherName.Contains("HeavySandStorm"))
+                {
+                    gv.mod.isSandstorm = true;
+                    gv.sandstormType = "heavySandStorm";
+                }
+                else if (gv.mod.currentWeatherName.Contains("sandStorm") || gv.mod.currentWeatherName.Contains("SandStorm"))
+                {
+                    gv.mod.isSandstorm = true;
+                    gv.sandstormType = "sandStorm";
+                }
+
+                if (gv.mod.currentWeatherName.Contains("heavyClouds") || gv.mod.currentWeatherName.Contains("HeavyClouds"))
+                {
+                    gv.mod.isCloudy = true;
+                    gv.cloudType = "heavyCloud";
+                }
+                else if (gv.mod.currentWeatherName.Contains("lightClouds") || gv.mod.currentWeatherName.Contains("LightClouds"))
+                {
+                    gv.mod.isCloudy = true;
+                    gv.cloudType = "lightCloud";
+                }
+                else if (gv.mod.currentWeatherName.Contains("clouds") || gv.mod.currentWeatherName.Contains("Clouds"))
+                {
+                    gv.mod.isCloudy = true;
+                    gv.cloudType = "cloud";
+                }
+
+                if (gv.mod.currentWeatherName.Contains("heavyFog") || gv.mod.currentWeatherName.Contains("HeavyFog"))
+                {
+                    gv.mod.isFoggy = true;
+                    gv.fogType = "heavyFog";
+                }
+                else if (gv.mod.currentWeatherName.Contains("lightFog") || gv.mod.currentWeatherName.Contains("LightFog"))
+                {
+                    gv.mod.isFoggy = true;
+                    gv.fogType = "lightFog";
+                }
+                else if (gv.mod.currentWeatherName.Contains("fog") || gv.mod.currentWeatherName.Contains("Fog"))
+                {
+                    gv.mod.isFoggy = true;
+                    gv.fogType = "fog";
+                }
+
+                if (gv.mod.currentWeatherName.Contains("lightning") || gv.mod.currentWeatherName.Contains("Lightning"))
+                {
+                    gv.mod.isLightning = true;
+                }
+            }
+
+            if (gv.mod.debugMode)
+            {
+                gv.cc.addLogText("lime", gv.mod.currentWeatherName);
+            }
+
+            //hurgh7
+            //gv.mod.currentWeatherName = "sandStorm";
+            //gv.mod.isSandstorm = true;
+        }
         //}
-               
+
         public void SetUpEntryLists(string str)
         {
             //this method expects input data in the following format
@@ -7008,6 +10205,1378 @@ namespace IBx
         }
 
 
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        //nearbybreathe
+        public void doPropMovesNearby()
+        {
+            //using this for pathfinding now, especially bridge situation
+            foreach (int i in getNearbyAreas())
+            {
+
+                foreach (Prop p in gv.mod.moduleAreasObjects[i].Props)
+                {
+
+                    recalcReloc(p);
+                    if (propIsWithinRelevantDistance(p, i))
+                    {
+                        if ((p.lastLocationX != p.LocationX) || (p.lastLocationY != p.LocationY))
+                        {
+                            p.lastLocationZ = p.LocationZ;
+                        }
+                        p.LocationZ = gv.mod.moduleAreasObjects[i].Tiles[p.LocationY * gv.mod.moduleAreasObjects[i].MapSizeX + p.LocationX].heightLevel;
+                    }
+                    if (p.MoverType == "daily")
+                    {
+                        int ghg = 0;
+                    }
+                }
+            }
+
+
+
+            #region Synchronization: update the position of time driven movers (either when the party switches area or when a time driven mover enters the current area)
+            // must extend this to props who ENTER or LEAVE NEARBY AREA, each WHILE ON CURRENT AREA, one of the nearby areas (not only current area); no change for the PARTY enters
+            //switch between nearby areas (including current) should in the end be smooth (Scrolling, no text message infomring about the switch)
+
+            //Synchronization: check for all time driven movers either 1. found when entering an area (three variants: move into current area, move on current area, move out of current area) or 2. coming in from outside while party is already on current area
+            //three nested loops running through area/prop/waypoint
+            for (int i = gv.mod.moduleAreasObjects.Count - 1; i >= 0; i--)
+            {
+                //the check for the two conditions itself; donOnEnterAreaUpdate is set in the region above 
+                if ((gv.mod.moduleAreasObjects[i].Filename != gv.mod.currentArea.Filename) || (doOnEnterAreaUpdate))
+                {
+                    for (int j = gv.mod.moduleAreasObjects[i].Props.Count - 1; j >= 0; j--)
+                    {
+                        if (gv.mod.moduleAreasObjects[i].Props[j].PropTag == "newPropTag_8745_17123" && doOnEnterAreaUpdate)
+                        {
+                            int hg = 0;
+                        }
+                        //we have to skip props here who are already on one of the whole (not just 8/13) nearby areas; 
+                        //this is to see their normal movement instaed of having them jump between waypoints
+                        //note: to experince props coming in form nearby area while party is on current, the prop code for leaving current area must be extened to leaving nearby area towarads current area; also nearby-nearby transiitiosn, all of them smoothly scrolling, gulp
+                        if (!doOnEnterAreaUpdate)
+                        {
+                            bool skipProp = false;
+
+                            foreach (int i2 in getNearbyAreas())
+                            {
+                                if (gv.mod.moduleAreasObjects[i2].Props.Contains(gv.mod.moduleAreasObjects[i].Props[j]))
+                                {
+                                    skipProp = true;
+                                    break;
+                                }
+                            }
+
+                            if (skipProp)
+                            {
+                                continue;
+                            }
+                        }
+
+                        int relevantAreaIndex = 0;
+                        int relevantPropIndex = 0;
+                        int relevantWaypointIndex = 0;
+                        bool foundProp = false;
+                        int nearestPointInTime = 0;
+                        string relevantPropTag = "";
+
+                        if ((gv.mod.moduleAreasObjects[i].Props[j].MoverType == "daily") || (gv.mod.moduleAreasObjects[i].Props[j].MoverType == "weekly") || (gv.mod.moduleAreasObjects[i].Props[j].MoverType == "monthly") || (gv.mod.moduleAreasObjects[i].Props[j].MoverType == "yearly"))
+                        {
+
+                            int listEndCheckedIndexOfNextWaypoint = 0;
+                            for (int k = gv.mod.moduleAreasObjects[i].Props[j].WayPointList.Count - 1; k >= 0; k--)
+                            {
+                                List<string> timeUnitsList = new List<string>();
+                                int currentTimeInInterval = 0;
+
+                                //convert the string from the toolset for departure time into separate ints, filtering out ":" and blanks
+                                //format in toolset is number:number:number
+                                //with these ranges [0 to 336]:[0 to 23]:[0 to 59]
+                                //actually it's 1 to 336 for for intuitive feeling, but below code treats zero and 1 the same way
+                                //think: 1 equals monday, 2 equals tuesday and so forth
+                                timeUnitsList = gv.mod.moduleAreasObjects[i].Props[j].WayPointList[k].departureTime.Split(':').Select(x => x.Trim()).ToList();
+
+                                int dayCounter = Convert.ToInt32(timeUnitsList[0]);
+                                int hourCounter = Convert.ToInt32(timeUnitsList[1]);
+                                int minuteCounter = Convert.ToInt32(timeUnitsList[2]);
+
+                                //catch entries of zero
+                                //counter is reduced by one to make below calculation work the same for day/minutes/hours
+                                if ((dayCounter == 0) || (dayCounter == 1))
+                                {
+                                    dayCounter = 0;
+                                }
+                                else
+                                {
+                                    dayCounter = (dayCounter - 1);
+                                }
+
+                                //turn the the three counters into one number for departure time (in minutes)
+                                int convertedDepartureTime = dayCounter * 1440 + hourCounter * 60 + minuteCounter;
+
+                                //automatically overwritwe departure time for last in line waypoint to be at the end of the respective time interval 
+                                //and factor in the duration of one step 
+                                //this makes sure that within each time cycle every waypoint is only used once
+
+                                if (k == gv.mod.moduleAreasObjects[i].Props[j].WayPointList.Count - 1)
+                                {
+                                    if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("daily"))
+                                    {
+                                        convertedDepartureTime = 1440 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                    if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("weekly"))
+                                    {
+                                        convertedDepartureTime = 10080 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                    if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("monthly"))
+                                    {
+                                        convertedDepartureTime = 40320 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                    if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("yearly"))
+                                    {
+                                        convertedDepartureTime = 483840 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                }
+
+                                if (k == 0)
+                                {
+                                    if (convertedDepartureTime < (gv.mod.timePerStepAfterSpeedCalc + 1))
+                                    {
+                                        convertedDepartureTime = gv.mod.timePerStepAfterSpeedCalc + 1;
+                                    }
+                                }
+
+                                //use modulo operation to get the current time (in seconds) in each of the intervals
+                                //the intervalls endlessly run from zero to maximum length to zero to maximum length and so forth
+                                if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("daily"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 1440;
+                                }
+                                if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("weekly"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 10080;
+                                }
+                                if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("monthly"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 40320;
+                                }
+                                if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("yearly"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 483840;
+                                }
+
+                                //we look for waypoints whose time has already been reached in this step
+                                if (currentTimeInInterval >= convertedDepartureTime)
+                                {
+                                    //we filter those waypoints out who are older than other waypoitns whose time has already been reached
+                                    if (convertedDepartureTime > nearestPointInTime)
+                                    {
+                                        //we store and overwrite the waypoints whose time has been reached, overwriting the older ones so long until only the youngest waypoint whose time has already been reached remains
+                                        nearestPointInTime = convertedDepartureTime;
+                                        relevantAreaIndex = i;
+                                        relevantPropIndex = j;
+                                        relevantWaypointIndex = k;
+                                        relevantPropTag = gv.mod.moduleAreasObjects[i].Props[j].PropTag;
+                                        foundProp = true;
+                                    }
+                                }
+                            }
+
+                            //a waypint whose time has been reached has been found in above step, it's the youngest of these
+                            if (foundProp)
+                            {
+                                //activate the filter again for the next props in the loop
+                                foundProp = false;
+
+                                //check whether the waypoint found was a last in line wayoint
+                                //this is important as we will look whether the waypoint after the found one has a different area name
+                                //note: if areea name of next waypoint is different than current one, the prop is transitioned to the other area (going in or out); correction liekly only going IN
+                                if (relevantWaypointIndex >= gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList.Count - 1)
+                                {
+                                    listEndCheckedIndexOfNextWaypoint = 0;
+                                }
+                                else
+                                {
+                                    listEndCheckedIndexOfNextWaypoint = relevantWaypointIndex + 1;
+                                }
+
+                                //we check the situation that the party enters a fresh area
+                                //there are three situations-.l to handle:
+                                //1. the current waypoint is on different map, but the next waypoint is on current map: move prop to next waypoint (move into area)
+                                //2. the current waypoint and the next are on current map: move prop to current waypoint (move on current area)
+                                //3. the current waypoint is on this map, but the next waypoint is on different map: move prop to next waypoint (move out of current area)
+
+                                //fidn out whetehr prop 
+
+                                if (doOnEnterAreaUpdate == true)
+                                {
+                                    //1. the current waypoint is on different map, but the next waypoint is on current map: move prop to next waypoint (move into area)
+                                    //sirene
+                                    //likely need to allow props to enter into nearby neighbours, too, todo
+                                    bool currentWPOnDifferent = true;
+                                    bool nextWPOnNearby = false;
+                                    foreach (int iA in getNearbyAreas())
+                                    {
+                                        if (gv.mod.moduleAreasObjects[iA].Filename == gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName)
+                                        {
+                                            nextWPOnNearby = true;
+                                            break;
+                                        }
+                                    }
+                                    foreach (int iA in getNearbyAreas())
+                                    {
+                                        if (gv.mod.moduleAreasObjects[iA].Filename == gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName)
+                                        {
+                                            currentWPOnDifferent = false;
+                                            break;
+                                        }
+                                    }
+
+
+                                    if (nextWPOnNearby && currentWPOnDifferent)
+                                    {
+                                        //apply only for props that are not already in current area
+                                        //bool isOnCurrentAreaAlready = false;
+
+                                        //foreach (int i2 in getNearbyAreas())
+                                        //{
+                                        //if (gv.mod.moduleAreasObjects[i2].Props.Contains(gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex]))
+                                        //{
+                                        //isOnCurrentAreaAlready = true;
+                                        //}
+                                        //}
+
+                                        //if (isOnCurrentAreaAlready == false)
+                                        //{
+                                        //we assign the index of next in line waypoint
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = listEndCheckedIndexOfNextWaypoint;
+                                        //set move to target coordinates
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X;
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y;
+                                        gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y.ToString());
+                                        //}
+                                        //prop already exists on a nearby area, so we only relocate it, but no transfer
+                                        //else
+                                        //{
+                                        //we assign the index of next in line waypoint
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = listEndCheckedIndexOfNextWaypoint;
+                                        //set move to target coordinates
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X;
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y;
+                                        //gv.sf.osController("osSetPropLocation.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y.ToString());
+                                        //}
+                                    }
+                                    //to be continued
+                                    //2. the current waypoint and the next are on current map: move prop to current waypoint (move on current area, venetually transfer in from other area)
+                                    else if (nextWPOnNearby && !currentWPOnDifferent)
+                                    {
+
+                                        //else if ((gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName == gv.mod.currentArea.Filename) && (gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName == gv.mod.currentArea.Filename))
+                                        //{
+                                        //apply only for props that are not already in current area
+                                        //bool isOnCurrentAreaAlready = false;
+                                        //foreach (Prop p in gv.mod.currentArea.Props)
+                                        //{
+                                        //if (p.PropTag == relevantPropTag)
+                                        //{
+                                        //isOnCurrentAreaAlready = true;
+                                        //}
+                                        //}
+                                        //prop is not on current area, so transfer and tehn relocate it
+                                        //if (isOnCurrentAreaAlready == false)
+                                        // {
+                                        //note: the index will be updated a few lines down in the normal move section to the correct target
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = relevantWaypointIndex;
+                                        //note: the move to target coordinates will be updated a few lines down in the normal move section
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].X;
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].Y;
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].lastAreaFilenameOfProp = gv.mod.moduleAreasObjects[relevantAreaIndex].Filename;
+                                        gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].Y.ToString());
+                                        //}
+                                        //the prop is already on the current area, so just relocate it on area
+                                        //else
+                                        //{
+                                        //note: the index will be updated a few lines down in the normal move section to the correct target
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = relevantWaypointIndex;
+                                        //note: the move to target coordinates will be updated a few lines down in the normal move section
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].X;
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].Y;
+                                        //gv.sf.osController("osSetPropLocation.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].Y.ToString());
+                                        //}
+                                    }
+                                    //3. remove from current area (move out of current area)
+                                    //remove from nearby area group
+                                    else if (!nextWPOnNearby && !currentWPOnDifferent)
+                                    {
+                                        //else if ((gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName != gv.mod.currentArea.Filename) && (gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName == gv.mod.currentArea.Filename))
+                                        //{
+                                        //apply only for props that ARE already in current area
+                                        bool isOnCurrentAreaAlready = false;
+
+                                        //foreach (Prop p in gv.mod.currentArea.Props)
+                                        //{
+                                        //if (p.PropTag == relevantPropTag)
+                                        //{
+                                        //isOnCurrentAreaAlready = true;
+                                        //}
+                                        //}
+                                        foreach (int i2 in getNearbyAreas())
+                                        {
+                                            if (gv.mod.moduleAreasObjects[i2].Props.Contains(gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex]))
+                                            {
+                                                isOnCurrentAreaAlready = true;
+                                            }
+                                        }
+
+                                        if (isOnCurrentAreaAlready)
+                                        {
+                                            //we assign the index of next in line waypoint
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = listEndCheckedIndexOfNextWaypoint;
+                                            //set move to target coordinates
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X;
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y;
+
+                                            //brussels
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].lastAreaFilenameOfProp = gv.mod.moduleAreasObjects[relevantAreaIndex].Filename;
+
+                                            gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y.ToString());
+                                        }
+
+                                    }
+                                    //4. remove from echo prop (and transfer to fitting area)
+                                    //else if ((gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName != gv.mod.currentArea.Filename) && (gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName != gv.mod.currentArea.Filename))
+                                    //{
+                                    else if (!nextWPOnNearby && currentWPOnDifferent)
+                                    {
+                                        //apply only for props that ARE already in current area
+                                        bool isOnCurrentAreaAlready = false;
+                                        foreach (int i2 in getNearbyAreas())
+                                        {
+                                            if (gv.mod.moduleAreasObjects[i2].Props.Contains(gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex]))
+                                            {
+                                                isOnCurrentAreaAlready = true;
+                                            }
+                                        }
+
+                                        if (isOnCurrentAreaAlready)
+                                        {
+                                            //we assign the index of next in line waypoint
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = listEndCheckedIndexOfNextWaypoint;
+                                            //set move to target coordinates
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X;
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y;
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].passOneMove = true;
+                                            gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].lastAreaFilenameOfProp = gv.mod.moduleAreasObjects[relevantAreaIndex].Filename;
+                                            gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y.ToString());
+                                        }
+                                    }
+                                }
+                                //we handle props entering the current area while the party is in it
+                                //we will look for props whose next in line waypoint is on current map: we then move the prop to next in line waypoint
+                                //note: this will allow props entering the current map even if the departure time of first waypoint on current map is not reached yet
+                                //note: this is not run for props already on the current map (see condition at the very start that exempts current area from the loops), so no worries about affecting those already existing props
+                                else
+                                {
+                                    bool currentWPOnDifferent = true;
+                                    bool nextWPOnNearby = false;
+                                    foreach (int iA in getNearbyAreas())
+                                    {
+                                        if (gv.mod.moduleAreasObjects[iA].Filename == gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName)
+                                        {
+                                            nextWPOnNearby = true;
+                                            break;
+                                        }
+                                    }
+                                    foreach (int iA in getNearbyAreas())
+                                    {
+                                        if (gv.mod.moduleAreasObjects[iA].Filename == gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[relevantWaypointIndex].areaName)
+                                        {
+                                            currentWPOnDifferent = false;
+                                            break;
+                                        }
+                                    }
+
+                                    //if (gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName == gv.mod.currentArea.Filename)
+                                    if (nextWPOnNearby)
+                                    {
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointListCurrentIndex = listEndCheckedIndexOfNextWaypoint;
+                                        //set move to target coordinates
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X;
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y;
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].passOneMove = true;
+                                        int xLocForFloaty = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X;
+                                        int yLocForFloaty = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y;
+                                        gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].lastAreaFilenameOfProp = gv.mod.moduleAreasObjects[relevantAreaIndex].Filename;
+                                        string targetAreaName = gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName;
+                                        gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].PropTag, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName, gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X.ToString(), gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].Y.ToString());
+
+                                        //gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].X
+                                        //xxxxx
+                                        //added floaty text that announces the area transfer
+                                        //string shownAreaName = "";
+                                        //for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
+                                        //{
+                                        //if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName)
+                                        //{
+                                        //shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
+                                        //}
+                                        //}
+                                        //IBMessageBox.Show(gv, "Prop just appeared");
+                                        //Platz/HBF
+                                        //gv.screenMainMap.addFloatyText(xLocForFloaty, yLocForFloaty, "Just arrived here", "white", 4000);
+                                        foreach (Area a in gv.mod.moduleAreasObjects)
+                                        {
+                                            //if (gv.mod.moduleAreasObjects[relevantAreaIndex].Props.Count > relevantPropIndex && listEndCheckedIndexOfNextWaypoint < gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList.Count)
+                                            //{
+                                            //if (a.Filename == gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName)
+                                            if (a.Filename == targetAreaName)
+                                            {
+                                                gv.screenMainMap.addFloatyText(a.Props[a.Props.Count - 1], "Just arrived here", "white", 2000);
+                                                break;
+                                            }
+                                            //}
+                                        }
+                                        //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex], "Just arrived here", "white", 4000);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            #region move ALL movers on current map (post, random, patrol, daily, weekly, monthly, yearly; also handle chasing)
+            //begin moving the existing props in this map
+            //this must be extended for all nearby areas
+            foreach (int h in getNearbyAreas())
+            {
+                for (int i = gv.mod.moduleAreasObjects[h].Props.Count - 1; i >= 0; i--)
+                //foreach (Prop p in gv.mod.moduleAreasObjects[i].Props)
+                {
+                    if (propIsWithinRelevantDistance(gv.mod.moduleAreasObjects[h].Props[i], h))
+                    {
+
+
+
+
+
+                        //for (int i = gv.mod.currentArea.Props.Count - 1; i >= 0; i--)
+                        //{
+                        if ((!gv.mod.moduleAreasObjects[h].Props[i].skipNavigationThisTurn || gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer))
+                        {
+                            //clear the lists with pixel destination coordinates of props
+                            //suspect2, this might be it: prop is first called on old area, but then again on new area, killing its destinations!
+                            if (!gv.mod.moduleAreasObjects[h].Props[i].justJumpedBetweenAreas)
+                            {
+                                gv.mod.moduleAreasObjects[h].Props[i].destinationPixelPositionXList.Clear();
+                                gv.mod.moduleAreasObjects[h].Props[i].destinationPixelPositionXList = new List<int>();
+                                gv.mod.moduleAreasObjects[h].Props[i].destinationPixelPositionYList.Clear();
+                                gv.mod.moduleAreasObjects[h].Props[i].destinationPixelPositionYList = new List<int>();
+                                gv.mod.moduleAreasObjects[h].Props[i].pixelMoveSpeed = 1;
+                            }
+                            else
+                            {
+                                gv.mod.moduleAreasObjects[h].Props[i].justJumpedBetweenAreas = false;
+                            }
+
+                            //}
+
+                            //set the currentPixel position of the props
+                            //this needs to be adjusted for tose nearby areas other than current
+                            //crowley
+
+                            int xOffSetInSquares = gv.mod.moduleAreasObjects[h].Props[i].relocX - gv.mod.PlayerLocationX;
+                            int yOffSetInSquares = gv.mod.moduleAreasObjects[h].Props[i].relocY - gv.mod.PlayerLocationY;
+                            //int xOffSetInSquares = gv.mod.currentArea.Props[i].LocationX - gv.mod.PlayerLocationX;
+                            //int yOffSetInSquares = gv.mod.currentArea.Props[i].LocationY - gv.mod.PlayerLocationY;
+                            int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
+                            int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
+
+                            //wolfwood3
+                            //if (gv.mod.currentArea.Props[i].propMovingHalfSpeedMulti == 1)
+                            //{
+                            gv.mod.moduleAreasObjects[h].Props[i].currentPixelPositionX = playerPositionXInPix + (xOffSetInSquares * gv.squareSize);
+                            gv.mod.moduleAreasObjects[h].Props[i].currentPixelPositionY = playerPositionYInPix + (yOffSetInSquares * gv.squareSize);
+                            //}
+
+
+                            if (1 == 1)
+                            {
+                                /*
+            #region delay a mover for one turn on same square as party
+                                //I suggest to modify this, so the prop will only wait for one turn and then move on, regardless of shared location with player
+                                //otherwise the player can pin down a mover forever which feels weird imho
+                                if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.PlayerLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.PlayerLocationY))
+                                {
+                                    if (gv.sf.GetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited") == -1)
+                                    {
+                                        gv.sf.SetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited", "1");
+                                        //do nothing since prop and player are on the same square
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    gv.sf.SetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited", "-1");
+                                }
+            #endregion
+                                */
+
+                                #region DISABLED: dont move props further away than ten squares
+                                //Here I would suggest a full disable - the illsuion of a living wold would not work with a time freeze bubble outside 10 square radius
+                                //if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) > 10)
+                                //{
+                                //do nothing since prop and player are far away from each other
+                                //continue;			
+                                //}
+                                #endregion
+
+                                if ((gv.mod.moduleAreasObjects[h].Props[i].isMover) && (gv.mod.moduleAreasObjects[h].Props[i].isActive))
+                                {
+                                    //determine move distance first
+                                    //crowley2
+                                    int moveDist = this.getMoveDistance(gv.mod.moduleAreasObjects[h].Props[i]);
+
+                                    //gv.mod.currentArea.Props[i].pixelMoveSpeed = moveDist;
+
+
+                                    #region Chaser code
+                                    if ((gv.mod.moduleAreasObjects[h].Props[i].isChaser) && (!gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost) && gv.mod.moduleAreasObjects[h].Filename == gv.mod.currentArea.Filename)
+                                    {
+                                        //party rolls stealth against dc(sotEnemy) of prop to prevent starting a chase
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //foreach (Area a in gv.mod.moduleAreasObjects)
+                                        //{
+                                        //if (a.Filename == gv.mod.currentArea.Filename)
+                                        //{
+                                        //foreach (Prop p in a.Props)
+                                        //{
+                                        //if (p.stealth != -1)
+                                        //{ 
+                                        //skill roll script
+                                        //visible state
+                                        bool isFooled = false;
+                                        string traitMethod = "leader";
+                                        foreach (Trait t in gv.mod.moduleTraitsList)
+                                        {
+                                            if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
+                                            {
+                                                traitMethod = t.methodOfChecking;
+                                            }
+                                        }
+                                        int parm1 = gv.mod.selectedPartyLeader;
+                                        if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                                        {
+                                            parm1 = gv.mod.selectedPartyLeader;
+                                        }
+                                        else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                                        {
+                                            parm1 = -2;
+                                        }
+                                        else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                                        {
+                                            parm1 = -3;
+                                        }
+                                        else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                                        {
+                                            parm1 = -4;
+                                        }
+                                        else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                                        {
+                                            parm1 = -5;
+                                        }
+                                        else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                                        {
+                                            parm1 = -6;
+                                        }
+
+                                        int tileAdder = 0;
+                                        int darkAdder = 0;
+                                        tileAdder = gv.mod.moduleAreasObjects[h].Tiles[gv.mod.PlayerLocationY * gv.mod.moduleAreasObjects[h].MapSizeX + gv.mod.PlayerLocationY].stealthModifier;
+
+                                        foreach (Prop p5 in gv.mod.currentArea.Props)
+                                        {
+                                            if (p5.stealthModifier != 0)
+                                            {
+                                                if (p5.LocationX == gv.mod.PlayerLocationX && p5.LocationY == gv.mod.PlayerLocationY)
+                                                {
+                                                    tileAdder = p5.stealthModifier;
+                                                }
+                                            }
+                                        }
+
+                                        if (gv.sf.CheckIsInDarkness("party", "night"))
+                                        {
+                                            darkAdder = 4;
+                                        }
+                                        if (gv.sf.CheckIsInDarkness("party", "noLight"))
+                                        {
+                                            darkAdder = 12;
+                                        }
+                                        Coordinate pcCoord = new Coordinate();
+                                        Coordinate propCoord = new Coordinate();
+                                        pcCoord.X = gv.mod.PlayerLocationX;
+                                        pcCoord.Y = gv.mod.PlayerLocationY;
+                                        propCoord.X = gv.mod.moduleAreasObjects[h].Props[i].relocX;
+                                        propCoord.Y = gv.mod.moduleAreasObjects[h].Props[i].relocY;
+
+                                        //factor in lit state and tile stealtModifier
+                                        int checkModifier = (gv.cc.getDistance(pcCoord, propCoord) - 1) * 2 - 4 + darkAdder + tileAdder;
+
+                                        if ((gv.mod.moduleAreasObjects[h].Props[i].spotEnemy != -1) && (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, gv.mod.moduleAreasObjects[h].Props[i].spotEnemy - checkModifier + 1, true, true)))
+                                        {
+                                            isFooled = true;
+                                        }
+                                        else
+                                        {
+                                            isFooled = false;
+                                        }
+
+                                        //}
+                                        //}
+                                        //}
+                                        //}
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                                        //determine if start chasing or stop chasing (set isCurrentlyChasing to true or false)
+                                        if (!gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing)
+                                        {
+
+                                            //not chasing so see if in detect distance and set to true
+                                            if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.moduleAreasObjects[h].Props[i].relocX, gv.mod.moduleAreasObjects[h].Props[i].relocY)) <= gv.mod.moduleAreasObjects[h].Props[i].ChaserDetectRangeRadius && gv.mod.moduleAreasObjects[h].Props.Contains(gv.mod.moduleAreasObjects[h].Props[i]))
+                                            {
+                                                bool tooMuchHeightDifference = false;
+                                                if (gv.mod.blendOutTooHighAndTooDeepTiles)
+                                                {
+                                                    if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.currentArea.Tiles[gv.mod.moduleAreasObjects[h].Props[i].LocationY * gv.mod.moduleAreasObjects[h].MapSizeX + gv.mod.moduleAreasObjects[h].Props[i].LocationX].heightLevel - 2))
+                                                    {
+                                                        tooMuchHeightDifference = true;
+                                                    }
+                                                }
+                                                if (!isFooled)
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing = true;
+                                                    gv.mod.moduleAreasObjects[h].Props[i].ChaserStartChasingTime = gv.mod.WorldTime;
+
+                                                    if (!gv.mod.moduleAreasObjects[h].Props[i].isStealthed)
+                                                    {
+                                                        if (!tooMuchHeightDifference)
+                                                        {
+                                                            gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Chasing...", "red", 1500);
+                                                        }
+                                                    }
+                                                }
+                                                //has been fooled
+                                                else
+                                                {
+
+                                                    if (!tooMuchHeightDifference && !gv.mod.moduleAreasObjects[h].Props[i].isStealthed)
+                                                    {
+                                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Fooled!", "green", 1500);
+                                                    }
+
+                                                }
+                                                if (gv.mod.debugMode)
+                                                {
+
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "following you", "red", 4000);
+                                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " start chasing " + gv.mod.moduleAreasObjects[h].Props[i].ChaserChaseDuration + " seconds</font><BR>");
+                                                }
+                                            }
+                                        }
+                                        else //is chasing so see if out of follow range and set to false
+                                        {
+                                            if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.moduleAreasObjects[h].Props[i].relocX, gv.mod.moduleAreasObjects[h].Props[i].relocY)) >= gv.mod.moduleAreasObjects[h].Props[i].ChaserGiveUpChasingRangeRadius || isFooled || !gv.mod.currentArea.Props.Contains(gv.mod.moduleAreasObjects[h].Props[i]))
+                                            {
+                                                gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing = false;
+                                                gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = true;
+                                                if (!gv.mod.moduleAreasObjects[h].Props[i].isStealthed)
+                                                {
+                                                    bool tooMuchHeightDifference = false;
+                                                    if (gv.mod.blendOutTooHighAndTooDeepTiles)
+                                                    {
+                                                        if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.moduleAreasObjects[h].Tiles[gv.mod.moduleAreasObjects[h].Props[i].relocY * gv.mod.moduleAreasObjects[h].MapSizeX + gv.mod.moduleAreasObjects[h].Props[i].relocX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.moduleAreasObjects[h].Tiles[gv.mod.moduleAreasObjects[h].Props[i].relocY * gv.mod.moduleAreasObjects[h].MapSizeX + gv.mod.moduleAreasObjects[h].Props[i].relocX].heightLevel - 2))
+                                                        {
+                                                            tooMuchHeightDifference = true;
+                                                        }
+                                                    }
+                                                    if (!tooMuchHeightDifference)
+                                                    {
+                                                        if (isFooled)
+                                                        {
+                                                            gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Lost sight...", "green", 1500);
+                                                        }
+                                                        else
+                                                        {
+                                                            gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Lost interest...", "green", 1500);
+                                                        }
+                                                    }
+                                                }
+                                                if (gv.mod.debugMode)
+                                                {
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Nevermind...", "green", 1000);
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "nevermind", "green", 4000);
+                                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " stop chasing on range</font><BR>");
+                                                }
+                                            }
+                                            else if (gv.mod.WorldTime - gv.mod.moduleAreasObjects[h].Props[i].ChaserStartChasingTime >= gv.mod.moduleAreasObjects[h].Props[i].ChaserChaseDuration)
+                                            {
+                                                gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing = false;
+                                                gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = true;
+                                                if (!gv.mod.moduleAreasObjects[h].Props[i].isStealthed)
+                                                {
+                                                    bool tooMuchHeightDifference = false;
+                                                    if (gv.mod.blendOutTooHighAndTooDeepTiles)
+                                                    {
+                                                        if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.moduleAreasObjects[h].Tiles[gv.mod.moduleAreasObjects[h].Props[i].relocY * gv.mod.moduleAreasObjects[h].MapSizeX + gv.mod.moduleAreasObjects[h].Props[i].relocX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.moduleAreasObjects[h].Tiles[gv.mod.moduleAreasObjects[h].Props[i].relocY * gv.mod.moduleAreasObjects[h].MapSizeX + gv.mod.moduleAreasObjects[h].Props[i].relocX].heightLevel - 2))
+                                                        {
+                                                            tooMuchHeightDifference = true;
+                                                        }
+                                                    }
+                                                    if (!tooMuchHeightDifference)
+                                                    {
+                                                        gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Lost interest...", "green", 1500);
+                                                    }
+                                                }
+                                                if (gv.mod.debugMode)
+                                                {
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "nevermind", "green", 4000);
+                                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " stop chasing on duration</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (gv.mod.debugMode)
+                                                {
+                                                    int timeRemain = gv.mod.moduleAreasObjects[h].Props[i].ChaserChaseDuration - (gv.mod.WorldTime - gv.mod.moduleAreasObjects[h].Props[i].ChaserStartChasingTime);
+                                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " chasing " + timeRemain + " seconds left</font><BR>");
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //check to see if currently chasing, if so, chase
+                                    if (!gv.mod.currentArea.Props.Contains(gv.mod.moduleAreasObjects[h].Props[i]))
+                                    {
+                                        gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing = false;
+                                        gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = true;
+                                    }
+                                    if ((gv.mod.moduleAreasObjects[h].Props[i].isChaser) && (gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing))
+                                    {
+
+                                        Coordinate newCoor2 = new Coordinate();
+                                        //newCoor2.X = gv.mod.currentArea.Props[i].CurrentMoveToTarget.X;
+                                        //newCoor2.Y = gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y;
+                                        newCoor2.X = gv.mod.PlayerLocationX;
+                                        newCoor2.Y = gv.mod.PlayerLocationY;
+                                        Coordinate newCoor3 = new Coordinate();
+                                        newCoor3.X = gv.mod.moduleAreasObjects[h].Props[i].relocX;
+                                        newCoor3.Y = gv.mod.moduleAreasObjects[h].Props[i].relocY;
+                                        //move the distance
+                                        //müde2
+                                        //if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                        //{
+                                        //moveDist = 1;
+                                        //gv.mod.currentArea.Props[i].moved2 = false;
+                                        //}
+                                        if (moveDist > 0)
+                                        {
+                                            this.moveToTarget(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.moduleAreasObjects[h].Props[i], moveDist);
+                                            //eisschraube
+                                            if (gv.mod.stopMoves)
+                                            {
+                                                gv.mod.stopMoves = false;
+                                                return;
+                                            }
+                                        }
+                                        //if (moveDist > 1)
+                                        //{
+                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                        //}
+                                        //wolfwood6
+                                        doPropBarkString(gv.mod.moduleAreasObjects[h].Props[i]);
+                                        if (gv.mod.debugMode)
+                                        {
+                                            gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                            gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "(" + gv.mod.moduleAreasObjects[h].Props[i].LocationX + "," + gv.mod.moduleAreasObjects[h].Props[i].LocationY + ")", "yellow", 4000);
+                                        }
+                                    }
+                                    #endregion
+
+                                    #region Mover type: post
+                                    //not chasing so do mover type
+                                    else if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("post"))
+                                    {
+                                        //move towards post location if not already there
+                                        if ((gv.mod.moduleAreasObjects[h].Props[i].LocationX == gv.mod.moduleAreasObjects[h].Props[i].PostLocationX) && (gv.mod.moduleAreasObjects[h].Props[i].LocationY == gv.mod.moduleAreasObjects[h].Props[i].PostLocationY))
+                                        {
+                                            //already there so do not move
+                                            gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                        }
+                                        else
+                                        {
+
+                                            Coordinate newCoor2 = new Coordinate();
+                                            newCoor2.X = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X;
+                                            newCoor2.Y = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y;
+                                            Coordinate newCoor3 = new Coordinate();
+                                            newCoor3.X = gv.mod.moduleAreasObjects[h].Props[i].LocationX;
+                                            newCoor3.Y = gv.mod.moduleAreasObjects[h].Props[i].LocationY;
+                                            //move the distance
+                                            if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                            {
+                                                moveDist = 1;
+                                                gv.mod.moduleAreasObjects[h].Props[i].moved2 = false;
+                                            }
+                                            if (moveDist > 0)
+                                            {
+                                                this.moveToTarget(gv.mod.moduleAreasObjects[h].Props[i].PostLocationX, gv.mod.moduleAreasObjects[h].Props[i].PostLocationY, gv.mod.moduleAreasObjects[h].Props[i], moveDist);
+                                            }
+                                            if (moveDist > 1)
+                                            {
+                                                //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                            }
+                                            if (gv.mod.debugMode)
+                                            {
+                                                gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                                gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "(" + gv.mod.moduleAreasObjects[h].Props[i].LocationX + "," + gv.mod.moduleAreasObjects[h].Props[i].LocationY + ")", "yellow", 4000);
+                                            }
+                                        }
+                                        doPropBarkString(gv.mod.moduleAreasObjects[h].Props[i]);
+                                    }
+                                    #endregion
+
+                                    #region Mover type: random
+                                    else if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("random"))
+                                    {
+                                        gv.mod.moduleAreasObjects[h].Props[i].randomMoverTimerForNextTarget += 1;
+                                        //check to see if at target square already and if so, change target
+                                        if (((gv.mod.moduleAreasObjects[h].Props[i].LocationX == gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X) && (gv.mod.moduleAreasObjects[h].Props[i].LocationY == gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y)) || (gv.mod.moduleAreasObjects[h].Props[i].randomMoverTimerForNextTarget >= 20))
+                                        {
+                                            gv.mod.moduleAreasObjects[h].Props[i].oldPath.Clear();
+                                            gv.mod.moduleAreasObjects[h].Props[i].randomMoverTimerForNextTarget = 0;
+                                            //wolfwood7
+                                            Coordinate newCoor = this.getNewRandomTarget(gv.mod.moduleAreasObjects[h].Props[i], h);
+                                            //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, "(" + newCoor.X + "," + newCoor.Y + ")", "blue", 4000);
+                                            gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget = new Coordinate(newCoor.X, newCoor.Y);
+                                            gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                        }
+                                        //move to target
+                                        /*
+                                        if (gv.mod.currentArea.Props[i].CurrentMoveToTarget.X == gv.mod.currentArea.Props[i].LocationX && gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y == gv.mod.currentArea.Props[i].LocationY)
+                                        {
+                                            moveDist = 0;
+                                        }
+                                        */
+                                        Coordinate newCoor2 = new Coordinate();
+                                        newCoor2.X = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X;
+                                        newCoor2.Y = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y;
+                                        Coordinate newCoor3 = new Coordinate();
+                                        newCoor3.X = gv.mod.moduleAreasObjects[h].Props[i].LocationX;
+                                        newCoor3.Y = gv.mod.moduleAreasObjects[h].Props[i].LocationY;
+                                        if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                        {
+                                            moveDist = 1;
+                                            gv.mod.moduleAreasObjects[h].Props[i].moved2 = false;
+                                        }
+                                        if (moveDist > 0)
+                                        {
+                                            this.moveToTarget(gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X, gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y, gv.mod.moduleAreasObjects[h].Props[i], moveDist);
+                                        }
+
+                                        if (moveDist > 1)
+                                        {
+                                            //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                        }
+                                        //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, "(" + prp.CurrentMoveToTarget.X + "," + prp.CurrentMoveToTarget.Y + ")", "red", 4000);
+                                        if (gv.mod.debugMode)
+                                        {
+                                            gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                            gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "(" + gv.mod.moduleAreasObjects[h].Props[i].LocationX + "," + gv.mod.moduleAreasObjects[h].Props[i].LocationY + ")", "yellow", 4000);
+                                        }
+                                        doPropBarkString(gv.mod.moduleAreasObjects[h].Props[i]);
+                                    }
+                                    #endregion
+
+                                    #region Mover type: patrol
+                                    else if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("patrol"))
+                                    {
+                                        bool mustWait = false;
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count > 0)
+                                        {
+                                            //move towards next waypoint location if not already there
+                                            if ((gv.mod.moduleAreasObjects[h].Props[i].LocationX == gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X) && (gv.mod.moduleAreasObjects[h].Props[i].LocationY == gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y))
+                                            {
+                                                gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                                if ((gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].WaitDuration > 0) && (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].turnsAlreadyWaited <= gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].WaitDuration))
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].turnsAlreadyWaited += 1;
+                                                    mustWait = true;
+                                                }
+                                                else
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].turnsAlreadyWaited = 0;
+                                                    //already there so set next way point location (revert to index 0 if at last way point)
+                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex >= gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count - 1)
+                                                    {
+                                                        gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex = 0;
+                                                    }
+                                                    else
+                                                    {
+                                                        gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex++;
+                                                    }
+                                                    gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X;
+                                                    gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y;
+                                                    gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                                }
+
+                                            }
+                                            //move to next target
+                                            if (!mustWait)
+                                            {
+                                                Coordinate newCoor2 = new Coordinate();
+                                                newCoor2.X = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X;
+                                                newCoor2.Y = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y;
+                                                Coordinate newCoor3 = new Coordinate();
+                                                newCoor3.X = gv.mod.moduleAreasObjects[h].Props[i].LocationX;
+                                                newCoor3.Y = gv.mod.moduleAreasObjects[h].Props[i].LocationY;
+                                                //move the distance
+                                                //richard
+
+                                                if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                                {
+                                                    moveDist = 1;
+                                                    gv.mod.moduleAreasObjects[h].Props[i].moved2 = false;
+                                                }
+                                                if (moveDist > 0)
+                                                {
+                                                    this.moveToTarget(gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X, gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y, gv.mod.moduleAreasObjects[h].Props[i], moveDist);
+                                                }
+                                                if (moveDist > 1)
+                                                {
+                                                    int fdfds = 0;
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                                }
+                                            }
+                                            if (gv.mod.debugMode)
+                                            {
+                                                gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                                //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "(" + gv.mod.moduleAreasObjects[h].Props[i].LocationX + "," + gv.mod.moduleAreasObjects[h].Props[i].LocationY + ")", "yellow", 4000);
+                                                gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "(" + gv.mod.moduleAreasObjects[h].Props[i].currentPixelPositionX + "," + gv.mod.moduleAreasObjects[h].Props[i].currentPixelPositionY + ")", "yellow", 4000);
+                                            }
+                                        }
+                                        doPropBarkString(gv.mod.moduleAreasObjects[h].Props[i]);
+                                    }
+                                    #endregion
+
+                                    #region time driven movers (daily, weekly, monthly, yearly)
+                                    else if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("daily") || gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("weekly") || gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("monthly") || gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("yearly"))
+                                    {
+                                        bool departureTimeReached = false;
+                                        List<string> timeUnitsList = new List<string>();
+                                        int currentTimeInInterval = 0;
+                                        bool registerRemoval = false;
+
+                                        timeUnitsList = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].departureTime.Split(':').Select(x => x.Trim()).ToList();
+
+                                        int dayCounter = Convert.ToInt32(timeUnitsList[0]);
+                                        int hourCounter = Convert.ToInt32(timeUnitsList[1]);
+                                        int minuteCounter = Convert.ToInt32(timeUnitsList[2]);
+
+                                        if ((dayCounter == 0) || (dayCounter == 1))
+                                        {
+                                            dayCounter = 0;
+                                        }
+                                        else
+                                        {
+                                            dayCounter = (dayCounter - 1);
+                                        }
+
+                                        int convertedDepartureTime = dayCounter * 1440 + hourCounter * 60 + minuteCounter;
+
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex == gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count - 1)
+                                        {
+                                            if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("daily"))
+                                            {
+                                                convertedDepartureTime = 1440 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                            }
+                                            if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("weekly"))
+                                            {
+                                                convertedDepartureTime = 10080 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                            }
+                                            if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("monthly"))
+                                            {
+                                                convertedDepartureTime = 40320 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                            }
+                                            if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("yearly"))
+                                            {
+                                                convertedDepartureTime = 483840 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                            }
+                                        }
+
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex == 0)
+                                        {
+                                            if (convertedDepartureTime < (gv.mod.timePerStepAfterSpeedCalc + 1))
+                                            {
+                                                convertedDepartureTime = gv.mod.timePerStepAfterSpeedCalc + 1;
+                                            }
+                                        }
+
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("daily"))
+                                        {
+                                            currentTimeInInterval = (gv.mod.WorldTime) % 1440;
+                                        }
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("weekly"))
+                                        {
+                                            currentTimeInInterval = (gv.mod.WorldTime) % 10080;
+                                        }
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("monthly"))
+                                        {
+                                            currentTimeInInterval = (gv.mod.WorldTime) % 40320;
+                                        }
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].MoverType.Equals("yearly"))
+                                        {
+                                            currentTimeInInterval = (gv.mod.WorldTime) % 483840;
+                                        }
+
+                                        if (currentTimeInInterval >= convertedDepartureTime)
+                                        {
+                                            departureTimeReached = true;
+                                        }
+
+
+                                        //timeUnitsList = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].departureTime.Split(':').Select(x => x.Trim()).ToList();
+                                        bool imminentLeave = false;
+                                        bool isSmoothTransitionSituation = false;
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count > 0)
+                                        {
+                                            //chokepoint, DONE
+                                            //doubel move, fast enough, DONE
+                                            //deetct whether before or after are on different map, DONE 
+                                            //let nearby enter occpied when on border and next wp is on doiffern map; but NEARBY mover sonly, ALMOST, add neighboruing areas requirement
+                                            //do same trick for patroling props/time driven movers who are moved via setlocation, NO, BUGGY
+                                            if (gv.mod.moduleAreasObjects[h].Props[i].LocationX == gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X && gv.mod.moduleAreasObjects[h].Props[i].LocationY == gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y)
+                                            {
+                                                //add requirement for neighbouring areas, too
+                                                if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X == 0 || gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X == gv.mod.moduleAreasObjects[h].MapSizeX - 1)
+                                                {
+                                                    imminentLeave = true;
+                                                }
+
+                                                if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y == 0 || gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y == gv.mod.moduleAreasObjects[h].MapSizeY - 1)
+                                                {
+                                                    imminentLeave = true;
+                                                }
+
+
+
+                                                //next wp is on differnt map
+                                                //next waypopint higher
+                                                //requires at least two waypoints
+
+                                                if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count > 1)
+                                                {
+                                                    //look at next wp up until last
+                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex + 1 < gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count)
+                                                    {
+                                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex + 1].areaName)
+                                                        {
+                                                            isSmoothTransitionSituation = true;
+                                                        }
+                                                    }
+                                                    //next waypoint at start, ie 0
+                                                    else
+                                                    {
+                                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Props[i].WayPointList[0].areaName)
+                                                        {
+                                                            isSmoothTransitionSituation = true;
+                                                        }
+                                                    }
+
+                                                    //look at last wp up until 0
+                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex - 1 >= 0)
+                                                    {
+                                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex - 1].areaName)
+                                                        {
+                                                            isSmoothTransitionSituation = true;
+                                                        }
+                                                    }
+                                                    //last waypoint in list referred
+                                                    else
+                                                    {
+                                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count - 1].areaName)
+                                                        {
+                                                            isSmoothTransitionSituation = true;
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+
+                                        }
+
+                                        if (imminentLeave && isSmoothTransitionSituation)
+                                        //if (isSmoothTransitionSituation)
+                                        {
+
+                                            departureTimeReached = true;
+                                        }
+
+
+                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count > 0)
+                                        {
+
+                                            if (departureTimeReached)
+                                            {
+                                                gv.mod.moduleAreasObjects[h].Props[i].oldPath.Clear();
+                                                //already there so set next way point location (revert to index 0 if at last way point)
+                                                if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex >= gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count - 1)
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex = 0;
+
+                                                    //wolfwood8
+                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Filename)
+                                                    {
+                                                        gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X;
+                                                        gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y;
+                                                        gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                                        //added floaty text that announces the area transfer
+                                                        string shownAreaName = "";
+                                                        for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
+                                                        {
+                                                            if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName)
+                                                            {
+                                                                shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
+                                                            }
+                                                        }
+                                                        bool oldIsNearby = false;
+                                                        bool NewIsNearby = false;
+
+                                                        foreach (int k in gv.cc.getNearbyAreas())
+                                                        {
+                                                            if (gv.mod.moduleAreasObjects[k].Filename == gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName)
+                                                            {
+                                                                NewIsNearby = true;
+                                                            }
+                                                            if (gv.mod.moduleAreasObjects[k].Filename == gv.mod.moduleAreasObjects[h].Filename)
+                                                            {
+                                                                oldIsNearby = true;
+                                                            }
+                                                        }
+
+                                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx
+                                                        if (!oldIsNearby || !NewIsNearby)
+                                                        {
+                                                            if (shownAreaName != "newArea" && shownAreaName != "" && shownAreaName != "none")
+                                                            {
+                                                                if (gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[h].Filename)
+                                                                {
+                                                                    gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i].LocationX, gv.mod.moduleAreasObjects[h].Props[i].LocationY, "Heading off towards " + shownAreaName, "white", 2000);
+                                                                }
+                                                                //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Just arrived here", "white", 4000);
+                                                                //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Heading off towards " + shownAreaName, "white", 4000);
+                                                                //pizza
+                                                                /*
+                                                                 foreach (Area a in gv.mod.moduleAreasObjects)
+                                          //if (a.Filename == gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex].WayPointList[listEndCheckedIndexOfNextWaypoint].areaName)
+                                            if (a.Filename == targetAreaName)
+                                            {
+                                                    gv.screenMainMap.addFloatyText(a.Props[a.Props.Count - 1], "Just arrived here", "white", 4000);
+                                                    break;
+                                                }
+                                        
+                                                                */
+                                                            }
+                                                            else
+                                                            {
+                                                                if (gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[h].Filename)
+                                                                {
+                                                                    gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i].LocationX, gv.mod.moduleAreasObjects[h].Props[i].LocationY, "Heading off", "white", 2000);
+                                                                }
+                                                                //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Heading off", "white", 4000);
+                                                            }
+                                                            //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Heading off towards " + shownAreaName, "white", 4000);
+
+                                                        }
+                                                        gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[h].Props[i].PropTag, gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName, gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X.ToString(), gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y.ToString());
+                                                        registerRemoval = true;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex++;
+                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Filename)
+                                                    {
+                                                        gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X;
+                                                        gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y;
+                                                        gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                                        //added floaty text that announces the area transfer
+                                                        string shownAreaName = "";
+                                                        for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
+                                                        {
+                                                            if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName)
+                                                            {
+                                                                shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
+                                                            }
+                                                        }
+                                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                                                        bool oldIsNearby = false;
+                                                        bool NewIsNearby = false;
+
+                                                        foreach (int k in gv.cc.getNearbyAreas())
+                                                        {
+                                                            if (gv.mod.moduleAreasObjects[k].Filename == gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName)
+                                                            {
+                                                                NewIsNearby = true;
+                                                            }
+                                                            if (gv.mod.moduleAreasObjects[k].Filename == gv.mod.moduleAreasObjects[h].Filename)
+                                                            {
+                                                                oldIsNearby = true;
+                                                            }
+                                                        }
+
+                                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx
+                                                        if (!oldIsNearby || !NewIsNearby)
+                                                        {
+                                                            if (shownAreaName != "newArea" && shownAreaName != "" && shownAreaName != "none")
+                                                            {
+                                                                if (gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[h].Filename)
+                                                                {
+                                                                    gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i].LocationX, gv.mod.moduleAreasObjects[h].Props[i].LocationY, "Heading off towards " + shownAreaName, "white", 2000);
+                                                                }
+                                                                //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Heading off towards " + shownAreaName, "white", 4000);
+                                                            }
+                                                            else
+                                                            {
+                                                                if (gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[h].Filename)
+                                                                {
+                                                                    gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i].LocationX, gv.mod.moduleAreasObjects[h].Props[i].LocationY, "Heading off", "white", 2000);
+                                                                }
+                                                                //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Heading off", "white", 4000);
+                                                            }
+                                                            //gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "Heading off towards " + shownAreaName, "white", 4000);
+                                                        }
+                                                        //neuefreunde
+                                                        gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.moduleAreasObjects[h].Props[i].PropTag, gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName, gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X.ToString(), gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y.ToString());
+                                                        registerRemoval = true;
+                                                    }
+                                                }
+                                                if (!registerRemoval)
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X;
+                                                    gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y = gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y;
+                                                    gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                                }
+
+                                            }
+
+                                            //move to next target
+                                            if (!registerRemoval)
+                                            {
+                                                //wolfwood9
+                                                if ((gv.mod.moduleAreasObjects[h].Props[i].LocationX == gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X) && (gv.mod.moduleAreasObjects[h].Props[i].LocationY == gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y))
+                                                {
+                                                    gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = false;
+                                                }
+                                                else
+                                                {
+                                                    Coordinate newCoor2 = new Coordinate();
+                                                    newCoor2.X = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X;
+                                                    newCoor2.Y = gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y;
+                                                    Coordinate newCoor3 = new Coordinate();
+                                                    newCoor3.X = gv.mod.moduleAreasObjects[h].Props[i].LocationX;
+                                                    newCoor3.Y = gv.mod.moduleAreasObjects[h].Props[i].LocationY;
+                                                    //move the distance
+                                                    if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                                    {
+                                                        moveDist = 1;
+                                                        gv.mod.moduleAreasObjects[h].Props[i].moved2 = false;
+                                                    }
+                                                    if (moveDist > 0)
+                                                    {
+
+                                                        bool imminentLeave2 = false;
+                                                        //add requirement for neighbouring areas, too
+                                                        if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count > 1)
+                                                        {
+                                                            if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X == 0 || gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].X == gv.mod.moduleAreasObjects[h].MapSizeX - 1)
+                                                            {
+                                                                imminentLeave2 = true;
+                                                            }
+
+                                                            if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y == 0 || gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].Y == gv.mod.moduleAreasObjects[h].MapSizeY - 1)
+                                                            {
+                                                                imminentLeave2 = true;
+                                                            }
+
+                                                            if (imminentLeave2)
+                                                            {
+                                                                //look at next wp up until last
+                                                                if (gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex + 1 < gv.mod.moduleAreasObjects[h].Props[i].WayPointList.Count)
+                                                                {
+                                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex + 1].areaName)
+                                                                    {
+                                                                        gv.mod.moduleAreasObjects[h].Props[i].allowEnteringOccupiedSquare = true;
+                                                                    }
+                                                                }
+                                                                //next waypoint at start, ie 0
+                                                                else
+                                                                {
+                                                                    if (gv.mod.moduleAreasObjects[h].Props[i].WayPointList[gv.mod.moduleAreasObjects[h].Props[i].WayPointListCurrentIndex].areaName != gv.mod.moduleAreasObjects[h].Props[i].WayPointList[0].areaName)
+                                                                    {
+                                                                        gv.mod.moduleAreasObjects[h].Props[i].allowEnteringOccupiedSquare = true;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+
+
+                                                        //waypoint on border detect code, but only for next waypoint
+                                                        //eventually flag the move thorugh directly on the prop with a new property (allowMovewThrough); settign up grid in pathfinding would read this in
+
+                                                        this.moveToTarget(gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.X, gv.mod.moduleAreasObjects[h].Props[i].CurrentMoveToTarget.Y, gv.mod.moduleAreasObjects[h].Props[i], moveDist);
+                                                    }
+                                                    if (moveDist > 1)
+                                                    {
+                                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                                    }
+                                                }
+                                            }
+
+                                            if ((gv.mod.debugMode) && (!registerRemoval))
+                                            {
+                                                gv.cc.addLogText("<font color='yellow'>" + gv.mod.moduleAreasObjects[h].Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                                gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[h].Props[i], "(" + gv.mod.moduleAreasObjects[h].Props[i].LocationX + "," + gv.mod.moduleAreasObjects[h].Props[i].LocationY + ")", "yellow", 4000);
+                                            }
+                                        }
+                                        if (!registerRemoval)
+                                        {
+                                            doPropBarkString(gv.mod.moduleAreasObjects[h].Props[i]);
+                                        }
+                                    }
+                                    #endregion
+                                }
+                            }
+                        }
+                        else
+                        {
+                            gv.mod.moduleAreasObjects[h].Props[i].skipNavigationThisTurn = false;
+                        }
+                    }
+
+                }
+            }
+            //endbracket
+            #endregion
+
+        }
+
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
         public void doPropMoves()
         {
@@ -7023,10 +11592,10 @@ namespace IBx
 
                 //updating props heightLevel
                 propObject.LocationZ = gv.mod.currentArea.Tiles[propObject.LocationY * gv.mod.currentArea.MapSizeX + propObject.LocationX].heightLevel;
-                
+
             }
 
-#region Synchronization: update the position of time driven movers (either when the party switches area or when a time driven mover enters the current area)
+            #region Synchronization: update the position of time driven movers (either when the party switches area or when a time driven mover enters the current area)
 
             //Synchronization: check for all time driven movers either 1. found when entering an area (three variants: move into current area, move on current area, move out of current area) or 2. coming in from outside while party is already on current area
             //three nested loops running through area/prop/waypoint
@@ -7086,27 +11655,27 @@ namespace IBx
                                 {
                                     if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("daily"))
                                     {
-                                        convertedDepartureTime = 1440 - (gv.mod.currentArea.TimePerSquare + 1);
+                                        convertedDepartureTime = 1440 - (gv.mod.timePerStepAfterSpeedCalc + 1);
                                     }
                                     if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("weekly"))
                                     {
-                                        convertedDepartureTime = 10080 - (gv.mod.currentArea.TimePerSquare + 1);
+                                        convertedDepartureTime = 10080 - (gv.mod.timePerStepAfterSpeedCalc + 1);
                                     }
                                     if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("monthly"))
                                     {
-                                        convertedDepartureTime = 40320 - (gv.mod.currentArea.TimePerSquare + 1);
+                                        convertedDepartureTime = 40320 - (gv.mod.timePerStepAfterSpeedCalc + 1);
                                     }
                                     if (gv.mod.moduleAreasObjects[i].Props[j].MoverType.Equals("yearly"))
                                     {
-                                        convertedDepartureTime = 483840 - (gv.mod.currentArea.TimePerSquare + 1);
+                                        convertedDepartureTime = 483840 - (gv.mod.timePerStepAfterSpeedCalc + 1);
                                     }
                                 }
 
                                 if (k == 0)
                                 {
-                                    if (convertedDepartureTime < (gv.mod.currentArea.TimePerSquare + 1))
+                                    if (convertedDepartureTime < (gv.mod.timePerStepAfterSpeedCalc + 1))
                                     {
-                                        convertedDepartureTime = gv.mod.currentArea.TimePerSquare + 1;
+                                        convertedDepartureTime = gv.mod.timePerStepAfterSpeedCalc + 1;
                                     }
                                 }
 
@@ -7318,7 +11887,7 @@ namespace IBx
                                         //}
                                         //}
                                         //IBMessageBox.Show(gv, "Prop just appeared");
-                                        gv.screenMainMap.addFloatyText(xLocForFloaty, yLocForFloaty, "Just arrived here", "white", 4000);
+                                        gv.screenMainMap.addFloatyText(gv.mod.moduleAreasObjects[relevantAreaIndex].Props[relevantPropIndex], "Just arrived here", "white", 2000);
 
                                     }
                                 }
@@ -7328,424 +11897,762 @@ namespace IBx
                 }
             }
 
-#endregion
+            #endregion
 
-#region move ALL movers on current map (post, random, patrol, daily, weekly, monthly, yearly; also handle chasing)
+            #region move ALL movers on current map (post, random, patrol, daily, weekly, monthly, yearly; also handle chasing)
             //begin moving the existing props in this map
+            /*
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea || a.Filename == gv.mod.currentArea.westernNeighbourArea || a.Filename == gv.mod.currentArea.northernNeighbourArea || a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    for (int i = a.Props.Count - 1; i >= 0; i--)
+                    {
+                        //clear the lists with pixel destination coordinates of props
+                        a.Props[i].destinationPixelPositionXList.Clear();
+                        a.Props[i].destinationPixelPositionXList = new List<int>();
+                        a.Props[i].destinationPixelPositionYList.Clear();
+                        a.Props[i].destinationPixelPositionYList = new List<int>();
+                        a.Props[i].pixelMoveSpeed = 1;
+
+                        //set the currentPixel position of the props
+                        int xOffSetInSquares = a.Props[i].LocationX - gv.mod.PlayerLocationX;
+                        int yOffSetInSquares = a.Props[i].LocationY - gv.mod.PlayerLocationY;
+                        int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
+                        int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
+
+                        a.Props[i].currentPixelPositionX = playerPositionXInPix + (xOffSetInSquares * gv.squareSize);
+                        a.Props[i].currentPixelPositionY = playerPositionYInPix + (yOffSetInSquares * gv.squareSize);
+
+                    }
+                }
+            }
+            */
+
 
             for (int i = gv.mod.currentArea.Props.Count - 1; i >= 0; i--)
             {
-                //clear the lists with pixel destination coordinates of props
-                gv.mod.currentArea.Props[i].destinationPixelPositionXList.Clear();
-                gv.mod.currentArea.Props[i].destinationPixelPositionXList = new List<int>();
-                gv.mod.currentArea.Props[i].destinationPixelPositionYList.Clear();
-                gv.mod.currentArea.Props[i].destinationPixelPositionYList = new List<int>();
-                gv.mod.currentArea.Props[i].pixelMoveSpeed = 1;
-
-                //set the currentPixel position of the props
-                int xOffSetInSquares = gv.mod.currentArea.Props[i].LocationX - gv.mod.PlayerLocationX;
-                int yOffSetInSquares = gv.mod.currentArea.Props[i].LocationY - gv.mod.PlayerLocationY;
-                int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
-                int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
-
-                gv.mod.currentArea.Props[i].currentPixelPositionX = playerPositionXInPix + (xOffSetInSquares * gv.squareSize);
-                gv.mod.currentArea.Props[i].currentPixelPositionY = playerPositionYInPix + (yOffSetInSquares * gv.squareSize);
-
-                //if (gv.mod.currentArea.Props[i].passOneMove == true)
-                //{
-                //gv.mod.currentArea.Props[i].passOneMove = false;
-                //continue;
-                //}
-                //else
-                if (1 == 1)
+                if ((!gv.mod.currentArea.Props[i].skipNavigationThisTurn || gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer))
                 {
-                    /*
-#region delay a mover for one turn on same square as party
-                    //I suggest to modify this, so the prop will only wait for one turn and then move on, regardless of shared location with player
-                    //otherwise the player can pin down a mover forever which feels weird imho
-                    if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.PlayerLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.PlayerLocationY))
-                    {
-                        if (gv.sf.GetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited") == -1)
-                        {
-                            gv.sf.SetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited", "1");
-                            //do nothing since prop and player are on the same square
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        gv.sf.SetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited", "-1");
-                    }
-#endregion
-                    */
+                    //clear the lists with pixel destination coordinates of props
 
-#region DISABLED: dont move props further away than ten squares
-                    //Here I would suggest a full disable - the illsuion of a living wold would not work with a time freeze bubble outside 10 square radius
-                    //if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) > 10)
-                    //{
-                    //do nothing since prop and player are far away from each other
-                    //continue;			
+                    gv.mod.currentArea.Props[i].destinationPixelPositionXList.Clear();
+                    gv.mod.currentArea.Props[i].destinationPixelPositionXList = new List<int>();
+                    gv.mod.currentArea.Props[i].destinationPixelPositionYList.Clear();
+                    gv.mod.currentArea.Props[i].destinationPixelPositionYList = new List<int>();
+                    gv.mod.currentArea.Props[i].pixelMoveSpeed = 1;
                     //}
-#endregion
 
-                    if ((gv.mod.currentArea.Props[i].isMover) && (gv.mod.currentArea.Props[i].isActive))
+
+                    //set the currentPixel position of the props
+
+                    int xOffSetInSquares = gv.mod.currentArea.Props[i].LocationX - gv.mod.PlayerLocationX;
+                    int yOffSetInSquares = gv.mod.currentArea.Props[i].LocationY - gv.mod.PlayerLocationY;
+                    int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
+                    int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
+
+                    //wolfwood3
+                    //if (gv.mod.currentArea.Props[i].propMovingHalfSpeedMulti == 1)
+                    //{
+                    gv.mod.currentArea.Props[i].currentPixelPositionX = playerPositionXInPix + (xOffSetInSquares * gv.squareSize);
+                    gv.mod.currentArea.Props[i].currentPixelPositionY = playerPositionYInPix + (yOffSetInSquares * gv.squareSize);
+                    //}
+
+
+                    if (1 == 1)
                     {
-                        //determine move distance first
-                        int moveDist = this.getMoveDistance(gv.mod.currentArea.Props[i]);
-                        //gv.mod.currentArea.Props[i].pixelMoveSpeed = moveDist;
-
-
-#region Chaser code
-                        if ((gv.mod.currentArea.Props[i].isChaser) && (!gv.mod.currentArea.Props[i].ReturningToPost))
+                        /*
+    #region delay a mover for one turn on same square as party
+                        //I suggest to modify this, so the prop will only wait for one turn and then move on, regardless of shared location with player
+                        //otherwise the player can pin down a mover forever which feels weird imho
+                        if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.PlayerLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.PlayerLocationY))
                         {
-                            //determine if start chasing or stop chasing (set isCurrentlyChasing to true or false)
-                            if (!gv.mod.currentArea.Props[i].isCurrentlyChasing)
+                            if (gv.sf.GetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited") == -1)
                             {
-                                //not chasing so see if in detect distance and set to true
-                                if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) <= gv.mod.currentArea.Props[i].ChaserDetectRangeRadius)
-                                {
-                                    gv.mod.currentArea.Props[i].isCurrentlyChasing = true;
-                                    gv.mod.currentArea.Props[i].ChaserStartChasingTime = gv.mod.WorldTime;
-                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Chasing...", "red", 1500);
-                                    if (gv.mod.debugMode)
-                                    {
-
-                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "following you", "red", 4000);
-                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " start chasing " + gv.mod.currentArea.Props[i].ChaserChaseDuration + " seconds</font><BR>");
-                                    }
-                                }
+                                gv.sf.SetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited", "1");
+                                //do nothing since prop and player are on the same square
+                                continue;
                             }
-                            else //is chasing so see if out of follow range and set to false
+                        }
+                        else
+                        {
+                            gv.sf.SetLocalInt(gv.mod.currentArea.Props[i].PropTag, "hasAlreadyWaited", "-1");
+                        }
+    #endregion
+                        */
+
+                        #region DISABLED: dont move props further away than ten squares
+                        //Here I would suggest a full disable - the illsuion of a living wold would not work with a time freeze bubble outside 10 square radius
+                        //if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) > 10)
+                        //{
+                        //do nothing since prop and player are far away from each other
+                        //continue;			
+                        //}
+                        #endregion
+
+                        if ((gv.mod.currentArea.Props[i].isMover) && (gv.mod.currentArea.Props[i].isActive))
+                        {
+                            //determine move distance first
+                            int moveDist = this.getMoveDistance(gv.mod.currentArea.Props[i]);
+
+                            //gv.mod.currentArea.Props[i].pixelMoveSpeed = moveDist;
+
+
+                            #region Chaser code
+                            if ((gv.mod.currentArea.Props[i].isChaser) && (!gv.mod.currentArea.Props[i].ReturningToPost))
                             {
-                                if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) >= gv.mod.currentArea.Props[i].ChaserGiveUpChasingRangeRadius)
+                                //party rolls stealth against dc(sotEnemy) of prop to prevent starting a chase
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                //foreach (Area a in gv.mod.moduleAreasObjects)
+                                //{
+                                //if (a.Filename == gv.mod.currentArea.Filename)
+                                //{
+                                //foreach (Prop p in a.Props)
+                                //{
+                                //if (p.stealth != -1)
+                                //{ 
+                                //skill roll script
+                                //visible state
+                                bool isFooled = false;
+                                string traitMethod = "leader";
+                                foreach (Trait t in gv.mod.moduleTraitsList)
                                 {
-                                    gv.mod.currentArea.Props[i].isCurrentlyChasing = false;
-                                    gv.mod.currentArea.Props[i].ReturningToPost = true;
-                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Lost interest...", "green", 1500);
-                                    if (gv.mod.debugMode)
+                                    if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
                                     {
-                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Nevermind...", "green", 1000);
-                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "nevermind", "green", 4000);
-                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " stop chasing on range</font><BR>");
+                                        traitMethod = t.methodOfChecking;
                                     }
                                 }
-                                else if (gv.mod.WorldTime - gv.mod.currentArea.Props[i].ChaserStartChasingTime >= gv.mod.currentArea.Props[i].ChaserChaseDuration)
+                                int parm1 = gv.mod.selectedPartyLeader;
+                                if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
                                 {
-                                    gv.mod.currentArea.Props[i].isCurrentlyChasing = false;
-                                    gv.mod.currentArea.Props[i].ReturningToPost = true;
-                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Lost interest...", "green", 1500);
-                                    if (gv.mod.debugMode)
+                                    parm1 = gv.mod.selectedPartyLeader;
+                                }
+                                else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                                {
+                                    parm1 = -2;
+                                }
+                                else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                                {
+                                    parm1 = -3;
+                                }
+                                else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                                {
+                                    parm1 = -4;
+                                }
+                                else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                                {
+                                    parm1 = -5;
+                                }
+                                else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                                {
+                                    parm1 = -6;
+                                }
+
+                                int tileAdder = 0;
+                                int darkAdder = 0;
+                                tileAdder = gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationY].stealthModifier;
+                                foreach (Prop p5 in gv.mod.currentArea.Props)
+                                {
+                                    if (p5.stealthModifier != 0)
                                     {
-                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "nevermind", "green", 4000);
-                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " stop chasing on duration</font><BR>");
+                                        if (p5.LocationX == gv.mod.PlayerLocationX && p5.LocationY == gv.mod.PlayerLocationY)
+                                        {
+                                            tileAdder = p5.stealthModifier;
+                                        }
                                     }
+                                }
+                                if (gv.sf.CheckIsInDarkness("party", "night"))
+                                {
+                                    darkAdder = 4;
+                                }
+                                if (gv.sf.CheckIsInDarkness("party", "noLight"))
+                                {
+                                    darkAdder = 12;
+                                }
+                                Coordinate pcCoord = new Coordinate();
+                                Coordinate propCoord = new Coordinate();
+                                pcCoord.X = gv.mod.PlayerLocationX;
+                                pcCoord.Y = gv.mod.PlayerLocationY;
+                                propCoord.X = gv.mod.currentArea.Props[i].LocationX;
+                                propCoord.Y = gv.mod.currentArea.Props[i].LocationY;
+
+                                //factor in lit state and tile stealtModifier
+                                int checkModifier = (gv.cc.getDistance(pcCoord, propCoord) - 1) * 2 - 4 + darkAdder + tileAdder;
+
+                                if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, gv.mod.currentArea.Props[i].spotEnemy - checkModifier + 1, true, true))
+                                {
+                                    isFooled = true;
                                 }
                                 else
                                 {
-                                    if (gv.mod.debugMode)
+                                    isFooled = false;
+                                }
+
+                                //}
+                                //}
+                                //}
+                                //}
+
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                                //determine if start chasing or stop chasing (set isCurrentlyChasing to true or false)
+                                if (!gv.mod.currentArea.Props[i].isCurrentlyChasing)
+                                {
+                                    //not chasing so see if in detect distance and set to true
+                                    if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) <= gv.mod.currentArea.Props[i].ChaserDetectRangeRadius)
                                     {
-                                        int timeRemain = gv.mod.currentArea.Props[i].ChaserChaseDuration - (gv.mod.WorldTime - gv.mod.currentArea.Props[i].ChaserStartChasingTime);
-                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " chasing " + timeRemain + " seconds left</font><BR>");
+                                        bool tooMuchHeightDifference = false;
+                                        if (gv.mod.blendOutTooHighAndTooDeepTiles)
+                                        {
+                                            if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel - 2))
+                                            {
+                                                tooMuchHeightDifference = true;
+                                            }
+                                        }
+                                        if (!isFooled)
+                                        {
+                                            gv.mod.currentArea.Props[i].isCurrentlyChasing = true;
+                                            gv.mod.currentArea.Props[i].ChaserStartChasingTime = gv.mod.WorldTime;
+
+                                            if (!gv.mod.currentArea.Props[i].isStealthed)
+                                            {
+                                                if (!tooMuchHeightDifference)
+                                                {
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Chasing...", "red", 1500);
+                                                }
+                                            }
+                                        }
+                                        //has been fooled
+                                        else
+                                        {
+
+                                            if (!tooMuchHeightDifference && !gv.mod.currentArea.Props[i].isStealthed)
+                                            {
+                                                //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Fooled!", "green", 1500);
+                                            }
+
+                                        }
+                                        if (gv.mod.debugMode)
+                                        {
+
+                                            //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "following you", "red", 4000);
+                                            gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " start chasing " + gv.mod.currentArea.Props[i].ChaserChaseDuration + " seconds</font><BR>");
+                                        }
+                                    }
+                                }
+                                else //is chasing so see if out of follow range and set to false
+                                {
+                                    if (getDistance(new Coordinate(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY), new Coordinate(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY)) >= gv.mod.currentArea.Props[i].ChaserGiveUpChasingRangeRadius || isFooled || !gv.mod.currentArea.Props.Contains(gv.mod.currentArea.Props[i]))
+                                    {
+                                        gv.mod.currentArea.Props[i].isCurrentlyChasing = false;
+                                        gv.mod.currentArea.Props[i].ReturningToPost = true;
+                                        if (!gv.mod.currentArea.Props[i].isStealthed)
+                                        {
+                                            bool tooMuchHeightDifference = false;
+                                            if (gv.mod.blendOutTooHighAndTooDeepTiles)
+                                            {
+                                                if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel - 2))
+                                                {
+                                                    tooMuchHeightDifference = true;
+                                                }
+                                            }
+                                            if (!tooMuchHeightDifference)
+                                            {
+                                                if (isFooled)
+                                                {
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Lost sight...", "green", 1500);
+                                                }
+                                                else
+                                                {
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Lost interest...", "green", 1500);
+                                                }
+                                            }
+                                        }
+                                        if (gv.mod.debugMode)
+                                        {
+                                            //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Nevermind...", "green", 1000);
+                                            //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "nevermind", "green", 4000);
+                                            gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " stop chasing on range</font><BR>");
+                                        }
+                                    }
+                                    else if (gv.mod.WorldTime - gv.mod.currentArea.Props[i].ChaserStartChasingTime >= gv.mod.currentArea.Props[i].ChaserChaseDuration)
+                                    {
+                                        gv.mod.currentArea.Props[i].isCurrentlyChasing = false;
+                                        gv.mod.currentArea.Props[i].ReturningToPost = true;
+                                        if (!gv.mod.currentArea.Props[i].isStealthed)
+                                        {
+                                            bool tooMuchHeightDifference = false;
+                                            if (gv.mod.blendOutTooHighAndTooDeepTiles)
+                                            {
+                                                if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].heightLevel - 2))
+                                                {
+                                                    tooMuchHeightDifference = true;
+                                                }
+                                            }
+                                            if (!tooMuchHeightDifference)
+                                            {
+                                                gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Lost interest...", "green", 1500);
+                                            }
+                                        }
+                                        if (gv.mod.debugMode)
+                                        {
+                                            //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "nevermind", "green", 4000);
+                                            gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " stop chasing on duration</font><BR>");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (gv.mod.debugMode)
+                                        {
+                                            int timeRemain = gv.mod.currentArea.Props[i].ChaserChaseDuration - (gv.mod.WorldTime - gv.mod.currentArea.Props[i].ChaserStartChasingTime);
+                                            gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " chasing " + timeRemain + " seconds left</font><BR>");
+                                        }
                                     }
                                 }
                             }
-                        }
-                        //check to see if currently chasing, if so, chase
-                        if ((gv.mod.currentArea.Props[i].isChaser) && (gv.mod.currentArea.Props[i].isCurrentlyChasing))
-                        {
-                            //move the distance
-                            this.moveToTarget(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.currentArea.Props[i], moveDist);
-                            if (moveDist > 1)
+                            //check to see if currently chasing, if so, chase
+                            if ((gv.mod.currentArea.Props[i].isChaser) && (gv.mod.currentArea.Props[i].isCurrentlyChasing))
                             {
-                                gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                Coordinate newCoor2 = new Coordinate();
+                                //newCoor2.X = gv.mod.currentArea.Props[i].CurrentMoveToTarget.X;
+                                //newCoor2.Y = gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y;
+                                newCoor2.X = gv.mod.PlayerLocationX;
+                                newCoor2.Y = gv.mod.PlayerLocationY;
+                                Coordinate newCoor3 = new Coordinate();
+                                newCoor3.X = gv.mod.currentArea.Props[i].LocationX;
+                                newCoor3.Y = gv.mod.currentArea.Props[i].LocationY;
+                                //move the distance
+                                //müde2
+                                //if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                //{
+                                //moveDist = 1;
+                                //gv.mod.currentArea.Props[i].moved2 = false;
+                                //}
+                                if (moveDist > 0)
+                                {
+                                    this.moveToTarget(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.currentArea.Props[i], moveDist);
+                                    //eisschraube
+                                    if (gv.mod.stopMoves)
+                                    {
+                                        gv.mod.stopMoves = false;
+                                        return;
+                                    }
+                                }
+                                //if (moveDist > 1)
+                                //{
+                                //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                //}
+                                doPropBarkString(gv.mod.currentArea.Props[i]);
+                                if (gv.mod.debugMode)
+                                {
+                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
+                                }
                             }
-                            doPropBarkString(gv.mod.currentArea.Props[i]);
-                            if (gv.mod.debugMode)
-                            {
-                                gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
-                                gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
-                            }
-                        }
-#endregion
 
-#region Mover type: post
-                        //not chasing so do mover type
-                        else if (gv.mod.currentArea.Props[i].MoverType.Equals("post"))
-                        {
-                            //move towards post location if not already there
-                            if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].PostLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].PostLocationY))
+                            if (gv.mod.currentArea.Props[i].ReturningToPost)
                             {
-                                //already there so do not move
-                                gv.mod.currentArea.Props[i].ReturningToPost = false;
+
+                                //move the distance
+                                //müde2
+                                //if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                //{
+                                //moveDist = 1;
+                                //gv.mod.currentArea.Props[i].moved2 = false;
+                                //}
+                                if (moveDist > 0)
+                                {
+                                    this.moveToTarget(gv.mod.currentArea.Props[i].PostLocationX, gv.mod.currentArea.Props[i].PostLocationY, gv.mod.currentArea.Props[i], moveDist);
+                                    //eisschraube
+                                    if (gv.mod.stopMoves)
+                                    {
+                                        gv.mod.stopMoves = false;
+                                        return;
+                                    }
+                                }
                             }
-                            else
+
+                            #endregion
+
+                            #region Mover type: post
+                            //not chasing so do mover type
+                            else if (gv.mod.currentArea.Props[i].MoverType.Equals("post"))
                             {
-                                this.moveToTarget(gv.mod.currentArea.Props[i].PostLocationX, gv.mod.currentArea.Props[i].PostLocationY, gv.mod.currentArea.Props[i], moveDist);
+                                //move towards post location if not already there
+                                if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].PostLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].PostLocationY))
+                                {
+                                    //already there so do not move
+                                    gv.mod.currentArea.Props[i].ReturningToPost = false;
+                                }
+                                else
+                                {
+
+                                    Coordinate newCoor2 = new Coordinate();
+                                    newCoor2.X = gv.mod.currentArea.Props[i].CurrentMoveToTarget.X;
+                                    newCoor2.Y = gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y;
+                                    Coordinate newCoor3 = new Coordinate();
+                                    newCoor3.X = gv.mod.currentArea.Props[i].LocationX;
+                                    newCoor3.Y = gv.mod.currentArea.Props[i].LocationY;
+                                    //move the distance
+                                    if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                    {
+                                        moveDist = 1;
+                                        gv.mod.currentArea.Props[i].moved2 = false;
+                                    }
+                                    if (moveDist > 0)
+                                    {
+                                        this.moveToTarget(gv.mod.currentArea.Props[i].PostLocationX, gv.mod.currentArea.Props[i].PostLocationY, gv.mod.currentArea.Props[i], moveDist);
+                                    }
+                                    if (moveDist > 1)
+                                    {
+                                        //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                    }
+                                    if (gv.mod.debugMode)
+                                    {
+                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                        gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
+                                    }
+                                }
+                                doPropBarkString(gv.mod.currentArea.Props[i]);
+                            }
+                            #endregion
+
+                            #region Mover type: random
+                            else if (gv.mod.currentArea.Props[i].MoverType.Equals("random"))
+                            {
+                                gv.mod.currentArea.Props[i].randomMoverTimerForNextTarget += 1;
+                                //check to see if at target square already and if so, change target
+                                if (((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].CurrentMoveToTarget.X) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y)) || (gv.mod.currentArea.Props[i].randomMoverTimerForNextTarget >= 20))
+                                {
+                                    gv.mod.currentArea.Props[i].randomMoverTimerForNextTarget = 0;
+                                    Coordinate newCoor = this.getNewRandomTarget(gv.mod.currentArea.Props[i]);
+                                    //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, "(" + newCoor.X + "," + newCoor.Y + ")", "blue", 4000);
+                                    gv.mod.currentArea.Props[i].CurrentMoveToTarget = new Coordinate(newCoor.X, newCoor.Y);
+                                    gv.mod.currentArea.Props[i].ReturningToPost = false;
+                                }
+                                //move to target
+                                /*
+                                if (gv.mod.currentArea.Props[i].CurrentMoveToTarget.X == gv.mod.currentArea.Props[i].LocationX && gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y == gv.mod.currentArea.Props[i].LocationY)
+                                {
+                                    moveDist = 0;
+                                }
+                                */
+                                Coordinate newCoor2 = new Coordinate();
+                                newCoor2.X = gv.mod.currentArea.Props[i].CurrentMoveToTarget.X;
+                                newCoor2.Y = gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y;
+                                Coordinate newCoor3 = new Coordinate();
+                                newCoor3.X = gv.mod.currentArea.Props[i].LocationX;
+                                newCoor3.Y = gv.mod.currentArea.Props[i].LocationY;
+                                if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                {
+                                    moveDist = 1;
+                                    gv.mod.currentArea.Props[i].moved2 = false;
+                                }
+                                if (moveDist > 0)
+                                {
+                                    this.moveToTarget(gv.mod.currentArea.Props[i].CurrentMoveToTarget.X, gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y, gv.mod.currentArea.Props[i], moveDist);
+                                }
+
                                 if (moveDist > 1)
                                 {
-                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
                                 }
+                                //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, "(" + prp.CurrentMoveToTarget.X + "," + prp.CurrentMoveToTarget.Y + ")", "red", 4000);
                                 if (gv.mod.debugMode)
                                 {
                                     gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
                                     gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
                                 }
+                                doPropBarkString(gv.mod.currentArea.Props[i]);
                             }
-                            doPropBarkString(gv.mod.currentArea.Props[i]);
-                        }
-#endregion
+                            #endregion
 
-#region Mover type: random
-                        else if (gv.mod.currentArea.Props[i].MoverType.Equals("random"))
-                        {
-                            gv.mod.currentArea.Props[i].randomMoverTimerForNextTarget += 1;
-                            //check to see if at target square already and if so, change target
-                            if (((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].CurrentMoveToTarget.X) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y)) || (gv.mod.currentArea.Props[i].randomMoverTimerForNextTarget >= 20))
+                            #region Mover type: patrol
+                            else if (gv.mod.currentArea.Props[i].MoverType.Equals("patrol"))
                             {
-                                gv.mod.currentArea.Props[i].randomMoverTimerForNextTarget = 0;
-                                Coordinate newCoor = this.getNewRandomTarget(gv.mod.currentArea.Props[i]);
-                                //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, "(" + newCoor.X + "," + newCoor.Y + ")", "blue", 4000);
-                                gv.mod.currentArea.Props[i].CurrentMoveToTarget = new Coordinate(newCoor.X, newCoor.Y);
-                                gv.mod.currentArea.Props[i].ReturningToPost = false;
-                            }
-                            //move to target
-                            this.moveToTarget(gv.mod.currentArea.Props[i].CurrentMoveToTarget.X, gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y, gv.mod.currentArea.Props[i], moveDist);
-                            if (moveDist > 1)
-                            {
-                                gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
-                            }
-                            //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, "(" + prp.CurrentMoveToTarget.X + "," + prp.CurrentMoveToTarget.Y + ")", "red", 4000);
-                            if (gv.mod.debugMode)
-                            {
-                                gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
-                                gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
-                            }
-                            doPropBarkString(gv.mod.currentArea.Props[i]);
-                        }
-#endregion
-
-#region Mover type: patrol
-                        else if (gv.mod.currentArea.Props[i].MoverType.Equals("patrol"))
-                        {
-                            bool mustWait = false;
-                            if (gv.mod.currentArea.Props[i].WayPointList.Count > 0)
-                            {
-                                //move towards next waypoint location if not already there
-                                if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].CurrentMoveToTarget.X) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y))
+                                bool mustWait = false;
+                                if (gv.mod.currentArea.Props[i].WayPointList.Count > 0)
                                 {
-                                    if ((gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].WaitDuration > 0) && (gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].turnsAlreadyWaited <= gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].WaitDuration))
+                                    //move towards next waypoint location if not already there
+                                    if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].CurrentMoveToTarget.X) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y))
                                     {
-                                        gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].turnsAlreadyWaited += 1;
-                                        mustWait = true;
+                                        if ((gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].WaitDuration > 0) && (gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].turnsAlreadyWaited <= gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].WaitDuration))
+                                        {
+                                            gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].turnsAlreadyWaited += 1;
+                                            mustWait = true;
+                                        }
+                                        else
+                                        {
+                                            gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].turnsAlreadyWaited = 0;
+                                            //already there so set next way point location (revert to index 0 if at last way point)
+                                            if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex >= gv.mod.currentArea.Props[i].WayPointList.Count - 1)
+                                            {
+                                                gv.mod.currentArea.Props[i].WayPointListCurrentIndex = 0;
+                                            }
+                                            else
+                                            {
+                                                gv.mod.currentArea.Props[i].WayPointListCurrentIndex++;
+                                            }
+                                            gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
+                                            gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
+                                            gv.mod.currentArea.Props[i].ReturningToPost = false;
+                                        }
+
                                     }
-                                    else
+                                    //move to next target
+                                    if (!mustWait)
                                     {
-                                        gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].turnsAlreadyWaited = 0;
+                                        Coordinate newCoor2 = new Coordinate();
+                                        newCoor2.X = gv.mod.currentArea.Props[i].CurrentMoveToTarget.X;
+                                        newCoor2.Y = gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y;
+                                        Coordinate newCoor3 = new Coordinate();
+                                        newCoor3.X = gv.mod.currentArea.Props[i].LocationX;
+                                        newCoor3.Y = gv.mod.currentArea.Props[i].LocationY;
+                                        //move the distance
+                                        if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                        {
+                                            moveDist = 1;
+                                            gv.mod.currentArea.Props[i].moved2 = false;
+                                        }
+                                        if (moveDist > 0)
+                                        {
+                                            this.moveToTarget(gv.mod.currentArea.Props[i].CurrentMoveToTarget.X, gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y, gv.mod.currentArea.Props[i], moveDist);
+                                        }
+                                        if (moveDist > 1)
+                                        {
+                                            //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                        }
+                                    }
+                                    if (gv.mod.debugMode)
+                                    {
+                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                        gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
+                                    }
+                                }
+                                doPropBarkString(gv.mod.currentArea.Props[i]);
+                            }
+                            #endregion
+
+                            #region time driven movers (daily, weekly, monthly, yearly)
+                            else if (gv.mod.currentArea.Props[i].MoverType.Equals("daily") || gv.mod.currentArea.Props[i].MoverType.Equals("weekly") || gv.mod.currentArea.Props[i].MoverType.Equals("monthly") || gv.mod.currentArea.Props[i].MoverType.Equals("yearly"))
+                            {
+                                bool departureTimeReached = false;
+                                List<string> timeUnitsList = new List<string>();
+                                int currentTimeInInterval = 0;
+                                bool registerRemoval = false;
+
+                                timeUnitsList = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].departureTime.Split(':').Select(x => x.Trim()).ToList();
+
+                                int dayCounter = Convert.ToInt32(timeUnitsList[0]);
+                                int hourCounter = Convert.ToInt32(timeUnitsList[1]);
+                                int minuteCounter = Convert.ToInt32(timeUnitsList[2]);
+
+                                if ((dayCounter == 0) || (dayCounter == 1))
+                                {
+                                    dayCounter = 0;
+                                }
+                                else
+                                {
+                                    dayCounter = (dayCounter - 1);
+                                }
+
+                                int convertedDepartureTime = dayCounter * 1440 + hourCounter * 60 + minuteCounter;
+
+                                if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex == gv.mod.currentArea.Props[i].WayPointList.Count - 1)
+                                {
+                                    if (gv.mod.currentArea.Props[i].MoverType.Equals("daily"))
+                                    {
+                                        convertedDepartureTime = 1440 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                    if (gv.mod.currentArea.Props[i].MoverType.Equals("weekly"))
+                                    {
+                                        convertedDepartureTime = 10080 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                    if (gv.mod.currentArea.Props[i].MoverType.Equals("monthly"))
+                                    {
+                                        convertedDepartureTime = 40320 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                    if (gv.mod.currentArea.Props[i].MoverType.Equals("yearly"))
+                                    {
+                                        convertedDepartureTime = 483840 - (gv.mod.timePerStepAfterSpeedCalc + 1);
+                                    }
+                                }
+
+                                if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex == 0)
+                                {
+                                    if (convertedDepartureTime < (gv.mod.timePerStepAfterSpeedCalc + 1))
+                                    {
+                                        convertedDepartureTime = gv.mod.timePerStepAfterSpeedCalc + 1;
+                                    }
+                                }
+
+                                if (gv.mod.currentArea.Props[i].MoverType.Equals("daily"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 1440;
+                                }
+                                if (gv.mod.currentArea.Props[i].MoverType.Equals("weekly"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 10080;
+                                }
+                                if (gv.mod.currentArea.Props[i].MoverType.Equals("monthly"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 40320;
+                                }
+                                if (gv.mod.currentArea.Props[i].MoverType.Equals("yearly"))
+                                {
+                                    currentTimeInInterval = (gv.mod.WorldTime) % 483840;
+                                }
+
+                                if (currentTimeInInterval >= convertedDepartureTime)
+                                {
+                                    departureTimeReached = true;
+                                }
+
+
+                                if (gv.mod.currentArea.Props[i].WayPointList.Count > 0)
+                                {
+
+                                    if (departureTimeReached)
+                                    {
                                         //already there so set next way point location (revert to index 0 if at last way point)
                                         if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex >= gv.mod.currentArea.Props[i].WayPointList.Count - 1)
                                         {
                                             gv.mod.currentArea.Props[i].WayPointListCurrentIndex = 0;
+
+                                            if (gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName != gv.mod.currentArea.Filename)
+                                            {
+                                                gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
+                                                gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
+                                                gv.mod.currentArea.Props[i].ReturningToPost = false;
+                                                //added floaty text that announces the area transfer
+                                                string shownAreaName = "";
+                                                for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
+                                                {
+                                                    if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName)
+                                                    {
+                                                        shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
+                                                    }
+                                                }
+
+                                                if (shownAreaName != "newArea" && shownAreaName != "" && shownAreaName != "none")
+                                                {
+                                                    //if (gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[i].Filename)
+                                                    //{
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "Heading off towards " + shownAreaName, "white", 2000);
+                                                    //}
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Heading off towards " + shownAreaName, "white", 4000);
+                                                }
+                                                else
+                                                {
+                                                    //if (gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[i].Filename)
+                                                    //{
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "Heading off", "white", 2000);
+                                                    //}
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Heading off", "white", 4000);
+                                                }
+                                                gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.currentArea.Props[i].PropTag, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X.ToString(), gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y.ToString());
+                                                registerRemoval = true;
+                                            }
                                         }
                                         else
                                         {
                                             gv.mod.currentArea.Props[i].WayPointListCurrentIndex++;
+                                            if (gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName != gv.mod.currentArea.Filename)
+                                            {
+                                                gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
+                                                gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
+                                                gv.mod.currentArea.Props[i].ReturningToPost = false;
+                                                //added floaty text that announces the area transfer
+                                                string shownAreaName = "";
+                                                for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
+                                                {
+                                                    if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName)
+                                                    {
+                                                        shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
+                                                    }
+                                                }
+                                                if (shownAreaName != "newArea" && shownAreaName != "" && shownAreaName != "none")
+                                                {
+
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "Heading off towards " + shownAreaName, "white", 2000);
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Heading off towards " + shownAreaName, "white", 4000);
+                                                }
+                                                else
+                                                {
+                                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "Heading off", "white", 2000);
+                                                    //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Heading off", "white", 4000);
+
+                                                }
+
+                                                gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.currentArea.Props[i].PropTag, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X.ToString(), gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y.ToString());
+
+                                                registerRemoval = true;
+                                            }
                                         }
-                                        gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
-                                        gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
-                                        gv.mod.currentArea.Props[i].ReturningToPost = false;
-                                    }
-
-                                }
-                                //move to next target
-                                if (!mustWait)
-                                {
-                                    this.moveToTarget(gv.mod.currentArea.Props[i].CurrentMoveToTarget.X, gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y, gv.mod.currentArea.Props[i], moveDist);
-                                    if (moveDist > 1)
-                                    {
-                                        gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
-                                    }
-                                }
-                                if (gv.mod.debugMode)
-                                {
-                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
-                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
-                                }
-                            }
-                            doPropBarkString(gv.mod.currentArea.Props[i]);
-                        }
-#endregion
-
-#region time driven movers (daily, weekly, monthly, yearly)
-                        else if (gv.mod.currentArea.Props[i].MoverType.Equals("daily") || gv.mod.currentArea.Props[i].MoverType.Equals("weekly") || gv.mod.currentArea.Props[i].MoverType.Equals("monthly") || gv.mod.currentArea.Props[i].MoverType.Equals("yearly"))
-                        {
-                            bool departureTimeReached = false;
-                            List<string> timeUnitsList = new List<string>();
-                            int currentTimeInInterval = 0;
-                            bool registerRemoval = false;
-
-                            timeUnitsList = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].departureTime.Split(':').Select(x => x.Trim()).ToList();
-
-                            int dayCounter = Convert.ToInt32(timeUnitsList[0]);
-                            int hourCounter = Convert.ToInt32(timeUnitsList[1]);
-                            int minuteCounter = Convert.ToInt32(timeUnitsList[2]);
-
-                            if ((dayCounter == 0) || (dayCounter == 1))
-                            {
-                                dayCounter = 0;
-                            }
-                            else
-                            {
-                                dayCounter = (dayCounter - 1);
-                            }
-
-                            int convertedDepartureTime = dayCounter * 1440 + hourCounter * 60 + minuteCounter;
-
-                            if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex == gv.mod.currentArea.Props[i].WayPointList.Count - 1)
-                            {
-                                if (gv.mod.currentArea.Props[i].MoverType.Equals("daily"))
-                                {
-                                    convertedDepartureTime = 1440 - (gv.mod.currentArea.TimePerSquare + 1);
-                                }
-                                if (gv.mod.currentArea.Props[i].MoverType.Equals("weekly"))
-                                {
-                                    convertedDepartureTime = 10080 - (gv.mod.currentArea.TimePerSquare + 1);
-                                }
-                                if (gv.mod.currentArea.Props[i].MoverType.Equals("monthly"))
-                                {
-                                    convertedDepartureTime = 40320 - (gv.mod.currentArea.TimePerSquare + 1);
-                                }
-                                if (gv.mod.currentArea.Props[i].MoverType.Equals("yearly"))
-                                {
-                                    convertedDepartureTime = 483840 - (gv.mod.currentArea.TimePerSquare + 1);
-                                }
-                            }
-
-                            if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex == 0)
-                            {
-                                if (convertedDepartureTime < (gv.mod.currentArea.TimePerSquare + 1))
-                                {
-                                    convertedDepartureTime = gv.mod.currentArea.TimePerSquare + 1;
-                                }
-                            }
-
-                            if (gv.mod.currentArea.Props[i].MoverType.Equals("daily"))
-                            {
-                                currentTimeInInterval = (gv.mod.WorldTime) % 1440;
-                            }
-                            if (gv.mod.currentArea.Props[i].MoverType.Equals("weekly"))
-                            {
-                                currentTimeInInterval = (gv.mod.WorldTime) % 10080;
-                            }
-                            if (gv.mod.currentArea.Props[i].MoverType.Equals("monthly"))
-                            {
-                                currentTimeInInterval = (gv.mod.WorldTime) % 40320;
-                            }
-                            if (gv.mod.currentArea.Props[i].MoverType.Equals("yearly"))
-                            {
-                                currentTimeInInterval = (gv.mod.WorldTime) % 483840;
-                            }
-
-                            if (currentTimeInInterval >= convertedDepartureTime)
-                            {
-                                departureTimeReached = true;
-                            }
-
-                            if (gv.mod.currentArea.Props[i].WayPointList.Count > 0)
-                            {
-
-                                if (departureTimeReached)
-                                {
-                                    //already there so set next way point location (revert to index 0 if at last way point)
-                                    if (gv.mod.currentArea.Props[i].WayPointListCurrentIndex >= gv.mod.currentArea.Props[i].WayPointList.Count - 1)
-                                    {
-                                        gv.mod.currentArea.Props[i].WayPointListCurrentIndex = 0;
-
-                                        if (gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName != gv.mod.currentArea.Filename)
+                                        if (!registerRemoval)
                                         {
                                             gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
                                             gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
                                             gv.mod.currentArea.Props[i].ReturningToPost = false;
-                                            //added floaty text that announces the area transfer
-                                            string shownAreaName = "";
-                                            for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
-                                            {
-                                                if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName)
-                                                {
-                                                    shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
-                                                }
-                                            }
-
-                                            gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "Heading off towards " + shownAreaName, "white", 4000);
-                                            gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.currentArea.Props[i].PropTag, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X.ToString(), gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y.ToString());
-                                            registerRemoval = true;
                                         }
-                                    }
-                                    else
-                                    {
-                                        gv.mod.currentArea.Props[i].WayPointListCurrentIndex++;
-                                        if (gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName != gv.mod.currentArea.Filename)
-                                        {
-                                            gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
-                                            gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
-                                            gv.mod.currentArea.Props[i].ReturningToPost = false;
-                                            //added floaty text that announces the area transfer
-                                            string shownAreaName = "";
-                                            for (int a = gv.mod.moduleAreasObjects.Count - 1; a >= 0; a--)
-                                            {
-                                                if (gv.mod.moduleAreasObjects[a].Filename == gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName)
-                                                {
-                                                    shownAreaName = gv.mod.moduleAreasObjects[a].inGameAreaName;
-                                                }
-                                            }
 
-                                            gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "Heading off towards " + shownAreaName, "white", 4000);
-                                            gv.sf.osController("osSetPropLocationAnyArea.cs", gv.mod.currentArea.Props[i].PropTag, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].areaName, gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X.ToString(), gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y.ToString());
-                                            registerRemoval = true;
-                                        }
                                     }
+
+                                    //move to next target
                                     if (!registerRemoval)
                                     {
-                                        gv.mod.currentArea.Props[i].CurrentMoveToTarget.X = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].X;
-                                        gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y = gv.mod.currentArea.Props[i].WayPointList[gv.mod.currentArea.Props[i].WayPointListCurrentIndex].Y;
-                                        gv.mod.currentArea.Props[i].ReturningToPost = false;
-                                    }
-
-                                }
-
-                                //move to next target
-                                if (!registerRemoval)
-                                {
-                                    if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].CurrentMoveToTarget.X) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y))
-                                    {
-
-                                    }
-                                    else
-                                    {
-                                        this.moveToTarget(gv.mod.currentArea.Props[i].CurrentMoveToTarget.X, gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y, gv.mod.currentArea.Props[i], moveDist);
-                                        if (moveDist > 1)
+                                        if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.currentArea.Props[i].CurrentMoveToTarget.X) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y))
                                         {
-                                            gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+
+                                        }
+                                        else
+                                        {
+                                            Coordinate newCoor2 = new Coordinate();
+                                            newCoor2.X = gv.mod.currentArea.Props[i].CurrentMoveToTarget.X;
+                                            newCoor2.Y = gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y;
+                                            Coordinate newCoor3 = new Coordinate();
+                                            newCoor3.X = gv.mod.currentArea.Props[i].LocationX;
+                                            newCoor3.Y = gv.mod.currentArea.Props[i].LocationY;
+                                            //move the distance
+                                            if (getDistance(newCoor2, newCoor3) <= 1 && moveDist > 0)
+                                            {
+                                                moveDist = 1;
+                                                gv.mod.currentArea.Props[i].moved2 = false;
+                                            }
+                                            if (moveDist > 0)
+                                            {
+                                                this.moveToTarget(gv.mod.currentArea.Props[i].CurrentMoveToTarget.X, gv.mod.currentArea.Props[i].CurrentMoveToTarget.Y, gv.mod.currentArea.Props[i], moveDist);
+                                            }
+                                            if (moveDist > 1)
+                                            {
+                                                //gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i], "Double move", "yellow", 1500);
+                                            }
                                         }
                                     }
-                                }
 
-                                if ((gv.mod.debugMode) && (!registerRemoval))
+                                    if ((gv.mod.debugMode) && (!registerRemoval))
+                                    {
+                                        gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
+                                        gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
+                                    }
+                                }
+                                if (!registerRemoval)
                                 {
-                                    gv.cc.addLogText("<font color='yellow'>" + gv.mod.currentArea.Props[i].PropTag + " moves " + moveDist + "</font><BR>");
-                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, "(" + gv.mod.currentArea.Props[i].LocationX + "," + gv.mod.currentArea.Props[i].LocationY + ")", "yellow", 4000);
+                                    doPropBarkString(gv.mod.currentArea.Props[i]);
                                 }
                             }
-                            if (!registerRemoval)
-                            {
-                                doPropBarkString(gv.mod.currentArea.Props[i]);
-                            }
+                            #endregion
                         }
-#endregion
                     }
+                }
+                else
+                {
+                    gv.mod.currentArea.Props[i].skipNavigationThisTurn = false;
                 }
             }
 
-#endregion
+            //endbracket
+            #endregion
             /*
             foreach (Prop propObject in gv.mod.currentArea.Props)
             {
@@ -7760,49 +12667,29 @@ namespace IBx
         }
         public void doPropBarkString(Prop prp)
         {
-            List<BarkString> chosenBarks = new List<BarkString>();
-            Random rnd3 = new Random();
-            int decider = 0;
-
-            if (prp.WayPointList.Count > 0)
+            //stealth and was kill 
+            bool tooMuchHeightDifference = false;
+            if (gv.mod.blendOutTooHighAndTooDeepTiles)
             {
-                if ((prp.LocationX == prp.CurrentMoveToTarget.X) && (prp.LocationY == prp.CurrentMoveToTarget.Y))
+                if ((gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel > gv.mod.currentArea.Tiles[prp.LocationY * gv.mod.currentArea.MapSizeX + prp.LocationX].heightLevel + 2) || (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].heightLevel < gv.mod.currentArea.Tiles[prp.LocationY * gv.mod.currentArea.MapSizeX + prp.LocationX].heightLevel - 2))
                 {
-                    //do barks for waypoint
-                    //if (prp.WayPointList[prp.WayPointListCurrentIndex].BarkStringsAtWayPoint.Count > 0)
-                    //{
-                    foreach (BarkString b in prp.WayPointList[prp.WayPointListCurrentIndex].BarkStringsAtWayPoint)
-                    {
-                        if (gv.sf.RandInt(100) < b.ChanceToShow)
-                        {
-                            chosenBarks.Add(b);
-                        }
-                    }
-                    if (chosenBarks.Count > 0)
-                    {
-                        decider = rnd3.Next(0, chosenBarks.Count);
-                        if (!gv.mod.useSmoothMovement)
-                        {
-                            gv.screenMainMap.addFloatyText(prp.LocationY, prp.LocationY, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
-                        }
-                        else
-                        {
-                            gv.screenMainMap.addFloatyText(prp, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
-
-                        }
-
-                        //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
-                    }
-                    //}
+                    tooMuchHeightDifference = true;
                 }
-                else
+            }
+
+            if (!tooMuchHeightDifference && !prp.isStealthed && !prp.wasKilled && prp.isShown && prp.isActive)
+            {
+                List<BarkString> chosenBarks = new List<BarkString>();
+                Random rnd3 = new Random();
+                int decider = 0;
+                if (prp.WayPointList.Count > 0)
                 {
-                    //do barks for patrol, random, chasing or time driven
-                    if (prp.WayPointListCurrentIndex == 0)
+                    if ((prp.LocationX == prp.CurrentMoveToTarget.X) && (prp.LocationY == prp.CurrentMoveToTarget.Y))
                     {
+                        //do barks for waypoint
                         //if (prp.WayPointList[prp.WayPointListCurrentIndex].BarkStringsAtWayPoint.Count > 0)
                         //{
-                        foreach (BarkString b in prp.WayPointList[prp.WayPointList.Count - 1].BarkStringsOnTheWayToNextWayPoint)
+                        foreach (BarkString b in prp.WayPointList[prp.WayPointListCurrentIndex].BarkStringsAtWayPoint)
                         {
                             if (gv.sf.RandInt(100) < b.ChanceToShow)
                             {
@@ -7818,7 +12705,11 @@ namespace IBx
                             }
                             else
                             {
-                                gv.screenMainMap.addFloatyText(prp, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                if (prp.timeSinceLastFloaty > 30f)
+                                {
+                                    prp.timeSinceLastFloaty = 0;
+                                    gv.screenMainMap.addFloatyText(prp, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                }
 
                             }
 
@@ -7828,39 +12719,206 @@ namespace IBx
                     }
                     else
                     {
-                        foreach (BarkString b in prp.WayPointList[prp.WayPointListCurrentIndex - 1].BarkStringsOnTheWayToNextWayPoint)
+                        //do barks for patrol, random, chasing or time driven
+                        if (prp.WayPointListCurrentIndex == 0)
                         {
-                            if (gv.sf.RandInt(100) < b.ChanceToShow)
+                            //if (prp.WayPointList[prp.WayPointListCurrentIndex].BarkStringsAtWayPoint.Count > 0)
+                            //{
+                            foreach (BarkString b in prp.WayPointList[prp.WayPointList.Count - 1].BarkStringsOnTheWayToNextWayPoint)
                             {
-                                chosenBarks.Add(b);
-                                //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, b.FloatyTextOneLiner, b.Color, b.LengthOfTimeToShowInMilliSeconds);
-                                //break;
+                                if (gv.sf.RandInt(100) < b.ChanceToShow)
+                                {
+                                    chosenBarks.Add(b);
+                                }
                             }
-                        }
-                        if (chosenBarks.Count > 0)
-                        {
-                            decider = rnd3.Next(0, chosenBarks.Count);
-                            if (!gv.mod.useSmoothMovement)
+                            if (chosenBarks.Count > 0)
                             {
-                                gv.screenMainMap.addFloatyText(prp.LocationY, prp.LocationY, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
-                            }
-                            else
-                            {
-                                gv.screenMainMap.addFloatyText(prp, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                decider = rnd3.Next(0, chosenBarks.Count);
+                                if (!gv.mod.useSmoothMovement)
+                                {
+                                    gv.screenMainMap.addFloatyText(prp.LocationY, prp.LocationY, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                }
+                                else
+                                {
+                                    if (prp.timeSinceLastFloaty > 30f)
+                                    {
+                                        prp.timeSinceLastFloaty = 0;
+                                        gv.screenMainMap.addFloatyText(prp, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                    }
 
+                                }
+
+                                //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                            }
+                            //}
+                        }
+                        else
+                        {
+                            foreach (BarkString b in prp.WayPointList[prp.WayPointListCurrentIndex - 1].BarkStringsOnTheWayToNextWayPoint)
+                            {
+                                if (gv.sf.RandInt(100) < b.ChanceToShow)
+                                {
+                                    chosenBarks.Add(b);
+                                    //gv.screenMainMap.addFloatyText(prp.LocationX, prp.LocationY, b.FloatyTextOneLiner, b.Color, b.LengthOfTimeToShowInMilliSeconds);
+                                    //break;
+                                }
+                            }
+                            if (chosenBarks.Count > 0)
+                            {
+                                decider = rnd3.Next(0, chosenBarks.Count);
+                                if (!gv.mod.useSmoothMovement)
+                                {
+                                    gv.screenMainMap.addFloatyText(prp.LocationY, prp.LocationY, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                }
+                                else
+                                {
+                                    if (prp.timeSinceLastFloaty > 30f)
+                                    {
+                                        prp.timeSinceLastFloaty = 0;
+                                        gv.screenMainMap.addFloatyText(prp, chosenBarks[decider].FloatyTextOneLiner, chosenBarks[decider].Color, chosenBarks[decider].LengthOfTimeToShowInMilliSeconds);
+                                    }
+
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
         public int getMoveDistance(Prop prp)
         {
-            if (gv.sf.RandInt(100) <= prp.ChanceToMove2Squares)
+            int Move0Chance = 0;
+            int Move2Chance = 0;
+
+            if (prp.movementSpeed == -1)
+            {
+                //Move0Chance = 40;
+                Move0Chance = 15;
+                Move2Chance = 0;
+            }
+            else
+            {
+                int relativeSpeed = gv.mod.partySpeed - prp.movementSpeed;
+
+                //prop is lightning fast (<= -13); Double:75% , None:0% 
+                if (relativeSpeed <= -13)
+                {
+                    Move0Chance = 0;
+                    Move2Chance = 75;
+                }
+                //prop is very fast (-8 til -12); Double:50% , None:5%
+                if (relativeSpeed <= -8 && relativeSpeed >= -12)
+                {
+                    //Move0Chance = 5;
+                    Move0Chance = 5;
+                    Move2Chance = 50;
+                }
+                //prop is fast (-3 til -7); Double:30% , None:10%
+                if (relativeSpeed <= -3 && relativeSpeed >= -7)
+                {
+                    //Move0Chance = 10;
+                    Move0Chance = 10;
+                    Move2Chance = 30;
+                }
+                //prop at default (-2 til +2); Double:15% , None:15%
+                if (relativeSpeed <= 2 && relativeSpeed >= -2)
+                {
+                    //Move0Chance = 15;
+                    //Move2Chance = 15;
+                    Move0Chance = 10;
+                    Move2Chance = 10;
+                }
+                //prop is slow (+3 til +7); Double:10% , None:30%
+                if (relativeSpeed <= 7 && relativeSpeed >= 3)
+                {
+                    //Move0Chance = 30;
+                    //Move2Chance = 10;
+                    Move0Chance = 15;
+                    Move2Chance = 5;
+                }
+                //prop is very slow (+8 til +12); Double:5% , None:50%
+                if (relativeSpeed <= 12 && relativeSpeed >= 8)
+                {
+                    //Move0Chance = 50;
+                    //Move2Chance = 5;
+                    Move0Chance = 20;
+                    Move2Chance = 0;
+                }
+                //prop is almost standing (>= +13); Double:0% , None:75%
+                if (relativeSpeed >= 13)
+                {
+                    //Move0Chance = 75;
+                    //Move2Chance = 0;
+                    Move0Chance = 30;
+                    Move2Chance = 0;
+                }
+            }
+
+            //wolfwood
+            //Move0Chance = -1;
+            //Move2Chance = -1;
+
+            if (gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer)
+            {
+                //Move0Chance = 0;
+            }
+
+            if (prp.pauseCounter <= 0 || prp.isCurrentlyChasing)
+            {
+                prp.isPausing = false;
+            }
+            //three lines added for diagdebug
+            //prp.isPausing = false;
+            //Move2Chance = -1;
+            //Move0Chance = -1;
+            //Move2Chance = 100;
+            if (prp.isPausing)
+            {
+                prp.pauseCounter--;
+                prp.moved2 = false;
+                return 0;
+            }
+
+            else if (gv.sf.RandInt(100) <= Move2Chance)
+            {
+                prp.moved2 = true;
+                //prp.oldPath.Clear();
+                //smoothman
+                //prp.propMovingHalfSpeedMulti = 1f;
+                return 2;
+            }
+            else if (gv.sf.RandInt(100) <= Move0Chance)
+            {
+                //smoothman
+                prp.moved2 = false;
+                if (!prp.isCurrentlyChasing)
+                {
+                    prp.isPausing = true;
+                    //prp.pauseCounter = 2 + gv.sf.RandInt(2);
+                    prp.pauseCounter = 1;
+                }
+                return 0;
+
+                //prp.moved2 = false;
+                //prp.propMovingHalfSpeedMulti = 0.5f;
+                //prp.skipNavigationThisTurn = true;
+                //return 1;
+            }
+            else
+            {
+                prp.moved2 = false;
+                //smoothman
+                prp.propMovingHalfSpeedMulti = 1f;
+                return 1;
+            }
+
+            /*
+            if (gv.sf.RandInt(gv.mod.partySpeed) <= prp.ChanceToMove2Squares)
             {
                 return 2;
             }
-            else if (gv.sf.RandInt(100) <= prp.ChanceToMove0Squares)
+            else if (gv.sf.RandInt(200 - gv.mod.partySpeed) <= prp.ChanceToMove0Squares)
             {
                 return 0;
             }
@@ -7868,6 +12926,39 @@ namespace IBx
             {
                 return 1;
             }
+            */
+        }
+        //overload for breathing world 2
+        public Coordinate getNewRandomTarget(Prop prp, int index)
+        {
+            Coordinate newCoor = new Coordinate();
+
+            //X range
+            int minX = prp.PostLocationX - prp.RandomMoverRadius;
+            if (minX < 0) { minX = 0; }
+            int maxX = prp.PostLocationX + prp.RandomMoverRadius;
+            if (maxX > gv.mod.moduleAreasObjects[index].MapSizeX - 1) { maxX = gv.mod.moduleAreasObjects[index].MapSizeX - 1; }
+
+            //Y range
+            int minY = prp.PostLocationY - prp.RandomMoverRadius;
+            if (minY < 0) { minY = 0; }
+            int maxY = prp.PostLocationY + prp.RandomMoverRadius;
+            if (maxY > gv.mod.moduleAreasObjects[index].MapSizeY - 1) { maxY = gv.mod.moduleAreasObjects[index].MapSizeY - 1; }
+
+            //get random location...check if location is valid first...do for loop and exit when found one, try 10 times
+            for (int i = 0; i < 10; i++)
+            {
+                int x = gv.sf.RandInt(minX, maxX);
+                int y = gv.sf.RandInt(minY, maxY);
+                //if (gv.mod.currentArea.Tiles.get(y * gv.mod.currentArea.MapSizeX + x).Walkable)
+                if (!gv.mod.moduleAreasObjects[index].GetBlocked(x, y))
+                {
+                    newCoor.X = x;
+                    newCoor.Y = y;
+                    return newCoor;
+                }
+            }
+            return new Coordinate(prp.LocationX, prp.LocationY);
         }
         public Coordinate getNewRandomTarget(Prop prp)
         {
@@ -7905,13 +12996,48 @@ namespace IBx
             //store last location
             //prp.lastLocationX = prp.LocationX;
             //prp.lastLocationX = prp.LocationX;
-            if (prp.LocationX == gv.mod.PlayerLocationX && prp.LocationY == gv.mod.PlayerLocationY)
+            //lets get the area the pathfindign shall be done on
+            if (prp == null)
+            {
+                addLogText("yellow", "Crash in move to target, prp was null, error1001");
+                return;
+            }
+
+
+            int propAreaIndex = 0;
+            bool breakOuter = false;
+            foreach (int i in getNearbyAreas())
+            {
+                foreach (Prop p in gv.mod.moduleAreasObjects[i].Props)
+                {
+                    if (prp.PropTag == p.PropTag)
+                    {
+                        propAreaIndex = i;
+                        if (i >= gv.mod.moduleAreasObjects.Count)
+                        {
+                            addLogText("yellow", "Crash in move to target, i exceeds number of areas, error1002");
+                            return;
+                        }
+                        breakOuter = true;
+                        break;
+                    }
+                }
+                if (breakOuter)
+                {
+                    break;
+                }
+            }
+
+            if (prp.LocationX == gv.mod.PlayerLocationX && prp.LocationY == gv.mod.PlayerLocationY && gv.mod.currentArea.Filename == gv.mod.moduleAreasObjects[propAreaIndex].Filename)
             {
                 if (prp.EncounterWhenOnPartySquare != "" && prp.EncounterWhenOnPartySquare != "none")
                 {
                     if (!gv.mod.EncounterOfTurnDone)
                     {
                         gv.mod.EncounterOfTurnDone = true;
+                        gv.sf.ThisProp = prp;
+                        gv.cc.calledEncounterFromProp = true;
+                        gv.mod.stopMoves = true;
                         doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                         gv.mod.breakActiveSearch = true;
                         //gv.mod.EncounterOfTurnDone = true;
@@ -7932,15 +13058,118 @@ namespace IBx
                 {
                     //if (i != 0)
                     //{
-                        //attempt to catch situations where a creature would otherwise move "over" the party without triggering convo/encounter
-                        //if (gv.triggerIndex == 0 && gv.triggerPropIndex == 0)
-                        //{
-                            //doPropTriggers();
-                        //}
+                    //attempt to catch situations where a creature would otherwise move "over" the party without triggering convo/encounter
+                    //if (gv.triggerIndex == 0 && gv.triggerPropIndex == 0)
+                    //{
+                    //doPropTriggers();
                     //}
-                    gv.pfa.resetGrid();
-                    Coordinate newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp);
+                    //}
+                    gv.pfa.resetGrid(propAreaIndex);
+                    Coordinate newCoor = new Coordinate();
+                    bool findNewPath = false;
+                    //for (int l = prp.oldPath.Count-2; i >)
+                    //if (prp.oldPath.Count >= 2 && !prp.moved2)
+                    if (prp.oldPath.Count >= 2)
+                    {
+                        //pendel
+                        if (gv.mod.moduleAreasObjects[propAreaIndex].GetBlocked(prp.oldPath[prp.oldPath.Count - 2].X, prp.oldPath[prp.oldPath.Count - 2].Y))
+                        {
+                            findNewPath = true;
+                        }
+                        //(prp.oldPath[prp.oldPath.Count-2].X)
+                    }
+                    /*
+                    else if (prp.oldPath.Count >= 3 && prp.moved2)
+                    {
+                        //pendel
+                        if (gv.mod.moduleAreasObjects[propAreaIndex].GetBlocked(prp.oldPath[prp.oldPath.Count - 2].X, prp.oldPath[prp.oldPath.Count - 2].Y))
+                        {
+                            findNewPath = true;
+                        }
+
+                        if (gv.mod.moduleAreasObjects[propAreaIndex].GetBlocked(prp.oldPath[prp.oldPath.Count - 3].X, prp.oldPath[prp.oldPath.Count - 3].Y))
+                        {
+                            findNewPath = true;
+                        }
+                    }
+                    */
+                    else
+                    {
+                        findNewPath = true;
+                    }
+
+                    //lumina
+                    Coordinate partyCoord = new Coordinate();
+                    Coordinate propCoord = new Coordinate();
+                    partyCoord.X = gv.mod.PlayerLocationX;
+                    partyCoord.Y = gv.mod.PlayerLocationY;
+                    propCoord.X = prp.relocX;
+                    propCoord.Y = prp.relocY;
+                    if (prp.isCurrentlyChasing || gv.cc.getDistance(partyCoord, propCoord) <= 8)
+                    {
+                        prp.oldPath.Clear();
+                        findNewPath = true;
+                    }
+
+                    if (prp.oldPath.Count >= 2)
+                    {
+                        foreach (Prop p in gv.mod.moduleAreasObjects[propAreaIndex].Props)
+                        {
+                            if (p.isMover && propIsWithinRelevantDistance(p, propAreaIndex))
+                            {
+                                if (p.LocationX == prp.oldPath[prp.oldPath.Count - 2].X && p.LocationY == prp.oldPath[prp.oldPath.Count - 2].Y)
+                                {
+                                    findNewPath = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                    //findNewPath = true;
+                    if (findNewPath)
+                    {
+                        newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                        gv.mod.findNewPointCounter++;
+                    }
+                    else
+                    {
+                        newCoor = prp.oldPath[prp.oldPath.Count - 2];
+                        prp.oldPath.RemoveAt(prp.oldPath.Count - 1);
+                    }
+
                     if ((newCoor.X == -1) && (newCoor.Y == -1))
+                    {
+                    */
+
+
+                    bool returnCauseSkip = false;
+                    if (findNewPath && (gv.mod.findNewPointCounter <= (int)(75f / gv.elapsed3) || prp.skippedPathfinding || prp.isCurrentlyChasing || gv.cc.getDistance(partyCoord, propCoord) <= 8))
+                    {
+                        newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                        gv.mod.findNewPointCounter++;
+                        prp.skippedPathfinding = false;
+
+                        //newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                    }
+
+                    if (!findNewPath)
+                    {
+                        newCoor = prp.oldPath[prp.oldPath.Count - 2];
+                        prp.oldPath.RemoveAt(prp.oldPath.Count - 1);
+                    }
+
+                    if (gv.mod.findNewPointCounter > (int)(75f / gv.elapsed3) && !prp.skippedPathfinding && findNewPath && !prp.isCurrentlyChasing && gv.cc.getDistance(partyCoord, propCoord) > 8)
+                    {
+                        prp.skippedPathfinding = true;
+                        prp.isPausing = true;
+                        prp.pauseCounter = 1;
+                        returnCauseSkip = true;
+                    }
+
+                    //Coordinate newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                    if ((newCoor.X == -1 && newCoor.Y == -1) || returnCauseSkip)
                     {
                         //didn't find a path, don't move
                         //why do we eliminate the moveto target here? Was fitting for a static world (that would never open a new path anyway). In a dynamic world I think we better keep the moveto information?
@@ -7955,7 +13184,7 @@ namespace IBx
 
                     //new code for preventing movers from ending on the same square
                     bool nextStepSquareIsOccupied = false;
-                    foreach (Prop otherProp in gv.mod.currentArea.Props)
+                    foreach (Prop otherProp in gv.mod.moduleAreasObjects[propAreaIndex].Props)
                     {
 
                         //check whether an active mover prop is on the field found as next step on the path
@@ -7964,6 +13193,12 @@ namespace IBx
                             nextStepSquareIsOccupied = true;
                             break;
                         }
+                    }
+
+                    if (prp.allowEnteringOccupiedSquare)
+                    {
+                        nextStepSquareIsOccupied = false;
+                        prp.allowEnteringOccupiedSquare = false;
                     }
 
                     if (nextStepSquareIsOccupied)
@@ -7980,7 +13215,7 @@ namespace IBx
 
                             //let's find out whether our prop can stay on its origin square, i.e. skip move, or whether it already comes from an occupied square and has to "sidestep"
                             //Note: moving along path, double move, wont work when the target square is the destination square, i.e. the end of the path
-                            foreach (Prop otherProp2 in gv.mod.currentArea.Props)
+                            foreach (Prop otherProp2 in gv.mod.moduleAreasObjects[propAreaIndex].Props)
                             {
                                 if ((otherProp2.LocationX == prp.LocationX) && (otherProp2.LocationY == prp.LocationY) && (otherProp2.isMover) && (otherProp2.isActive))
                                 {
@@ -8015,7 +13250,7 @@ namespace IBx
                         {
                             originSquareOccupied = false;
                             //check whether origin square is occupied, too 
-                            foreach (Prop otherProp2 in gv.mod.currentArea.Props)
+                            foreach (Prop otherProp2 in gv.mod.moduleAreasObjects[propAreaIndex].Props)
                             {
                                 if ((otherProp2.LocationX == prp.LocationX) && (otherProp2.LocationY == prp.LocationY) && (otherProp2.isMover) && (otherProp2.isActive))
                                 {
@@ -8030,31 +13265,58 @@ namespace IBx
                             if (originSquareOccupied)
                             {
                                 //careful, watch for infinite loop, recursive calling here
+                                int adjustY = 0;
+                                int adjustX = 0;
+                                if (prp.LocationX > newCoor.X)
+                                {
+                                    //adjustX = -1;
+                                    adjustX = newCoor.X - prp.relocX;
+
+                                }
+                                if (prp.LocationX < newCoor.X)
+                                {
+                                    //adjustX = +1;
+                                    adjustX = newCoor.X - prp.relocX;
+                                }
+                                if (prp.LocationY > newCoor.Y)
+                                {
+                                    //adjustY = -1;
+                                    adjustY = newCoor.Y - prp.relocY;
+                                }
+                                if (prp.LocationY < newCoor.Y)
+                                {
+                                    //adjustY = +1;
+                                    adjustY = newCoor.Y - prp.relocY;
+                                }
                                 prp.LocationX = newCoor.X;
                                 prp.LocationY = newCoor.Y;
-
+                                recalcReloc(prp);
+                                adjustX = 0;
+                                adjustY = 0;
                                 int xOffSetInSquares = 0;
                                 int yOffSetInSquares = 0;
-                                if (gv.mod.PlayerLocationX >= prp.LocationX)
+                                if (gv.mod.PlayerLocationX >= prp.relocX)
                                 {
-                                    xOffSetInSquares = prp.LocationX - gv.mod.PlayerLocationX;
+                                    xOffSetInSquares = prp.relocX + adjustX - gv.mod.PlayerLocationX;
                                 }
                                 else
                                 {
-                                    xOffSetInSquares = prp.LocationX - gv.mod.PlayerLocationX;
+                                    xOffSetInSquares = prp.relocX + adjustX - gv.mod.PlayerLocationX;
                                 }
-                                if (gv.mod.PlayerLocationY >= prp.LocationY)
+                                if (gv.mod.PlayerLocationY >= prp.relocY)
                                 {
-                                    yOffSetInSquares = prp.LocationY - gv.mod.PlayerLocationY;
+                                    yOffSetInSquares = prp.relocY + adjustY - gv.mod.PlayerLocationY;
                                 }
                                 else
                                 {
-                                    yOffSetInSquares = prp.LocationY - gv.mod.PlayerLocationY;
+                                    yOffSetInSquares = prp.relocY + adjustY - gv.mod.PlayerLocationY;
                                 }
                                 int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
                                 int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
 
-                                if ((xOffSetInSquares <= 10) && (xOffSetInSquares >= -10) && (yOffSetInSquares <= 10) && (yOffSetInSquares >= -10))
+                                //wolfwood5
+                                //was 10
+                                if ((xOffSetInSquares <= 14) && (xOffSetInSquares >= -14) && (yOffSetInSquares <= 8) && (yOffSetInSquares >= -8))
                                 {
                                     prp.destinationPixelPositionXList.Add(playerPositionXInPix + (xOffSetInSquares * gv.squareSize));
                                     prp.destinationPixelPositionYList.Add(playerPositionYInPix + (yOffSetInSquares * gv.squareSize));
@@ -8072,6 +13334,29 @@ namespace IBx
                                 //another step forward, ie (at least) 2 steps on path
                                 if (decider < 5)
                                 {
+                                    int adjustY = 0;
+                                    int adjustX = 0;
+                                    if (prp.LocationX > newCoor.X)
+                                    {
+                                        //adjustX = -1;
+                                        adjustX = newCoor.X - prp.relocX;
+
+                                    }
+                                    if (prp.LocationX < newCoor.X)
+                                    {
+                                        //adjustX = +1;
+                                        adjustX = newCoor.X - prp.relocX;
+                                    }
+                                    if (prp.LocationY > newCoor.Y)
+                                    {
+                                        //adjustY = -1;
+                                        adjustY = newCoor.Y - prp.relocY;
+                                    }
+                                    if (prp.LocationY < newCoor.Y)
+                                    {
+                                        //adjustY = +1;
+                                        adjustY = newCoor.Y - prp.relocY;
+                                    }
                                     prp.LocationX = newCoor.X;
                                     prp.LocationY = newCoor.Y;
 
@@ -8082,6 +13367,9 @@ namespace IBx
                                             if (!gv.mod.EncounterOfTurnDone)
                                             {
                                                 gv.mod.EncounterOfTurnDone = true;
+                                                gv.sf.ThisProp = prp;
+                                                gv.cc.calledEncounterFromProp = true;
+                                                gv.mod.stopMoves = true;
                                                 doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                                                 gv.mod.breakActiveSearch = true;
                                                 //gv.mod.EncounterOfTurnDone = true;
@@ -8089,29 +13377,33 @@ namespace IBx
                                             //doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                                         }
                                     }
-
+                                    recalcReloc(prp);
+                                    adjustX = 0;
+                                    adjustY = 0;
                                     int xOffSetInSquares = 0;
                                     int yOffSetInSquares = 0;
-                                    if (gv.mod.PlayerLocationX >= prp.LocationX)
+                                    if (gv.mod.PlayerLocationX >= prp.relocX)
                                     {
-                                        xOffSetInSquares = prp.LocationX - gv.mod.PlayerLocationX;
+                                        xOffSetInSquares = prp.relocX + adjustX - gv.mod.PlayerLocationX;
                                     }
                                     else
                                     {
-                                        xOffSetInSquares = prp.LocationX - gv.mod.PlayerLocationX;
+                                        xOffSetInSquares = prp.relocX + adjustX - gv.mod.PlayerLocationX;
                                     }
-                                    if (gv.mod.PlayerLocationY >= prp.LocationY)
+                                    if (gv.mod.PlayerLocationY >= prp.relocY)
                                     {
-                                        yOffSetInSquares = prp.LocationY - gv.mod.PlayerLocationY;
+                                        yOffSetInSquares = prp.relocY + adjustY - gv.mod.PlayerLocationY;
                                     }
                                     else
                                     {
-                                        yOffSetInSquares = prp.LocationY - gv.mod.PlayerLocationY;
+                                        yOffSetInSquares = prp.relocY + adjustY - gv.mod.PlayerLocationY;
                                     }
                                     int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
                                     int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
 
-                                    if ((xOffSetInSquares <= 5) && (xOffSetInSquares >= -5) && (yOffSetInSquares <= 5) && (yOffSetInSquares >= -5))
+                                    //wolfwood
+                                    //was 5
+                                    if ((xOffSetInSquares <= 14) && (xOffSetInSquares >= -14) && (yOffSetInSquares <= 8) && (yOffSetInSquares >= -8))
                                     {
                                         prp.destinationPixelPositionXList.Add(playerPositionXInPix + (xOffSetInSquares * gv.squareSize));
                                         prp.destinationPixelPositionYList.Add(playerPositionYInPix + (yOffSetInSquares * gv.squareSize));
@@ -8145,8 +13437,33 @@ namespace IBx
                             prp.PropFacingLeft = false;
                         }//3
 
+                        int adjustY = 0;
+                        int adjustX = 0;
+                        if (prp.LocationX > newCoor.X)
+                        {
+                            //adjustX = -1;
+                            adjustX = newCoor.X - prp.relocX;
+
+                        }
+                        if (prp.LocationX < newCoor.X)
+                        {
+                            //adjustX = +1;
+                            adjustX = newCoor.X - prp.relocX;
+                        }
+                        if (prp.LocationY > newCoor.Y)
+                        {
+                            //adjustY = -1;
+                            adjustY = newCoor.Y - prp.relocY;
+                        }
+                        if (prp.LocationY < newCoor.Y)
+                        {
+                            //adjustY = +1;
+                            adjustY = newCoor.Y - prp.relocY;
+                        }
                         prp.LocationX = newCoor.X;
                         prp.LocationY = newCoor.Y;
+
+
 
                         if (prp.LocationX == gv.mod.PlayerLocationX && prp.LocationY == gv.mod.PlayerLocationY)
                         {
@@ -8155,6 +13472,9 @@ namespace IBx
                                 if (!gv.mod.EncounterOfTurnDone)
                                 {
                                     gv.mod.EncounterOfTurnDone = true;
+                                    gv.sf.ThisProp = prp;
+                                    gv.cc.calledEncounterFromProp = true;
+                                    gv.mod.stopMoves = true;
                                     doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                                     gv.mod.breakActiveSearch = true;
                                     //gv.mod.EncounterOfTurnDone = true;
@@ -8162,29 +13482,40 @@ namespace IBx
                                 //doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                             }
                         }
+                        //if (gv.mod.moduleAreasObjects[index] == gv.mod.currentArea)
+                        //{
 
+                        //prp.relocX = prp.LocationX;
+                        //prp.relocY = prp.LocationY;
+                        recalcReloc(prp);
+                        adjustX = 0;
+                        adjustY = 0;
+                        //}
                         int xOffSetInSquares = 0;
                         int yOffSetInSquares = 0;
-                        if (gv.mod.PlayerLocationX >= prp.LocationX)
+                        if (gv.mod.PlayerLocationX >= prp.relocX)
                         {
-                            xOffSetInSquares = prp.LocationX - gv.mod.PlayerLocationX;
+                            xOffSetInSquares = prp.relocX + adjustX - gv.mod.PlayerLocationX;
                         }
                         else
                         {
-                            xOffSetInSquares = prp.LocationX - gv.mod.PlayerLocationX;
+                            //urfeld721
+                            xOffSetInSquares = prp.relocX + adjustX - gv.mod.PlayerLocationX;
                         }
-                        if (gv.mod.PlayerLocationY >= prp.LocationY)
+                        if (gv.mod.PlayerLocationY >= prp.relocY)
                         {
-                            yOffSetInSquares = prp.LocationY - gv.mod.PlayerLocationY;
+                            yOffSetInSquares = prp.relocY + adjustY - gv.mod.PlayerLocationY;
                         }
                         else
                         {
-                            yOffSetInSquares = prp.LocationY - gv.mod.PlayerLocationY;
+                            yOffSetInSquares = prp.relocY + adjustY - gv.mod.PlayerLocationY;
                         }
                         int playerPositionXInPix = gv.oXshift + gv.screenMainMap.mapStartLocXinPixels + (gv.playerOffsetX * gv.squareSize);
                         int playerPositionYInPix = gv.playerOffsetY * gv.squareSize;
-
-                        if ((xOffSetInSquares <= 5) && (xOffSetInSquares >= -5) && (yOffSetInSquares <= 5) && (yOffSetInSquares >= -5))
+                        //wolfwood
+                        //was 5
+                        //widescreenmarker
+                        if ((xOffSetInSquares <= 14) && (xOffSetInSquares >= -14) && (yOffSetInSquares <= 8) && (yOffSetInSquares >= -8))
                         {
                             prp.destinationPixelPositionXList.Add(playerPositionXInPix + (xOffSetInSquares * gv.squareSize));
                             prp.destinationPixelPositionYList.Add(playerPositionYInPix + (yOffSetInSquares * gv.squareSize));
@@ -8193,15 +13524,83 @@ namespace IBx
                     }
                 }
                 prp.pixelMoveSpeed = prp.destinationPixelPositionXList.Count;
+
             }
             else
             {
                 Random rnd2 = new Random();
                 for (int i = 0; i < moveDistance; i++)
                 {
-                    gv.pfa.resetGrid();
-                    Coordinate newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp);
-                    if ((newCoor.X == -1) && (newCoor.Y == -1))
+                    gv.pfa.resetGrid(propAreaIndex);
+                    Coordinate newCoor = new Coordinate();
+                    bool findNewPath = false;
+                    //for (int l = prp.oldPath.Count-2; i >)
+                    if (prp.oldPath.Count >= 2 && !prp.moved2)
+                    {
+                        //pendel
+                        if (gv.mod.moduleAreasObjects[propAreaIndex].GetBlocked(prp.oldPath[prp.oldPath.Count - 2].X, prp.oldPath[prp.oldPath.Count - 2].Y))
+                        {
+                            findNewPath = true;
+                        }
+                        //(prp.oldPath[prp.oldPath.Count-2].X)
+                    }
+                    else if (prp.oldPath.Count >= 3 && prp.moved2)
+                    {
+                        //pendel
+                        if (gv.mod.moduleAreasObjects[propAreaIndex].GetBlocked(prp.oldPath[prp.oldPath.Count - 2].X, prp.oldPath[prp.oldPath.Count - 2].Y))
+                        {
+                            findNewPath = true;
+                        }
+
+                        if (gv.mod.moduleAreasObjects[propAreaIndex].GetBlocked(prp.oldPath[prp.oldPath.Count - 3].X, prp.oldPath[prp.oldPath.Count - 3].Y))
+                        {
+                            findNewPath = true;
+                        }
+                    }
+                    else
+                    {
+                        findNewPath = true;
+                    }
+
+                    //lumina
+                    Coordinate partyCoord = new Coordinate();
+                    Coordinate propCoord = new Coordinate();
+                    partyCoord.X = gv.mod.PlayerLocationX;
+                    partyCoord.Y = gv.mod.PlayerLocationY;
+                    propCoord.X = prp.relocX;
+                    propCoord.Y = prp.relocY;
+                    if (prp.isCurrentlyChasing || gv.cc.getDistance(partyCoord, propCoord) <= 8)
+                    {
+                        prp.oldPath.Clear();
+                        findNewPath = true;
+                    }
+                    bool returnCauseSkip = false;
+
+                    if (findNewPath && (gv.mod.findNewPointCounter <= (int)(75f / gv.elapsed3) || prp.skippedPathfinding || prp.isCurrentlyChasing || gv.cc.getDistance(partyCoord, propCoord) <= 8))
+                    {
+                        newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                        gv.mod.findNewPointCounter++;
+                        prp.skippedPathfinding = false;
+
+                        //newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                    }
+
+                    if (!findNewPath)
+                    {
+                        newCoor = prp.oldPath[prp.oldPath.Count - 2];
+                        prp.oldPath.RemoveAt(prp.oldPath.Count - 1);
+                    }
+
+                    if (gv.mod.findNewPointCounter > (int)(75f / gv.elapsed3) && !prp.skippedPathfinding && findNewPath && !prp.isCurrentlyChasing && gv.cc.getDistance(partyCoord, propCoord) > 8)
+                    {
+                        prp.skippedPathfinding = true;
+                        prp.isPausing = true;
+                        prp.pauseCounter = 1;
+                        returnCauseSkip = true;
+                    }
+
+                    //Coordinate newCoor = gv.pfa.findNewPoint(new Coordinate(prp.LocationX, prp.LocationY), new Coordinate(targetX, targetY), prp, propAreaIndex);
+                    if ((newCoor.X == -1 && newCoor.Y == -1) || returnCauseSkip)
                     {
                         //didn't find a path, don't move
                         //why do we eliminate the moveto target here? Was fitting for a static world (that would never open a new path anyway). In a dynamic world I think we better keep the moveto information?
@@ -8210,7 +13609,7 @@ namespace IBx
                         //prp.CurrentMoveToTarget.X = prp.LocationX;
                         //prp.CurrentMoveToTarget.Y = prp.LocationY;
                         //gv.Invalidate();
-//                        gv.Render();
+                        //                        gv.Render();
                         return;
                     }
 
@@ -8251,9 +13650,9 @@ namespace IBx
                             //check whether to stay on origin square ("step back")
                             if ((originSquareOccupied == false) && (decider2 == 0))
                             {//4
-                                //memo to self: check what invalidate does                                         
-                                //gv.Invalidate();
-//                                gv.Render();
+                             //memo to self: check what invalidate does                                         
+                             //gv.Invalidate();
+                             //                                gv.Render();
                                 return;
                             }//4
 
@@ -8347,8 +13746,8 @@ namespace IBx
                                     //only very close to target tiles 
                                     if (dist < 3)
                                     {//6
-                                        gv.pfa.resetGrid();
-                                        Coordinate newCoor2 = gv.pfa.findNewPoint(new Coordinate(tileLocX, tileLocY), new Coordinate(targetX, targetY), prp, tileLocX, tileLocY, 6);
+                                        gv.pfa.resetGrid(propAreaIndex);
+                                        Coordinate newCoor2 = gv.pfa.findNewPoint(new Coordinate(tileLocX, tileLocY), new Coordinate(targetX, targetY), prp, tileLocX, tileLocY, 6, propAreaIndex);
                                         if ((newCoor2.X != -1) && (newCoor2.Y != -1) && (prp.lengthOfLastPath < 4))
                                         {
                                             nearestTileByIndex = freeTilesByIndex[k];
@@ -8374,6 +13773,9 @@ namespace IBx
                                             if (!gv.mod.EncounterOfTurnDone)
                                             {
                                                 gv.mod.EncounterOfTurnDone = true;
+                                                gv.sf.ThisProp = prp;
+                                                gv.cc.calledEncounterFromProp = true;
+                                                gv.mod.stopMoves = true;
                                                 doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                                                 gv.mod.breakActiveSearch = true;
                                                 //gv.mod.EncounterOfTurnDone = true;
@@ -8414,6 +13816,9 @@ namespace IBx
                                         if (!gv.mod.EncounterOfTurnDone)
                                         {
                                             gv.mod.EncounterOfTurnDone = true;
+                                            gv.sf.ThisProp = prp;
+                                            gv.cc.calledEncounterFromProp = true;
+                                            gv.mod.stopMoves = true;
                                             doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                                             gv.mod.breakActiveSearch = true;
                                             //gv.mod.EncounterOfTurnDone = true;
@@ -8444,7 +13849,7 @@ namespace IBx
                                 {
                                     //memo to self: check what invalidate does
                                     //gv.Invalidate();
-//                                    gv.Render();
+                                    //                                    gv.Render();
                                     return;
                                 }
                             }
@@ -8476,6 +13881,9 @@ namespace IBx
                                     if (!gv.mod.EncounterOfTurnDone)
                                     {
                                         gv.mod.EncounterOfTurnDone = true;
+                                        gv.sf.ThisProp = prp;
+                                        gv.cc.calledEncounterFromProp = true;
+                                        gv.mod.stopMoves = true;
                                         doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
                                         gv.mod.breakActiveSearch = true;
                                     }
@@ -8494,31 +13902,34 @@ namespace IBx
         {
             try
             {
-                foreach (Player pc in gv.mod.playerList)
+                if (!gv.mod.currentArea.isOverviewMap)
                 {
-                    foreach (Effect ef in pc.effectsList)
+                    foreach (Player pc in gv.mod.playerList)
                     {
-                        //decrement duration of all
-                        if (!ef.isPermanent)
+                        foreach (Effect ef in pc.effectsList)
                         {
-                            ef.durationInUnits -= gv.mod.currentArea.TimePerSquare * 60; //timePerSquare is in minutes while effects work with seconds
-                        }
-                        if (!ef.usedForUpdateStats) //not used for stat updates
-                        {
-                            doEffectScript(pc, ef);
+                            //decrement duration of all
+                            if (!ef.isPermanent)
+                            {
+                                ef.durationInUnits -= gv.mod.timePerStepAfterSpeedCalc * 60; //timePerSquare is in minutes while effects work with seconds
+                            }
+                            if (!ef.usedForUpdateStats) //not used for stat updates
+                            {
+                                doEffectScript(pc, ef);
+                            }
                         }
                     }
-                }
-                //if remaining duration <= 0, remove from list
-                foreach (Player pc in gv.mod.playerList)
-                {
-                    for (int i = pc.effectsList.Count; i > 0; i--)
+                    //if remaining duration <= 0, remove from list
+                    foreach (Player pc in gv.mod.playerList)
                     {
-                        if (pc.effectsList[i - 1].durationInUnits <= 0)
+                        for (int i = pc.effectsList.Count; i > 0; i--)
                         {
-                            if (!pc.effectsList[i-1].isPermanent)
+                            if (pc.effectsList[i - 1].durationInUnits <= 0)
                             {
-                                pc.effectsList.RemoveAt(i - 1);
+                                if (!pc.effectsList[i - 1].isPermanent)
+                                {
+                                    pc.effectsList.RemoveAt(i - 1);
+                                }
                             }
                         }
                     }
@@ -8526,6 +13937,7 @@ namespace IBx
             }
             catch (Exception ex)
             {
+                gv.sf.MessageBox("Karl Error 116End");
                 gv.errorLog(ex.ToString());
             }
         }
@@ -8557,24 +13969,1151 @@ namespace IBx
                 gv.sf.efPoisoned(src, ef, 4);
             }
         }
+
+        public Coordinate recalcTileCoord(int areaIndex, int orgX, int orgY)
+        {
+            int index = areaIndex;
+            Coordinate recalculatedTileCoord = new Coordinate();
+
+            if (gv.mod.moduleAreasObjects[index] == gv.mod.currentArea)
+            {
+                //sebastian
+                //targetCoord.X = j % gv.mod.moduleAreasObjects[i].MapSizeX;
+                //targetCoord.Y = j / gv.mod.moduleAreasObjects[i].MapSizeY;
+                recalculatedTileCoord.X = orgX;
+                recalculatedTileCoord.Y = orgY;
+                return recalculatedTileCoord;
+            }
+
+            recalculatedTileCoord.X = orgX;
+            recalculatedTileCoord.Y = orgY;
+            string NENeighbourFilename = "none";
+            string NWNeighbourFilename = "none";
+            string SENeighbourFilename = "none";
+            string SWNeighbourFilename = "none";
+
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                //NW1
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.westernNeighbourArea)
+                        {
+                            NWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NW2
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.northernNeighbourArea)
+                        {
+                            NWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NE1
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.easternNeighbourArea)
+                        {
+                            NENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NE2
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.northernNeighbourArea)
+                        {
+                            NENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SE1
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.easternNeighbourArea)
+                        {
+                            SENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SE2
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.southernNeighbourArea)
+                        {
+                            SENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SW1
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.westernNeighbourArea)
+                        {
+                            SWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SW2
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.southernNeighbourArea)
+                        {
+                            SWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+            }
+
+            if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.northernNeighbourArea)
+            {
+                recalculatedTileCoord.X = orgX;
+                recalculatedTileCoord.Y = orgY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.southernNeighbourArea)
+            {
+                recalculatedTileCoord.X = orgX;
+                recalculatedTileCoord.Y = orgY + gv.mod.moduleAreasObjects[index].MapSizeY;
+                //recalculatedPropLocationX = p.LocationX;
+                //recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.westernNeighbourArea)
+            {
+                recalculatedTileCoord.X = orgX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedTileCoord.Y = orgY;
+                //recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                //recalculatedPropLocationY = p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.easternNeighbourArea)
+            {
+                recalculatedTileCoord.X = orgX + gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedTileCoord.Y = orgY;
+                //recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                //recalculatedPropLocationY = p.LocationY;
+            }
+            //todo
+            else if (gv.mod.moduleAreasObjects[index].Filename == NWNeighbourFilename)
+            {
+                recalculatedTileCoord.X = orgX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedTileCoord.Y = orgY - gv.mod.moduleAreasObjects[index].MapSizeY;
+                //recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                //recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == NENeighbourFilename)
+            {
+                recalculatedTileCoord.X = orgX + gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedTileCoord.Y = orgY - gv.mod.moduleAreasObjects[index].MapSizeY;
+                //recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                //recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == SENeighbourFilename)
+            {
+                recalculatedTileCoord.X = orgX + gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedTileCoord.Y = orgY + gv.mod.moduleAreasObjects[index].MapSizeY;
+                //recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                //recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == SWNeighbourFilename)
+            {
+                recalculatedTileCoord.X = orgX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedTileCoord.Y = orgY + gv.mod.moduleAreasObjects[index].MapSizeY;
+                //recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                //recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            return recalculatedTileCoord;
+            //p.relocX = recalculatedPropLocationX;
+            //p.relocY = recalculatedPropLocationY;
+        }
+
+        public void recalcReloc(Prop p)
+        {
+            int index = 0;
+            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+            {
+                if (gv.mod.moduleAreasObjects[i].Props.Contains(p))
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (gv.mod.moduleAreasObjects[index] == gv.mod.currentArea)
+            {
+                p.relocX = p.LocationX;
+                p.relocY = p.LocationY;
+            }
+
+            int recalculatedPropLocationX = p.LocationX;
+            int recalculatedPropLocationY = p.LocationY;
+            string NENeighbourFilename = "none";
+            string NWNeighbourFilename = "none";
+            string SENeighbourFilename = "none";
+            string SWNeighbourFilename = "none";
+
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                //NW1
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.westernNeighbourArea)
+                        {
+                            NWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NW2
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.northernNeighbourArea)
+                        {
+                            NWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NE1
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.easternNeighbourArea)
+                        {
+                            NENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NE2
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.northernNeighbourArea)
+                        {
+                            NENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SE1
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.easternNeighbourArea)
+                        {
+                            SENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SE2
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.southernNeighbourArea)
+                        {
+                            SENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SW1
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.westernNeighbourArea)
+                        {
+                            SWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SW2
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.southernNeighbourArea)
+                        {
+                            SWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+            }
+
+            if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.northernNeighbourArea)
+            {
+                recalculatedPropLocationX = p.LocationX;
+                recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.southernNeighbourArea)
+            {
+                recalculatedPropLocationX = p.LocationX;
+                recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.westernNeighbourArea)
+            {
+                recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedPropLocationY = p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.easternNeighbourArea)
+            {
+                recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                recalculatedPropLocationY = p.LocationY;
+            }
+            //todo
+            else if (gv.mod.moduleAreasObjects[index].Filename == NWNeighbourFilename)
+            {
+                recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == NENeighbourFilename)
+            {
+                recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == SENeighbourFilename)
+            {
+                recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == SWNeighbourFilename)
+            {
+                recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+
+            p.relocX = recalculatedPropLocationX;
+            p.relocY = recalculatedPropLocationY;
+        }
+
+        public bool propIsWithinRelevantDistance(Prop p, int index)
+        {
+            if (!p.isMover)
+            {
+                return false;
+            }
+
+            //return true;
+
+            if (p.MoverType.Equals("daily") || p.MoverType.Equals("weekly") || p.MoverType.Equals("monthly") || p.MoverType.Equals("yearly"))
+            {
+                return true;
+            }
+
+            if (gv.mod.moduleAreasObjects[index] == gv.mod.currentArea)
+            {
+                p.relocX = p.LocationX;
+                p.relocY = p.LocationY;
+                return true;
+            }
+
+            int recalculatedPropLocationX = p.LocationX;
+            int recalculatedPropLocationY = p.LocationY;
+            string NENeighbourFilename = "none";
+            string NWNeighbourFilename = "none";
+            string SENeighbourFilename = "none";
+            string SWNeighbourFilename = "none";
+
+            foreach (Area a in gv.mod.moduleAreasObjects)
+            {
+                //NW1
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.westernNeighbourArea)
+                        {
+                            NWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NW2
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.northernNeighbourArea)
+                        {
+                            NWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NE1
+                if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.easternNeighbourArea)
+                        {
+                            NENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //NE2
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.northernNeighbourArea)
+                        {
+                            NENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SE1
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.easternNeighbourArea)
+                        {
+                            SENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SE2
+                if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.southernNeighbourArea)
+                        {
+                            SENeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SW1
+                if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.westernNeighbourArea)
+                        {
+                            SWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+
+                //SW2
+                if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                {
+                    foreach (Area a2 in gv.mod.moduleAreasObjects)
+                    {
+                        if (a2.Filename == a.southernNeighbourArea)
+                        {
+                            SWNeighbourFilename = a2.Filename;
+                        }
+                    }
+                }
+            }
+
+            if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.northernNeighbourArea)
+            {
+                recalculatedPropLocationX = p.LocationX;
+                recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.southernNeighbourArea)
+            {
+                recalculatedPropLocationX = p.LocationX;
+                recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.westernNeighbourArea)
+            {
+                recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedPropLocationY = p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == gv.mod.currentArea.easternNeighbourArea)
+            {
+                recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                recalculatedPropLocationY = p.LocationY;
+            }
+            //todo
+            else if (gv.mod.moduleAreasObjects[index].Filename == NWNeighbourFilename)
+            {
+                recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == NENeighbourFilename)
+            {
+                recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                recalculatedPropLocationY = p.LocationY - gv.mod.moduleAreasObjects[index].MapSizeY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == SENeighbourFilename)
+            {
+                recalculatedPropLocationX = gv.mod.currentArea.MapSizeX + p.LocationX;
+                recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+            else if (gv.mod.moduleAreasObjects[index].Filename == SWNeighbourFilename)
+            {
+                recalculatedPropLocationX = p.LocationX - gv.mod.moduleAreasObjects[index].MapSizeX;
+                recalculatedPropLocationY = gv.mod.currentArea.MapSizeY + p.LocationY;
+            }
+
+            p.relocX = recalculatedPropLocationX;
+            p.relocY = recalculatedPropLocationY;
+
+
+            int distanceX = recalculatedPropLocationX - gv.mod.PlayerLocationX;
+            if (distanceX < 0)
+            {
+                distanceX *= -1;
+            }
+            int distanceY = recalculatedPropLocationY - gv.mod.PlayerLocationY;
+            if (distanceY < 0)
+            {
+                distanceY *= -1;
+            }
+
+            if (distanceY <= 10 && distanceX <= 15)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public List<int> getNearbyAreas()
+        {
+            List<int> nearbyAreasIndices = new List<int>();
+            bool onlyNorth = false;
+            bool onlySouth = false;
+            bool onlyEast = false;
+            bool onlyWest = false;
+            bool NWCorner = false;
+            bool NECorner = false;
+            bool SECorner = false;
+            bool SWCorner = false;
+
+            if ((gv.mod.PlayerLocationY <= 8) && (gv.mod.PlayerLocationX <= 12))
+            {
+                NWCorner = true;
+            }
+            else if ((gv.mod.PlayerLocationY <= 8) && (gv.mod.PlayerLocationX >= gv.mod.currentArea.MapSizeX - 12))
+            {
+                NECorner = true;
+            }
+            else if ((gv.mod.PlayerLocationY >= gv.mod.currentArea.MapSizeY - 8) && (gv.mod.PlayerLocationX <= 12))
+            {
+                SWCorner = true;
+            }
+            else if ((gv.mod.PlayerLocationY >= gv.mod.currentArea.MapSizeY - 8) && (gv.mod.PlayerLocationX >= gv.mod.currentArea.MapSizeX - 12))
+            {
+                SECorner = true;
+            }
+
+            else if ((gv.mod.PlayerLocationY <= 8) && (gv.mod.PlayerLocationX > 12) && (gv.mod.PlayerLocationX < gv.mod.currentArea.MapSizeX - 12))
+            {
+                onlyNorth = true;
+            }
+            else if ((gv.mod.PlayerLocationY > gv.mod.currentArea.MapSizeY - 8) && (gv.mod.PlayerLocationX > 12) && (gv.mod.PlayerLocationX < gv.mod.currentArea.MapSizeX - 12))
+            {
+                onlySouth = true;
+            }
+            else if ((gv.mod.PlayerLocationX <= 12) && (gv.mod.PlayerLocationY > 8) && (gv.mod.PlayerLocationY < gv.mod.currentArea.MapSizeY - 8))
+            {
+                onlyWest = true;
+            }
+            else if ((gv.mod.PlayerLocationX > gv.mod.currentArea.MapSizeX - 12) && (gv.mod.PlayerLocationY > 8) && (gv.mod.PlayerLocationY < gv.mod.currentArea.MapSizeY - 8))
+            {
+                onlyEast = true;
+            }
+
+            //add the areas
+            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+            {
+                if (gv.mod.moduleAreasObjects[i] == gv.mod.currentArea)
+                {
+                    nearbyAreasIndices.Add(i);
+                }
+
+                if (onlyNorth)
+                {
+                    if (gv.mod.currentArea.northernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (onlySouth)
+                {
+                    if (gv.mod.currentArea.southernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (onlyEast)
+                {
+                    if (gv.mod.currentArea.easternNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (onlyWest)
+                {
+                    if (gv.mod.currentArea.westernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (NECorner)
+                {
+                    if (gv.mod.currentArea.northernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.easternNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+
+                }
+                else if (NWCorner)
+                {
+                    if (gv.mod.currentArea.northernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.westernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (SWCorner)
+                {
+                    if (gv.mod.currentArea.southernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.westernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (SECorner)
+                {
+                    if (gv.mod.currentArea.southernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.easternNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+
+            }
+
+            if (NECorner)
+            {
+                bool cornerFound = false;
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.northernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.easternNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (NWCorner)
+            {
+                bool cornerFound = false;
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.northernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.westernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (SWCorner)
+            {
+                bool cornerFound = false;
+
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.southernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.westernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (SECorner)
+            {
+                bool cornerFound = false;
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.southernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.easternNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return nearbyAreasIndices;
+        }
+
+        public List<int> getNearbyAreasLongRange()
+        {
+            List<int> nearbyAreasIndices = new List<int>();
+            bool onlyNorth = false;
+            bool onlySouth = false;
+            bool onlyEast = false;
+            bool onlyWest = false;
+            bool NWCorner = false;
+            bool NECorner = false;
+            bool SECorner = false;
+            bool SWCorner = false;
+
+            if ((gv.mod.PlayerLocationY <= 14) && (gv.mod.PlayerLocationX <= 14))
+            {
+                NWCorner = true;
+            }
+            else if ((gv.mod.PlayerLocationY <= 14) && (gv.mod.PlayerLocationX >= gv.mod.currentArea.MapSizeX - 14))
+            {
+                NECorner = true;
+            }
+            else if ((gv.mod.PlayerLocationY >= gv.mod.currentArea.MapSizeY - 14) && (gv.mod.PlayerLocationX <= 14))
+            {
+                SWCorner = true;
+            }
+            else if ((gv.mod.PlayerLocationY >= gv.mod.currentArea.MapSizeY - 14) && (gv.mod.PlayerLocationX >= gv.mod.currentArea.MapSizeX - 14))
+            {
+                SECorner = true;
+            }
+
+            else if ((gv.mod.PlayerLocationY <= 14) && (gv.mod.PlayerLocationX > 14) && (gv.mod.PlayerLocationX < gv.mod.currentArea.MapSizeX - 14))
+            {
+                onlyNorth = true;
+            }
+            else if ((gv.mod.PlayerLocationY > gv.mod.currentArea.MapSizeY - 14) && (gv.mod.PlayerLocationX > 14) && (gv.mod.PlayerLocationX < gv.mod.currentArea.MapSizeX - 14))
+            {
+                onlySouth = true;
+            }
+            else if ((gv.mod.PlayerLocationX <= 14) && (gv.mod.PlayerLocationY > 14) && (gv.mod.PlayerLocationY < gv.mod.currentArea.MapSizeY - 14))
+            {
+                onlyWest = true;
+            }
+            else if ((gv.mod.PlayerLocationX > gv.mod.currentArea.MapSizeX - 14) && (gv.mod.PlayerLocationY > 14) && (gv.mod.PlayerLocationY < gv.mod.currentArea.MapSizeY - 14))
+            {
+                onlyEast = true;
+            }
+
+            //add the areas
+            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+            {
+                if (gv.mod.moduleAreasObjects[i] == gv.mod.currentArea)
+                {
+                    nearbyAreasIndices.Add(i);
+                }
+
+                if (onlyNorth)
+                {
+                    if (gv.mod.currentArea.northernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (onlySouth)
+                {
+                    if (gv.mod.currentArea.southernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (onlyEast)
+                {
+                    if (gv.mod.currentArea.easternNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (onlyWest)
+                {
+                    if (gv.mod.currentArea.westernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (NECorner)
+                {
+                    if (gv.mod.currentArea.northernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.easternNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+
+                }
+                else if (NWCorner)
+                {
+                    if (gv.mod.currentArea.northernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.westernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (SWCorner)
+                {
+                    if (gv.mod.currentArea.southernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.westernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+                else if (SECorner)
+                {
+                    if (gv.mod.currentArea.southernNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                    if (gv.mod.currentArea.easternNeighbourArea == gv.mod.moduleAreasObjects[i].Filename)
+                    {
+                        nearbyAreasIndices.Add(i);
+                    }
+                }
+
+            }
+
+            if (NECorner)
+            {
+                bool cornerFound = false;
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.northernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.easternNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (NWCorner)
+            {
+                bool cornerFound = false;
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.northernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.northernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.westernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (SWCorner)
+            {
+                bool cornerFound = false;
+
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.westernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.southernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.westernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (SECorner)
+            {
+                bool cornerFound = false;
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    //bool cornerFound = false;
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.easternNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.southernNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!cornerFound)
+                    {
+                        if (a.Filename == gv.mod.currentArea.southernNeighbourArea)
+                        {
+                            for (int i = 0; i < gv.mod.moduleAreasObjects.Count; i++)
+                            {
+                                if (gv.mod.moduleAreasObjects[i].Filename == a.easternNeighbourArea)
+                                {
+                                    nearbyAreasIndices.Add(i);
+                                    cornerFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return nearbyAreasIndices;
+        }
+
         public void doPropTriggers()
         {
+            //gv.mod.blockMainKeyboard = true;
             try
             {
                 //search area for any props that share the party location
                 bool foundOne = false;
-                foreach (Prop prp in gv.mod.currentArea.Props)
+                for (int i = gv.mod.currentArea.Props.Count - 1; i >= 0; i--)
+                //foreach (Prop prp in gv.mod.currentArea.Props)
                 {
+
+                    /*
                     bool delProp = false;
-                    if (prp.EncounterWhenOnPartySquare != "" && prp.EncounterWhenOnPartySquare != "none")
+                    if (gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare != "" && gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare != "none")
                     {
                         //delProp = true;
                         foreach (Encounter e in gv.mod.moduleEncountersList)
                         {
-                            if (e.encounterName == prp.EncounterWhenOnPartySquare)
+                            if (e.encounterName == gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare)
                             {
                                     if (e.isOver)
                                     {
+                                        e.isOver = false;
                                         delProp = true;
                                         break;
                                     }
@@ -8582,44 +15121,186 @@ namespace IBx
                             }
                         }
                     }
+                    */
 
-                    if (delProp)
+                    //if (delProp)
+                    if (gv.mod.currentArea.Props[i].wasKilled)
                     {
-                        gv.mod.currentArea.Props.Remove(prp);
+                        if ((gv.mod.currentArea.Props[i].respawnTimeInHours > 0) && ((gv.mod.currentArea.Props[i].numberOfRespawnsThatHappenedAlready < gv.mod.currentArea.Props[i].maxNumberOfRespawns) || (gv.mod.currentArea.Props[i].maxNumberOfRespawns == -1)))
+                        {
+                            gv.mod.propsWaitingForRespawn.Add(gv.mod.currentArea.Props[i]);
+                        }
+
+                        foreach (Faction f in gv.mod.moduleFactionsList)
+                        {
+                            if (f.tag == gv.mod.currentArea.Props[i].factionTag)
+                            {
+                                f.strength -= gv.mod.currentArea.Props[i].worthForOwnFaction;
+                            }
+                            if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath1)
+                            {
+                                f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath1;
+                            }
+                            if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath2)
+                            {
+                                f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath2;
+                            }
+                            if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath3)
+                            {
+                                f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath3;
+                            }
+                            if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath4)
+                            {
+                                f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath4;
+                            }
+                        }
+                        if (gv.mod.currentArea.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                        {
+                            gv.sf.SetGlobalInt(gv.mod.currentArea.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                        }
+                        gv.mod.currentArea.Props.Remove(gv.mod.currentArea.Props[i]);
                         continue;
                     }
 
+                    //enter code for skipping triggers of prop here
+                    if (gv.mod.currentArea.Props[i].stealthSkipsPropTriggers)
+                    {
+                        //add missing check
+                        bool isFooled = false;
+                        string traitMethod = "leader";
+                        foreach (Trait t in gv.mod.moduleTraitsList)
+                        {
+                            if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
+                            {
+                                traitMethod = t.methodOfChecking;
+                            }
+                        }
+                        int parm1 = gv.mod.selectedPartyLeader;
+                        if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                        {
+                            parm1 = gv.mod.selectedPartyLeader;
+                        }
+                        else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                        {
+                            parm1 = -2;
+                        }
+                        else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                        {
+                            parm1 = -3;
+                        }
+                        else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                        {
+                            parm1 = -4;
+                        }
+                        else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                        {
+                            parm1 = -5;
+                        }
+                        else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                        {
+                            parm1 = -6;
+                        }
+
+                        int tileAdder = 0;
+                        int darkAdder = 0;
+                        tileAdder = gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationY].stealthModifier;
+                        foreach (Prop p5 in gv.mod.currentArea.Props)
+                        {
+                            if (p5.stealthModifier != 0)
+                            {
+                                if (p5.LocationX == gv.mod.PlayerLocationX && p5.LocationY == gv.mod.PlayerLocationY)
+                                {
+                                    tileAdder = p5.stealthModifier;
+                                }
+                            }
+                        }
+                        if (gv.sf.CheckIsInDarkness("party", "night"))
+                        {
+                            darkAdder = 4;
+                        }
+                        if (gv.sf.CheckIsInDarkness("party", "noLight"))
+                        {
+                            darkAdder = 12;
+                        }
+                        Coordinate pcCoord = new Coordinate();
+                        Coordinate propCoord = new Coordinate();
+                        pcCoord.X = gv.mod.PlayerLocationX;
+                        pcCoord.Y = gv.mod.PlayerLocationY;
+                        propCoord.X = gv.mod.currentArea.Props[i].LocationX;
+                        propCoord.Y = gv.mod.currentArea.Props[i].LocationY;
+
+                        //factor in lit state and tile stealtModifier
+                        //this way a sneak through is 5 points more diffcult than a direct sneak by
+
+                        //spot dc 13, sneak dc 27 
+                        //allows sneak through
+                        //entlastungsa
+                        int checkModifier = -4 + darkAdder + tileAdder - 5;
+
+                        if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, gv.mod.currentArea.Props[i].spotEnemy - checkModifier, true, true))
+                        {
+                            isFooled = true;
+                            gv.mod.currentArea.Props[i].showSneakThroughSymbol = true;
+                        }
+                        else
+                        {
+                            isFooled = false;
+                            gv.mod.currentArea.Props[i].showSneakThroughSymbol = false;
+                        }
+
+                        if (isFooled)
+                        {
+                            continue;
+                        }
+                    }//up to here
+
                     bool doNotTriggerProp = false;
-                    if ((prp.isMover == false) || ((prp.MoverType == "Post") && (prp.isChaser == false)))
+                    if ((gv.mod.currentArea.Props[i].isMover == false) || ((gv.mod.currentArea.Props[i].MoverType == "post") && (gv.mod.currentArea.Props[i].isChaser == false)))
                     {
                         if (gv.realTimeTimerMilliSecondsEllapsed >= gv.mod.realTimeTimerLengthInMilliSeconds)
                         {
                             doNotTriggerProp = true;
                         }
                     }
-                                        
-                    if ((prp.LocationX == gv.mod.PlayerLocationX) && (prp.LocationY == gv.mod.PlayerLocationY) && (prp.isActive) && (doNotTriggerProp == false))
+
+                    if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.PlayerLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.PlayerLocationY) && (gv.mod.currentArea.Props[i].isActive) && (doNotTriggerProp == false))
                     {
+
+
+                        if ((!gv.mod.currentArea.Props[i].MouseOverText.Equals("none")) && (gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].Visible))
+                        {
+                            showFloatyStepOrBumpPropInfo(i);
+                        }
+
+                        /*
+                        gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+                        if (gv.sf.ThisProp.EncounterWhenOnPartySquare != "none" || gv.sf.ThisProp.EncounterWhenOnPartySquare != "None" || gv.sf.ThisProp.EncounterWhenOnPartySquare != "")
+                        {
+                            gv.cc.calledEncounterFromProp = true;
+                        }
+                        */
+
+
                         //prp.wasTriggeredLastUpdate = true;
                         foundOne = true;
                         blockSecondPropTriggersCall = true;
                         gv.triggerPropIndex++;
-                        if ((gv.triggerPropIndex == 1) && (!prp.ConversationWhenOnPartySquare.Equals("none")))
+                        if ((gv.triggerPropIndex == 1) && (!gv.mod.currentArea.Props[i].ConversationWhenOnPartySquare.Equals("none")))
                         {
 
-                            if (prp.unavoidableConversation == true)
+                            if (gv.mod.currentArea.Props[i].unavoidableConversation == true)
                             {
                                 gv.mod.breakActiveSearch = true;
                                 calledConvoFromProp = true;
-                                gv.sf.ThisProp = prp;
-                                if ((gv.mod.useSmoothMovement) && (prp.isMover))
+                                gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+                                if ((gv.mod.useSmoothMovement) && (gv.mod.currentArea.Props[i].isMover))
                                 {
                                     //for (int i = 0; i < 30; i++)
                                     //{
-                                        //gv.Render(0);
+                                    //gv.Render(0);
                                     //}
                                 }
-                                doConversationBasedOnTag(prp.ConversationWhenOnPartySquare);
+                                doConversationBasedOnTag(gv.mod.currentArea.Props[i].ConversationWhenOnPartySquare);
                                 //continue;
                                 break;
                             }
@@ -8627,17 +15308,17 @@ namespace IBx
                             {
                                 gv.mod.breakActiveSearch = true;
                                 calledConvoFromProp = true;
-                                gv.sf.ThisProp = prp;
-                                
-                                if ((gv.mod.useSmoothMovement) && (prp.isMover))
+                                gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+
+                                if ((gv.mod.useSmoothMovement) && (gv.mod.currentArea.Props[i].isMover))
                                 {
                                     //for (int i = 0; i < 30; i++)
                                     //{
-                                                                                //gv.Render(0);
+                                    //gv.Render(0);
                                     //}
                                 }
-                                
-                                doConversationBasedOnTag(prp.ConversationWhenOnPartySquare);
+
+                                doConversationBasedOnTag(gv.mod.currentArea.Props[i].ConversationWhenOnPartySquare);
                                 //continue;
                                 break;
                             }
@@ -8649,29 +15330,53 @@ namespace IBx
                             }
 
                         }
-                        else if ((gv.triggerPropIndex == 2) && (!prp.EncounterWhenOnPartySquare.Equals("none")))
+                        else if ((gv.triggerPropIndex == 2) && (!gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare.Equals("none")))
                         {
                             calledEncounterFromProp = true;
-                            gv.sf.ThisProp = prp;
-                            
-                            if ((gv.mod.useSmoothMovement) && (prp.isMover))
-                            {
-                                //for (int i = 0; i < 30; i++)
-                                //{
-                                                                        //gv.Render(0);
-                                //}
-                            }
+                            gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+
                             if (!gv.mod.EncounterOfTurnDone)
                             {
                                 gv.mod.EncounterOfTurnDone = true;
-                                doEncounterBasedOnTag(prp.EncounterWhenOnPartySquare);
+                                doEncounterBasedOnTag(gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare);
                                 gv.mod.breakActiveSearch = true;
+
                                 //gv.mod.EncounterOfTurnDone = true;
                             }
                             //continue;
+
                             break;
                         }
-                        else if (gv.triggerPropIndex < 3)
+                        //script
+                        else if ((gv.triggerPropIndex == 3) && (gv.mod.currentArea.Props[i].scriptFilename != "none" && gv.mod.currentArea.Props[i].scriptFilename != "None" && gv.mod.currentArea.Props[i].scriptFilename != ""))
+                        {
+
+                            //gv.mod.currentArea.Props[i]
+                            gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+                            doScriptBasedOnFilename(gv.mod.currentArea.Props[i].scriptFilename, gv.mod.currentArea.Props[i].parm1, gv.mod.currentArea.Props[i].parm2, gv.mod.currentArea.Props[i].parm3, gv.mod.currentArea.Props[i].parm4);
+
+                            //code for floaty shown on prop upon script activation
+                            if (gv.mod.currentArea.Props[i].scriptActivationFloaty != "none" && gv.mod.currentArea.Props[i].scriptActivationFloaty != "None" && gv.mod.currentArea.Props[i].scriptActivationFloaty != "")
+                            {
+                                gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, gv.mod.currentArea.Props[i].scriptActivationFloaty, "red", 2000);
+                            }
+
+                            //code for log, to do
+                            if (gv.mod.currentArea.Props[i].scriptActivationLogEntry != "none" && gv.mod.currentArea.Props[i].scriptActivationLogEntry != "None" && gv.mod.currentArea.Props[i].scriptActivationLogEntry != "")
+                            {
+                                gv.cc.addLogText("red", gv.mod.currentArea.Props[i].scriptActivationLogEntry);
+                            }
+
+                            if (gv.mod.currentArea.Props[i].onlyOnce)
+                            {
+                                gv.mod.currentArea.Props[i].isShown = false;
+                                gv.mod.currentArea.Props[i].isActive = false;
+                            }
+
+                            gv.mod.breakActiveSearch = true;
+                            break;
+                        }
+                        else if (gv.triggerPropIndex < 4)
                         {
                             gv.mod.isRecursiveCall = true;
                             doPropTriggers();
@@ -8679,18 +15384,76 @@ namespace IBx
                             //continue;
                             break;
                         }
-                        if (gv.triggerPropIndex > 2)
+                        if (gv.triggerPropIndex > 3)
                         {
                             gv.triggerPropIndex = 0;
                             //set flags back to false
                             calledConvoFromProp = false;
+                            //aegon2
                             calledEncounterFromProp = false;
                             foundOne = false;
+                            //factionsystem
                             //delete prop if flag is set to do so and break foreach loop
-                            if (prp.DeletePropWhenThisEncounterIsWon)
+                            //crozier
+
+                            if (gv.mod.currentArea.Props[i].DeletePropWhenThisEncounterIsWon && gv.mod.currentArea.Props[i].wasKilled)
                             {
-                                gv.mod.currentArea.Props.Remove(prp);
+                                if ((gv.mod.currentArea.Props[i].respawnTimeInHours > 0) && ((gv.mod.currentArea.Props[i].numberOfRespawnsThatHappenedAlready < gv.mod.currentArea.Props[i].maxNumberOfRespawns) || (gv.mod.currentArea.Props[i].maxNumberOfRespawns == -1)))
+                                {
+                                    gv.mod.propsWaitingForRespawn.Add(gv.mod.currentArea.Props[i]);
+                                }
+
+                                foreach (Faction f in gv.mod.moduleFactionsList)
+                                {
+                                    if (f.tag == gv.mod.currentArea.Props[i].factionTag)
+                                    {
+                                        f.strength -= gv.mod.currentArea.Props[i].worthForOwnFaction;
+                                    }
+                                    if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath1)
+                                    {
+                                        f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath1;
+                                    }
+                                    if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath2)
+                                    {
+                                        f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath2;
+                                    }
+                                    if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath3)
+                                    {
+                                        f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath3;
+                                    }
+                                    if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath4)
+                                    {
+                                        f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath4;
+                                    }
+                                }
+                                gv.sf.SetGlobalInt(gv.mod.currentArea.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                                gv.mod.currentArea.Props.Remove(gv.mod.currentArea.Props[i]);
+
+                                //two checks on update function: 1. Respawn check (adds back to areas prop lsit from propsWaitingForRespawn) and 2. faction limit check (sets is isAcive and isShown)
+
+                                //add another third check (afterwards) to doupdate that kills off props whose master is inactive or whose master is on propsWaitingForRespawn 
+
+                                //on worldtim emethod for each prop in propsWaitingForRespawn the wait time is increased accordingly 
+
+                                //here (doPropTriggers, deletepropwhenenciunteriswon): add killed - respawing props, when max number of respawn is not reached - to the new list <prop> propsWaitingForRespawn list of module
+                                //this is done regardless of master death (Can change: master respawn) or min-max faction strength requirement (faction strength changes all the time)
+
+                                //props are only returned from propsWaitingForRespawn (during respawn check on doupdate) when:
+                                //1. respawn time is reached AND
+                                //2. target square on home area can be found (free or look for sqaure around it) AND
+                                //3. master lives: lives means is himself in prop list (not killed) and also isActive
+                                //upon retun the props wait time is set to zero again
+
+                                //isActive and isShown are set to false for props outside faction strength min max (called: faction limit check)
+                                //and to true if inside, check on every update (faction limit check)
+                                //this means they can respawn when outside faction str min max, but will do so inactive
+
+                                //question: do respawn for current map or for all maps? Pending! Best for all areas (both respawn and faction limit check), so world time driven movers work with the system
+
+                                //grant cretaures a faction property, too, and implement system for buffs and debuffs based on the relevant faction'sstrength
+                                //maybe use effect system for this and make it all configurable in the faction editor
                             }
+
                             //continue;
                             break;
                         }
@@ -8698,7 +15461,11 @@ namespace IBx
                 }
                 if (!foundOne)
                 {
-                    doTrigger();
+                    if (gv.realTimeTimerMilliSecondsEllapsed < gv.mod.realTimeTimerLengthInMilliSeconds)
+                    {
+                        blockSecondPropTriggersCall = true;
+                        doTrigger();
+                    }
                 }
             }
             catch (Exception ex)
@@ -8709,268 +15476,1424 @@ namespace IBx
                     gv.errorLog(ex.ToString());
                 }
             }
+            //gv.mod.blockMainKeyboard = false;
         }
+
+        public void doPropTriggersMovers()
+        {
+            //gv.mod.blockMainKeyboard = true;
+            try
+            {
+                //search area for any props that share the party location
+                bool foundOne = false;
+                for (int i = gv.mod.currentArea.Props.Count - 1; i >= 0; i--)
+                //foreach (Prop prp in gv.mod.currentArea.Props)
+                {
+                    if (gv.mod.currentArea.Props[i].isMover)
+                    {
+                        /*
+                        bool delProp = false;
+                        if (gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare != "" && gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare != "none")
+                        {
+                            //delProp = true;
+                            foreach (Encounter e in gv.mod.moduleEncountersList)
+                            {
+                                if (e.encounterName == gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare)
+                                {
+                                        if (e.isOver)
+                                        {
+                                            e.isOver = false;
+                                            delProp = true;
+                                            break;
+                                        }
+
+                                }
+                            }
+                        }
+                        */
+
+                        //if (delProp)
+                        if (gv.mod.currentArea.Props[i].wasKilled)
+                        {
+                            if ((gv.mod.currentArea.Props[i].respawnTimeInHours > 0) && ((gv.mod.currentArea.Props[i].numberOfRespawnsThatHappenedAlready < gv.mod.currentArea.Props[i].maxNumberOfRespawns) || (gv.mod.currentArea.Props[i].maxNumberOfRespawns == -1)))
+                            {
+                                gv.mod.propsWaitingForRespawn.Add(gv.mod.currentArea.Props[i]);
+                            }
+
+                            foreach (Faction f in gv.mod.moduleFactionsList)
+                            {
+                                if (f.tag == gv.mod.currentArea.Props[i].factionTag)
+                                {
+                                    f.strength -= gv.mod.currentArea.Props[i].worthForOwnFaction;
+                                }
+                                if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath1)
+                                {
+                                    f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath1;
+                                }
+                                if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath2)
+                                {
+                                    f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath2;
+                                }
+                                if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath3)
+                                {
+                                    f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath3;
+                                }
+                                if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath4)
+                                {
+                                    f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath4;
+                                }
+                            }
+                            if (gv.mod.currentArea.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity != "none")
+                            {
+                                gv.sf.SetGlobalInt(gv.mod.currentArea.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                            }
+                            gv.mod.currentArea.Props.Remove(gv.mod.currentArea.Props[i]);
+                            continue;
+                        }
+
+                        //enter code for skipping triggers of prop here
+                        if (gv.mod.currentArea.Props[i].stealthSkipsPropTriggers)
+                        {
+                            //add missing check
+                            bool isFooled = false;
+                            string traitMethod = "leader";
+                            foreach (Trait t in gv.mod.moduleTraitsList)
+                            {
+                                if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
+                                {
+                                    traitMethod = t.methodOfChecking;
+                                }
+                            }
+                            int parm1 = gv.mod.selectedPartyLeader;
+                            if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                            {
+                                parm1 = gv.mod.selectedPartyLeader;
+                            }
+                            else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                            {
+                                parm1 = -2;
+                            }
+                            else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                            {
+                                parm1 = -3;
+                            }
+                            else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                            {
+                                parm1 = -4;
+                            }
+                            else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                            {
+                                parm1 = -5;
+                            }
+                            else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                            {
+                                parm1 = -6;
+                            }
+
+                            int tileAdder = 0;
+                            int darkAdder = 0;
+                            tileAdder = gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationY].stealthModifier;
+                            foreach (Prop p5 in gv.mod.currentArea.Props)
+                            {
+                                if (p5.stealthModifier != 0)
+                                {
+                                    if (p5.LocationX == gv.mod.PlayerLocationX && p5.LocationY == gv.mod.PlayerLocationY)
+                                    {
+                                        tileAdder = p5.stealthModifier;
+                                    }
+                                }
+                            }
+                            if (gv.sf.CheckIsInDarkness("party", "night"))
+                            {
+                                darkAdder = 4;
+                            }
+                            if (gv.sf.CheckIsInDarkness("party", "noLight"))
+                            {
+                                darkAdder = 12;
+                            }
+                            Coordinate pcCoord = new Coordinate();
+                            Coordinate propCoord = new Coordinate();
+                            pcCoord.X = gv.mod.PlayerLocationX;
+                            pcCoord.Y = gv.mod.PlayerLocationY;
+                            propCoord.X = gv.mod.currentArea.Props[i].LocationX;
+                            propCoord.Y = gv.mod.currentArea.Props[i].LocationY;
+
+                            //factor in lit state and tile stealtModifier
+                            //this way a sneak through is 5 points more diffcult than a direct sneak by
+
+                            //spot dc 13, sneak dc 27 
+                            //allows sneak through
+                            //entlastungsa
+                            int checkModifier = -4 + darkAdder + tileAdder - 5;
+
+                            if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, gv.mod.currentArea.Props[i].spotEnemy - checkModifier, true, true))
+                            {
+                                isFooled = true;
+                                gv.mod.currentArea.Props[i].showSneakThroughSymbol = true;
+                            }
+                            else
+                            {
+                                isFooled = false;
+                                gv.mod.currentArea.Props[i].showSneakThroughSymbol = false;
+                            }
+
+                            if (isFooled)
+                            {
+                                continue;
+                            }
+                        }//up to here
+
+                        bool doNotTriggerProp = false;
+                        if ((gv.mod.currentArea.Props[i].isMover == false) || ((gv.mod.currentArea.Props[i].MoverType == "post") && (gv.mod.currentArea.Props[i].isChaser == false)))
+                        {
+                            if (gv.realTimeTimerMilliSecondsEllapsed >= gv.mod.realTimeTimerLengthInMilliSeconds)
+                            {
+                                doNotTriggerProp = true;
+                            }
+                        }
+
+                        if ((gv.mod.currentArea.Props[i].LocationX == gv.mod.PlayerLocationX) && (gv.mod.currentArea.Props[i].LocationY == gv.mod.PlayerLocationY) && (gv.mod.currentArea.Props[i].isActive) && (doNotTriggerProp == false))
+                        {
+
+
+                            if ((!gv.mod.currentArea.Props[i].MouseOverText.Equals("none")) && (gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].Visible))
+                            {
+                                showFloatyStepOrBumpPropInfo(i);
+                            }
+
+                            /*
+                            gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+                            if (gv.sf.ThisProp.EncounterWhenOnPartySquare != "none" || gv.sf.ThisProp.EncounterWhenOnPartySquare != "None" || gv.sf.ThisProp.EncounterWhenOnPartySquare != "")
+                            {
+                                gv.cc.calledEncounterFromProp = true;
+                            }
+                            */
+
+
+                            //prp.wasTriggeredLastUpdate = true;
+                            foundOne = true;
+                            blockSecondPropTriggersCall = true;
+                            gv.triggerPropIndex++;
+                            if ((gv.triggerPropIndex == 1) && (!gv.mod.currentArea.Props[i].ConversationWhenOnPartySquare.Equals("none")))
+                            {
+
+                                if (gv.mod.currentArea.Props[i].unavoidableConversation == true)
+                                {
+                                    gv.mod.breakActiveSearch = true;
+                                    calledConvoFromProp = true;
+                                    gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+                                    if ((gv.mod.useSmoothMovement) && (gv.mod.currentArea.Props[i].isMover))
+                                    {
+                                        //for (int i = 0; i < 30; i++)
+                                        //{
+                                        //gv.Render(0);
+                                        //}
+                                    }
+                                    doConversationBasedOnTag(gv.mod.currentArea.Props[i].ConversationWhenOnPartySquare);
+                                    //continue;
+                                    break;
+                                }
+                                else if (gv.mod.avoidInteraction == false)
+                                {
+                                    gv.mod.breakActiveSearch = true;
+                                    calledConvoFromProp = true;
+                                    gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+
+                                    if ((gv.mod.useSmoothMovement) && (gv.mod.currentArea.Props[i].isMover))
+                                    {
+                                        //for (int i = 0; i < 30; i++)
+                                        //{
+                                        //gv.Render(0);
+                                        //}
+                                    }
+
+                                    doConversationBasedOnTag(gv.mod.currentArea.Props[i].ConversationWhenOnPartySquare);
+                                    //continue;
+                                    break;
+                                }
+                                else
+                                {
+                                    foundOne = false;
+                                    //continue;
+                                    break;
+                                }
+
+                            }
+                            else if ((gv.triggerPropIndex == 2) && (!gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare.Equals("none")))
+                            {
+                                calledEncounterFromProp = true;
+                                gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+
+                                if (!gv.mod.EncounterOfTurnDone)
+                                {
+
+                                    gv.mod.EncounterOfTurnDone = true;
+                                    doEncounterBasedOnTag(gv.mod.currentArea.Props[i].EncounterWhenOnPartySquare);
+                                    gv.mod.breakActiveSearch = true;
+
+                                    //gv.mod.EncounterOfTurnDone = true;
+                                }
+                                //continue;
+
+                                break;
+                            }
+                            //script
+                            else if ((gv.triggerPropIndex == 3) && (gv.mod.currentArea.Props[i].scriptFilename != "none" && gv.mod.currentArea.Props[i].scriptFilename != "None" && gv.mod.currentArea.Props[i].scriptFilename != ""))
+                            {
+
+                                //gv.mod.currentArea.Props[i]
+                                gv.sf.ThisProp = gv.mod.currentArea.Props[i];
+                                doScriptBasedOnFilename(gv.mod.currentArea.Props[i].scriptFilename, gv.mod.currentArea.Props[i].parm1, gv.mod.currentArea.Props[i].parm2, gv.mod.currentArea.Props[i].parm3, gv.mod.currentArea.Props[i].parm4);
+
+                                //code for floaty shown on prop upon script activation
+                                if (gv.mod.currentArea.Props[i].scriptActivationFloaty != "none" && gv.mod.currentArea.Props[i].scriptActivationFloaty != "None" && gv.mod.currentArea.Props[i].scriptActivationFloaty != "")
+                                {
+                                    gv.screenMainMap.addFloatyText(gv.mod.currentArea.Props[i].LocationX, gv.mod.currentArea.Props[i].LocationY, gv.mod.currentArea.Props[i].scriptActivationFloaty, "red", 2000);
+                                }
+
+                                //code for log, to do
+                                if (gv.mod.currentArea.Props[i].scriptActivationLogEntry != "none" && gv.mod.currentArea.Props[i].scriptActivationLogEntry != "None" && gv.mod.currentArea.Props[i].scriptActivationLogEntry != "")
+                                {
+                                    gv.cc.addLogText("red", gv.mod.currentArea.Props[i].scriptActivationLogEntry);
+                                }
+
+                                if (gv.mod.currentArea.Props[i].onlyOnce)
+                                {
+                                    gv.mod.currentArea.Props[i].isShown = false;
+                                    gv.mod.currentArea.Props[i].isActive = false;
+                                }
+
+                                gv.mod.breakActiveSearch = true;
+                                break;
+                            }
+                            else if (gv.triggerPropIndex < 4)
+                            {
+                                gv.mod.isRecursiveCall = true;
+                                doPropTriggers();
+                                gv.mod.isRecursiveCall = false;
+                                //continue;
+                                break;
+                            }
+                            if (gv.triggerPropIndex > 3)
+                            {
+                                gv.triggerPropIndex = 0;
+                                //set flags back to false
+                                calledConvoFromProp = false;
+                                //aegon2
+                                calledEncounterFromProp = false;
+                                foundOne = false;
+                                //factionsystem
+                                //delete prop if flag is set to do so and break foreach loop
+                                //crozier
+
+                                if (gv.mod.currentArea.Props[i].DeletePropWhenThisEncounterIsWon && gv.mod.currentArea.Props[i].wasKilled)
+                                {
+                                    if ((gv.mod.currentArea.Props[i].respawnTimeInHours > 0) && ((gv.mod.currentArea.Props[i].numberOfRespawnsThatHappenedAlready < gv.mod.currentArea.Props[i].maxNumberOfRespawns) || (gv.mod.currentArea.Props[i].maxNumberOfRespawns == -1)))
+                                    {
+                                        gv.mod.propsWaitingForRespawn.Add(gv.mod.currentArea.Props[i]);
+                                    }
+
+                                    foreach (Faction f in gv.mod.moduleFactionsList)
+                                    {
+                                        if (f.tag == gv.mod.currentArea.Props[i].factionTag)
+                                        {
+                                            f.strength -= gv.mod.currentArea.Props[i].worthForOwnFaction;
+                                        }
+                                        if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath1)
+                                        {
+                                            f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath1;
+                                        }
+                                        if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath2)
+                                        {
+                                            f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath2;
+                                        }
+                                        if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath3)
+                                        {
+                                            f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath3;
+                                        }
+                                        if (f.tag == gv.mod.currentArea.Props[i].otherFactionAffectedOnDeath4)
+                                        {
+                                            f.strength += gv.mod.currentArea.Props[i].effectOnOtherFactionOnDeath4;
+                                        }
+                                    }
+                                    gv.sf.SetGlobalInt(gv.mod.currentArea.Props[i].keyOfGlobalVarToSetTo1OnDeathOrInactivity, "1");
+                                    gv.mod.currentArea.Props.Remove(gv.mod.currentArea.Props[i]);
+
+                                    //two checks on update function: 1. Respawn check (adds back to areas prop lsit from propsWaitingForRespawn) and 2. faction limit check (sets is isAcive and isShown)
+
+                                    //add another third check (afterwards) to doupdate that kills off props whose master is inactive or whose master is on propsWaitingForRespawn 
+
+                                    //on worldtim emethod for each prop in propsWaitingForRespawn the wait time is increased accordingly 
+
+                                    //here (doPropTriggers, deletepropwhenenciunteriswon): add killed - respawing props, when max number of respawn is not reached - to the new list <prop> propsWaitingForRespawn list of module
+                                    //this is done regardless of master death (Can change: master respawn) or min-max faction strength requirement (faction strength changes all the time)
+
+                                    //props are only returned from propsWaitingForRespawn (during respawn check on doupdate) when:
+                                    //1. respawn time is reached AND
+                                    //2. target square on home area can be found (free or look for sqaure around it) AND
+                                    //3. master lives: lives means is himself in prop list (not killed) and also isActive
+                                    //upon retun the props wait time is set to zero again
+
+                                    //isActive and isShown are set to false for props outside faction strength min max (called: faction limit check)
+                                    //and to true if inside, check on every update (faction limit check)
+                                    //this means they can respawn when outside faction str min max, but will do so inactive
+
+                                    //question: do respawn for current map or for all maps? Pending! Best for all areas (both respawn and faction limit check), so world time driven movers work with the system
+
+                                    //grant cretaures a faction property, too, and implement system for buffs and debuffs based on the relevant faction'sstrength
+                                    //maybe use effect system for this and make it all configurable in the faction editor
+                                }
+
+                                //continue;
+                                break;
+                            }
+                        }
+
+                        if (!foundOne)
+                        {
+                            //chamber
+                            //doTrigger();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (gv.mod.debugMode)
+                {
+                    gv.sf.MessageBox("failed to do prop trigger: " + ex.ToString());
+                    gv.errorLog(ex.ToString());
+                }
+            }
+            //gv.mod.blockMainKeyboard = false;
+        }
+
+        public void showFloatyStepOrBumpPropInfo(int i)
+        {
+            bool lightIsNoProblem = false;
+            if ((!gv.mod.currentArea.useLightSystem) || (gv.mod.currentArea.UseDayNightCycle))
+            {
+                lightIsNoProblem = true;
+            }
+            else
+            {
+                bool foundTrue = false;
+
+                /*
+                if (gv.mod.currentArea.Tiles[actualY * gv.mod.currentArea.MapSizeX + actualX].isLit.Count > 0)
+                {
+                    lightIsNoProblem = true;
+                }
+                */
+                foreach (bool state in gv.mod.currentArea.Tiles[gv.mod.currentArea.Props[i].LocationY * gv.mod.currentArea.MapSizeX + gv.mod.currentArea.Props[i].LocationX].isLit)
+                {
+                    if (state)
+                    {
+                        foundTrue = true;
+                        break;
+                    }
+                }
+                if (foundTrue)
+                {
+                    lightIsNoProblem = true;
+                }
+            }
+
+            if (lightIsNoProblem)
+            {
+                int x = gv.playerOffsetX * gv.squareSize;
+                int y = gv.playerOffsetY * gv.squareSize;
+                gv.cc.floatyText = gv.mod.currentArea.Props[i].MouseOverText;
+                float floatyPushUp = 0;
+
+                if (gv.cc.floatyText.Length <= 20)
+                {
+                    floatyPushUp = 0.0f;
+                }
+                else if (gv.cc.floatyText.Length <= 35)
+                {
+                    floatyPushUp = 0.25f;
+                }
+                else if (gv.cc.floatyText.Length <= 52)
+                {
+                    floatyPushUp = 0.5f;
+                }
+                else if (gv.cc.floatyText.Length <= 70)
+                {
+                    floatyPushUp = 0.8f;
+                }
+                else if (gv.cc.floatyText.Length <= 87)
+                {
+                    floatyPushUp = 1.05f;
+                }
+                else if (gv.cc.floatyText.Length <= 105)
+                {
+                    floatyPushUp = 1.25f;
+                }
+                else if (gv.cc.floatyText.Length <= 122)
+                {
+                    floatyPushUp = 1.6f;
+                }
+                else if (gv.cc.floatyText.Length <= 140)
+                {
+                    floatyPushUp = 1.75f;
+                }
+                else if (gv.cc.floatyText.Length <= 157)
+                {
+                    floatyPushUp = 1.87f;
+                }
+                else if (gv.cc.floatyText.Length <= 175)
+                {
+                    floatyPushUp = 2.0f;
+                }
+                else
+                {
+                    floatyPushUp = 2.25f;
+                }
+                gv.cc.floatyTextLoc = new Coordinate(x + gv.oXshift + gv.screenMainMap.mapStartLocXinPixels, y - (int)(floatyPushUp * gv.squareSize));
+            }
+        }
+
+        public void showFloatyStepOrBumpPropInfo(Prop p)
+        {
+            bool lightIsNoProblem = false;
+            if ((!gv.mod.currentArea.useLightSystem) || (gv.mod.currentArea.UseDayNightCycle))
+            {
+                lightIsNoProblem = true;
+            }
+            else
+            {
+                bool foundTrue = false;
+
+                /*
+                if (gv.mod.currentArea.Tiles[actualY * gv.mod.currentArea.MapSizeX + actualX].isLit.Count > 0)
+                {
+                    lightIsNoProblem = true;
+                }
+                */
+                foreach (bool state in gv.mod.currentArea.Tiles[p.LocationY * gv.mod.currentArea.MapSizeX + p.LocationX].isLit)
+                {
+                    if (state)
+                    {
+                        foundTrue = true;
+                        break;
+                    }
+                }
+                if (foundTrue)
+                {
+                    lightIsNoProblem = true;
+                }
+            }
+
+            if (lightIsNoProblem)
+            {
+                int x = gv.playerOffsetX * gv.squareSize;
+                int y = gv.playerOffsetY * gv.squareSize;
+                gv.cc.floatyText = p.MouseOverText;
+                float floatyPushUp = 0;
+                if (gv.cc.floatyText.Length <= 20)
+                {
+                    floatyPushUp = 0.0f;
+                }
+                else if (gv.cc.floatyText.Length <= 35)
+                {
+                    floatyPushUp = 0.25f;
+                }
+                else if (gv.cc.floatyText.Length <= 52)
+                {
+                    floatyPushUp = 0.5f;
+                }
+                else if (gv.cc.floatyText.Length <= 70)
+                {
+                    floatyPushUp = 0.8f;
+                }
+                else if (gv.cc.floatyText.Length <= 87)
+                {
+                    floatyPushUp = 1.05f;
+                }
+                else if (gv.cc.floatyText.Length <= 105)
+                {
+                    floatyPushUp = 1.25f;
+                }
+                else if (gv.cc.floatyText.Length <= 122)
+                {
+                    floatyPushUp = 1.6f;
+                }
+                else if (gv.cc.floatyText.Length <= 140)
+                {
+                    floatyPushUp = 1.75f;
+                }
+                else if (gv.cc.floatyText.Length <= 157)
+                {
+                    floatyPushUp = 1.87f;
+                }
+                else if (gv.cc.floatyText.Length <= 175)
+                {
+                    floatyPushUp = 2.0f;
+                }
+                else
+                {
+                    floatyPushUp = 2.25f;
+                }
+                gv.cc.floatyTextLoc = new Coordinate(x + gv.oXshift + gv.screenMainMap.mapStartLocXinPixels, y - (int)(floatyPushUp * gv.squareSize));
+            }
+        }
+
         public void doTrigger()
         {
+
+            gv.realTimeTimerMilliSecondsEllapsed = 0;
             bool allowTrigger = true;
             Trigger trig2 = gv.mod.currentArea.getTriggerByLocation(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY);
-            if ((trig2.requiresActiveSearch && gv.mod.activeSearchDoneThisMove) || !trig2.requiresActiveSearch)
+
+            //119end
+            if (trig2 != null)
             {
-                if ((trig2 != null) && (trig2.Enabled))
+                if (trig2.TriggerSquaresList.Count == 1)
                 {
-                    //to do: different direction checks (when leaving link in diection of master) needed below
-                    if ((trig2.isLinkToMaster) && (gv.mod.currentArea.masterOfThisArea == "none"))
+                    if (trig2.bumpTriggerDirection != "none")
                     {
-                        if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "N")
+                        allowTrigger = false;
+                    }
+                }
+            }
+
+            /*
+            if (trig2 == null)
+            {
+                trig2 = gv.mod.currentArea.getTriggerByLocation(gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY);
+            }
+            */
+
+            if (trig2 != null)
+            {
+                if ((trig2.requiresActiveSearch && gv.mod.activeSearchDoneThisMove) || !trig2.requiresActiveSearch)
+                {
+                    if (trig2.Enabled)
+                    {
+                        //to do: different direction checks (when leaving link in diection of master) needed below
+                        if ((trig2.isLinkToMaster) && (gv.mod.currentArea.masterOfThisArea == "none"))
                         {
-                            if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX) || (gv.mod.PlayerLastLocationY + 1 != gv.mod.PlayerLocationY))
+                            if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "N")
                             {
-                                allowTrigger = false;
+                                if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX) || (gv.mod.PlayerLastLocationY + 1 != gv.mod.PlayerLocationY))
+                                {
+                                    allowTrigger = false;
+                                }
+                            }
+                            else if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "S")
+                            {
+                                if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX) || (gv.mod.PlayerLastLocationY - 1 != gv.mod.PlayerLocationY))
+                                {
+                                    allowTrigger = false;
+                                }
+                            }
+                            else if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "W")
+                            {
+                                if ((gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || (gv.mod.PlayerLastLocationX + 1 != gv.mod.PlayerLocationX))
+                                {
+                                    allowTrigger = false;
+                                }
+                            }
+                            else if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "E")
+                            {
+                                if ((gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || (gv.mod.PlayerLastLocationX - 1 != gv.mod.PlayerLocationX))
+                                {
+                                    allowTrigger = false;
+                                }
                             }
                         }
-                        else if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "S")
+                    }
+                    //else
+                    //{
+                    //allowTrigger = false;
+                    //}
+
+                    if (allowTrigger)
+                    {
+                        if (gv.realTimeTimerMilliSecondsEllapsed < gv.mod.realTimeTimerLengthInMilliSeconds)
                         {
-                            if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX) || (gv.mod.PlayerLastLocationY - 1 != gv.mod.PlayerLocationY))
+                            try
                             {
-                                allowTrigger = false;
+                                Trigger trig = gv.mod.currentArea.getTriggerByLocation(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY);
+                                if ((trig != null) && (trig.Enabled))
+                                {
+                                    blockSecondPropTriggersCall = false;
+
+                                    //iterate through each event                  
+                                    //#region Event1 stuff
+                                    //check to see if enabled and parm not "none"
+                                    /*for (int i = 0; i < 15; i++)
+                                    {
+                                        gv.Render();
+                                    }*/
+                                    gv.triggerIndex++;
+
+                                    if ((gv.triggerIndex == 1) && (trig.EnabledEvent1) && (!trig.Event1FilenameOrTag.Equals("none")))
+                                    {
+                                        //check to see what type of event
+                                        if (trig.Event1Type.Equals("container"))
+                                        {
+                                            gv.mod.realTimeTimerStopped = true;
+                                            gv.mod.breakActiveSearch = true;
+                                            doContainerBasedOnTag(trig.Event1FilenameOrTag);
+                                            doTrigger();
+                                        }
+                                        else if (trig.Event1Type.Equals("transition"))
+                                        {
+                                            gv.mod.breakActiveSearch = true;
+                                            doTransitionBasedOnAreaLocation(trig.Event1FilenameOrTag, trig.Event1TransPointX, trig.Event1TransPointY);
+                                        }
+                                        else if (trig.Event1Type.Equals("conversation"))
+                                        {
+                                            gv.mod.realTimeTimerStopped = true;
+                                            if (trig.conversationCannotBeAvoided == true)
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                doConversationBasedOnTag(trig.Event1FilenameOrTag);
+                                            }
+                                            else if (gv.mod.avoidInteraction == false)
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                doConversationBasedOnTag(trig.Event1FilenameOrTag);
+                                            }
+                                        }
+                                        else if (trig.Event1Type.Equals("encounter"))
+                                        {
+                                            gv.mod.realTimeTimerStopped = true;
+                                            if (!gv.mod.EncounterOfTurnDone)
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                gv.mod.EncounterOfTurnDone = true;
+                                                doEncounterBasedOnTag(trig.Event1FilenameOrTag);
+                                                //gv.mod.EncounterOfTurnDone = true;
+                                            }
+                                            //doEncounterBasedOnTag(trig.Event1FilenameOrTag);
+                                        }
+                                        else if (trig.Event1Type.Equals("script"))
+                                        {
+                                            gv.mod.realTimeTimerStopped = true;
+                                            gv.mod.breakActiveSearch = true;
+                                            doScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1, trig.Event1Parm2, trig.Event1Parm3, trig.Event1Parm4);
+                                            doTrigger();
+                                        }
+                                        else if (trig.Event1Type.Equals("ibscript"))
+                                        {
+                                            gv.mod.realTimeTimerStopped = true;
+                                            gv.mod.breakActiveSearch = true;
+                                            doIBScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1);
+                                            doTrigger();
+                                        }
+                                        //do that event
+                                        if (trig.DoOnceOnlyEvent1)
+                                        {
+                                            trig.EnabledEvent1 = false;
+                                        }
+                                    }
+                                    //#endregion
+                                    //#region Event2 stuff
+                                    //check to see if enabled and parm not "none"
+                                    else if ((gv.triggerIndex == 2) && (trig.EnabledEvent2) && (!trig.Event2FilenameOrTag.Equals("none")))
+                                    {
+                                        if (!trig.event2RequiresTrueReturnCheck || (trig.event2RequiresTrueReturnCheck && gv.mod.returnCheck))
+                                        {
+                                            //check to see what type of event
+                                            if (trig.Event2Type.Equals("container"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doContainerBasedOnTag(trig.Event2FilenameOrTag);
+                                                doTrigger();
+                                            }
+                                            else if (trig.Event2Type.Equals("transition"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doTransitionBasedOnAreaLocation(trig.Event2FilenameOrTag, trig.Event2TransPointX, trig.Event2TransPointY);
+                                            }
+                                            else if (trig.Event2Type.Equals("conversation"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                if (trig.conversationCannotBeAvoided == true)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doConversationBasedOnTag(trig.Event2FilenameOrTag);
+                                                }
+                                                else if (gv.mod.avoidInteraction == false)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doConversationBasedOnTag(trig.Event2FilenameOrTag);
+                                                }
+                                            }
+                                            else if (trig.Event2Type.Equals("encounter"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                if (!gv.mod.EncounterOfTurnDone)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    gv.mod.EncounterOfTurnDone = true;
+                                                    doEncounterBasedOnTag(trig.Event2FilenameOrTag);
+                                                    //gv.mod.EncounterOfTurnDone = true;
+                                                }
+                                                //doEncounterBasedOnTag(trig.Event2FilenameOrTag);
+                                            }
+                                            else if (trig.Event2Type.Equals("script"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
+                                                doTrigger();
+                                            }
+                                            else if (trig.Event2Type.Equals("ibscript"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
+                                                doTrigger();
+                                            }
+                                            //do that event
+                                            if (trig.DoOnceOnlyEvent2)
+                                            {
+                                                trig.EnabledEvent2 = false;
+                                            }
+                                        }
+                                    }
+                                    //#endregion
+                                    //#region Event3 stuff
+                                    //check to see if enabled and parm not "none"
+                                    else if ((gv.triggerIndex == 3) && (trig.EnabledEvent3) && (!trig.Event3FilenameOrTag.Equals("none")))
+                                    {
+                                        if (!trig.event3RequiresFalseReturnCheck || (trig.event3RequiresFalseReturnCheck && !gv.mod.returnCheck))
+                                        {
+                                            //check to see what type of event
+                                            if (trig.Event3Type.Equals("container"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doContainerBasedOnTag(trig.Event3FilenameOrTag);
+                                                doTrigger();
+                                            }
+                                            else if (trig.Event3Type.Equals("transition"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doTransitionBasedOnAreaLocation(trig.Event3FilenameOrTag, trig.Event3TransPointX, trig.Event3TransPointY);
+                                            }
+                                            else if (trig.Event3Type.Equals("conversation"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                if (trig.conversationCannotBeAvoided == true)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doConversationBasedOnTag(trig.Event3FilenameOrTag);
+                                                }
+                                                else if (gv.mod.avoidInteraction == false)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doConversationBasedOnTag(trig.Event3FilenameOrTag);
+                                                }
+                                            }
+                                            else if (trig.Event3Type.Equals("encounter"))
+                                            {
+
+                                                gv.mod.realTimeTimerStopped = true;
+                                                if (!gv.mod.EncounterOfTurnDone)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    gv.mod.EncounterOfTurnDone = true;
+                                                    doEncounterBasedOnTag(trig.Event3FilenameOrTag);
+                                                    //gv.mod.EncounterOfTurnDone = true;
+                                                }
+                                                //doEncounterBasedOnTag(trig.Event3FilenameOrTag);
+                                            }
+                                            else if (trig.Event3Type.Equals("script"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
+                                                doTrigger();
+                                            }
+                                            else if (trig.Event3Type.Equals("ibscript"))
+                                            {
+                                                gv.mod.realTimeTimerStopped = true;
+                                                gv.mod.breakActiveSearch = true;
+                                                doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
+                                                doTrigger();
+                                            }
+                                            //do that event
+                                            if (trig.DoOnceOnlyEvent3)
+                                            {
+                                                trig.EnabledEvent3 = false;
+                                            }
+                                        }
+                                    }
+                                    else if (gv.triggerIndex < 4)
+                                    {
+                                        doTrigger();
+                                    }
+                                    //#endregion
+                                    if (gv.triggerIndex > 3)
+                                    {
+                                        blockSecondPropTriggersCall = true;
+                                        gv.triggerIndex = 0;
+                                        if (trig.DoOnceOnly)
+                                        {
+                                            trig.Enabled = false;
+                                        }
+                                    }
+                                }
+                                //}
                             }
-                        }
-                        else if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "W")
-                        {
-                            if ((gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || (gv.mod.PlayerLastLocationX + 1 != gv.mod.PlayerLocationX))
+                            catch (Exception ex)
                             {
-                                allowTrigger = false;
-                            }
-                        }
-                        else if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX].transitionToMasterDirection == "E")
-                        {
-                            if ((gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || (gv.mod.PlayerLastLocationX - 1 != gv.mod.PlayerLocationX))
-                            {
-                                allowTrigger = false;
+                                if (gv.mod.debugMode)
+                                {
+                                    gv.sf.MessageBox("failed to do trigger: " + ex.ToString());
+                                    gv.errorLog(ex.ToString());
+                                }
                             }
                         }
                     }
                 }
-                //else
-                //{
-                //allowTrigger = false;
-                //}
+            }
+        }
 
-                if (allowTrigger)
+        public void doBumpTrigger(Trigger trig2)
+        {
+            bool allowTrigger = true;
+            int xPosition = trig2.TriggerSquaresList[0].X;
+            int yPosition = trig2.TriggerSquaresList[0].Y;
+
+            //Trigger trig2 = gv.mod.currentArea.getTriggerByLocation(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY);
+
+            /*
+            if (trig2 == null)
+            {
+                trig2 = gv.mod.currentArea.getTriggerByLocation(gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY);
+            }
+            */
+
+            if (trig2 != null)
+            {
+                if ((trig2.requiresActiveSearch && gv.mod.activeSearchDoneThisMove) || !trig2.requiresActiveSearch)
                 {
-                    if (gv.realTimeTimerMilliSecondsEllapsed < gv.mod.realTimeTimerLengthInMilliSeconds)
+                    if (trig2.Enabled)
                     {
-                        try
+                        //to do: different direction checks (when leaving link in diection of master) needed below
+                        if ((trig2.isLinkToMaster) && (gv.mod.currentArea.masterOfThisArea == "none"))
                         {
-                            Trigger trig = gv.mod.currentArea.getTriggerByLocation(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY);
-                            if ((trig != null) && (trig.Enabled))
+                            //continue with positions
+                            if (gv.mod.currentArea.Tiles[yPosition * gv.mod.currentArea.MapSizeX + xPosition].transitionToMasterDirection == "N")
                             {
-                                blockSecondPropTriggersCall = true;
-                                //iterate through each event                  
-                                //#region Event1 stuff
-                                //check to see if enabled and parm not "none"
-                                /*for (int i = 0; i < 15; i++)
+                                if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX) || (gv.mod.PlayerLastLocationY + 1 != gv.mod.PlayerLocationY))
                                 {
-                                    gv.Render();
-                                }*/
-                                gv.triggerIndex++;
-
-                                if ((gv.triggerIndex == 1) && (trig.EnabledEvent1) && (!trig.Event1FilenameOrTag.Equals("none")))
-                                {
-                                    //check to see what type of event
-                                    if (trig.Event1Type.Equals("container"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doContainerBasedOnTag(trig.Event1FilenameOrTag);
-                                        doTrigger();
-                                    }
-                                    else if (trig.Event1Type.Equals("transition"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doTransitionBasedOnAreaLocation(trig.Event1FilenameOrTag, trig.Event1TransPointX, trig.Event1TransPointY);
-                                    }
-                                    else if (trig.Event1Type.Equals("conversation"))
-                                    {
-                                        if (trig.conversationCannotBeAvoided == true)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            doConversationBasedOnTag(trig.Event1FilenameOrTag);
-                                        }
-                                        else if (gv.mod.avoidInteraction == false)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            doConversationBasedOnTag(trig.Event1FilenameOrTag);
-                                        }
-                                    }
-                                    else if (trig.Event1Type.Equals("encounter"))
-                                    {
-                                        if (!gv.mod.EncounterOfTurnDone)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            gv.mod.EncounterOfTurnDone = true;
-                                            doEncounterBasedOnTag(trig.Event1FilenameOrTag);
-                                            //gv.mod.EncounterOfTurnDone = true;
-                                        }
-                                        //doEncounterBasedOnTag(trig.Event1FilenameOrTag);
-                                    }
-                                    else if (trig.Event1Type.Equals("script"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1, trig.Event1Parm2, trig.Event1Parm3, trig.Event1Parm4);
-                                        doTrigger();
-                                    }
-                                    else if (trig.Event1Type.Equals("ibscript"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doIBScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1);
-                                        doTrigger();
-                                    }
-                                    //do that event
-                                    if (trig.DoOnceOnlyEvent1)
-                                    {
-                                        trig.EnabledEvent1 = false;
-                                    }
+                                    allowTrigger = false;
                                 }
-                                //#endregion
-                                //#region Event2 stuff
-                                //check to see if enabled and parm not "none"
-                                else if ((gv.triggerIndex == 2) && (trig.EnabledEvent2) && (!trig.Event2FilenameOrTag.Equals("none")))
+                            }
+                            else if (gv.mod.currentArea.Tiles[yPosition * gv.mod.currentArea.MapSizeX + xPosition].transitionToMasterDirection == "S")
+                            {
+                                if ((gv.mod.PlayerLastLocationX != gv.mod.PlayerLocationX) || (gv.mod.PlayerLastLocationY - 1 != gv.mod.PlayerLocationY))
                                 {
-                                    //check to see what type of event
-                                    if (trig.Event2Type.Equals("container"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doContainerBasedOnTag(trig.Event2FilenameOrTag);
-                                        doTrigger();
-                                    }
-                                    else if (trig.Event2Type.Equals("transition"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doTransitionBasedOnAreaLocation(trig.Event2FilenameOrTag, trig.Event2TransPointX, trig.Event2TransPointY);
-                                    }
-                                    else if (trig.Event2Type.Equals("conversation"))
-                                    {
-                                        if (trig.conversationCannotBeAvoided == true)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            doConversationBasedOnTag(trig.Event2FilenameOrTag);
-                                        }
-                                        else if (gv.mod.avoidInteraction == false)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            doConversationBasedOnTag(trig.Event2FilenameOrTag);
-                                        }
-                                    }
-                                    else if (trig.Event2Type.Equals("encounter"))
-                                    {
-                                        if (!gv.mod.EncounterOfTurnDone)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            gv.mod.EncounterOfTurnDone = true;
-                                            doEncounterBasedOnTag(trig.Event2FilenameOrTag);
-                                            //gv.mod.EncounterOfTurnDone = true;
-                                        }
-                                        //doEncounterBasedOnTag(trig.Event2FilenameOrTag);
-                                    }
-                                    else if (trig.Event2Type.Equals("script"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
-                                        doTrigger();
-                                    }
-                                    else if (trig.Event2Type.Equals("ibscript"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
-                                        doTrigger();
-                                    }
-                                    //do that event
-                                    if (trig.DoOnceOnlyEvent2)
-                                    {
-                                        trig.EnabledEvent2 = false;
-                                    }
+                                    allowTrigger = false;
                                 }
-                                //#endregion
-                                //#region Event3 stuff
-                                //check to see if enabled and parm not "none"
-                                else if ((gv.triggerIndex == 3) && (trig.EnabledEvent3) && (!trig.Event3FilenameOrTag.Equals("none")))
+                            }
+                            else if (gv.mod.currentArea.Tiles[yPosition * gv.mod.currentArea.MapSizeX + xPosition].transitionToMasterDirection == "W")
+                            {
+                                if ((gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || (gv.mod.PlayerLastLocationX + 1 != gv.mod.PlayerLocationX))
                                 {
-                                    //check to see what type of event
-                                    if (trig.Event3Type.Equals("container"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doContainerBasedOnTag(trig.Event3FilenameOrTag);
-                                        doTrigger();
-                                    }
-                                    else if (trig.Event3Type.Equals("transition"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doTransitionBasedOnAreaLocation(trig.Event3FilenameOrTag, trig.Event3TransPointX, trig.Event3TransPointY);
-                                    }
-                                    else if (trig.Event3Type.Equals("conversation"))
-                                    {
-                                        if (trig.conversationCannotBeAvoided == true)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            doConversationBasedOnTag(trig.Event3FilenameOrTag);
-                                        }
-                                        else if (gv.mod.avoidInteraction == false)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            doConversationBasedOnTag(trig.Event3FilenameOrTag);
-                                        }
-                                    }
-                                    else if (trig.Event3Type.Equals("encounter"))
-                                    {
-
-                                        if (!gv.mod.EncounterOfTurnDone)
-                                        {
-                                            gv.mod.breakActiveSearch = true;
-                                            gv.mod.EncounterOfTurnDone = true;
-                                            doEncounterBasedOnTag(trig.Event3FilenameOrTag);
-                                            //gv.mod.EncounterOfTurnDone = true;
-                                        }
-                                        //doEncounterBasedOnTag(trig.Event3FilenameOrTag);
-                                    }
-                                    else if (trig.Event3Type.Equals("script"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
-                                        doTrigger();
-                                    }
-                                    else if (trig.Event3Type.Equals("ibscript"))
-                                    {
-                                        gv.mod.breakActiveSearch = true;
-                                        doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
-                                        doTrigger();
-                                    }
-                                    //do that event
-                                    if (trig.DoOnceOnlyEvent3)
-                                    {
-                                        trig.EnabledEvent3 = false;
-                                    }
+                                    allowTrigger = false;
                                 }
-                                else if (gv.triggerIndex < 4)
+                            }
+                            else if (gv.mod.currentArea.Tiles[yPosition * gv.mod.currentArea.MapSizeX + xPosition].transitionToMasterDirection == "E")
+                            {
+                                if ((gv.mod.PlayerLastLocationY != gv.mod.PlayerLocationY) || (gv.mod.PlayerLastLocationX - 1 != gv.mod.PlayerLocationX))
                                 {
-                                    doTrigger();
-                                }
-                                //#endregion
-                                if (gv.triggerIndex > 3)
-                                {
-                                    gv.triggerIndex = 0;
-                                    if (trig.DoOnceOnly)
-                                    {
-                                        trig.Enabled = false;
-                                    }
+                                    allowTrigger = false;
                                 }
                             }
                         }
-                        catch (Exception ex)
+                    }
+                    //else
+                    //{
+                    //allowTrigger = false;
+                    //}
+
+                    if (allowTrigger)
+                    {
+                        if (gv.realTimeTimerMilliSecondsEllapsed < gv.mod.realTimeTimerLengthInMilliSeconds)
                         {
-                            if (gv.mod.debugMode)
+                            try
                             {
-                                gv.sf.MessageBox("failed to do trigger: " + ex.ToString());
-                                gv.errorLog(ex.ToString());
+                                Trigger trig = trig2;
+                                if ((trig != null) && (trig.Enabled))
+                                {
+                                    blockSecondPropTriggersCall = true;
+                                    //iterate through each event                  
+                                    //#region Event1 stuff
+                                    //check to see if enabled and parm not "none"
+                                    /*for (int i = 0; i < 15; i++)
+                                    {
+                                        gv.Render();
+                                    }*/
+                                    gv.triggerIndex++;
+
+                                    if ((gv.triggerIndex == 1) && (trig.EnabledEvent1) && (!trig.Event1FilenameOrTag.Equals("none")))
+                                    {
+
+                                        bool doTrans = false;
+                                        foreach (Trigger t in gv.mod.currentArea.Triggers)
+                                        {
+                                        }
+                                        if (trig.bumpTriggerDirection == "none")
+                                        {
+                                            doTrans = true;
+                                        }
+                                        if (trig.bumpTriggerDirection == "fromSouth")
+                                        {
+                                            if (gv.mod.PlayerLocationY > yPosition)
+                                            {
+                                                doTrans = true;
+                                            }
+                                        }
+                                        if (trig.bumpTriggerDirection == "fromNorth")
+                                        {
+                                            if (gv.mod.PlayerLocationY < yPosition)
+                                            {
+                                                doTrans = true;
+                                            }
+                                        }
+
+                                        if (trig.bumpTriggerDirection == "fromEast")
+                                        {
+                                            if (gv.mod.PlayerLocationX > xPosition)
+                                            {
+                                                doTrans = true;
+                                            }
+                                        }
+
+                                        if (trig.bumpTriggerDirection == "fromWest")
+                                        {
+                                            if (gv.mod.PlayerLocationX < xPosition)
+                                            {
+                                                doTrans = true;
+                                            }
+                                        }
+
+                                        if (doTrans)
+                                        {
+                                            //check to see what type of event
+                                            if (trig.Event1Type.Equals("container"))
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                doContainerBasedOnTag(trig.Event1FilenameOrTag);
+                                                doBumpTrigger(trig2);
+                                            }
+                                            else if (trig.Event1Type.Equals("transition"))
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                doTrans = false;
+                                                foreach (Trigger t in gv.mod.currentArea.Triggers)
+                                                { }
+                                                if (trig.bumpTriggerDirection == "none")
+                                                {
+                                                    doTrans = true;
+                                                }
+                                                if (trig.bumpTriggerDirection == "fromSouth")
+                                                {
+                                                    if (gv.mod.PlayerLocationY > yPosition)
+                                                    {
+                                                        doTrans = true;
+                                                    }
+                                                }
+                                                if (trig.bumpTriggerDirection == "fromNorth")
+                                                {
+                                                    if (gv.mod.PlayerLocationY < yPosition)
+                                                    {
+                                                        doTrans = true;
+                                                    }
+                                                }
+
+                                                if (trig.bumpTriggerDirection == "fromEast")
+                                                {
+                                                    if (gv.mod.PlayerLocationX > xPosition)
+                                                    {
+                                                        doTrans = true;
+                                                    }
+                                                }
+
+                                                if (trig.bumpTriggerDirection == "fromWest")
+                                                {
+                                                    if (gv.mod.PlayerLocationX < xPosition)
+                                                    {
+                                                        doTrans = true;
+                                                    }
+                                                }
+
+                                                if (doTrans)
+                                                {
+                                                    doTransitionBasedOnAreaLocation(trig.Event1FilenameOrTag, trig.Event1TransPointX, trig.Event1TransPointY);
+                                                }
+                                            }
+                                            else if (trig.Event1Type.Equals("conversation"))
+                                            {
+                                                if (trig.conversationCannotBeAvoided == true)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doConversationBasedOnTag(trig.Event1FilenameOrTag);
+                                                }
+                                                else if (gv.mod.avoidInteraction == false)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doConversationBasedOnTag(trig.Event1FilenameOrTag);
+                                                }
+                                            }
+                                            else if (trig.Event1Type.Equals("encounter"))
+                                            {
+                                                if (!gv.mod.EncounterOfTurnDone)
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    gv.mod.EncounterOfTurnDone = true;
+                                                    doEncounterBasedOnTag(trig.Event1FilenameOrTag);
+                                                    //gv.mod.EncounterOfTurnDone = true;
+                                                }
+                                                //doEncounterBasedOnTag(trig.Event1FilenameOrTag);
+                                            }
+                                            else if (trig.Event1Type.Equals("script"))
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                doScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1, trig.Event1Parm2, trig.Event1Parm3, trig.Event1Parm4);
+                                                doBumpTrigger(trig2);
+                                            }
+                                            else if (trig.Event1Type.Equals("ibscript"))
+                                            {
+                                                gv.mod.breakActiveSearch = true;
+                                                doIBScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1);
+                                                doBumpTrigger(trig2);
+                                            }
+                                            //do that event
+                                            if (trig.DoOnceOnlyEvent1)
+                                            {
+                                                trig.EnabledEvent1 = false;
+                                            }
+                                        }
+                                    }
+                                    //#endregion
+                                    //#region Event2 stuff
+                                    //check to see if enabled and parm not "none"
+                                    else if ((gv.triggerIndex == 2) && (trig.EnabledEvent2) && (!trig.Event2FilenameOrTag.Equals("none")))
+                                    {
+                                        if (!trig.event2RequiresTrueReturnCheck || (trig.event2RequiresTrueReturnCheck && gv.mod.returnCheck))
+                                        {
+                                            bool doTrans = false;
+                                            foreach (Trigger t in gv.mod.currentArea.Triggers)
+                                            {
+                                            }
+                                            if (trig.bumpTriggerDirection == "none")
+                                            {
+                                                doTrans = true;
+                                            }
+                                            if (trig.bumpTriggerDirection == "fromSouth")
+                                            {
+                                                if (gv.mod.PlayerLocationY > yPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+                                            if (trig.bumpTriggerDirection == "fromNorth")
+                                            {
+                                                if (gv.mod.PlayerLocationY < yPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+
+                                            if (trig.bumpTriggerDirection == "fromEast")
+                                            {
+                                                if (gv.mod.PlayerLocationX > xPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+
+                                            if (trig.bumpTriggerDirection == "fromWest")
+                                            {
+                                                if (gv.mod.PlayerLocationX < xPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+
+                                            if (doTrans)
+                                            {
+                                                //check to see what type of event
+                                                if (trig.Event2Type.Equals("container"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doContainerBasedOnTag(trig.Event2FilenameOrTag);
+                                                    doBumpTrigger(trig2);
+                                                }
+                                                else if (trig.Event2Type.Equals("transition"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doTrans = false;
+                                                    foreach (Trigger t in gv.mod.currentArea.Triggers)
+                                                    {
+                                                    }
+                                                    if (trig.bumpTriggerDirection == "none")
+                                                    {
+                                                        doTrans = true;
+                                                    }
+                                                    if (trig.bumpTriggerDirection == "fromSouth")
+                                                    {
+                                                        if (gv.mod.PlayerLocationY > yPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+                                                    if (trig.bumpTriggerDirection == "fromNorth")
+                                                    {
+                                                        if (gv.mod.PlayerLocationY < yPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+
+                                                    if (trig.bumpTriggerDirection == "fromEast")
+                                                    {
+                                                        if (gv.mod.PlayerLocationX > xPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+
+                                                    if (trig.bumpTriggerDirection == "fromWest")
+                                                    {
+                                                        if (gv.mod.PlayerLocationX < xPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+
+                                                    if (doTrans)
+                                                    {
+                                                        doTransitionBasedOnAreaLocation(trig.Event2FilenameOrTag, trig.Event2TransPointX, trig.Event2TransPointY);
+                                                    }
+                                                }
+                                                else if (trig.Event2Type.Equals("conversation"))
+                                                {
+                                                    if (trig.conversationCannotBeAvoided == true)
+                                                    {
+                                                        gv.mod.breakActiveSearch = true;
+                                                        doConversationBasedOnTag(trig.Event2FilenameOrTag);
+                                                    }
+                                                    else if (gv.mod.avoidInteraction == false)
+                                                    {
+                                                        gv.mod.breakActiveSearch = true;
+                                                        doConversationBasedOnTag(trig.Event2FilenameOrTag);
+                                                    }
+                                                }
+                                                else if (trig.Event2Type.Equals("encounter"))
+                                                {
+                                                    if (!gv.mod.EncounterOfTurnDone)
+                                                    {
+                                                        gv.mod.breakActiveSearch = true;
+                                                        gv.mod.EncounterOfTurnDone = true;
+                                                        doEncounterBasedOnTag(trig.Event2FilenameOrTag);
+                                                        //gv.mod.EncounterOfTurnDone = true;
+                                                    }
+                                                    //doEncounterBasedOnTag(trig.Event2FilenameOrTag);
+                                                }
+                                                else if (trig.Event2Type.Equals("script"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
+                                                    doBumpTrigger(trig2);
+                                                }
+                                                else if (trig.Event2Type.Equals("ibscript"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
+                                                    doBumpTrigger(trig2);
+                                                }
+                                                //do that event
+                                                if (trig.DoOnceOnlyEvent2)
+                                                {
+                                                    trig.EnabledEvent2 = false;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //#endregion
+                                    //#region Event3 stuff
+                                    //check to see if enabled and parm not "none"
+                                    else if ((gv.triggerIndex == 3) && (trig.EnabledEvent3) && (!trig.Event3FilenameOrTag.Equals("none")))
+                                    {
+                                        if (!trig.event3RequiresFalseReturnCheck || (trig.event3RequiresFalseReturnCheck && !gv.mod.returnCheck))
+                                        {
+                                            bool doTrans = false;
+                                            foreach (Trigger t in gv.mod.currentArea.Triggers)
+                                            {
+                                            }
+                                            if (trig.bumpTriggerDirection == "none")
+                                            {
+                                                doTrans = true;
+                                            }
+                                            if (trig.bumpTriggerDirection == "fromSouth")
+                                            {
+                                                if (gv.mod.PlayerLocationY > yPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+                                            if (trig.bumpTriggerDirection == "fromNorth")
+                                            {
+                                                if (gv.mod.PlayerLocationY < yPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+
+                                            if (trig.bumpTriggerDirection == "fromEast")
+                                            {
+                                                if (gv.mod.PlayerLocationX > xPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+
+                                            if (trig.bumpTriggerDirection == "fromWest")
+                                            {
+                                                if (gv.mod.PlayerLocationX < xPosition)
+                                                {
+                                                    doTrans = true;
+                                                }
+                                            }
+
+                                            if (doTrans)
+                                            {
+                                                //check to see what type of event
+                                                if (trig.Event3Type.Equals("container"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doContainerBasedOnTag(trig.Event3FilenameOrTag);
+                                                    doBumpTrigger(trig2);
+                                                }
+                                                else if (trig.Event3Type.Equals("transition"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doTrans = false;
+                                                    foreach (Trigger t in gv.mod.currentArea.Triggers)
+                                                    {
+                                                    }
+                                                    if (trig.bumpTriggerDirection == "none")
+                                                    {
+                                                        doTrans = true;
+                                                    }
+                                                    if (trig.bumpTriggerDirection == "fromSouth")
+                                                    {
+                                                        if (gv.mod.PlayerLocationY > yPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+                                                    if (trig.bumpTriggerDirection == "fromNorth")
+                                                    {
+                                                        if (gv.mod.PlayerLocationY < yPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+
+                                                    if (trig.bumpTriggerDirection == "fromEast")
+                                                    {
+                                                        if (gv.mod.PlayerLocationX > xPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+
+                                                    if (trig.bumpTriggerDirection == "fromWest")
+                                                    {
+                                                        if (gv.mod.PlayerLocationX < xPosition)
+                                                        {
+                                                            doTrans = true;
+                                                        }
+                                                    }
+
+                                                    if (doTrans)
+                                                    {
+                                                        doTransitionBasedOnAreaLocation(trig.Event3FilenameOrTag, trig.Event3TransPointX, trig.Event3TransPointY);
+                                                    }
+                                                }
+                                                else if (trig.Event3Type.Equals("conversation"))
+                                                {
+                                                    if (trig.conversationCannotBeAvoided == true)
+                                                    {
+                                                        gv.mod.breakActiveSearch = true;
+                                                        doConversationBasedOnTag(trig.Event3FilenameOrTag);
+                                                    }
+                                                    else if (gv.mod.avoidInteraction == false)
+                                                    {
+                                                        gv.mod.breakActiveSearch = true;
+                                                        doConversationBasedOnTag(trig.Event3FilenameOrTag);
+                                                    }
+                                                }
+                                                else if (trig.Event3Type.Equals("encounter"))
+                                                {
+
+                                                    if (!gv.mod.EncounterOfTurnDone)
+                                                    {
+                                                        gv.mod.breakActiveSearch = true;
+                                                        gv.mod.EncounterOfTurnDone = true;
+
+                                                        doEncounterBasedOnTag(trig.Event3FilenameOrTag);
+                                                        //gv.mod.EncounterOfTurnDone = true;
+                                                    }
+                                                    //doEncounterBasedOnTag(trig.Event3FilenameOrTag);
+                                                }
+                                                else if (trig.Event3Type.Equals("script"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
+                                                    doBumpTrigger(trig2);
+                                                }
+                                                else if (trig.Event3Type.Equals("ibscript"))
+                                                {
+                                                    gv.mod.breakActiveSearch = true;
+                                                    doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
+                                                    doBumpTrigger(trig2);
+                                                }
+                                                //do that event
+                                                if (trig.DoOnceOnlyEvent3)
+                                                {
+                                                    trig.EnabledEvent3 = false;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if (gv.triggerIndex < 4)
+                                    {
+                                        doBumpTrigger(trig2);
+                                    }
+                                    //#endregion
+                                    if (gv.triggerIndex > 3)
+                                    {
+                                        gv.triggerIndex = 0;
+                                        if (trig.DoOnceOnly)
+                                        {
+                                            trig.Enabled = false;
+                                        }
+                                    }
+                                }
+                                //}
+                            }
+                            catch (Exception ex)
+                            {
+                                if (gv.mod.debugMode)
+                                {
+                                    gv.sf.MessageBox("failed to do trigger: " + ex.ToString());
+                                    gv.errorLog(ex.ToString());
+                                }
                             }
                         }
                     }
@@ -8981,6 +16904,27 @@ namespace IBx
         public void doContainerBasedOnTag(string tag)
         {
 
+            //gv.aTimer.Stop();
+            //gv.a2Timer.Stop();
+            //gv.mod.scrollModeSpeed = 1.15f;
+            gv.mod.blockRightKey = false;
+            gv.mod.blockLeftKey = false;
+            gv.mod.blockUpKey = false;
+            gv.mod.blockDownKey = false;
+
+
+            gv.aTimer = false;
+            gv.a2Timer = false;
+            gv.mod.scrollModeSpeed = 1.15f;
+
+            //gv.mod.isScrollingNow = false;
+            //gv.mod.doNotStartScrolling = true;
+            //gv.mod.scrollingDirection = "none";
+            //gv.blockMoveBecausOfCurrentScrolling = true;
+            gv.mod.scrollingTimer = 100;
+            //gv.mod.justLeftCombat = true;
+            gv.screenType = "main";
+
             try
             {
                 Container container = gv.mod.getContainerByTag(tag);
@@ -8990,44 +16934,187 @@ namespace IBx
             }
             catch (Exception ex)
             {
+                gv.sf.MessageBox("Karl Error 117End");
                 gv.errorLog(ex.ToString());
             }
 
         }
         public void doConversationBasedOnTag(string tag)
-        {           
+        {
+
+            gv.mod.realTimeTimerStopped = true;
+            gv.realTimeTimerMilliSecondsEllapsed = 0;
+            bool isFooled = false;
+            //enter code for skipping triggers of prop here
+            if (calledConvoFromProp)
+            {
+                if (gv.sf.ThisProp != null)
+                {
+                    if (gv.sf.ThisProp.blockConvoForOneTurn)
+                    {
+                        return;
+                    }
+                    gv.sf.ThisProp.blockConvoForOneTurn = true;
+
+
+                    if (gv.sf.ThisProp.stealthSkipsPropTriggers)
+                    {
+                        //add missing check
+                        //bool isFooled = false;
+                        string traitMethod = "leader";
+                        foreach (Trait t in gv.mod.moduleTraitsList)
+                        {
+                            if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
+                            {
+                                traitMethod = t.methodOfChecking;
+                            }
+                        }
+                        int parm1 = gv.mod.selectedPartyLeader;
+                        if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                        {
+                            parm1 = gv.mod.selectedPartyLeader;
+                        }
+                        else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                        {
+                            parm1 = -2;
+                        }
+                        else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                        {
+                            parm1 = -3;
+                        }
+                        else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                        {
+                            parm1 = -4;
+                        }
+                        else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                        {
+                            parm1 = -5;
+                        }
+                        else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                        {
+                            parm1 = -6;
+                        }
+
+                        int tileAdder = 0;
+                        int darkAdder = 0;
+                        tileAdder = gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationY].stealthModifier;
+                        foreach (Prop p5 in gv.mod.currentArea.Props)
+                        {
+                            if (p5.stealthModifier != 0)
+                            {
+                                if (p5.LocationX == gv.mod.PlayerLocationX && p5.LocationY == gv.mod.PlayerLocationY)
+                                {
+                                    tileAdder = p5.stealthModifier;
+                                }
+                            }
+                        }
+                        if (gv.sf.CheckIsInDarkness("party", "night"))
+                        {
+                            darkAdder = 4;
+                        }
+                        if (gv.sf.CheckIsInDarkness("party", "noLight"))
+                        {
+                            darkAdder = 12;
+                        }
+                        Coordinate pcCoord = new Coordinate();
+                        Coordinate propCoord = new Coordinate();
+                        pcCoord.X = gv.mod.PlayerLocationX;
+                        pcCoord.Y = gv.mod.PlayerLocationY;
+                        propCoord.X = gv.sf.ThisProp.LocationX;
+                        propCoord.Y = gv.sf.ThisProp.LocationY;
+
+                        //factor in lit state and tile stealtModifier
+                        //this way a sneak through is 5 points more diffcult than a direct sneak by
+
+                        //spot dc 13, sneak dc 27 
+                        //allows sneak through
+                        //entlastungsa
+                        int checkModifier = -4 + darkAdder + tileAdder - 5;
+
+                        if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, gv.sf.ThisProp.spotEnemy - checkModifier, true, true))
+                        {
+                            isFooled = true;
+                            gv.sf.ThisProp.showSneakThroughSymbol = true;
+                        }
+                        else
+                        {
+                            isFooled = false;
+                            gv.sf.ThisProp.showSneakThroughSymbol = false;
+                        }
+
+                        if (isFooled)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }//up to here
+             //if (gv.mod.doConvo)
+             //{
             try
-            {                
+            {
+
+                if (calledConvoFromProp)
+                {
+                    if (gv.sf.ThisProp != null)
+                    {
+                        if (gv.sf.ThisProp.isMover)
+                        {
+                            gv.sf.ThisProp.ReturningToPost = true;
+                            gv.sf.ThisProp.isCurrentlyChasing = false;
+                        }
+                    }
+                }
+
+                gv.mod.blockRightKey = false;
+                gv.mod.blockLeftKey = false;
+                gv.mod.blockUpKey = false;
+                gv.mod.blockDownKey = false;
+
+
+                gv.aTimer = false;
+                gv.a2Timer = false;
+                gv.mod.scrollModeSpeed = 1.15f;
+
+                //gv.mod.isScrollingNow = false;
+                //gv.mod.doNotStartScrolling = true;
+                //gv.mod.scrollingDirection = "none";
+                //gv.blockMoveBecausOfCurrentScrolling = true;
+                gv.mod.scrollingTimer = 100;
+                //gv.mod.justLeftCombat = true;
+                gv.screenType = "main";
+
+                gv.mod.allowImmediateRetransition = true;
                 LoadCurrentConvo(tag);
-                if (gv.screenConvo.currentConvo == null)
-                {
-                    gv.sf.MessageBox("failed to open conversation with tag: " + tag);
-                }
-                else
-                {
-                    gv.mod.allowImmediateRetransition = true;
-                    gv.screenType = "convo";
-                    gv.screenConvo.startConvo();
-                }
+                gv.screenType = "convo";
+                gv.screenConvo.startConvo();
             }
             catch (Exception ex)
             {
                 gv.sf.MessageBox("failed to open conversation with tag: " + tag);
             }
+            //}
+            //else
+            //{
+            //gv.mod.doConvo = true;
+            //}
         }
 
         //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        public void doSpellCalledFromScript (Spell spell, Player player, int casterLevel, string logTextForCastingAction)
+        public void doSpellCalledFromScript(Spell spell, Player player, int casterLevel, string logTextForCastingAction)
         {
-            
-           gv.cc.addLogText("<font color='yellow'>" + logTextForCastingAction + "</font><BR>");
+
+            if (logTextForCastingAction != "none" && logTextForCastingAction != "None" && logTextForCastingAction != "")
+            {
+                gv.cc.addLogText("<font color='yellow'>" + logTextForCastingAction + "</font><BR>");
+            }
 
             Creature source = new Creature();
             source.cr_level = casterLevel;
-            source.cr_name = ""; 
+            source.cr_name = "";
             source.sp = 1000000;
             source.hp = 1000000;
-            
+
             bool outsideCombat = true;
             Object target = new Object();
             target = player;
@@ -9039,7 +17126,8 @@ namespace IBx
             }
             else if (!spell.spellEffectTag.Equals("none"))
             {
-                gv.sf.spGenericUsingOldSingleEffectTag(spell, source, target, outsideCombat);
+                gv.sf.spGeneric(spell, source, target, outsideCombat, logTextForCastingAction);
+                //gv.sf.spGenericUsingOldSingleEffectTag(spell, source, target, outsideCombat);
             }
 
             //WIZARD SPELLS
@@ -9128,7 +17216,206 @@ namespace IBx
         }
 
         //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        public void doSpellEncounterTrigger(string spellTag, string removeAfterStepBool, string casterLevel, string logText)
+        {
+            int casterLevelInt = Convert.ToInt32(casterLevel);
+            bool remove = false;
+            if (removeAfterStepBool == "true" || removeAfterStepBool == "True")
+            {
+                remove = true;
+            }
 
+            Spell spell = new Spell();
+            foreach (Spell sp in gv.mod.moduleSpellsList)
+            {
+                if (sp.tag == spellTag)
+                {
+                    spell = sp;
+                }
+            }
+            if (logText != "none" && logText != "None" && logText != "")
+            {
+                gv.cc.addLogText("<font color='yellow'>" + logText + "</font><BR>");
+            }
+            else
+            {
+                gv.cc.addLogText("<font color='yellow'>" + spell.name + " triggered" + "</font><BR>");
+            }
+
+            gv.sf.AoeTargetsList.Clear();
+            bool outsideCombat = false;
+            Coordinate triggerCoord = new Coordinate();
+            int relevantMoveOrderIndex = gv.screenCombat.currentMoveOrderIndex - 1;
+
+            foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (crt.moveOrder == relevantMoveOrderIndex)
+                {
+                    triggerCoord.X = crt.combatLocX;
+                    triggerCoord.Y = crt.combatLocY;
+                }
+            }
+
+            foreach (Player p in gv.mod.playerList)
+            {
+                if (p.moveOrder == relevantMoveOrderIndex)
+                {
+                    triggerCoord.X = p.combatLocX;
+                    triggerCoord.Y = p.combatLocY;
+                }
+            }
+
+            //this sorts the three possible effect sources in the order: tag list for generic, single tag for generic (compatibility with old spells) and finally specific script
+            if (spell.spellEffectTagList.Count > 0)
+            {
+                //burning man
+                string logTextForCastAction = "none";
+                gv.sf.spGeneric(spell, triggerCoord, triggerCoord, outsideCombat, logTextForCastAction, casterLevelInt, remove);
+            }
+
+
+
+            //add ending animation 
+            //if (!gv.screenCombat.isPlayerTurn)
+            //{
+            //gv.screenCombat.dontEndCreatureTurn = true;
+            //}
+
+            //if (gv.screenCombat.isPlayerTurn && gv.screenCombat.currentMoves != 0)
+            //{
+            string filename = spell.spriteEndingFilename;
+            AnimationSequence newSeq = new AnimationSequence();
+            gv.screenCombat.animationSeqStack.Add(newSeq);
+            AnimationStackGroup newGroup = new AnimationStackGroup();
+            gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+            foreach (Coordinate coor in gv.sf.AoeSquaresList)
+            {
+                gv.screenCombat.addEndingAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)), filename);
+            }
+            //add floaty text  
+            //add death animations
+
+            newGroup = new AnimationStackGroup();
+            gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+            gv.screenCombat.deathAnimationLocations.Clear();
+
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (c.hp <= 0)
+                {
+                    Coordinate coord = new Coordinate();
+                    coord.X = c.combatLocX;
+                    coord.Y = c.combatLocY;
+                    gv.screenCombat.deathAnimationLocations.Add(coord);
+                    gv.screenCombat.blockCreatureDrawLocations.Add(coord);
+                }
+            }
+            foreach (Coordinate coor in gv.screenCombat.deathAnimationLocations)
+            {
+                gv.screenCombat.addDeathAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)));
+            }
+
+            //gv.screenCombat.animationsOn = true;
+            gv.screenCombat.stepAnimationsOn = true;
+            //}
+
+
+            //for now encounter triggers only work for spells taht use spellEffectTagList!
+
+            /*
+            else if (!spell.spellEffectTag.Equals("none"))
+            {
+                gv.sf.spGenericUsingOldSingleEffectTag(spell, triggerCoord, triggerCoord, outsideCombat);
+            }
+
+            //WIZARD SPELLS
+
+            else if (spell.spellScript.Equals("spDimensionDoor"))
+            {
+                gv.sf.spDimensionDoor(source, target);
+            }
+
+            else if (spell.spellScript.Equals("spSummonAlly"))
+            {
+                gv.sf.spSummonAlly(source, target, spell);
+            }
+
+            else if (spell.spellScript.Equals("spFlameFingers"))
+            {
+                gv.sf.spFlameFingers(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spMageBolt"))
+            {
+                gv.sf.spMageBolt(source, target);
+            }
+            else if (spell.spellScript.Equals("spSleep"))
+            {
+                gv.sf.spSleep(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spMageArmor"))
+            {
+                gv.sf.spMageArmor(source, target);
+            }
+            else if (spell.spellScript.Equals("spMinorRegen"))
+            {
+                gv.sf.spMinorRegen(source, target);
+            }
+            else if (spell.spellScript.Equals("spWeb"))
+            {
+                gv.sf.spWeb(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spIceStorm"))
+            {
+                gv.sf.spIceStorm(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spFireball"))
+            {
+                gv.sf.spFireball(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spLightning"))
+            {
+                gv.sf.spLightning(source, target, spell);
+            }
+
+            //CLERIC SPELLS
+            else if (spell.tag.Equals("minorHealing"))
+            {
+                gv.sf.spHeal(source, target, 8);
+            }
+            else if (spell.tag.Equals("moderateHealing"))
+            {
+                gv.sf.spHeal(source, target, 16);
+            }
+            else if (spell.tag.Equals("massMinorHealing"))
+            {
+                gv.sf.spMassHeal(source, target, 8);
+            }
+            else if (spell.spellScript.Equals("spBless"))
+            {
+                gv.sf.spBless(source, target);
+            }
+            else if (spell.spellScript.Equals("spMagicStone"))
+            {
+                gv.sf.spMagicStone(source, target);
+            }
+            else if (spell.spellScript.Equals("spBlastOfLight"))
+            {
+                gv.sf.spBlastOfLight(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spHold"))
+            {
+                gv.sf.spHold(source, target);
+            }
+            //THIEF SKILL 
+            else if (spell.spellScript.Equals("trRemoveTrap"))
+            {
+                gv.sf.trRemoveTrap(source, target);
+            }
+            */
+        }
+
+
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         public void doSpellBasedOnScriptOrEffectTag(Spell spell, object source, object target, bool outsideCombat, bool isTraitUsage)
         {
             //int powerLevel = 0;
@@ -9136,15 +17423,15 @@ namespace IBx
             {
                 Creature src = (Creature)source;
                 //powerLevel = src.cr_level;
-                
-                    if (src.labelForCastAction != "none" && src.labelForCastAction != "CAST")
-                    {
-                        gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
-                    }
-                    else
-                    {
-                        gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " creates " + spell.name + "</font><BR>");
-                    }
+
+                if (src.labelForCastAction != "none" && src.labelForCastAction != "CAST")
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " creates " + spell.name + "</font><BR>");
+                }
             }
             else if (source is Player)
             {
@@ -9201,21 +17488,24 @@ namespace IBx
             }
             else if (!spell.spellEffectTag.Equals("none"))
             {
-                gv.sf.spGenericUsingOldSingleEffectTag(spell, source, target, outsideCombat);
+                string logTextForCastAction = "none";
+                //gv.sf.spGeneric(spell, source, target, outsideCombat, logTextForCastAction);
+                gv.sf.spGeneric(spell, source, target, outsideCombat, logTextForCastAction);
+                //gv.sf.spGenericUsingOldSingleEffectTag(spell, source, target, outsideCombat);
             }
 
             //WIZARD SPELLS
 
             else if (spell.spellScript.Equals("spDimensionDoor"))
             {
-                gv.sf.spDimensionDoor(source, target); 
+                gv.sf.spDimensionDoor(source, target);
             }
 
             else if (spell.spellScript.Equals("spSummonAlly"))
             {
                 gv.sf.spSummonAlly(source, target, spell);
             }
-            
+
             else if (spell.spellScript.Equals("spFlameFingers"))
             {
                 gv.sf.spFlameFingers(source, target, spell);
@@ -9252,7 +17542,7 @@ namespace IBx
             {
                 gv.sf.spLightning(source, target, spell);
             }
-            
+
             //CLERIC SPELLS
             else if (spell.tag.Equals("minorHealing"))
             {
@@ -9289,38 +17579,200 @@ namespace IBx
             }
         }
 
-/*
-        public void doSpellBasedOnScriptOrEffectTag(Spell spell, object source, object target, bool outsideCombat)
-2614         { 
-2615             gv.sf.AoeTargetsList.Clear(); 
-2616 
- 
-2617             if (!spell.spellEffectTag.Equals("none")) 
-2618             { 
-2619                 gv.sf.spGeneric(spell, source, target, outsideCombat); 
-2620             } 
-2621 
- 
-2622             //WIZARD SPELLS 
-2623             else if (spell.spellScript.Equals("spDimensionDoor")) 
-2624             { 
-2625                 gv.sf.spDimensionDoor(source, target); 
-2626             } 
-2627                          
-2628             //CLERIC SPELLS 
-2629             else if (spell.tag.Equals("minorHealing")) 
-2630             { 
-2631                 //gv.sf.spHeal(source, target, 8); 
-2632             } 
-2633 
- 
-2634             //THIEF SKILL 
-2635             else if (spell.spellScript.Equals("trRemoveTrap")) 
-2636             { 
-2637                 gv.sf.trRemoveTrap(source, target); 
-2638             } 
-2639         } 
-*/
+        //overload for getting trait name
+        public void doSpellBasedOnScriptOrEffectTag(Spell spell, object source, object target, bool outsideCombat, bool isTraitUsage, string traitName)
+        {
+            //int powerLevel = 0;
+            if (source is Creature)
+            {
+                Creature src = (Creature)source;
+                //powerLevel = src.cr_level;
+
+                if (src.labelForCastAction != "none" && src.labelForCastAction != "CAST")
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " " + src.labelForCastAction + " " + traitName + "</font><BR>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " creates " + traitName + "</font><BR>");
+                }
+            }
+            else if (source is Player)
+            {
+                Player src = (Player)source;
+                ///powerLevel = src.classLevel;
+                if (!isTraitUsage)
+                {
+                    if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.playerClass.labelForCastAction + " " + traitName + "</font><BR>");
+                    }
+                    else
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + traitName + "</font><BR>");
+                    }
+                }
+                else
+                {
+                    if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.playerClass.labelForUseTraitAction + " " + traitName + "</font><BR>");
+                    }
+                    else
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + traitName + "</font><BR>");
+                    }
+                }
+
+                //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+            }
+            else if (source is Item)
+            {
+                Item src = (Item)source;
+                //powerLevel = 
+                if (src.labelForCastAction != "none")
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.labelForCastAction + " " + traitName + "</font><BR>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + traitName + "</font><BR>");
+                }
+
+                //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+            }
+
+            gv.sf.AoeTargetsList.Clear();
+
+            //this sorts the three possible effect sources in the order: tag list for generic, single tag for generic (compatibility with old spells) and finally specific script
+            if (spell.spellEffectTagList.Count > 0)
+            {
+                string logTextForCastAction = "none";
+                gv.sf.spGeneric(spell, source, target, outsideCombat, logTextForCastAction);
+            }
+            else if (!spell.spellEffectTag.Equals("none"))
+            {
+                string logTextForCastAction = "none";
+                gv.sf.spGeneric(spell, source, target, outsideCombat, logTextForCastAction);
+                //gv.sf.spGenericUsingOldSingleEffectTag(spell, source, target, outsideCombat);
+            }
+
+            //WIZARD SPELLS
+
+            else if (spell.spellScript.Equals("spDimensionDoor"))
+            {
+                gv.sf.spDimensionDoor(source, target);
+            }
+
+            else if (spell.spellScript.Equals("spSummonAlly"))
+            {
+                gv.sf.spSummonAlly(source, target, spell);
+            }
+
+            else if (spell.spellScript.Equals("spFlameFingers"))
+            {
+                gv.sf.spFlameFingers(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spMageBolt"))
+            {
+                gv.sf.spMageBolt(source, target);
+            }
+            else if (spell.spellScript.Equals("spSleep"))
+            {
+                gv.sf.spSleep(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spMageArmor"))
+            {
+                gv.sf.spMageArmor(source, target);
+            }
+            else if (spell.spellScript.Equals("spMinorRegen"))
+            {
+                gv.sf.spMinorRegen(source, target);
+            }
+            else if (spell.spellScript.Equals("spWeb"))
+            {
+                gv.sf.spWeb(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spIceStorm"))
+            {
+                gv.sf.spIceStorm(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spFireball"))
+            {
+                gv.sf.spFireball(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spLightning"))
+            {
+                gv.sf.spLightning(source, target, spell);
+            }
+
+            //CLERIC SPELLS
+            else if (spell.tag.Equals("minorHealing"))
+            {
+                gv.sf.spHeal(source, target, 8);
+            }
+            else if (spell.tag.Equals("moderateHealing"))
+            {
+                gv.sf.spHeal(source, target, 16);
+            }
+            else if (spell.tag.Equals("massMinorHealing"))
+            {
+                gv.sf.spMassHeal(source, target, 8);
+            }
+            else if (spell.spellScript.Equals("spBless"))
+            {
+                gv.sf.spBless(source, target);
+            }
+            else if (spell.spellScript.Equals("spMagicStone"))
+            {
+                gv.sf.spMagicStone(source, target);
+            }
+            else if (spell.spellScript.Equals("spBlastOfLight"))
+            {
+                gv.sf.spBlastOfLight(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("spHold"))
+            {
+                gv.sf.spHold(source, target);
+            }
+            //THIEF SKILL 
+            else if (spell.spellScript.Equals("trRemoveTrap"))
+            {
+                gv.sf.trRemoveTrap(source, target);
+            }
+        }
+        /*
+                public void doSpellBasedOnScriptOrEffectTag(Spell spell, object source, object target, bool outsideCombat)
+        2614         { 
+        2615             gv.sf.AoeTargetsList.Clear(); 
+        2616 
+
+        2617             if (!spell.spellEffectTag.Equals("none")) 
+        2618             { 
+        2619                 gv.sf.spGeneric(spell, source, target, outsideCombat); 
+        2620             } 
+        2621 
+
+        2622             //WIZARD SPELLS 
+        2623             else if (spell.spellScript.Equals("spDimensionDoor")) 
+        2624             { 
+        2625                 gv.sf.spDimensionDoor(source, target); 
+        2626             } 
+        2627                          
+        2628             //CLERIC SPELLS 
+        2629             else if (spell.tag.Equals("minorHealing")) 
+        2630             { 
+        2631                 //gv.sf.spHeal(source, target, 8); 
+        2632             } 
+        2633 
+
+        2634             //THIEF SKILL 
+        2635             else if (spell.spellScript.Equals("trRemoveTrap")) 
+        2636             { 
+        2637                 gv.sf.trRemoveTrap(source, target); 
+        2638             } 
+        2639         } 
+        */
 
         public void doScriptBasedOnFilename(string filename, string prm1, string prm2, string prm3, string prm4)
         {
@@ -9421,7 +17873,7 @@ namespace IBx
 
         }
 
-        public string buildItemInfoText (Item it, int lineCount)
+        public string buildItemInfoText(Item it, int lineCount)
         {
             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             //int lineCount = 3;
@@ -9668,7 +18120,7 @@ namespace IBx
                     {
                         if (t.tag == it.tagOfTraitInfluenced)
                         {
-                            traitName = t.tag.Substring(0, t.tag.Length-2);
+                            traitName = t.nameOfTraitGroup;
                             //traitName = t.name;
                             break;
                         }
@@ -9828,11 +18280,11 @@ namespace IBx
 
                 if (it.onScoringHit != "none")
                 {
-                                    if (lineCount < 10)
-                                    {
-                                        lineCount++;
-                                        textToSpan += "Special effect on hit: " + "See item description" + "<BR>";
-                                    }
+                    if (lineCount < 10)
+                    {
+                        lineCount++;
+                        textToSpan += "Special effect on hit: " + "See item description" + "<BR>";
+                    }
                 }
 
 
@@ -10253,59 +18705,339 @@ namespace IBx
         {
             //if (parms != "fullScreenEffectScript")
             //{
-                try
+            try
+            {
+                if (!filename.Equals("none"))
                 {
-                    if (!filename.Equals("none"))
-                    {
-                        IBScriptEngine e = new IBScriptEngine(gv, filename, parms);
-                        e.RunScript();
-                    }
+                    IBScriptEngine e = new IBScriptEngine(gv, filename, parms);
+                    e.RunScript();
                 }
-                catch (Exception ex)
-                {
-                    gv.sf.MessageBox("failed to run IBScript: " + filename);
-                }
+            }
+            catch (Exception ex)
+            {
+                gv.sf.MessageBox("failed to run IBScript: " + filename);
+            }
             //}
         }
 
         public void doEncounterBasedOnTag(string name)
         {
-            if (gv.mod.breakActiveSearch == false)
+            //aegon2
+            //gv.mod.scrollingTimer = 0;
+            //gv.mod.isScrollingNow = false;
+            //if (gv.mod.currentEncounter.isOver)
+            EncCalled = calledEncounterFromProp;
+
+            if (calledEncounterFromProp && gv.sf.ThisProp != null)
             {
-                //project repeatable
-                try
+                TagOFPropToKill = gv.sf.ThisProp.PropTag;
+                bool isFooled = false;
+                //enter code for skipping triggers of prop here
+                //if (calledEncounterFromProp)
+                //{
+                if (gv.sf.ThisProp.stealthSkipsPropTriggers)
                 {
-                    gv.mod.currentEncounter = gv.mod.getEncounter(name);
-                    if (gv.mod.currentEncounter.encounterCreatureRefsList.Count > 0)
+                    //add missing check
+                    //bool isFooled = false;
+                    string traitMethod = "leader";
+                    foreach (Trait t in gv.mod.moduleTraitsList)
                     {
-                        gv.screenCombat.doCombatSetup();
-                        int foundOnePc = 0;
-                        foreach (Player chr in gv.mod.playerList)
+                        if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
                         {
-                            if (chr.hp > 0)
+                            traitMethod = t.methodOfChecking;
+                        }
+                    }
+                    int parm1 = gv.mod.selectedPartyLeader;
+                    if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                    {
+                        parm1 = gv.mod.selectedPartyLeader;
+                    }
+                    else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                    {
+                        parm1 = -2;
+                    }
+                    else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                    {
+                        parm1 = -3;
+                    }
+                    else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                    {
+                        parm1 = -4;
+                    }
+                    else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                    {
+                        parm1 = -5;
+                    }
+                    else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                    {
+                        parm1 = -6;
+                    }
+
+                    int tileAdder = 0;
+                    int darkAdder = 0;
+                    tileAdder = gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationY].stealthModifier;
+                    foreach (Prop p5 in gv.mod.currentArea.Props)
+                    {
+                        if (p5.stealthModifier != 0)
+                        {
+                            if (p5.LocationX == gv.mod.PlayerLocationX && p5.LocationY == gv.mod.PlayerLocationY)
                             {
-                                foundOnePc = 1;
+                                tileAdder = p5.stealthModifier;
                             }
                         }
-                        if (foundOnePc == 0)
-                        {
-                            //IBMessageBox.Show(game, "Party is wiped out...game over");
-                        }
+                    }
+                    if (gv.sf.CheckIsInDarkness("party", "night"))
+                    {
+                        darkAdder = 4;
+                    }
+                    if (gv.sf.CheckIsInDarkness("party", "noLight"))
+                    {
+                        darkAdder = 12;
+                    }
+                    Coordinate pcCoord = new Coordinate();
+                    Coordinate propCoord = new Coordinate();
+                    pcCoord.X = gv.mod.PlayerLocationX;
+                    pcCoord.Y = gv.mod.PlayerLocationY;
+                    propCoord.X = gv.sf.ThisProp.LocationX;
+                    propCoord.Y = gv.sf.ThisProp.LocationY;
+
+                    //factor in lit state and tile stealtModifier
+                    //this way a sneak through is 5 points more diffcult than a direct sneak by
+
+                    //spot dc 13, sneak dc 27 
+                    //allows sneak through
+                    //entlastungsa
+                    int checkModifier = -4 + darkAdder + tileAdder - 5;
+
+                    if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, gv.sf.ThisProp.spotEnemy - checkModifier, true, true))
+                    {
+                        isFooled = true;
+                        gv.sf.ThisProp.showSneakThroughSymbol = true;
                     }
                     else
                     {
-                        //IBMessageBox.Show(game, "no creatures left here"); 
+                        isFooled = false;
+                        gv.sf.ThisProp.showSneakThroughSymbol = false;
+                    }
+
+                    if (isFooled)
+                    {
+                        return;
+                    }
+                    //}
+                }//up to here
+            }
+
+            //if (gv.mod.breakActiveSearch == false)
+            //{
+            //project repeatable
+            try
+            {
+                if (calledConvoFromProp)
+                {
+                    if (gv.sf.ThisProp != null)
+                    {
+                        if (gv.sf.ThisProp.isMover)
+                        {
+                            gv.sf.ThisProp.ReturningToPost = true;
+                            gv.sf.ThisProp.isCurrentlyChasing = false;
+                        }
                     }
                 }
-                catch (Exception ex)
+
+                /*
+                gv.mod.blockRightKey = false;
+                gv.mod.blockLeftKey = false;
+                gv.mod.blockUpKey = false;
+                gv.mod.blockDownKey = false;
+
+
+                gv.aTimer.Stop();
+                gv.a2Timer.Stop();
+                gv.mod.scrollModeSpeed = 1.15f;
+                gv.mod.isScrollingNow = false;
+                gv.mod.doNotStartScrolling = true;
+                gv.mod.scrollingDirection = "none";
+                //gv.blockMoveBecausOfCurrentScrolling = true;
+                gv.mod.scrollingTimer = 100;
+                //gv.mod.justLeftCombat = true;
+                gv.screenType = "main";
+                */
+
+                gv.mod.currentEncounter = gv.mod.getEncounter(name);
+                if (gv.mod.currentEncounter.encounterCreatureRefsList.Count > 0)
                 {
-                    gv.errorLog(ex.ToString());
+                    bool isDoubleCall = false;
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        isDoubleCall = true;
+                    }
+                    if (!isDoubleCall)
+                    {
+                        gv.screenCombat.doCombatSetup();
+                    }
+                    int foundOnePc = 0;
+                    foreach (Player chr in gv.mod.playerList)
+                    {
+                        if (chr.hp > 0)
+                        {
+                            foundOnePc = 1;
+                        }
+                    }
+                    if (foundOnePc == 0)
+                    {
+                        //IBMessageBox.Show(game, "Party is wiped out...game over");
+                    }
+                }
+                else
+                {
+                    //IBMessageBox.Show(game, "no creatures left here"); 
                 }
             }
+            catch (Exception ex)
+            {
+                gv.sf.MessageBox("Karl Error 118End");
+                gv.errorLog(ex.ToString());
+            }
+            //}
         }
 
         public bool goWest()
         {
+            gv.mod.realTimeTimerStopped = false;
+            if ((gv.mod.playFootstepSound) && (gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer))
+            {
+                gv.PlaySound("footstep");
+            }
+            /*
+            if (!gv.mod.hideInterfaceNextMove && !gv.mod.showPortrtaitsThisUpdate)
+            {
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag == "portraitPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+            */
+            if (gv.mod.hideInterfaceNextMove)
+            {
+                if (!gv.screenMainMap.hideClock)
+                {
+                    gv.screenMainMap.hideClock = true;
+                }
+                else
+                {
+                    //gv.screenMainMap.hideClock = false;
+                }
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag != "arrowPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+            gv.mod.showPortrtaitsThisUpdate = false;
+            if (gv.mod.PlayerLocationX > 0)
+            {
+                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX - 1, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                {
+                    if (gv.mod.PlayerLocationX != gv.mod.PlayerLastLocationX || gv.mod.PlayerLocationY != gv.mod.PlayerLastLocationY)
+                    {
+                        if (!gv.mod.isScrollingNow)
+                        {
+                            gv.cc.floatyText = "";
+                            gv.cc.floatyText2 = "";
+                            gv.cc.floatyText3 = "";
+                            gv.cc.floatyText4 = "";
+                            gv.cc.floatyText4 = "";
+                            gv.cc.floatyText0 = "";
+                            gv.cc.floatyTextA = "";
+                            gv.cc.floatyTextB = "";
+                        }
+                    }
+                }
+            }
             bool doTransition = false;
 
             bool foundNeighbourArea = false;
@@ -10313,7 +19045,7 @@ namespace IBx
 
             if ((gv.mod.PlayerLocationX == gv.mod.borderAreaSize) && (gv.mod.currentArea.westernNeighbourArea == ""))
             {
-                gv.cc.addLogText("red", "No neigbhbouring area existent.");
+                gv.cc.addLogText("red", "No neighbouring area existent.");
             }
 
             if ((gv.mod.PlayerLocationX == gv.mod.borderAreaSize) && (gv.mod.currentArea.westernNeighbourArea != ""))
@@ -10333,24 +19065,36 @@ namespace IBx
                     if (((gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeY - 1) >= gv.mod.PlayerLocationY))
                     {
                         //check for block on other side
-                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeX - 1 - gv.mod.borderAreaSize, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.currentArea, gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeX - 1 - gv.mod.borderAreaSize, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
                         {
+                            // if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].Tiles[gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeX
                             int xTargetCoordinate = gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeX - 1 - gv.mod.borderAreaSize;
                             int yTargetCoordinate = gv.mod.PlayerLocationY;
+                            foreach (Player pc in gv.mod.playerList)
+                            {
+                                if (!pc.combatFacingLeft)
+                                {
+                                    pc.combatFacingLeft = true;
+                                }
+                            }
+                            gv.mod.drawPartyDirection = "right";
                             gv.mod.allowImmediateRetransition = true;
+                            gv.mod.justWentWest = true;
+                            gv.mod.partyJustCameFromNeighbouringArea = true;
                             gv.cc.doTransitionBasedOnAreaLocation(gv.mod.moduleAreasObjects[indexOfNeighbourMap].Filename, xTargetCoordinate, yTargetCoordinate);
                             doTransition = true;
                         }
                         else
                         {
-                            gv.cc.addLogText("red", "Something blocks the path from the other side.");
+                            gv.screenMainMap.StopScrollingOnBlocked();
+                            //gv.cc.addLogText("red", "Something blocks the path from the other side.");
                         }
                     }
                     else
                     {
                         gv.cc.addLogText("red", "The neigbhbouring area does not touch this border section.");
                     }
-                    
+
                 }
                 else
                 {
@@ -10363,6 +19107,143 @@ namespace IBx
 
         public bool goEast()
         {
+            gv.mod.realTimeTimerStopped = false;
+            if ((gv.mod.playFootstepSound) && (gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer))
+            {
+                gv.PlaySound("footstep");
+            }
+
+            //if (gv.mod.currentArea.Tiles[gv.mod.PlayerLocationY * gv.mod.currentArea.MapSizeX + gv.mod.PlayerLocationX] < gv.mod.currentArea.MapSizeX)
+            //if (gv.mod.PlayerLocationX < gv.mod.currentArea.MapSizeX-1)
+            /*
+            if (!gv.mod.hideInterfaceNextMove && !gv.mod.showPortrtaitsThisUpdate)
+            {
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag == "portraitPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+    */
+            if (gv.mod.hideInterfaceNextMove)
+            {
+                if (!gv.screenMainMap.hideClock)
+                {
+                    gv.screenMainMap.hideClock = true;
+                }
+                else
+                {
+                    //gv.screenMainMap.hideClock = false;
+                }
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag != "arrowPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            gv.mod.showPortrtaitsThisUpdate = false;
+            if (gv.mod.PlayerLocationX < (gv.mod.currentArea.MapSizeX - 1))
+            {
+                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX + 1, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                {
+                    if (gv.mod.PlayerLocationX != gv.mod.PlayerLastLocationX || gv.mod.PlayerLocationY != gv.mod.PlayerLastLocationY)
+                    {
+                        if (!gv.mod.isScrollingNow)
+                        {
+                            gv.cc.floatyText = "";
+                            gv.cc.floatyText2 = "";
+                            gv.cc.floatyText3 = "";
+                            gv.cc.floatyText4 = "";
+                            gv.cc.floatyText0 = "";
+                            gv.cc.floatyTextA = "";
+                            gv.cc.floatyTextB = "";
+                        }
+                    }
+                }
+            }
             bool doTransition = false;
 
             bool foundNeighbourArea = false;
@@ -10370,7 +19251,7 @@ namespace IBx
 
             if ((gv.mod.PlayerLocationX == (gv.mod.currentArea.MapSizeX - 1 - gv.mod.borderAreaSize)) && (gv.mod.currentArea.easternNeighbourArea == ""))
             {
-                gv.cc.addLogText("red", "No neigbhbouring area existent.");
+                gv.cc.addLogText("red", "No neighbouring area existent.");
             }
 
             if ((gv.mod.PlayerLocationX == (gv.mod.currentArea.MapSizeX - 1 - gv.mod.borderAreaSize)) && (gv.mod.currentArea.easternNeighbourArea != ""))
@@ -10390,17 +19271,27 @@ namespace IBx
                     if (((gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeY - 1) >= gv.mod.PlayerLocationY))
                     {
                         //check for block on other side
-                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.borderAreaSize, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.currentArea, gv.mod.borderAreaSize, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
                         {
                             int xTargetCoordinate = gv.mod.borderAreaSize;
                             int yTargetCoordinate = gv.mod.PlayerLocationY;
+                            gv.mod.drawPartyDirection = "left";
+                            foreach (Player pc in gv.mod.playerList)
+                            {
+                                if (pc.combatFacingLeft)
+                                {
+                                    pc.combatFacingLeft = false;
+                                }
+                            }
                             gv.mod.allowImmediateRetransition = true;
+                            gv.mod.justWentEast = true;
                             gv.cc.doTransitionBasedOnAreaLocation(gv.mod.moduleAreasObjects[indexOfNeighbourMap].Filename, xTargetCoordinate, yTargetCoordinate);
                             doTransition = true;
                         }
                         else
                         {
-                            gv.cc.addLogText("red", "Something blocks the path from the other side.");
+                            gv.screenMainMap.StopScrollingOnBlocked();
+                            //gv.cc.addLogText("red", "Something blocks the path from the other side.");
                         }
                     }
                     else
@@ -10420,6 +19311,140 @@ namespace IBx
 
         public bool goNorth()
         {
+            gv.mod.realTimeTimerStopped = false;
+            if ((gv.mod.playFootstepSound) && (gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer))
+            {
+                gv.PlaySound("footstep");
+            }
+            /*
+            if (!gv.mod.hideInterfaceNextMove && !gv.mod.showPortrtaitsThisUpdate)
+            {
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag == "portraitPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+            */
+            if (gv.mod.hideInterfaceNextMove)
+            {
+                if (!gv.screenMainMap.hideClock)
+                {
+                    gv.screenMainMap.hideClock = true;
+                }
+                else
+                {
+                    //gv.screenMainMap.hideClock = false;
+                }
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag != "arrowPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+            gv.mod.showPortrtaitsThisUpdate = false;
+            if (gv.mod.PlayerLocationY > 0)
+            {
+                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY - 1, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                {
+                    if (gv.mod.PlayerLocationX != gv.mod.PlayerLastLocationX || gv.mod.PlayerLocationY != gv.mod.PlayerLastLocationY)
+                    {
+                        if (!gv.mod.isScrollingNow)
+                        {
+                            gv.cc.floatyText = "";
+                            gv.cc.floatyText2 = "";
+                            gv.cc.floatyText3 = "";
+                            gv.cc.floatyText4 = "";
+                            gv.cc.floatyText0 = "";
+                            gv.cc.floatyTextA = "";
+                            gv.cc.floatyTextB = "";
+                        }
+                    }
+                }
+            }
+
             bool doTransition = false;
 
             bool foundNeighbourArea = false;
@@ -10427,7 +19452,7 @@ namespace IBx
 
             if ((gv.mod.PlayerLocationY == gv.mod.borderAreaSize) && (gv.mod.currentArea.northernNeighbourArea == ""))
             {
-                gv.cc.addLogText("red", "No neigbhbouring area existent.");
+                gv.cc.addLogText("red", "No neighbouring area existent.");
             }
 
             if ((gv.mod.PlayerLocationY == gv.mod.borderAreaSize) && (gv.mod.currentArea.northernNeighbourArea != ""))
@@ -10447,17 +19472,20 @@ namespace IBx
                     if (((gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeX - 1) >= gv.mod.PlayerLocationX))
                     {
                         //check for block on other side
-                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.PlayerLocationX, gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeY - 1 - gv.mod.borderAreaSize, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.currentArea, gv.mod.PlayerLocationX, gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeY - 1 - gv.mod.borderAreaSize, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
                         {
                             int xTargetCoordinate = gv.mod.PlayerLocationX;
                             int yTargetCoordinate = gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeY - 1 - gv.mod.borderAreaSize;
                             gv.mod.allowImmediateRetransition = true;
+                            gv.mod.drawPartyDirection = "down";
+                            gv.mod.justWentNorth = true;
                             gv.cc.doTransitionBasedOnAreaLocation(gv.mod.moduleAreasObjects[indexOfNeighbourMap].Filename, xTargetCoordinate, yTargetCoordinate);
                             doTransition = true;
                         }
                         else
                         {
-                            gv.cc.addLogText("red", "Something blocks the path from the other side.");
+                            gv.screenMainMap.StopScrollingOnBlocked();
+                            //gv.cc.addLogText("red", "Something blocks the path from the other side.");
                         }
                     }
                     else
@@ -10477,6 +19505,141 @@ namespace IBx
 
         public bool goSouth()
         {
+            gv.mod.realTimeTimerStopped = false;
+            if ((gv.mod.playFootstepSound) && (gv.mod.isScrollingNow || gv.a2Timer || gv.aTimer))
+            {
+                gv.PlaySound("footstep");
+            }
+            /*
+            if (!gv.mod.hideInterfaceNextMove && !gv.mod.showPortrtaitsThisUpdate)
+            {
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag == "portraitPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+            */
+            if (gv.mod.hideInterfaceNextMove)
+            {
+                if (!gv.screenMainMap.hideClock)
+                {
+                    gv.screenMainMap.hideClock = true;
+                }
+                else
+                {
+                    //gv.screenMainMap.hideClock = false;
+                }
+                foreach (IB2Panel pnl in gv.screenMainMap.mainUiLayout.panelList)
+                {
+                    if (pnl.tag != "arrowPanel")
+                    {
+                        //hides right
+                        if (pnl.hidingXIncrement > 0 && !gv.mod.showPortrtaitsThisUpdate)
+                        {
+                            if (pnl.currentLocX > pnl.shownLocX)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides down
+                        else if (pnl.hidingYIncrement > 0)
+                        {
+                            if (pnl.currentLocY > pnl.shownLocY)
+                            {
+                                if ((pnl.tag.Equals("arrowPanel")) && (!gv.screenMainMap.showArrows)) //don't show arrows
+                                {
+                                    continue;
+                                }
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                        //hides up
+                        else if (pnl.hidingYIncrement < 0)
+                        {
+                            if (pnl.currentLocY < pnl.shownLocY)
+                            {
+                                //pnl.showing = true;
+                            }
+                            else
+                            {
+                                pnl.hiding = true;
+                            }
+                        }
+                    }
+                }
+            }
+            gv.mod.showPortrtaitsThisUpdate = false;
+
+
+            if (gv.mod.PlayerLocationY < (gv.mod.currentArea.MapSizeY - 1))
+            {
+                if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY + 1, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                {
+                    if (gv.mod.PlayerLocationX != gv.mod.PlayerLastLocationX || gv.mod.PlayerLocationY != gv.mod.PlayerLastLocationY)
+                    {
+                        if (!gv.mod.isScrollingNow)
+                        {
+                            gv.cc.floatyText = "";
+                            gv.cc.floatyText2 = "";
+                            gv.cc.floatyText3 = "";
+                            gv.cc.floatyText4 = "";
+                            gv.cc.floatyText0 = "";
+                            gv.cc.floatyTextA = "";
+                            gv.cc.floatyTextB = "";
+                        }
+                    }
+                }
+            }
             bool doTransition = false;
 
             bool foundNeighbourArea = false;
@@ -10484,7 +19647,7 @@ namespace IBx
 
             if ((gv.mod.PlayerLocationY == (gv.mod.currentArea.MapSizeY - 1 - gv.mod.borderAreaSize)) && (gv.mod.currentArea.southernNeighbourArea == ""))
             {
-                gv.cc.addLogText("red", "No neigbhbouring area existent.");
+                gv.cc.addLogText("red", "No neighbouring area existent.");
             }
 
             if ((gv.mod.PlayerLocationY == (gv.mod.currentArea.MapSizeY - 1 - gv.mod.borderAreaSize)) && (gv.mod.currentArea.southernNeighbourArea != ""))
@@ -10504,17 +19667,20 @@ namespace IBx
                     if (((gv.mod.moduleAreasObjects[indexOfNeighbourMap].MapSizeX - 1) >= gv.mod.PlayerLocationX))
                     {
                         //check for block on other side
-                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.PlayerLocationX, gv.mod.borderAreaSize, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
+                        if (gv.mod.moduleAreasObjects[indexOfNeighbourMap].GetBlocked(gv.mod.currentArea, gv.mod.PlayerLocationX, gv.mod.borderAreaSize, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX, gv.mod.PlayerLastLocationY) == false)
                         {
                             int xTargetCoordinate = gv.mod.PlayerLocationX;
                             int yTargetCoordinate = gv.mod.borderAreaSize;
                             gv.mod.allowImmediateRetransition = true;
+                            gv.mod.drawPartyDirection = "up";
+                            gv.mod.justWentSouth = true;
                             gv.cc.doTransitionBasedOnAreaLocation(gv.mod.moduleAreasObjects[indexOfNeighbourMap].Filename, xTargetCoordinate, yTargetCoordinate);
                             doTransition = true;
                         }
                         else
                         {
-                            gv.cc.addLogText("red", "Something blocks the path from the other side.");
+                            gv.screenMainMap.StopScrollingOnBlocked();
+                            //gv.cc.addLogText("red", "Something blocks the path from the other side.");
                         }
                     }
                     else
@@ -10534,9 +19700,68 @@ namespace IBx
 
         public void doTransitionBasedOnAreaLocation(string areaFilename, int x, int y)
         {
+
+            adjustSpriteMainMapPositionToMakeItMoveIdependentlyFromPlayer();
+
+            if (gv.mod.currentArea.isOverviewMap)
+            {
+                gv.mod.loadedTileBitmapsNames.Clear();
+                //gv.mod.loadedTileBitmaps.Clear();
+            }
+
+            if (gv.mod.isBreathingWorld)
+            {
+                if (gv.mod.currentArea.northernNeighbourArea == areaFilename || gv.mod.currentArea.easternNeighbourArea == areaFilename || gv.mod.currentArea.westernNeighbourArea == areaFilename || gv.mod.currentArea.southernNeighbourArea == areaFilename)
+                {
+                    doOnEnterAreaUpdate = false;
+                }
+                else
+                {
+                    gv.mod.loadedTileBitmapsNames.Clear();
+                    //gv.mod.loadedTileBitmaps.Clear();
+                    doOnEnterAreaUpdate = true;
+                    foreach (Prop p in gv.mod.currentArea.Props)
+                    {
+                        p.currentWalkingSpeed = 0;
+                        p.showWalkingFrame = false;
+                    }
+
+                    /*
+                    gv.mod.doNotStartScrolling = true;
+                    gv.mod.blockRightKey = false;
+                    gv.mod.blockLeftKey = false;
+                    gv.mod.blockUpKey = false;
+                    gv.mod.blockDownKey = false;
+                    gv.aTimer.Stop();
+                    gv.a2Timer.Stop();
+                    gv.mod.scrollModeSpeed = 1.15f;
+                    */
+                    //gv.mod.scrollingTimer = 100;
+                }
+            }
+            else
+            {
+                doOnEnterAreaUpdate = true;
+                foreach (Prop p in gv.mod.currentArea.Props)
+                {
+                    p.currentWalkingSpeed = 0;
+                    p.showWalkingFrame = false;
+                }
+            }
+
+            gv.mod.doTriggerInspiteOfScrolling = true;
+            gv.cc.floatyText = "";
+            gv.cc.floatyText2 = "";
+            gv.cc.floatyText3 = "";
+            gv.cc.floatyText4 = "";
+            gv.cc.floatyText0 = "";
+            gv.cc.floatyTextA = "";
+            gv.cc.floatyTextB = "";
+
+
             try
             {
-               
+
                 if ((gv.mod.justTransitioned == false) || (gv.mod.allowImmediateRetransition == true))
                 {
                     gv.mod.PlayerLocationX = x;
@@ -10545,24 +19770,14 @@ namespace IBx
                     {
                         gv.mod.allowImmediateRetransition = false;
                     }
-                
+
                     storeCurrentWeatherSettings();
                     gv.mod.justTransitioned = true;
                     gv.mod.justTransitioned2 = true;
                     //}
                     gv.mod.arrivalSquareX = gv.mod.PlayerLocationX;
                     gv.mod.arrivalSquareY = gv.mod.PlayerLocationY;
-                    //TDO: reset light!
-                    //gv.mod.currentArea.Filename = areaFilename;
 
-                    //hmmm, is double (see below, must verify later)
-                    //if (gv.mod.playMusic)
-                    //{
-                    //gv.stopMusic();
-                    //gv.stopAmbient();
-
-
-                    //}
                     bool changeMusic = true;
                     bool changeAmbient = true;
                     foreach (Area a in gv.mod.moduleAreasObjects)
@@ -10581,21 +19796,6 @@ namespace IBx
                         }
                     }
 
-                    /*
-                    if (gv.mod.playMusic)
-                    {
-                        if (changeMusic)
-                        {
-                            gv.startMusic();
-                        }
-                        if (changeAmbient)
-                        {
-                            gv.startAmbient();
-                        }
-                    }
-                    */
-
-                    //areaMusic.controls.pause();
                     Area oldMaster = new Area();
                     oldMaster.Filename = "ignore";
                     if (gv.mod.currentArea.masterOfThisArea == "none")
@@ -10603,17 +19803,20 @@ namespace IBx
                         oldMaster = gv.mod.currentArea;
                     }
 
+
+
                     bool foundArea = gv.mod.setCurrentArea(areaFilename, gv);
+
                     if (!foundArea)
                     {
                         gv.sf.MessageBox("Area: " + areaFilename + " does not exist in the module...check the spelling of the 'area.Filename'");
                         return;
                     }
-                    //gv.mod.setCurrentArea(areaFilename, gv);
+
 
                     if (gv.mod.currentArea.masterOfThisArea == oldMaster.Filename)
                     {
-                        for (int i = 0; i <= gv.mod.currentArea.Tiles.Count-1; i++)
+                        for (int i = 0; i <= gv.mod.currentArea.Tiles.Count - 1; i++)
                         {
                             if (gv.mod.currentArea.Tiles[i].linkedToMasterMap)
                             {
@@ -10633,7 +19836,7 @@ namespace IBx
                             gv.startAmbient();
                         }
                     }
-                    
+
                     if (gv.mod.currentArea.areaWeatherName == "")
                     {
                         //TODO gv.weatherSounds1.controls.pause();
@@ -10669,107 +19872,7 @@ namespace IBx
                     {
                         gv.mod.currentArea.useFullScreenEffectLayer4 = false;
                     }
-                    //karl
-                    //gv.log.AddHtmlTextToLog("<font color='red'>" + areaFilename + "</font>");
-                    //gv.log.AddHtmlTextToLog("<font color='red'>" + gv.mod.currentArea.Filename + "</font>");
 
-
-                    //weather related inserts
-                    /*
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX1 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX2 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX3 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX4 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX5 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX6 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX7 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX8 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX9 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterX10 = 0;
-
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY1 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY2 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY3 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY4 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY5 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY6 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY7 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY8 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY9 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounterY10 = 0;
-
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter1 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter2 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter3 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter4 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter5 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter6 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter7 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter8 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter9 = 0;
-                    gv.mod.currentArea.fullScreenAnimationFrameCounter10 = 0;
-
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive1 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive2 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive3 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive4 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive5 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive6 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive7 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive8 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive9 = true;
-                    gv.mod.currentArea.fullScreenEffectLayerIsActive10 = true;
-                    */
-
-                    //new ideas
-                    /*
-                    gv.mod.currentArea.numberOfCyclesPerOccurence1 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence2 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence3 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence4 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence5 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence6 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence7 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence8 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence9 = 0;
-                    gv.mod.currentArea.numberOfCyclesPerOccurence10 = 0;
-
-                    gv.mod.currentArea.cycleCounter1 = 0;
-                    gv.mod.currentArea.cycleCounter2 = 0;
-                    gv.mod.currentArea.cycleCounter3 = 0;
-                    gv.mod.currentArea.cycleCounter4 = 0;
-                    gv.mod.currentArea.cycleCounter5 = 0;
-                    gv.mod.currentArea.cycleCounter6 = 0;
-                    gv.mod.currentArea.cycleCounter7 = 0;
-                    gv.mod.currentArea.cycleCounter8 = 0;
-                    gv.mod.currentArea.cycleCounter9 = 0;
-                    gv.mod.currentArea.cycleCounter10 = 0;
-
-                    gv.mod.currentArea.changeCounter1 = 0;
-                    gv.mod.currentArea.changeCounter2 = 0;
-                    gv.mod.currentArea.changeCounter3 = 0;
-                    gv.mod.currentArea.changeCounter4 = 0;
-                    gv.mod.currentArea.changeCounter5 = 0;
-                    gv.mod.currentArea.changeCounter6 = 0;
-                    gv.mod.currentArea.changeCounter7 = 0;
-                    gv.mod.currentArea.changeCounter8 = 0;
-                    gv.mod.currentArea.changeCounter9 = 0;
-                    gv.mod.currentArea.changeCounter10 = 0;
-
-                    gv.mod.currentArea.changeFrameCounter1 = 1;
-                    gv.mod.currentArea.changeFrameCounter2 = 1;
-                    gv.mod.currentArea.changeFrameCounter3 = 1;
-                    gv.mod.currentArea.changeFrameCounter4 = 1;
-                    gv.mod.currentArea.changeFrameCounter5 = 1;
-                    gv.mod.currentArea.changeFrameCounter6 = 1;
-                    gv.mod.currentArea.changeFrameCounter7 = 1;
-                    gv.mod.currentArea.changeFrameCounter8 = 1;
-                    gv.mod.currentArea.changeFrameCounter9 = 1;
-                    gv.mod.currentArea.changeFrameCounter10 = 1;
-                    */
-
-                    //try to keep weather consistency intact
-                    //gv.mod.currentWeatherName = "";
 
                     //end of new ideas
                     doChannelScripts();
@@ -10777,150 +19880,153 @@ namespace IBx
 
                     gv.screenMainMap.resetMiniMapBitmap();
 
-                    doOnEnterAreaUpdate = true;
-                    doPropMoves();
+                    //if (gv.mod.useAllTileSystem)
+                    gv.screenMainMap.setExplored();
+                    gv.screenMainMap.setExploredForConnectedDiscoveryTriggers();
+
+                    //doOnEnterAreaUpdate = true;
+                    if (!gv.mod.isBreathingWorld)
+                    {
+                        doPropMoves();
+                    }
+                    else
+                    {
+                        doPropMovesNearby();
+                        gv.mod.allowImmediateRetransition = true;
+                    }
                     doOnEnterAreaUpdate = false;
                     //if (gv.mod.playMusic)
                     //{
-                        //gv.startMusic();
-                        //gv.startAmbient();
+                    //gv.startMusic();
+                    //gv.startAmbient();
                     //}
                     gv.triggerIndex = 0;
                     doTrigger();
                 }
+
+                if (gv.mod.currentArea.isOverviewMap)
+                {
+                    gv.mod.loadedTileBitmapsNames.Clear();
+                    //gv.mod.loadedTileBitmaps.Clear();
+                    foreach (Tile t in gv.mod.currentArea.Tiles)
+                    {
+                        t.Visible = true;
+                    }
+                }
             }
             catch (Exception ex)
             {
+                gv.sf.MessageBox("Karl Error 119End");
                 gv.errorLog(ex.ToString());
             }
 
-            //for testing sprites (temporary disable)
-            //createSpritesForTesting();
 
-            /*
-            try
-            {
-                if (gv.mod.loadedTileBitmaps != null)
-                {
-                    foreach (SharpDX.Direct2D1.Bitmap bm in gv.mod.loadedTileBitmaps)
-                    {
-                        bm.Dispose();
-                    }
-                }
-
-                //these two lists keep an exact order so each bitmap stored in one corrsponds with a name in the other
-
-                gv.mod.loadedTileBitmaps.Clear();
-                gv.mod.loadedTileBitmapsNames.Clear();
-            }
-            catch { }
-            */
         }
 
         public void storeCurrentWeatherSettings()
         {
 
-        gv.mod.overrideDelayCounter1 = gv.mod.currentArea.overrideDelayCounter1;
-        gv.mod.cycleCounter1 = gv.mod.currentArea.cycleCounter1;
-        gv.mod.fullScreenAnimationFrameCounter1 = gv.mod.currentArea.fullScreenAnimationFrameCounter1;
-        gv.mod.changeCounter1 = gv.mod.currentArea.changeCounter1;
-        gv.mod.changeFrameCounter1 = gv.mod.currentArea.changeFrameCounter1;
-        gv.mod.fullScreenAnimationSpeedX1 = gv.mod.currentArea.fullScreenAnimationSpeedX1; 
-        gv.mod.fullScreenAnimationSpeedY1 = gv.mod.currentArea.fullScreenAnimationSpeedY1;
-        gv.mod.fullScreenAnimationFrameCounterX1 = gv.mod.currentArea.fullScreenAnimationFrameCounterX1;
-        gv.mod.fullScreenAnimationFrameCounterY1 = gv.mod.currentArea.fullScreenAnimationFrameCounterY1;
+            gv.mod.overrideDelayCounter1 = gv.mod.currentArea.overrideDelayCounter1;
+            gv.mod.cycleCounter1 = gv.mod.currentArea.cycleCounter1;
+            gv.mod.fullScreenAnimationFrameCounter1 = gv.mod.currentArea.fullScreenAnimationFrameCounter1;
+            gv.mod.changeCounter1 = gv.mod.currentArea.changeCounter1;
+            gv.mod.changeFrameCounter1 = gv.mod.currentArea.changeFrameCounter1;
+            gv.mod.fullScreenAnimationSpeedX1 = gv.mod.currentArea.fullScreenAnimationSpeedX1;
+            gv.mod.fullScreenAnimationSpeedY1 = gv.mod.currentArea.fullScreenAnimationSpeedY1;
+            gv.mod.fullScreenAnimationFrameCounterX1 = gv.mod.currentArea.fullScreenAnimationFrameCounterX1;
+            gv.mod.fullScreenAnimationFrameCounterY1 = gv.mod.currentArea.fullScreenAnimationFrameCounterY1;
 
-        gv.mod.overrideDelayCounter2 = gv.mod.currentArea.overrideDelayCounter2;
-        gv.mod.cycleCounter2 = gv.mod.currentArea.cycleCounter2;
-        gv.mod.fullScreenAnimationFrameCounter2 = gv.mod.currentArea.fullScreenAnimationFrameCounter2;
-        gv.mod.changeCounter2 = gv.mod.currentArea.changeCounter2;
-        gv.mod.changeFrameCounter2 = gv.mod.currentArea.changeFrameCounter2;
-        gv.mod.fullScreenAnimationSpeedX2 = gv.mod.currentArea.fullScreenAnimationSpeedX2;
-        gv.mod.fullScreenAnimationSpeedY2 = gv.mod.currentArea.fullScreenAnimationSpeedY2;
-        gv.mod.fullScreenAnimationFrameCounterX2 = gv.mod.currentArea.fullScreenAnimationFrameCounterX2;
-        gv.mod.fullScreenAnimationFrameCounterY2 = gv.mod.currentArea.fullScreenAnimationFrameCounterY2;
-        
-        gv.mod.overrideDelayCounter3 = gv.mod.currentArea.overrideDelayCounter3;
-        gv.mod.cycleCounter3 = gv.mod.currentArea.cycleCounter3;
-        gv.mod.fullScreenAnimationFrameCounter3 = gv.mod.currentArea.fullScreenAnimationFrameCounter3;
-        gv.mod.changeCounter3 = gv.mod.currentArea.changeCounter3;
-        gv.mod.changeFrameCounter3 = gv.mod.currentArea.changeFrameCounter3;
-        gv.mod.fullScreenAnimationSpeedX3 = gv.mod.currentArea.fullScreenAnimationSpeedX3;
-        gv.mod.fullScreenAnimationSpeedY3 = gv.mod.currentArea.fullScreenAnimationSpeedY3;
-        gv.mod.fullScreenAnimationFrameCounterX3 = gv.mod.currentArea.fullScreenAnimationFrameCounterX3;
-        gv.mod.fullScreenAnimationFrameCounterY3 = gv.mod.currentArea.fullScreenAnimationFrameCounterY3;
+            gv.mod.overrideDelayCounter2 = gv.mod.currentArea.overrideDelayCounter2;
+            gv.mod.cycleCounter2 = gv.mod.currentArea.cycleCounter2;
+            gv.mod.fullScreenAnimationFrameCounter2 = gv.mod.currentArea.fullScreenAnimationFrameCounter2;
+            gv.mod.changeCounter2 = gv.mod.currentArea.changeCounter2;
+            gv.mod.changeFrameCounter2 = gv.mod.currentArea.changeFrameCounter2;
+            gv.mod.fullScreenAnimationSpeedX2 = gv.mod.currentArea.fullScreenAnimationSpeedX2;
+            gv.mod.fullScreenAnimationSpeedY2 = gv.mod.currentArea.fullScreenAnimationSpeedY2;
+            gv.mod.fullScreenAnimationFrameCounterX2 = gv.mod.currentArea.fullScreenAnimationFrameCounterX2;
+            gv.mod.fullScreenAnimationFrameCounterY2 = gv.mod.currentArea.fullScreenAnimationFrameCounterY2;
 
-        gv.mod.overrideDelayCounter4 = gv.mod.currentArea.overrideDelayCounter4;
-        gv.mod.cycleCounter4 = gv.mod.currentArea.cycleCounter4;
-        gv.mod.fullScreenAnimationFrameCounter4 = gv.mod.currentArea.fullScreenAnimationFrameCounter4;
-        gv.mod.changeCounter4 = gv.mod.currentArea.changeCounter4;
-        gv.mod.changeFrameCounter4 = gv.mod.currentArea.changeFrameCounter4;
-        gv.mod.fullScreenAnimationSpeedX4 = gv.mod.currentArea.fullScreenAnimationSpeedX4;
-        gv.mod.fullScreenAnimationSpeedY4 = gv.mod.currentArea.fullScreenAnimationSpeedY4;
-        gv.mod.fullScreenAnimationFrameCounterX4 = gv.mod.currentArea.fullScreenAnimationFrameCounterX4;
-        gv.mod.fullScreenAnimationFrameCounterY4 = gv.mod.currentArea.fullScreenAnimationFrameCounterY4;
+            gv.mod.overrideDelayCounter3 = gv.mod.currentArea.overrideDelayCounter3;
+            gv.mod.cycleCounter3 = gv.mod.currentArea.cycleCounter3;
+            gv.mod.fullScreenAnimationFrameCounter3 = gv.mod.currentArea.fullScreenAnimationFrameCounter3;
+            gv.mod.changeCounter3 = gv.mod.currentArea.changeCounter3;
+            gv.mod.changeFrameCounter3 = gv.mod.currentArea.changeFrameCounter3;
+            gv.mod.fullScreenAnimationSpeedX3 = gv.mod.currentArea.fullScreenAnimationSpeedX3;
+            gv.mod.fullScreenAnimationSpeedY3 = gv.mod.currentArea.fullScreenAnimationSpeedY3;
+            gv.mod.fullScreenAnimationFrameCounterX3 = gv.mod.currentArea.fullScreenAnimationFrameCounterX3;
+            gv.mod.fullScreenAnimationFrameCounterY3 = gv.mod.currentArea.fullScreenAnimationFrameCounterY3;
 
-        gv.mod.overrideDelayCounter5 = gv.mod.currentArea.overrideDelayCounter5;
-        gv.mod.cycleCounter5 = gv.mod.currentArea.cycleCounter5;
-        gv.mod.fullScreenAnimationFrameCounter5 = gv.mod.currentArea.fullScreenAnimationFrameCounter5;
-        gv.mod.changeCounter5 = gv.mod.currentArea.changeCounter5;
-        gv.mod.changeFrameCounter5 = gv.mod.currentArea.changeFrameCounter5;
-        gv.mod.fullScreenAnimationSpeedX5 = gv.mod.currentArea.fullScreenAnimationSpeedX5;
-        gv.mod.fullScreenAnimationSpeedY5 = gv.mod.currentArea.fullScreenAnimationSpeedY5;
-        gv.mod.fullScreenAnimationFrameCounterX5 = gv.mod.currentArea.fullScreenAnimationFrameCounterX5;
-        gv.mod.fullScreenAnimationFrameCounterY5 = gv.mod.currentArea.fullScreenAnimationFrameCounterY5;
+            gv.mod.overrideDelayCounter4 = gv.mod.currentArea.overrideDelayCounter4;
+            gv.mod.cycleCounter4 = gv.mod.currentArea.cycleCounter4;
+            gv.mod.fullScreenAnimationFrameCounter4 = gv.mod.currentArea.fullScreenAnimationFrameCounter4;
+            gv.mod.changeCounter4 = gv.mod.currentArea.changeCounter4;
+            gv.mod.changeFrameCounter4 = gv.mod.currentArea.changeFrameCounter4;
+            gv.mod.fullScreenAnimationSpeedX4 = gv.mod.currentArea.fullScreenAnimationSpeedX4;
+            gv.mod.fullScreenAnimationSpeedY4 = gv.mod.currentArea.fullScreenAnimationSpeedY4;
+            gv.mod.fullScreenAnimationFrameCounterX4 = gv.mod.currentArea.fullScreenAnimationFrameCounterX4;
+            gv.mod.fullScreenAnimationFrameCounterY4 = gv.mod.currentArea.fullScreenAnimationFrameCounterY4;
 
-        gv.mod.overrideDelayCounter6 = gv.mod.currentArea.overrideDelayCounter6;
-        gv.mod.cycleCounter6 = gv.mod.currentArea.cycleCounter6;
-        gv.mod.fullScreenAnimationFrameCounter6 = gv.mod.currentArea.fullScreenAnimationFrameCounter6;
-        gv.mod.changeCounter6 = gv.mod.currentArea.changeCounter6;
-        gv.mod.changeFrameCounter6 = gv.mod.currentArea.changeFrameCounter6;
-        gv.mod.fullScreenAnimationSpeedX6 = gv.mod.currentArea.fullScreenAnimationSpeedX6;
-        gv.mod.fullScreenAnimationSpeedY6 = gv.mod.currentArea.fullScreenAnimationSpeedY6;
-        gv.mod.fullScreenAnimationFrameCounterX6 = gv.mod.currentArea.fullScreenAnimationFrameCounterX6;
-        gv.mod.fullScreenAnimationFrameCounterY6 = gv.mod.currentArea.fullScreenAnimationFrameCounterY6;
+            gv.mod.overrideDelayCounter5 = gv.mod.currentArea.overrideDelayCounter5;
+            gv.mod.cycleCounter5 = gv.mod.currentArea.cycleCounter5;
+            gv.mod.fullScreenAnimationFrameCounter5 = gv.mod.currentArea.fullScreenAnimationFrameCounter5;
+            gv.mod.changeCounter5 = gv.mod.currentArea.changeCounter5;
+            gv.mod.changeFrameCounter5 = gv.mod.currentArea.changeFrameCounter5;
+            gv.mod.fullScreenAnimationSpeedX5 = gv.mod.currentArea.fullScreenAnimationSpeedX5;
+            gv.mod.fullScreenAnimationSpeedY5 = gv.mod.currentArea.fullScreenAnimationSpeedY5;
+            gv.mod.fullScreenAnimationFrameCounterX5 = gv.mod.currentArea.fullScreenAnimationFrameCounterX5;
+            gv.mod.fullScreenAnimationFrameCounterY5 = gv.mod.currentArea.fullScreenAnimationFrameCounterY5;
 
-        gv.mod.overrideDelayCounter7 = gv.mod.currentArea.overrideDelayCounter7;
-        gv.mod.cycleCounter7 = gv.mod.currentArea.cycleCounter7;
-        gv.mod.fullScreenAnimationFrameCounter7 = gv.mod.currentArea.fullScreenAnimationFrameCounter7;
-        gv.mod.changeCounter7 = gv.mod.currentArea.changeCounter7;
-        gv.mod.changeFrameCounter7 = gv.mod.currentArea.changeFrameCounter7;
-        gv.mod.fullScreenAnimationSpeedX7 = gv.mod.currentArea.fullScreenAnimationSpeedX7;
-        gv.mod.fullScreenAnimationSpeedY7 = gv.mod.currentArea.fullScreenAnimationSpeedY7;
-        gv.mod.fullScreenAnimationFrameCounterX7 = gv.mod.currentArea.fullScreenAnimationFrameCounterX7;
-        gv.mod.fullScreenAnimationFrameCounterY7 = gv.mod.currentArea.fullScreenAnimationFrameCounterY7;
+            gv.mod.overrideDelayCounter6 = gv.mod.currentArea.overrideDelayCounter6;
+            gv.mod.cycleCounter6 = gv.mod.currentArea.cycleCounter6;
+            gv.mod.fullScreenAnimationFrameCounter6 = gv.mod.currentArea.fullScreenAnimationFrameCounter6;
+            gv.mod.changeCounter6 = gv.mod.currentArea.changeCounter6;
+            gv.mod.changeFrameCounter6 = gv.mod.currentArea.changeFrameCounter6;
+            gv.mod.fullScreenAnimationSpeedX6 = gv.mod.currentArea.fullScreenAnimationSpeedX6;
+            gv.mod.fullScreenAnimationSpeedY6 = gv.mod.currentArea.fullScreenAnimationSpeedY6;
+            gv.mod.fullScreenAnimationFrameCounterX6 = gv.mod.currentArea.fullScreenAnimationFrameCounterX6;
+            gv.mod.fullScreenAnimationFrameCounterY6 = gv.mod.currentArea.fullScreenAnimationFrameCounterY6;
 
-        gv.mod.overrideDelayCounter8 = gv.mod.currentArea.overrideDelayCounter8;
-        gv.mod.cycleCounter8 = gv.mod.currentArea.cycleCounter8;
-        gv.mod.fullScreenAnimationFrameCounter8 = gv.mod.currentArea.fullScreenAnimationFrameCounter8;
-        gv.mod.changeCounter8 = gv.mod.currentArea.changeCounter8;
-        gv.mod.changeFrameCounter8 = gv.mod.currentArea.changeFrameCounter8;
-        gv.mod.fullScreenAnimationSpeedX8 = gv.mod.currentArea.fullScreenAnimationSpeedX8;
-        gv.mod.fullScreenAnimationSpeedY8 = gv.mod.currentArea.fullScreenAnimationSpeedY8;
-        gv.mod.fullScreenAnimationFrameCounterX8 = gv.mod.currentArea.fullScreenAnimationFrameCounterX8;
-        gv.mod.fullScreenAnimationFrameCounterY8 = gv.mod.currentArea.fullScreenAnimationFrameCounterY8;
+            gv.mod.overrideDelayCounter7 = gv.mod.currentArea.overrideDelayCounter7;
+            gv.mod.cycleCounter7 = gv.mod.currentArea.cycleCounter7;
+            gv.mod.fullScreenAnimationFrameCounter7 = gv.mod.currentArea.fullScreenAnimationFrameCounter7;
+            gv.mod.changeCounter7 = gv.mod.currentArea.changeCounter7;
+            gv.mod.changeFrameCounter7 = gv.mod.currentArea.changeFrameCounter7;
+            gv.mod.fullScreenAnimationSpeedX7 = gv.mod.currentArea.fullScreenAnimationSpeedX7;
+            gv.mod.fullScreenAnimationSpeedY7 = gv.mod.currentArea.fullScreenAnimationSpeedY7;
+            gv.mod.fullScreenAnimationFrameCounterX7 = gv.mod.currentArea.fullScreenAnimationFrameCounterX7;
+            gv.mod.fullScreenAnimationFrameCounterY7 = gv.mod.currentArea.fullScreenAnimationFrameCounterY7;
 
-        gv.mod.overrideDelayCounter9 = gv.mod.currentArea.overrideDelayCounter9;
-        gv.mod.cycleCounter9 = gv.mod.currentArea.cycleCounter9;
-        gv.mod.fullScreenAnimationFrameCounter9 = gv.mod.currentArea.fullScreenAnimationFrameCounter9;
-        gv.mod.changeCounter9 = gv.mod.currentArea.changeCounter9;
-        gv.mod.changeFrameCounter9 = gv.mod.currentArea.changeFrameCounter9;
-        gv.mod.fullScreenAnimationSpeedX9 = gv.mod.currentArea.fullScreenAnimationSpeedX9;
-        gv.mod.fullScreenAnimationSpeedY9 = gv.mod.currentArea.fullScreenAnimationSpeedY9;
-        gv.mod.fullScreenAnimationFrameCounterX9 = gv.mod.currentArea.fullScreenAnimationFrameCounterX9;
-        gv.mod.fullScreenAnimationFrameCounterY9 = gv.mod.currentArea.fullScreenAnimationFrameCounterY9;
+            gv.mod.overrideDelayCounter8 = gv.mod.currentArea.overrideDelayCounter8;
+            gv.mod.cycleCounter8 = gv.mod.currentArea.cycleCounter8;
+            gv.mod.fullScreenAnimationFrameCounter8 = gv.mod.currentArea.fullScreenAnimationFrameCounter8;
+            gv.mod.changeCounter8 = gv.mod.currentArea.changeCounter8;
+            gv.mod.changeFrameCounter8 = gv.mod.currentArea.changeFrameCounter8;
+            gv.mod.fullScreenAnimationSpeedX8 = gv.mod.currentArea.fullScreenAnimationSpeedX8;
+            gv.mod.fullScreenAnimationSpeedY8 = gv.mod.currentArea.fullScreenAnimationSpeedY8;
+            gv.mod.fullScreenAnimationFrameCounterX8 = gv.mod.currentArea.fullScreenAnimationFrameCounterX8;
+            gv.mod.fullScreenAnimationFrameCounterY8 = gv.mod.currentArea.fullScreenAnimationFrameCounterY8;
 
-        gv.mod.overrideDelayCounter10 = gv.mod.currentArea.overrideDelayCounter10;
-        gv.mod.cycleCounter10 = gv.mod.currentArea.cycleCounter10;
-        gv.mod.fullScreenAnimationFrameCounter10 = gv.mod.currentArea.fullScreenAnimationFrameCounter10;
-        gv.mod.changeCounter10 = gv.mod.currentArea.changeCounter10;
-        gv.mod.changeFrameCounter10 = gv.mod.currentArea.changeFrameCounter10;
-        gv.mod.fullScreenAnimationSpeedX10 = gv.mod.currentArea.fullScreenAnimationSpeedX10;
-        gv.mod.fullScreenAnimationSpeedY10 = gv.mod.currentArea.fullScreenAnimationSpeedY10;
-        gv.mod.fullScreenAnimationFrameCounterX10 = gv.mod.currentArea.fullScreenAnimationFrameCounterX10;
-        gv.mod.fullScreenAnimationFrameCounterY10 = gv.mod.currentArea.fullScreenAnimationFrameCounterY10;
+            gv.mod.overrideDelayCounter9 = gv.mod.currentArea.overrideDelayCounter9;
+            gv.mod.cycleCounter9 = gv.mod.currentArea.cycleCounter9;
+            gv.mod.fullScreenAnimationFrameCounter9 = gv.mod.currentArea.fullScreenAnimationFrameCounter9;
+            gv.mod.changeCounter9 = gv.mod.currentArea.changeCounter9;
+            gv.mod.changeFrameCounter9 = gv.mod.currentArea.changeFrameCounter9;
+            gv.mod.fullScreenAnimationSpeedX9 = gv.mod.currentArea.fullScreenAnimationSpeedX9;
+            gv.mod.fullScreenAnimationSpeedY9 = gv.mod.currentArea.fullScreenAnimationSpeedY9;
+            gv.mod.fullScreenAnimationFrameCounterX9 = gv.mod.currentArea.fullScreenAnimationFrameCounterX9;
+            gv.mod.fullScreenAnimationFrameCounterY9 = gv.mod.currentArea.fullScreenAnimationFrameCounterY9;
 
-      
+            gv.mod.overrideDelayCounter10 = gv.mod.currentArea.overrideDelayCounter10;
+            gv.mod.cycleCounter10 = gv.mod.currentArea.cycleCounter10;
+            gv.mod.fullScreenAnimationFrameCounter10 = gv.mod.currentArea.fullScreenAnimationFrameCounter10;
+            gv.mod.changeCounter10 = gv.mod.currentArea.changeCounter10;
+            gv.mod.changeFrameCounter10 = gv.mod.currentArea.changeFrameCounter10;
+            gv.mod.fullScreenAnimationSpeedX10 = gv.mod.currentArea.fullScreenAnimationSpeedX10;
+            gv.mod.fullScreenAnimationSpeedY10 = gv.mod.currentArea.fullScreenAnimationSpeedY10;
+            gv.mod.fullScreenAnimationFrameCounterX10 = gv.mod.currentArea.fullScreenAnimationFrameCounterX10;
+            gv.mod.fullScreenAnimationFrameCounterY10 = gv.mod.currentArea.fullScreenAnimationFrameCounterY10;
+
+
         }
 
         public void doItemScriptBasedOnUseItem(Player pc, ItemRefs itRef, bool destroyItemAfterUse)
@@ -10949,7 +20055,7 @@ namespace IBx
             }
             //if ((foundScript) && (destroyItemAfterUse))
             //{
-                //gv.sf.RemoveItemFromInventory(itRef, 1);
+            //gv.sf.RemoveItemFromInventory(itRef, 1);
             //}
         }
 
@@ -10960,7 +20066,7 @@ namespace IBx
             {
                 Sprite spr = new Sprite(gv, "hit_symbol", gv.sf.RandInt(1000), gv.sf.RandInt(1000), (float)(gv.sf.RandInt(100) + 1) / 1000f, (float)(gv.sf.RandInt(100) + 1) / 1000f, 0, (float)(gv.sf.RandInt(100) + 1) / 10000f, 1.0f, gv.sf.RandInt(10000) + 3000, false, 100);
                 gv.screenMainMap.spriteList.Add(spr);
-            }            
+            }
         }
 
         public void createRain(string density)
@@ -10980,16 +20086,54 @@ namespace IBx
                 {
                     rainChance = gv.sf.RandInt(20) + 15;
                 }
-
-                float storedIncrement = 0;
-                for (int i = 1; i < 61; i++)
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXX
+                /*
+                if (gv.mod.isInitialParticleWave && !gv.mod.isFoggy)
                 {
-                    float increment = gv.screenWidth / 60;
-                    storedIncrement += increment;
-                    if (gv.sf.RandInt(100) < rainChance)
+                    float storedIncrement = 0;
+                    float storedIncrementVert = 0;
+                    int lifeTimeReduction = 0;
+                    for (int h = 1; h < 66; h++)
                     {
-                        Sprite spr = new Sprite(gv, "rainDrop", storedIncrement - (gv.squareSize/2), -(float)(gv.sf.RandInt(10)), (float)(gv.sf.RandInt(5) + 35) / 650f, (float)(gv.sf.RandInt(80) + 170) / 500f, 0, 0, 0.18f* 0.65f, 0.335f * 0.73f, gv.sf.RandInt(10000) + 6000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "rain", false, 0);
-                        gv.screenMainMap.spriteList.Add(spr);
+                        float incrementVert = gv.screenHeight / 60;
+                        storedIncrementVert += incrementVert;
+                        storedIncrement = 0;
+                        lifeTimeReduction += 133;
+
+                        for (int i = 1; i < 66; i++)
+                        {
+                            float increment = gv.screenWidth / 60;
+                            storedIncrement += increment;
+
+                            //float incrementVert = gv.screenHeight / 60;
+                            //storedIncrementVert += incrementVert;
+
+                            if (gv.sf.RandInt(100) < rainChance)
+                            {
+                                //int scaleMulti = gv.sf.RandInt(50) + 75;
+                                Sprite spr = new Sprite(gv, "rainDrop", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)) + storedIncrementVert, (float)(gv.sf.RandInt(5) + 35) / 650f, (float)(gv.sf.RandInt(80) + 170) / 500f, 0, 0, 0.18f * 0.649f*1.05f, 0.335f * 0.73f*2.0f, gv.sf.RandInt(10000) + 6000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "rain", false, 0);
+                                //spr.movesIndependentlyFromPlayerPosition = false;
+                                gv.screenMainMap.spriteList.Add(spr);
+                            }
+                        }
+                    }
+                }
+                
+                //XXXXXXXXXXXXXXXXXXXXXXXxxx
+
+                else
+                */
+                {
+                    float storedIncrement = -20 * (gv.screenWidth / 60);
+                    for (int i = -20; i < 81; i++)
+                    {
+                        float increment = gv.screenWidth / 60;
+                        storedIncrement += increment;
+                        if (gv.sf.RandInt(100) < rainChance)
+                        {
+                            Sprite spr = new Sprite(gv, "rainDrop", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)), (float)(gv.sf.RandInt(5) + 35) / 650f, (float)(gv.sf.RandInt(80) + 170) / 500f, 0, 0, 0.18f * 0.649f * 1.05f, 0.335f * 0.73f * 2.0f, gv.sf.RandInt(10000) + 6000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "rain", false, 0);
+                            gv.screenMainMap.spriteList.Add(spr);
+                        }
                     }
                 }
             }
@@ -11002,27 +20146,73 @@ namespace IBx
                 float snowChance = 0;
                 if (density == "lightSnow")
                 {
-                    snowChance = gv.sf.RandInt(5) + 7;
+                    snowChance = gv.sf.RandInt(5) + 3;
                 }
                 else if (density == "heavySnow")
                 {
-                    snowChance = gv.sf.RandInt(30) + 15;
+                    snowChance = gv.sf.RandInt(11) + 7;
                 }
                 else if (density == "snow")
                 {
-                    snowChance = gv.sf.RandInt(12) + 7;
+                    snowChance = gv.sf.RandInt(8) + 5;
                 }
 
-                float storedIncrement = 0;
-                for (int i = 1; i < 61; i++)
+                //snowshift
+                /*
+                if (gv.mod.isInitialParticleWave && !gv.mod.isFoggy)
                 {
-                    float increment = gv.screenWidth / 60;
-                    storedIncrement += increment;
-                    if (gv.sf.RandInt(100) < snowChance)
+                    float storedIncrement = 0;
+                    float storedIncrementVert = 0;
+                    int lifeTimeReduction = 0;
+                    for (int h = 1; h < 66; h++)
                     {
-                        int scaleMulti = gv.sf.RandInt(50) + 75;
-                        Sprite spr = new Sprite(gv, "snowFlake", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)), 0, (float)(gv.sf.RandInt(80) + 170) / 6000f, 0, 0, 0.425f * scaleMulti/100f, 0.425f * scaleMulti/100f, gv.sf.RandInt(10000) + 15000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "snow", false, 0);
-                        gv.screenMainMap.spriteList.Add(spr);
+                        float incrementVert = gv.screenHeight / 60;
+                        storedIncrementVert += incrementVert;
+                        storedIncrement = 0;
+                        lifeTimeReduction += 400;
+
+                        for (int i = 1; i < 66; i++)
+                        {
+                            float increment = gv.screenWidth / 60;
+                            storedIncrement += increment;
+
+                            //float incrementVert = gv.screenHeight / 60;
+                            //storedIncrementVert += incrementVert;
+
+                            if (gv.sf.RandInt(100) < snowChance)
+                            {
+                                int scaleMulti = gv.sf.RandInt(50) + 75;
+                                Sprite spr = new Sprite(gv, "snowFlake", storedIncrement - (gv.squareSize * 0.5f), -(float)(gv.sf.RandInt(10)) - gv.oYshift * 2 + storedIncrementVert, 0, (float)(gv.sf.RandInt(80) + 170) / 6000f, 0, 0, 0.325f * scaleMulti / 100f, 0.325f * scaleMulti / 100f, gv.sf.RandInt(10000) + 20000 - lifeTimeReduction, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "snow", false, 0);
+                                //spr.movesIndependentlyFromPlayerPosition = false;
+                                gv.screenMainMap.spriteList.Add(spr);
+                            }
+                        }
+                    }
+                }
+                else
+                */
+                {
+                    //ie just 1
+                    for (int h = 0; h < 1; h++)
+                    {
+                        float storedIncrement = -90 * (gv.screenWidth / 60);
+                        //float storedIncrement = -90 * (gv.screenWidth / 60);
+                        //1 and 66
+                        for (int i = 0; i < 160; i++)
+                        //for (int i = -91; i < 136; i++)
+                        {
+                            float increment = gv.screenWidth / 40;
+                            //float increment = gv.screenWidth / 60;
+                            storedIncrement += increment;
+                            if (gv.sf.RandInt(100) < snowChance)
+                            {
+                                int scaleMulti = gv.sf.RandInt(50) + 75;
+                                Sprite spr = new Sprite(gv, "snowFlake", storedIncrement - (gv.squareSize * 0.5f), -(float)(gv.sf.RandInt(10)) - gv.oYshift * 2 + (h * (gv.screenHeight + gv.squareSize)), 0, (float)(gv.sf.RandInt(80) + 170) / 6000f, 0, 0, 0.325f * scaleMulti / 100f, 0.325f * scaleMulti / 100f, gv.sf.RandInt(10000) + 20000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "snow", false, 0);
+                                //calli
+                                //spr.movesIndependentlyFromPlayerPosition = true;
+                                gv.screenMainMap.spriteList.Add(spr);
+                            }
+                        }
                     }
                 }
             }
@@ -11055,10 +20245,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", -(float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", -(float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11071,10 +20264,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), gv.screenHeight + (float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), gv.screenHeight + (float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11088,10 +20284,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", gv.screenWidth + (float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", gv.screenWidth + (float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11104,10 +20303,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), gv.screenHeight + (float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), gv.screenHeight + (float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11122,10 +20324,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", gv.screenWidth + (float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", gv.screenWidth + (float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11138,10 +20343,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11155,10 +20363,13 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", -(float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            //(float)(gv.sf.RandInt(80) + 170) / 600f
+                            Sprite spr = new Sprite(gv, "sandGrain", -(float)(gv.sf.RandInt(10)), storedIncrement - (gv.squareSize / 2), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11171,10 +20382,12 @@ namespace IBx
                         storedIncrement += increment;
                         if (gv.sf.RandInt(100) < sandstormChance)
                         {
-                            int scaleMulti = gv.sf.RandInt(50) + 75;
-                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 100f;
+                            //without +50
+                            int scaleMulti = gv.sf.RandInt(50) + 75 + 35;
+                            //divided by 100f
+                            float thisParticleSpeed = (75f + gv.sf.RandInt(50)) / 120f;
                             //(float)(gv.sf.RandInt(80) + 170) / 600f
-                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti/100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
+                            Sprite spr = new Sprite(gv, "sandGrain", storedIncrement - (gv.squareSize / 2), -(float)(gv.sf.RandInt(10)), thisParticleSpeed * gv.mod.sandStormDirectionX, thisParticleSpeed * gv.mod.sandStormDirectionY, 0, 0, 0.235f * scaleMulti / 100f, 0.235f * scaleMulti / 100f, 4000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "sandstorm", false, 0);
                             gv.screenMainMap.spriteList.Add(spr);
                         }
                     }
@@ -11185,21 +20398,21 @@ namespace IBx
             }
         }
 
-        public void createClouds(string cloudType, float speedMultiplier, float positionModifierX, float positionModifierY)
+        public void createClouds(string cloudType, float speedMultiplier, float positionModifierX, float positionModifierY, int mass, float angle)
         {
-                float veloX = 0;
-                float veloY = 0;
+            float veloX = 0;
+            float veloY = 0;
 
             if (gv.mod.windDirection.Contains("North"))
-                {
-                    veloX = 0;
-                    veloY = -1f / 50f;
-                }
-                if (gv.mod.windDirection.Contains("South"))
-                {
-                    veloX = 0;
-                    veloY = 1f / 50f;
-                }
+            {
+                veloX = 0;
+                veloY = -1f / 50f;
+            }
+            if (gv.mod.windDirection.Contains("South"))
+            {
+                veloX = 0;
+                veloY = 1f / 50f;
+            }
             if (gv.mod.windDirection.Contains("East"))
             {
                 veloX = 1f / 50f;
@@ -11223,7 +20436,7 @@ namespace IBx
             if (gv.mod.windDirection.Contains("SE"))
             {
                 veloX = 1f / 50f;
-                veloY = 1f / 50f; 
+                veloY = 1f / 50f;
             }
             if (gv.mod.windDirection.Contains("NW"))
             {
@@ -11231,14 +20444,14 @@ namespace IBx
                 veloY = -1f / 50f;
             }
 
-            Sprite spr = new Sprite(gv, cloudType, gv.screenWidth/2 - gv.screenHeight/2 + positionModifierX, gv.screenHeight/2 - gv.screenHeight/2 + positionModifierY, veloX * speedMultiplier, veloY * speedMultiplier, 0, 0, gv.sf.RandInt(60)/10f + 7.5f, gv.sf.RandInt(60)/10f + 7.5f, gv.sf.RandInt(80000) + 48000, false, 100,gv.mod.fullScreenEffectOpacityWeather,0,"clouds",true,0);
-            gv.screenMainMap.spriteList.Add(spr);   
+            Sprite spr = new Sprite(gv, cloudType, gv.screenWidth / 2 - gv.screenHeight / 2 + positionModifierX, gv.screenHeight / 2 - gv.screenHeight / 2 + positionModifierY, veloX * speedMultiplier, veloY * speedMultiplier, angle, 0, (gv.sf.RandInt(60) / 10f + 7.5f) / 1.5f, (gv.sf.RandInt(60) / 10f + 7.5f) / 1.5f, gv.sf.RandInt(80000) + 48000, false, 100, gv.mod.fullScreenEffectOpacityWeather * 1.5f, mass, "clouds", true, 0);
+            gv.screenMainMap.spriteList.Add(spr);
         }
 
         public void createFog(string fogType, float speedMultiplier, float positionModifierX, float positionModifierY)
         {
-            float veloX = 0.012f + gv.sf.RandInt(20)/40000f;
-            float veloY = 0.012f + gv.sf.RandInt(20)/40000f;
+            float veloX = 0.012f + gv.sf.RandInt(20) / 40000f;
+            float veloY = 0.012f + gv.sf.RandInt(20) / 40000f;
 
             int decider = gv.sf.RandInt(2);
             if (decider == 1)
@@ -11252,13 +20465,17 @@ namespace IBx
                 veloY = veloY * -1;
             }
 
-            Sprite spr = new Sprite(gv, fogType, gv.screenWidth / 2 - gv.screenHeight / 2 + positionModifierX, gv.screenHeight / 2 - gv.screenHeight / 2 + positionModifierY, veloX * speedMultiplier * 0.7f, veloY * speedMultiplier * 0.7f, 0, 0, 14.5f,14.5f, gv.sf.RandInt(80000) + 48000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "fog", false, 0);
+            //scheissbrille4 (move independent was false)
+            //Sprite spr = new Sprite(gv, fogType, gv.screenWidth / 2 - gv.screenHeight / 2 + positionModifierX, gv.screenHeight / 2 - gv.screenHeight / 2 + positionModifierY, veloX * speedMultiplier * 0.7f, veloY * speedMultiplier * 0.7f, 0, 0, 14.5f,14.5f, gv.sf.RandInt(80000) + 48000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "fog", true, 0);
+            Sprite spr = new Sprite(gv, fogType, positionModifierX, positionModifierY, veloX * speedMultiplier * 0.7f, veloY * speedMultiplier * 0.7f, 0, 0, 14.5f, 14.5f, gv.sf.RandInt(80000) + 48000, false, 100, gv.mod.fullScreenEffectOpacityWeather, 0, "fog", true, 0);
+
             gv.screenMainMap.spriteList.Add(spr);
         }
 
         public void createLightning(string lightningType, float posX, float posY, float scaleMod)
         {
-            /*TODO
+            /* TODO
+            //scheissbrille2
             Sprite spr = new Sprite(gv, lightningType, posX, posY, 0, 0, 0, 0, 5.0f * scaleMod, 5.0f * scaleMod, 4000, false, 45, 1.0f, 0, "lightning", false, 8);
             gv.screenMainMap.spriteList.Add(spr);
 
@@ -11293,6 +20510,7 @@ namespace IBx
                     gv.weatherSounds3.controls.stop();
                     gv.weatherSounds3.controls.play();
                 }
+
             }
             */
         }
@@ -11309,7 +20527,38 @@ namespace IBx
                 dist = deltaY;
             return dist;
         }
-               
+
+        /*
+        public int getCreatureSize(string tokenfilename)
+        {  
+             
+            //1=normal, 2=wide, 3=tall, 4=large  
+             int width = gv.cc.GetFromBitmapList(tokenfilename).PixelSize.Width;  
+             int height = gv.cc.GetFromBitmapList(tokenfilename).PixelSize.Height;  
+             //normal  
+             if ((width == gv.standardTokenSize) && (height == gv.standardTokenSize* 2))  
+             {  
+                 return 1;  
+             }  
+             //wide  
+             else if ((width == gv.standardTokenSize* 2) && (height == gv.standardTokenSize* 2))  
+             {  
+                 return 2;  
+             }  
+             //tall  
+             else if ((width == gv.standardTokenSize) && (height == gv.standardTokenSize* 4))  
+             {  
+                 return 3;  
+             }  
+             //large  
+             else if ((width == gv.standardTokenSize* 2) && (height == gv.standardTokenSize* 4))  
+             {  
+                 return 4;  
+             }  
+             return 1;  
+        }
+        */
+
         public SKBitmap LoadBitmap(string filename) //change this to LoadBitmapGDI
         {
             SKBitmap bm = null;
@@ -11497,12 +20746,57 @@ namespace IBx
             return txt;
             */
         }
-        
-        public void MakeDirectoryIfDoesntExist(string filenameAndFullPath)
+        /*public float MeasureString(string text, SharpDX.DirectWrite.FontWeight fw, SharpDX.DirectWrite.FontStyle fs, float fontHeight)
+        {
+            // Measure string width.
+            SharpDX.DirectWrite.TextFormat tf = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, fw, fs, SharpDX.DirectWrite.FontStretch.Normal, fontHeight) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
+            SharpDX.DirectWrite.TextLayout tl = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, text, tf, gv.Width, gv.Height);
+            float returnWidth = tl.Metrics.Width;
+            if (tf != null)
+            {
+                tf.Dispose();
+                tf = null;
+            }
+            if (tl != null)
+            {
+                tl.Dispose();
+                tl = null;
+            }
+            return returnWidth;
+        }*/
+        /*public CoordinateF MeasureStringSize(string text, SharpDX.DirectWrite.FontWeight fw, SharpDX.DirectWrite.FontStyle fs, float fontHeight)
+        {
+            // Measure string width.
+            SharpDX.DirectWrite.TextFormat tf = new SharpDX.DirectWrite.TextFormat(gv.factoryDWrite, gv.family.Name, gv.CurrentFontCollection, fw, fs, SharpDX.DirectWrite.FontStretch.Normal, fontHeight) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
+            SharpDX.DirectWrite.TextLayout tl = new SharpDX.DirectWrite.TextLayout(gv.factoryDWrite, text, tf, gv.Width, gv.Height);
+            CoordinateF returnSize = new CoordinateF(tl.Metrics.Width, tl.Metrics.Height);
+            if (tf != null)
+            {
+                tf.Dispose();
+                tf = null;
+            }
+            if (tl != null)
+            {
+                tl.Dispose();
+                tl = null;
+            }
+            return returnSize;
+        }*/
+        /*public void MakeDirectoryIfDoesntExist(string filenameAndFullPath)
         {
             System.IO.FileInfo file = new System.IO.FileInfo(filenameAndFullPath);
             file.Directory.Create(); // If the directory already exists, this method does nothing.
-        }
+        }*/
+        /*public System.Drawing.Bitmap flip(System.Drawing.Bitmap src)
+        {
+            src.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            return src;
+        }*/
+        /*public System.Drawing.Bitmap FlipHorz(System.Drawing.Bitmap src)
+        {
+            src.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            return src;
+        }*/
 
         //DIRECT2D STUFF
         public SKBitmap GetFromBitmapList(string fileNameWithOutExt)
@@ -11520,6 +20814,20 @@ namespace IBx
                 return commonBitmapList[fileNameWithOutExt];
             }
         }
+        /*public SharpDX.Direct2D1.Bitmap GetFromTileBitmapList(string fileNameWithOutExt)
+        {
+            //check to see if in list already and return bitmap it if found
+            if (tileBitmapList.ContainsKey(fileNameWithOutExt))
+            {
+                return tileBitmapList[fileNameWithOutExt];
+            }
+            //try loading and adding to list and return bitmap
+            else
+            {
+                tileBitmapList.Add(fileNameWithOutExt, LoadBitmap(fileNameWithOutExt));
+                return tileBitmapList[fileNameWithOutExt];
+            }
+        }*/
         /*public System.Drawing.Bitmap GetFromTileGDIBitmapList(string fileNameWithOutExt)
         {
             //check to see if in list already and return bitmap it if found
@@ -11532,6 +20840,121 @@ namespace IBx
             {
                 tileGDIBitmapList.Add(fileNameWithOutExt, LoadBitmapGDI(fileNameWithOutExt));
                 return tileGDIBitmapList[fileNameWithOutExt];
+            }
+        }*/
+        /*public void DisposeOfBitmap(ref SharpDX.Direct2D1.Bitmap bmp)
+        {
+            if (bmp != null)
+            {
+                bmp.Dispose();
+                bmp = null;
+            }
+        }*/
+        /*public SharpDX.Direct2D1.Bitmap LoadBitmap(string file, Module mdl) //change this to LoadBitmap
+        {
+            // Loads from file using System.Drawing.Image
+            using (var bitmap = LoadBitmapGDI(file, mdl)) //change this to LoadBitmapGDI
+            {
+                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
+                var size = new Size2(bitmap.Width, bitmap.Height);
+
+                // Transform pixels from BGRA to RGBA
+                int stride = bitmap.Width * sizeof(int);
+                using (var tempStream = new DataStream(bitmap.Height * stride, true, true))
+                {
+                    // Lock System.Drawing.Bitmap
+                    var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+                    // Convert all pixels 
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        int offset = bitmapData.Stride * y;
+                        for (int x = 0; x < bitmap.Width; x++)
+                        {
+                            // Not optimized 
+                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                            tempStream.Write(rgba);
+                        }
+                    }
+                    bitmap.UnlockBits(bitmapData);
+                    tempStream.Position = 0;
+                    return new SharpDX.Direct2D1.Bitmap(gv.renderTarget2D, size, tempStream, stride, bitmapProperties);
+                }
+            }
+        }*/
+        /*public SharpDX.Direct2D1.Bitmap LoadBitmap(string file) //change this to LoadBitmap
+        {
+            // Loads from file using System.Drawing.Image
+            using (var bitmap = LoadBitmapGDI(file)) //change this to LoadBitmapGDI
+            {
+                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
+                var size = new Size2(bitmap.Width, bitmap.Height);
+
+                // Transform pixels from BGRA to RGBA
+                int stride = bitmap.Width * sizeof(int);
+                using (var tempStream = new DataStream(bitmap.Height * stride, true, true))
+                {
+                    // Lock System.Drawing.Bitmap
+                    var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+                    // Convert all pixels 
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        int offset = bitmapData.Stride * y;
+                        for (int x = 0; x < bitmap.Width; x++)
+                        {
+                            // Not optimized 
+                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                            tempStream.Write(rgba);
+                        }
+                    }
+                    bitmap.UnlockBits(bitmapData);
+                    tempStream.Position = 0;
+                    return new SharpDX.Direct2D1.Bitmap(gv.renderTarget2D, size, tempStream, stride, bitmapProperties);
+                }
+            }
+        }*/
+        /*public SharpDX.Direct2D1.Bitmap ConvertGDIBitmapToD2D(System.Drawing.Bitmap gdibitmap)
+        {
+            var sourceArea = new System.Drawing.Rectangle(0, 0, gdibitmap.Width, gdibitmap.Height);
+            var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
+            var size = new Size2(gdibitmap.Width, gdibitmap.Height);
+
+            // Transform pixels from BGRA to RGBA
+            int stride = gdibitmap.Width * sizeof(int);
+            using (var tempStream = new DataStream(gdibitmap.Height * stride, true, true))
+            {
+                // Lock System.Drawing.Bitmap
+                var bitmapData = gdibitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+                // Convert all pixels 
+                for (int y = 0; y < gdibitmap.Height; y++)
+                {
+                    int offset = bitmapData.Stride * y;
+                    for (int x = 0; x < gdibitmap.Width; x++)
+                    {
+                        // Not optimized 
+                        byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                        byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                        byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                        byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                        int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                        tempStream.Write(rgba);
+                    }
+                }
+                gdibitmap.UnlockBits(bitmapData);
+                tempStream.Position = 0;
+                return new SharpDX.Direct2D1.Bitmap(gv.renderTarget2D, size, tempStream, stride, bitmapProperties);
             }
         }*/
         public List<FormattedLine> ProcessHtmlString(string text, int width, List<string> tagStack)
@@ -11709,7 +21132,7 @@ namespace IBx
                 {
                     tag += c;
                 }
-            #endregion
+                #endregion
             }
             tagStack.Clear();
             return logLinesList;
@@ -11785,7 +21208,7 @@ namespace IBx
                     else
                     {
                         style = "italic";
-                    }                    
+                    }
                 }
                 if (s == "b")
                 {
@@ -11829,6 +21252,5 @@ namespace IBx
             }
             return fSize;
         }
-
     }
 }

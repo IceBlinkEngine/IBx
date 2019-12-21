@@ -9,28 +9,28 @@ namespace IBx
     public class ScreenItemSelector
     {
         //public Module gv.mod;
-	    public GameView gv;
-	    private int inventoryPageIndex = 0;
-	    private int inventorySlotIndex = 0;
-	    private int slotsPerPage = 20;
-	    private List<IbbButton> btnInventorySlot = new List<IbbButton>();
-	    private IbbButton btnInventoryLeft = null;
-	    private IbbButton btnInventoryRight = null;
-	    private IbbButton btnPageIndex = null;
-	    private IbbButton btnInfo = null;
-	    private IbbButton btnAction = null;
+        public GameView gv;
+        private int inventoryPageIndex = 0;
+        private int inventorySlotIndex = 0;
+        private int slotsPerPage = 20;
+        private List<IbbButton> btnInventorySlot = new List<IbbButton>();
+        private IbbButton btnInventoryLeft = null;
+        private IbbButton btnInventoryRight = null;
+        private IbbButton btnPageIndex = null;
+        private IbbButton btnInfo = null;
+        private IbbButton btnAction = null;
         private IbbButton btnAction2 = null;
         private IbbButton btnExit = null;
         public string itemSelectorType = "container"; //container, equip, use
         public string callingScreen = "main"; //main, party, inventory
         public List<ItemRefs> thisItemRefs;
-	    private IbbHtmlTextBox description;
+        private IbbHtmlTextBox description;
 
         public ScreenItemSelector(Module m, GameView g)
-	    {
-		    //gv.mod = m;
-		    gv = g;
-	    }
+        {
+            //gv.mod = m;
+            gv = g;
+        }
 
         public void resetItemSelector(List<ItemRefs> itemRefsList, string selectorType, string callingScreenToReturnTo)
         {
@@ -87,68 +87,68 @@ namespace IBx
             itemSelectorType = selectorType;
             callingScreen = callingScreenToReturnTo;
         }
-	
-	    public void setControlsStart()
-	    {			
-    	    int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		    int padW = gv.squareSize/6;
+
+        public void setControlsStart()
+        {
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+            int padW = gv.squareSize / 6;
 
             description = new IbbHtmlTextBox(gv, 320, 100, 500, 300);
             description.showBoxBorder = false;
 
-		    if (btnInventoryLeft == null)
-		    {
-			    btnInventoryLeft = new IbbButton(gv, 1.0f);
-			    btnInventoryLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInventoryLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
-			    btnInventoryLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnInventoryLeft.X = 8 * gv.squareSize;
-			    btnInventoryLeft.Y = (1 * gv.squareSize) - (pH * 2);
+            if (btnInventoryLeft == null)
+            {
+                btnInventoryLeft = new IbbButton(gv, 1.0f);
+                btnInventoryLeft.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnInventoryLeft.Img2 = "ctrl_left_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_left_arrow);
+                btnInventoryLeft.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnInventoryLeft.X = 8 * gv.squareSize;
+                btnInventoryLeft.Y = (1 * gv.squareSize) - (pH * 2);
                 btnInventoryLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnInventoryLeft.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		    if (btnPageIndex == null)
-		    {
-			    btnPageIndex = new IbbButton(gv, 1.0f);
-			    btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
-			    btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnPageIndex.Text = "1/10";
-			    btnPageIndex.X = 9 * gv.squareSize;
-			    btnPageIndex.Y = (1 * gv.squareSize) - (pH * 2);
+            }
+            if (btnPageIndex == null)
+            {
+                btnPageIndex = new IbbButton(gv, 1.0f);
+                btnPageIndex.Img = "btn_small_off"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_off);
+                btnPageIndex.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnPageIndex.Text = "1/10";
+                btnPageIndex.X = 9 * gv.squareSize;
+                btnPageIndex.Y = (1 * gv.squareSize) - (pH * 2);
                 btnPageIndex.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnPageIndex.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		    if (btnInventoryRight == null)
-		    {
-			    btnInventoryRight = new IbbButton(gv, 1.0f);
-			    btnInventoryRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInventoryRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
-			    btnInventoryRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnInventoryRight.X = 10 * gv.squareSize;
-			    btnInventoryRight.Y = (1 * gv.squareSize) - (pH * 2);
+            }
+            if (btnInventoryRight == null)
+            {
+                btnInventoryRight = new IbbButton(gv, 1.0f);
+                btnInventoryRight.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnInventoryRight.Img2 = "ctrl_right_arrow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.ctrl_right_arrow);
+                btnInventoryRight.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnInventoryRight.X = 10 * gv.squareSize;
+                btnInventoryRight.Y = (1 * gv.squareSize) - (pH * 2);
                 btnInventoryRight.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnInventoryRight.Width = (int)(gv.ibbwidthR * gv.screenDensity);
-		    }
-		
-		    if (btnAction == null)
-		    {
-			    btnAction = new IbbButton(gv, 1.0f);
+            }
+
+            if (btnAction == null)
+            {
+                btnAction = new IbbButton(gv, 1.0f);
                 if (itemSelectorType.Equals("container"))
                 {
-                    btnAction.Text = "TAKE ALL";
+                    btnAction.Text = "TAKE ALL (space)";
                 }
                 else if (itemSelectorType.Equals("equip"))
                 {
                     btnAction.Text = "EQUIP SELECTED";
                 }
-			    btnAction.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
-			    btnAction.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
+                btnAction.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
+                btnAction.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnAction.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f) - (gv.squareSize * 4);
-			    btnAction.Y = 9 * gv.squareSize + pH * 2;
+                btnAction.Y = 9 * gv.squareSize + pH * 2;
                 btnAction.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnAction.Width = (int)(gv.ibbwidthL * gv.screenDensity);			
-		    }
+                btnAction.Width = (int)(gv.ibbwidthL * gv.screenDensity);
+            }
             if (btnAction2 == null)
             {
                 btnAction2 = new IbbButton(gv, 1.0f);
@@ -170,7 +170,7 @@ namespace IBx
             if (btnExit == null)
             {
                 btnExit = new IbbButton(gv, 1.0f);
-                btnExit.Text = "EXIT";
+                btnExit.Text = "RETURN";
                 btnExit.Img = "btn_large"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large);
                 btnExit.Glow = "btn_large_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_large_glow);
                 btnExit.X = (gv.screenWidth / 2) - (int)(gv.ibbwidthL * gv.screenDensity / 2.0f);
@@ -178,63 +178,63 @@ namespace IBx
                 btnExit.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnExit.Width = (int)(gv.ibbwidthL * gv.screenDensity);
             }
-		    if (btnInfo == null)
-		    {
-			    btnInfo = new IbbButton(gv, 0.8f);	
-			    btnInfo.Text = "INFO";
-			    btnInfo.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
-			    btnInfo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			    btnInfo.X = (16 * gv.squareSize) - padW * 1 + gv.oXshift;
+            if (btnInfo == null)
+            {
+                btnInfo = new IbbButton(gv, 0.8f);
+                btnInfo.Text = "INFO";
+                btnInfo.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small);
+                btnInfo.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnInfo.X = (16 * gv.squareSize) - padW * 1 + gv.oXshift;
                 btnInfo.Y = 9 * gv.squareSize + pH * 2;
                 btnInfo.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnInfo.Width = (int)(gv.ibbwidthR * gv.screenDensity);			
-		    }
-		    for (int y = 0; y < slotsPerPage; y++)
-		    {
-			    IbbButton btnNew = new IbbButton(gv, 1.0f);	
-			    btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
-			    btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
-			
-			    if (y < 5)
-			    {
-				    btnNew.X = ((y + 2 + 4) * gv.squareSize) + (padW * (y+1)) + gv.oXshift;
-				    btnNew.Y = 2 * gv.squareSize;
-			    }
-			    else if ((y >=5 ) && (y < 10))
-			    {
-				    btnNew.X = ((y-5 + 2 + 4) * gv.squareSize) + (padW * ((y-5)+1)) + gv.oXshift;
-				    btnNew.Y = 3 * gv.squareSize + padW;
-			    }
-			    else if ((y >=10 ) && (y < 15))
-			    {
-				    btnNew.X = ((y-10 + 2 + 4) * gv.squareSize) + (padW * ((y-10)+1)) + gv.oXshift;
-				    btnNew.Y = 4 * gv.squareSize + (padW * 2);
-			    }
-			    else
-			    {
-				    btnNew.X = ((y-15 + 2 + 4) * gv.squareSize) + (padW * ((y-15)+1)) + gv.oXshift;
-				    btnNew.Y = 5 * gv.squareSize + (padW * 3);
-			    }
+                btnInfo.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+            }
+            for (int y = 0; y < slotsPerPage; y++)
+            {
+                IbbButton btnNew = new IbbButton(gv, 1.0f);
+                btnNew.Img = "item_slot"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+                btnNew.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+
+                if (y < 5)
+                {
+                    btnNew.X = ((y + 2 + 4) * gv.squareSize) + (padW * (y + 1)) + gv.oXshift;
+                    btnNew.Y = 2 * gv.squareSize;
+                }
+                else if ((y >= 5) && (y < 10))
+                {
+                    btnNew.X = ((y - 5 + 2 + 4) * gv.squareSize) + (padW * ((y - 5) + 1)) + gv.oXshift;
+                    btnNew.Y = 3 * gv.squareSize + padW;
+                }
+                else if ((y >= 10) && (y < 15))
+                {
+                    btnNew.X = ((y - 10 + 2 + 4) * gv.squareSize) + (padW * ((y - 10) + 1)) + gv.oXshift;
+                    btnNew.Y = 4 * gv.squareSize + (padW * 2);
+                }
+                else
+                {
+                    btnNew.X = ((y - 15 + 2 + 4) * gv.squareSize) + (padW * ((y - 15) + 1)) + gv.oXshift;
+                    btnNew.Y = 5 * gv.squareSize + (padW * 3);
+                }
 
                 btnNew.Height = (int)(gv.ibbheight * gv.screenDensity);
-                btnNew.Width = (int)(gv.ibbwidthR * gv.screenDensity);	
-			
-			    btnInventorySlot.Add(btnNew);
-		    }			
-	    }
-	
-	    //INVENTORY SCREEN (COMBAT and MAIN)
+                btnNew.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+
+                btnInventorySlot.Add(btnNew);
+            }
+        }
+
+        //INVENTORY SCREEN (COMBAT and MAIN)
         public void redrawItemSelector()
         {
-    	    //IF CONTROLS ARE NULL, CREATE THEM
-    	    if (btnAction == null)
-    	    {
-    		    setControlsStart();
-    	    }
+            //IF CONTROLS ARE NULL, CREATE THEM
+            if (btnAction == null)
+            {
+                setControlsStart();
+            }
 
             if (itemSelectorType.Equals("container"))
             {
-                btnAction.Text = "TAKE ALL";
+                btnAction.Text = "TAKE ALL (space)";
                 btnAction2.Text = "TAKE SELECTED";
             }
             else if (itemSelectorType.Equals("equip"))
@@ -244,41 +244,41 @@ namespace IBx
             }
 
             int pW = (int)((float)gv.screenWidth / 100.0f);
-		    int pH = (int)((float)gv.screenHeight / 100.0f);
-		
-    	    int locY = 0;
-    	    int locX = pW * 4;
-    	    int textH = (int)gv.drawFontRegHeight;
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+
+            int locY = 0;
+            int locX = pW * 4;
+            int textH = (int)gv.drawFontRegHeight;
             int spacing = textH;
             int tabX = pW * 4;
-    	    int tabX2 = 5 * gv.squareSize + pW * 2;
-    	    int leftStartY = pH * 4;
-    	    int tabStartY = 5 * gv.squareSize + pW * 10;
-    	
+            int tabX2 = 5 * gv.squareSize + pW * 2;
+            int leftStartY = pH * 4;
+            int tabStartY = 5 * gv.squareSize + pW * 10;
+
             //DRAW TEXT		
-		    locY = (pH * 2);
-		    gv.DrawText("Item Selection", locX + (gv.squareSize * 8), locY);
-		    
-		    //DRAW LEFT/RIGHT ARROWS and PAGE INDEX
-		    btnPageIndex.Draw();
-		    btnInventoryLeft.Draw();
-		    btnInventoryRight.Draw();		
-		
-		    //DRAW ALL INVENTORY SLOTS		
-		    int cntSlot = 0;
-		    foreach (IbbButton btn in btnInventorySlot)
-		    {
-			    if (cntSlot == inventorySlotIndex) {btn.glowOn = true;}
-			    else {btn.glowOn = false;}
-			    if ((cntSlot + (inventoryPageIndex * slotsPerPage)) < thisItemRefs.Count)
-			    {
+            locY = (pH * 2);
+            gv.DrawText("Item Selection", locX + (gv.squareSize * 8), locY);
+
+            //DRAW LEFT/RIGHT ARROWS and PAGE INDEX
+            btnPageIndex.Draw();
+            btnInventoryLeft.Draw();
+            btnInventoryRight.Draw();
+
+            //DRAW ALL INVENTORY SLOTS		
+            int cntSlot = 0;
+            foreach (IbbButton btn in btnInventorySlot)
+            {
+                if (cntSlot == inventorySlotIndex) { btn.glowOn = true; }
+                else { btn.glowOn = false; }
+                if ((cntSlot + (inventoryPageIndex * slotsPerPage)) < thisItemRefs.Count)
+                {
                     Item it = gv.mod.getItemByResRefForInfo(thisItemRefs[cntSlot + (inventoryPageIndex * slotsPerPage)].resref);
-				    btn.Img2 = it.itemImage;
+                    btn.Img2 = it.itemImage;
                     ItemRefs itr = thisItemRefs[cntSlot + (inventoryPageIndex * slotsPerPage)];
-                    if ((it.onUseItemCastSpellTag == "none" || it.onUseItemCastSpellTag == "") && (it.onUseItemIBScript == "none" || it.onUseItemIBScript == "") && (it.onUseItem == "none" || it.onUseItem == ""))
+                    if (((it.onUseItemCastSpellTag == "none" || it.onUseItemCastSpellTag == "") && (it.onUseItemIBScript == "none" || it.onUseItemIBScript == "") && (it.onUseItem == "none" || it.onUseItem == "")) || (itr.isLightSource))
                     {
                         //if (it.onUseItemCastSpellTag == "none" || it.onUseItemCastSpellTag == "")
-                    //{
+                        //{
                         if (itr.quantity > 1)
                         {
                             btn.Quantity = itr.quantity + "";
@@ -319,22 +319,22 @@ namespace IBx
                         btn.btnOfChargedItem = false;
                     }
                 }
-			    else
-			    {
-				    btn.Img2 = null;
-				    btn.Quantity = "";
+                else
+                {
+                    btn.Img2 = null;
+                    btn.Quantity = "";
                     btn.btnOfChargedItem = false;
                 }
-			    btn.Draw();
-			    cntSlot++;
-		    }
-		
-		    //DRAW DESCRIPTION BOX
-		    locY = tabStartY;		
-		    if (isSelectedItemSlotInPartyInventoryRange())
-		    {
-			    ItemRefs itRef = GetCurrentlySelectedItemRefs();
-        	    Item it = gv.mod.getItemByResRefForInfo(itRef.resref);
+                btn.Draw();
+                cntSlot++;
+            }
+
+            //DRAW DESCRIPTION BOX
+            locY = tabStartY;
+            if (isSelectedItemSlotInPartyInventoryRange())
+            {
+                ItemRefs itRef = GetCurrentlySelectedItemRefs();
+                Item it = gv.mod.getItemByResRefForInfo(itRef.resref);
 
                 /*
                 //Description
@@ -373,9 +373,9 @@ namespace IBx
                 description.logLinesList.Clear();
                 description.AddHtmlTextToLog(textToSpan);
                 description.onDrawLogBox();
-		    }
-		    btnInfo.Draw();	
-		    btnAction.Draw();
+            }
+            btnInfo.Draw();
+            btnAction.Draw();
             btnExit.Draw();
             if ((itemSelectorType.Equals("container")) || (itemSelectorType.Equals("equip")))
             {
@@ -384,22 +384,92 @@ namespace IBx
         }
         public string isUseableBy(Item it)
         {
-    	    string strg = "";
-    	    foreach (PlayerClass cls in gv.mod.modulePlayerClassList)
-    	    {
-                string firstLetter = cls.name.Substring(0,1);
-    		    foreach (ItemRefs stg in cls.itemsAllowed)
-    		    {
-    			    if (stg.resref.Equals(it.resref))
-    			    {
-    				    strg += firstLetter + ", ";
-    			    }
-    		    }
-    	    }
-    	    return strg;
+            string strg = "";
+            foreach (PlayerClass cls in gv.mod.modulePlayerClassList)
+            {
+                string firstLetter = cls.name.Substring(0, 1);
+                foreach (ItemRefs stg in cls.itemsAllowed)
+                {
+                    if (stg.resref.Equals(it.resref))
+                    {
+                        strg += firstLetter + ", ";
+                    }
+                }
+            }
+            return strg;
         }
-	    public void onTouchItemSelector(int eX, int eY, MouseEventType.EventType eventType)
-	    {
+
+        public void onKeyUp()
+        {
+            /*TODO if (itemSelectorType.Equals("container"))
+            {
+                if (keyData == Keys.Space)
+                {
+                    //todo: take all
+                    //TO DO: Adjust for rtion and light source limits
+                    bool allowAdding = true;
+                    int numberOfRationsInChest = 0;
+                    int numberOfLightSourceItemsInChest = 0;
+                    foreach (ItemRefs itRef in thisItemRefs)
+                    {
+                        if (itRef.isRation)
+                        {
+                            numberOfRationsInChest++;
+                        }
+
+                        if (itRef.isLightSource)
+                        {
+                            numberOfLightSourceItemsInChest++;
+                        }
+                    }
+                    //to do
+                    foreach (ItemRefs itRef in thisItemRefs)
+                    {
+                        //code for capping number of rations and light sources
+                        if ((itRef.isRation) && (gv.mod.numberOfRationsRemaining + numberOfRationsInChest > gv.mod.maxNumberOfRationsAllowed))
+                        {
+                            gv.sf.MessageBoxHtml("Too much encumbrance by rations - your party can carry only " + gv.mod.maxNumberOfRationsAllowed.ToString() + ".");
+                            allowAdding = false;
+                            break;
+                        }
+
+                        if (itRef.isLightSource)
+                        {
+                            int lightSourceCounter = 0;
+                            foreach (ItemRefs itRef2 in gv.mod.partyInventoryRefsList)
+                            {
+                                if (itRef2.isLightSource)
+                                {
+                                    lightSourceCounter += itRef2.quantity;
+                                }
+                            }
+
+                            if (lightSourceCounter + numberOfLightSourceItemsInChest > gv.mod.maxNumberOfLightSourcesAllowed)
+                            {
+                                gv.sf.MessageBoxHtml("Too much encumbrance by light sources - your party can carry only " + gv.mod.maxNumberOfLightSourcesAllowed.ToString() + ".");
+                                allowAdding = false;
+                                break;
+                            }
+                        }
+
+                    }
+                    //XXXXXXX
+                    //TAKE ALL                        
+                    if (allowAdding)
+                    {
+                        foreach (ItemRefs s in thisItemRefs)
+                        {
+                            gv.mod.partyInventoryRefsList.Add(s.DeepCopy());
+                        }
+                        thisItemRefs.Clear();
+                        gv.screenType = "main";
+                    }
+                }
+            }*/
+        }
+
+        public void onTouchItemSelector(int eX, int eY, MouseEventType.EventType eventType)
+        {
             try
             {
                 btnInventoryLeft.glowOn = false;
@@ -537,7 +607,7 @@ namespace IBx
                                         {
                                             gv.screenType = "combatParty";
                                         }
-                                        
+
                                     }
                                 }
                                 inventorySlotIndex = j;
@@ -660,6 +730,21 @@ namespace IBx
                         }
                         else if (btnExit.getImpact(x, y))
                         {
+                            gv.mod.realTimeTimerStopped = true;
+                            gv.mod.blockRightKey = false;
+                            gv.mod.blockLeftKey = false;
+                            gv.mod.blockUpKey = false;
+                            gv.mod.blockDownKey = false;
+                            gv.aTimer = false;
+                            gv.a2Timer = false;
+                            gv.mod.scrollModeSpeed = 1.15f;
+                            gv.mod.scrollingTimer = 100;
+                            //gv.mod.isScrollingNow = false;
+                            //gv.mod.scrollingTimer = 100;
+                            //gv.aTimer.Stop();
+                            //gv.a2Timer.Stop();
+                            //gv.mod.scrollModeSpeed = 1.15f;
+
                             if (itemSelectorType.Equals("container"))
                             {
                                 gv.screenType = "main";
@@ -753,7 +838,7 @@ namespace IBx
             }
             catch
             { }
-	    }
+        }
         public void switchEquipment(bool inCombat)
         {
             Player pc = gv.mod.playerList[gv.cc.partyScreenPcIndex];
@@ -774,9 +859,9 @@ namespace IBx
                     if (it.entriesForPcTags.Count > 0)
                     {
                         bool breakOuter = false;
-                        for (int i = it.entriesForPcTags.Count-1; i >= 0; i--)
+                        for (int i = it.entriesForPcTags.Count - 1; i >= 0; i--)
                         {
-                            for (int j = pc.pcTags.Count-1; j >= 0; j--)
+                            for (int j = pc.pcTags.Count - 1; j >= 0; j--)
                             {
                                 if (it.entriesForPcTags[i].Value == pc.pcTags[j])
                                 {
@@ -793,9 +878,9 @@ namespace IBx
                     }
                     //move currently equipped item to the party inventory (list and taglist)
                     gv.mod.partyInventoryRefsList.Add(pc.MainHandRefs.DeepCopy());
-                    
+
                     //add adding pcTags for new main hand item here
-                    
+
                     //place the item into the main hand
                     pc.MainHandRefs = GetCurrentlySelectedItemRefs().DeepCopy();
 
@@ -809,12 +894,12 @@ namespace IBx
                         }
                     }
 
-                    
+
                     if (it.endTurnAfterEquipping)
                     {
                         endTurn = true;
                     }
-                    
+
 
                     //remove the item from the party inventory
                     gv.mod.partyInventoryRefsList.Remove(GetCurrentlySelectedItemRefs());
@@ -932,7 +1017,7 @@ namespace IBx
                 if (!pc.HeadRefs.resref.Equals("none"))
                 {
                     gv.mod.partyInventoryRefsList.Add(pc.HeadRefs.DeepCopy());
-                    
+
                     //get the item
                     Item it = gv.mod.getItemByResRef(pc.HeadRefs.resref);
 
@@ -1095,7 +1180,7 @@ namespace IBx
             }
 
             else if (gv.cc.partyItemSlotIndex == 2) //Neck
-                //schizo
+                                                    //schizo
             {
                 // if equip slot has an item, move it to inventory first
                 if (!pc.NeckRefs.resref.Equals("none"))
@@ -2032,31 +2117,31 @@ namespace IBx
                 pc.AmmoRefs = new ItemRefs();
             }
         }
-	
 
-	    public void doCleanUp()
-	    {
-		    btnInventorySlot.Clear();
-		    btnInventoryLeft = null;
-		    btnInventoryRight = null;
-		    btnPageIndex = null;
-		    btnInfo = null;
-		    btnAction = null;
+
+        public void doCleanUp()
+        {
+            btnInventorySlot.Clear();
+            btnInventoryLeft = null;
+            btnInventoryRight = null;
+            btnPageIndex = null;
+            btnInfo = null;
+            btnAction = null;
             btnExit = null;
             btnAction2 = null;
-	    }
-	
-	    public int GetIndex()
-	    {
-		    return inventorySlotIndex + (inventoryPageIndex * slotsPerPage);
-	    }	
-	    public ItemRefs GetCurrentlySelectedItemRefs()
-	    {
+        }
+
+        public int GetIndex()
+        {
+            return inventorySlotIndex + (inventoryPageIndex * slotsPerPage);
+        }
+        public ItemRefs GetCurrentlySelectedItemRefs()
+        {
             return thisItemRefs[GetIndex()];
-	    }
-	    public bool isSelectedItemSlotInPartyInventoryRange()
-	    {
+        }
+        public bool isSelectedItemSlotInPartyInventoryRange()
+        {
             return GetIndex() < thisItemRefs.Count;
-	    }
+        }
     }
 }

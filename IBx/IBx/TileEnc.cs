@@ -6,8 +6,16 @@ using System.Text;
 
 namespace IBx
 {
-    public class TileEnc 
+    public class TileEnc
     {
+        public bool isInShortShadeN = false;
+        public bool isInShortShadeE = false;
+        public bool isInShortShadeS = false;
+        public bool isInShortShadeW = false;
+        public bool isInShortShadeNE = false;
+        public bool isInShortShadeNW = false;
+        public bool isInShortShadeSE = false;
+        public bool isInShortShadeSW = false;
         //[JsonIgnore]
         public string Layer1Filename = "t_grass";
         //[JsonIgnore]
@@ -26,45 +34,45 @@ namespace IBx
         public int Layer2Xshift = 0;
         //[JsonIgnore]
         public int Layer3Xshift = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer1Yshift = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer2Yshift = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer3Yshift = 0;
-         /// <summary>
-         /// 
-         /// </summary>
-//[JsonIgnore]
+        /// <summary>
+        /// 
+        /// </summary>
+        //[JsonIgnore]
         public bool Layer1Mirror = false;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public bool Layer2Mirror = false;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public bool Layer3Mirror = false;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer1Xscale = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer2Xscale = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer3Xscale = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer1Yscale = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer2Yscale = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public int Layer3Yscale = 0;
-         //[JsonIgnore]
+        //[JsonIgnore]
         public bool Walkable = true;
-         //[JsonIgnore]
-	    public bool LoSBlocked = false;
+        //[JsonIgnore]
+        public bool LoSBlocked = false;
 
         public string tileBitmap1;
         public string tileBitmap2;
         public string tileBitmap3;
 
         public TileEnc()
-	    {
-	
-	    }
+        {
+
+        }
     }
 }

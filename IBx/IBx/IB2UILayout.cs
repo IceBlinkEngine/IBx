@@ -14,7 +14,7 @@ namespace IBx
 
         public IB2UILayout()
         {
-            
+
         }
 
         public IB2UILayout(GameView g)
@@ -50,14 +50,22 @@ namespace IBx
                 {
                     return rtn;
                 }
-            }            
+            }
             return "";
         }
 
         public void Draw()
         {
             //iterate over all controls and draw
-            if (gv.mod.useMinimalisticUI)
+            if (!gv.mod.skipTextRender)
+            {
+                gv.mod.skipTextRender = true;
+            }
+            else
+            {
+                gv.mod.skipTextRender = false;
+            }
+            if (gv.mod.useMinimalisticUI && !gv.mod.currentArea.isOverviewMap)
             {
                 foreach (IB2Panel pnl in panelList)
                 {
@@ -68,7 +76,10 @@ namespace IBx
                     }
                     else
                     {
+                        //if (pnl.tag != "TraitsPanel")
+                        //{
                         pnl.Draw();
+                        //}
                     }
                 }
             }
@@ -79,6 +90,9 @@ namespace IBx
                     pnl.Draw();
                 }
             }
+
+
+
         }
 
         public void Update(int elapsed)

@@ -12,6 +12,22 @@ namespace IBx
     {
         //public Module gv.mod;
         public GameView gv;
+
+        public bool creaturesHaveUpperHand = false;
+        public bool partyHasUpperHand = false;
+
+
+        //public List<int> originalAoEofSpells = new List<int>(); 
+        public List<Coordinate> blockCreatureDrawLocations = new List<Coordinate>();
+
+        public bool allDone = false;
+
+        public Prop ThisProp = null;
+        public int roundCounter = 1;
+        public bool floatyTextEnlargerOn = false;
+
+        public List<string> tagsOfTriggersAndPropTriggersCalledThisTurn = new List<string>();
+
         public List<string> alreadyTargetedCreatureTagsList = new List<string>();
         public int upperLeftInFastForwardX = -100;
         public int upperLeftInFastForwardY = -100;
@@ -93,6 +109,7 @@ namespace IBx
         public bool adjustCamToRangedCreature = false;
         public bool isPlayerTurn = true;
         public bool dontEndTurn = false;
+        public bool dontEndCreatureTurn = false;
         public bool continueTurn = false;
         public bool canMove = true;
         public int currentPlayerIndex = 0;
@@ -151,6 +168,7 @@ namespace IBx
         public List<Sprite> spriteList = new List<Sprite>();
         public List<AnimationSequence> animationSeqStack = new List<AnimationSequence>();
         public bool animationsOn = false;
+        public bool stepAnimationsOn = false;
         public int attackAnimationTimeElapsed = 0;
         public int attackAnimationLengthInMilliseconds = 250;
 
@@ -316,7 +334,16 @@ namespace IBx
             {
                 creatureToAnimate.Clear();
                 playerToAnimate = null;
-                Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+                Creature crt = new Creature();
+                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt = c;
+                        break;
+                    }
+                }
+                //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
                 if (moveCost == gv.mod.diagonalMoveCost)
                 {
                     creatureMoves += gv.mod.diagonalMoveCost;
@@ -329,12 +356,213 @@ namespace IBx
 
                 //do triggers and anything else needed after each creature or PC move
                 afterEachMoveCalls();
+                floatyTextOn = true;
+                checkEndEncounter();
+                if (crt.hp <= 0 || crt.isHeld())
+                {
+                    endCreatureTurn(crt);
+                }
+
                 doCreatureNextAction();
             }
         }
 
         public void doCombatSetup()
         {
+            //surprise round system
+            creaturesHaveUpperHand = false;
+            partyHasUpperHand = false;
+            bool advantageCreatures = false;
+            bool advantageParty = false;
+
+            //comparisons between two upperhand potentials
+            //1. get party upperhand potential
+            //make party roll spot enemy against DC: prop stealth + 10 + 5
+            //if successful, party has upperhand
+            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            if (gv.mod.useFlatFootedSystem)
+            {
+                string traitMethod = "leader";
+                foreach (Trait t in gv.mod.moduleTraitsList)
+                {
+                    if (t.tag.Contains(gv.mod.tagOfStealthMainTrait))
+                    {
+                        traitMethod = t.methodOfChecking;
+                    }
+                }
+                int parm1 = gv.mod.selectedPartyLeader;
+                if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                {
+                    parm1 = gv.mod.selectedPartyLeader;
+                }
+                else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                {
+                    parm1 = -2;
+                }
+                else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                {
+                    parm1 = -3;
+                }
+                else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                {
+                    parm1 = -4;
+                }
+                else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                {
+                    parm1 = -5;
+                }
+                else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                {
+                    parm1 = -6;
+                }
+
+                int propEncSpot = 0;
+                if (gv.sf.ThisProp != null)
+                {
+                    if (gv.sf.ThisProp.spotEnemy != -1)
+                    {
+                        propEncSpot = gv.sf.ThisProp.spotEnemy;
+                    }
+                    else
+                    {
+                        propEncSpot = gv.mod.currentEncounter.encSpotEnemy;
+                    }
+                }
+                else
+                {
+                    propEncSpot = gv.mod.currentEncounter.encSpotEnemy;
+                }
+
+                if (gv.sf.CheckPassSkill(parm1, gv.mod.tagOfStealthMainTrait, propEncSpot, false, true))
+                {
+                    advantageParty = true;
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                //do same excercise for prop
+
+                int propEncStealth = 0;
+                if (gv.sf.ThisProp != null)
+                {
+                    if (gv.sf.ThisProp.stealth != -1)
+                    {
+                        propEncStealth = gv.sf.ThisProp.stealth;
+                    }
+                    else
+                    {
+                        propEncStealth = gv.mod.currentEncounter.encStealth;
+                    }
+                }
+                else
+                {
+                    propEncStealth = gv.mod.currentEncounter.encStealth;
+                }
+
+
+                foreach (Trait t in gv.mod.moduleTraitsList)
+                {
+                    if (t.tag.Contains(gv.mod.tagOfSpotEnemyTrait))
+                    {
+                        traitMethod = t.methodOfChecking;
+                    }
+                }
+                parm1 = gv.mod.selectedPartyLeader;
+                if (traitMethod.Equals("-1") || traitMethod.Equals("leader") || traitMethod.Equals("Leader"))
+                {
+                    parm1 = gv.mod.selectedPartyLeader;
+                }
+                else if (traitMethod.Equals("-2") || traitMethod.Equals("highest") || traitMethod.Equals("Highest"))
+                {
+                    parm1 = -2;
+                }
+                else if (traitMethod.Equals("-3") || traitMethod.Equals("lowest") || traitMethod.Equals("Lowest"))
+                {
+                    parm1 = -3;
+                }
+                else if (traitMethod.Equals("-4") || traitMethod.Equals("average") || traitMethod.Equals("Average"))
+                {
+                    parm1 = -4;
+                }
+                else if (traitMethod.Equals("-5") || traitMethod.Equals("allMustSucceed") || traitMethod.Equals("AllMustSucceed"))
+                {
+                    parm1 = -5;
+                }
+                else if (traitMethod.Equals("-6") || traitMethod.Equals("oneMustSucceed") || traitMethod.Equals("OneMustSucceed"))
+                {
+                    parm1 = -6;
+                }
+
+                if (!gv.sf.CheckPassSkill(parm1, gv.mod.tagOfSpotEnemyTrait, propEncStealth, false, true))
+                {
+                    advantageCreatures = true;
+                }
+
+                if (gv.sf.ThisProp != null)
+                {
+                    if (gv.sf.ThisProp.isStealthed)
+                    {
+                        creaturesHaveUpperHand = true;
+                        gv.cc.addLogText("<font color='red'>" + "Ambush! The enemy has caught the party flat-footed. Free first round for the enemy." + "</font><BR>");
+                    }
+                    else if ((advantageCreatures && advantageParty) || (!advantageCreatures && !advantageParty))
+                    {
+                        //no advantage in summ, ie no surprise round
+                    }
+                    else if (advantageCreatures && !advantageParty)
+                    {
+                        creaturesHaveUpperHand = true;
+                        gv.cc.addLogText("<font color='red'>" + "The enemy has caught the party flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the enemy." + "</font><BR>");
+                    }
+                    else if (!advantageCreatures && advantageParty)
+                    {
+                        partyHasUpperHand = true;
+                        gv.cc.addLogText("<font color='blue'>" + "The party has caught the enemy flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the party." + "</font><BR>");
+                    }
+                }
+                //not called from prop
+                else
+                {
+                    if ((advantageCreatures && advantageParty) || (!advantageCreatures && !advantageParty))
+                    {
+                        //no advantage in summ, ie no surprise round
+                    }
+                    else if (advantageCreatures && !advantageParty)
+                    {
+                        creaturesHaveUpperHand = true;
+                        gv.cc.addLogText("<font color='red'>" + "The enemy has caught the party flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the enemy." + "</font><BR>");
+                    }
+                    else if (!advantageCreatures && advantageParty)
+                    {
+                        partyHasUpperHand = true;
+                        gv.cc.addLogText("<font color='blue'>" + "The party has caught the enemy flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the party." + "</font><BR>");
+                    }
+                }
+            }
+
+            if (gv.mod.currentEncounter.allSpellsSPCostDoubled)
+            {
+                foreach (Spell sp in gv.mod.moduleSpellsList)
+                {
+                    sp.costSP *= 2;
+                }
+            }
+
+            if (gv.mod.currentEncounter.allSpellsWithoutAoE)
+            {
+                //1. clear list with backup AoE of Spells
+                gv.mod.currentEncounter.originalAoEofSpells.Clear();
+                //2. fill list with backup AoE of Spells, readin in all spells
+                foreach (Spell sp in gv.mod.moduleSpellsList)
+                {
+                    gv.mod.currentEncounter.originalAoEofSpells.Add(sp.aoeRadius);
+                }
+                //3. set all spples AoE to 0
+                foreach (Spell sp in gv.mod.moduleSpellsList)
+                {
+                    sp.aoeRadius = 0;
+                }
+            }
+            //4. restore original AoE of Spells from checkendencounter
 
             if (gv.mod.playMusic)
             {
@@ -343,10 +571,23 @@ namespace IBx
                 gv.startCombatMusic();
             }
             gv.screenType = "combat";
+            gv.mod.currentEncounter.isOver = false;
+            continueTurn = false;
+            allDone = false;
+            roundCounter = 1;
+            //langbein
+            gv.screenCombat.animationSeqStack.Clear();
+            gv.screenCombat.deathAnimationLocations.Clear();
+            gv.screenCombat.blockCreatureDrawLocations.Clear();
+            gv.screenCombat.hitAnimationLocation = null;
+            gv.screenCombat.endingAnimationLocation = null;
+            gv.cc.floatyTextList.Clear();
+
             //resetToggleButtons();
             //Load map if used
             if (gv.mod.currentEncounter.UseMapImage)
             {
+                //gv.cc.DisposeOfBitmap(ref mapBitmap);
                 mapBitmap = gv.mod.currentEncounter.MapImage;
             }
             else //loads only the tiles that are used on this encounter map
@@ -364,18 +605,206 @@ namespace IBx
                 {
                     if (crf.creatureResRef.Equals(c.cr_resref))
                     {
-                        //copy it and add to encounters creature object list
-                        try
+                        if (crf.spawnAtStartOfRoundX == 0 || crf.spawnAtStartOfRoundX == 1)
                         {
-                            Creature copy = c.DeepCopy();
-                            copy.cr_tag = crf.creatureTag;
-                            copy.combatLocX = crf.creatureStartLocationX;
-                            copy.combatLocY = crf.creatureStartLocationY;
-                            gv.mod.currentEncounter.encounterCreatureList.Add(copy);
-                        }
-                        catch (Exception ex)
-                        {
-                            gv.errorLog(ex.ToString());
+                            //copy it and add to encounters creature object list
+                            try
+                            {
+                                Creature copy = c.DeepCopy();
+                                copy.cr_tag = crf.creatureTag;
+                                //gv.cc.DisposeOfBitmap(ref copy.token);
+                                //copy.token = gv.cc.LoadBitmap(copy.cr_tokenFilename);
+                                copy.combatLocX = crf.creatureStartLocationX;
+                                copy.combatLocY = crf.creatureStartLocationY;
+                                //factionsystem: faction buff
+                                if (copy.factionTag != null)
+                                {
+                                    if (copy.factionTag != "none" && copy.factionTag != "None" && copy.factionTag != "")
+                                    {
+                                        //Faction tempFaction = new Faction();
+
+                                        //creature's faction
+                                        foreach (Faction f in gv.mod.moduleFactionsList)
+                                        {
+                                            if (f.tag == copy.factionTag)
+                                            {
+                                                if (f.rank == 1)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank1;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank1;
+                                                    copy.will += f.accumulatedBuffStrengthRank1;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank1;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank1;
+                                                    if (f.accumulatedBuffStrengthRank1 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank1.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank1 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank1.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    //birthday
+                                                    //let's limit the faction buff effect a bit for starters
+                                                    //copy.hpMax = copy.hpMax + copy.hpMax * (f.accumulatedBuffStrengthRank1 * 10 / 100);
+                                                }
+                                                if (f.rank == 2)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank2;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank2;
+                                                    copy.will += f.accumulatedBuffStrengthRank2;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank2;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank2;
+                                                    if (f.accumulatedBuffStrengthRank2 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank2.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank2 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank2.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 3)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank3;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank3;
+                                                    copy.will += f.accumulatedBuffStrengthRank3;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank3;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank3;
+                                                    if (f.accumulatedBuffStrengthRank3 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank3.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank3 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank3.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 4)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank4;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank4;
+                                                    copy.will += f.accumulatedBuffStrengthRank4;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank4;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank4;
+                                                    if (f.accumulatedBuffStrengthRank4 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank4.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank4 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank4.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 5)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank5;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank5;
+                                                    copy.will += f.accumulatedBuffStrengthRank5;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank5;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank5;
+                                                    if (f.accumulatedBuffStrengthRank5 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank5.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank5 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank5.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 6)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank6;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank6;
+                                                    copy.will += f.accumulatedBuffStrengthRank6;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank6;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank6;
+                                                    if (f.accumulatedBuffStrengthRank6 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank6.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank6 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank6.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 7)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank7;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank7;
+                                                    copy.will += f.accumulatedBuffStrengthRank7;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank7;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank7;
+                                                    if (f.accumulatedBuffStrengthRank7 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank7.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank7 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank7.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 8)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank8;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank8;
+                                                    copy.will += f.accumulatedBuffStrengthRank8;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank8;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank8;
+                                                    if (f.accumulatedBuffStrengthRank8 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank8.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank8 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank8.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 9)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank9;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank9;
+                                                    copy.will += f.accumulatedBuffStrengthRank9;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank9;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank9;
+                                                    if (f.accumulatedBuffStrengthRank9 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank9.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank9 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank9.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+                                                if (f.rank == 10)
+                                                {
+                                                    copy.AC += f.accumulatedBuffStrengthRank10;
+                                                    copy.cr_att += f.accumulatedBuffStrengthRank10;
+                                                    copy.will += f.accumulatedBuffStrengthRank10;
+                                                    copy.fortitude += f.accumulatedBuffStrengthRank10;
+                                                    copy.reflex += f.accumulatedBuffStrengthRank10;
+                                                    if (f.accumulatedBuffStrengthRank10 > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank10.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                    else if (f.accumulatedBuffStrengthRank10 < 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank10.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                    }
+                                                }
+
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                gv.mod.currentEncounter.encounterCreatureList.Add(copy);
+                            }
+                            catch (Exception ex)
+                            {
+                                gv.errorLog(ex.ToString());
+                            }
                         }
                     }
                 }
@@ -427,6 +856,63 @@ namespace IBx
                     //or maybe a script does this, called at start of encounter
                 }
             }
+
+            //ad effects for night and darkness fights
+            if (gv.sf.CheckIsInDarkness("party", "night"))
+            {
+                if (gv.mod.nightFightModifier != 0)
+                {
+                    gv.mod.poorVisionModifier = gv.mod.nightFightModifier;
+                    gv.cc.addLogText("<font color='yellow'>Night debuff of " + gv.mod.nightFightModifier.ToString() + " applied on party." + "<BR></font>");
+                    for (int index = 0; index < gv.mod.playerList.Count; index++)
+                    {
+                        gv.sf.UpdateStats(gv.mod.playerList[index]);
+                    }
+                }
+
+                /*
+                for (int index = 0; index < gv.mod.playerList.Count; index++)
+                {
+                    gv.mod.poorVisionModifier = gv.mod.nightFightModifier;
+                    gv.mod.playerList[index].ACBase += gv.mod.nightFightModifier;
+                    gv.mod.playerList[index].playerClass.babTable[gv.mod.playerList[index].classLevel] += gv.mod.nightFightModifier;
+                    gv.mod.playerList[index].baseWill += gv.mod.nightFightModifier;
+                    gv.mod.playerList[index].baseReflex += gv.mod.nightFightModifier;
+                    gv.mod.playerList[index].baseFortitude += gv.mod.nightFightModifier;
+                    gv.sf.UpdateStats(gv.mod.playerList[index]);
+                    gv.cc.addLogText("<font color='yellow'>Night debuff of "+ gv.mod.nightFightModifier.ToString() + " applied on " + gv.mod.playerList[index].name + ".<BR></font>");
+                }
+                */
+            }
+            else if (gv.sf.CheckIsInDarkness("party", "noLight"))
+            {
+                if (gv.mod.darkFightModifier != 0)
+                {
+                    gv.mod.poorVisionModifier = gv.mod.darkFightModifier;
+                    gv.cc.addLogText("<font color='yellow'>Darkness debuff of " + gv.mod.darkFightModifier.ToString() + " applied on party" + ".<BR></font>");
+                    for (int index = 0; index < gv.mod.playerList.Count; index++)
+                    {
+                        gv.sf.UpdateStats(gv.mod.playerList[index]);
+                    }
+                }
+                /*
+                                for (int index = 0; index < gv.mod.playerList.Count; index++)
+                                {
+                                    gv.mod.playerList[index].ACBase += gv.mod.darkFightModifier;
+                                    gv.mod.playerList[index].playerClass.babTable[gv.mod.playerList[index].classLevel] += gv.mod.darkFightModifier;
+                                    gv.mod.playerList[index].baseWill += gv.mod.darkFightModifier;
+                                    gv.mod.playerList[index].baseReflex += gv.mod.darkFightModifier;
+                                    gv.mod.playerList[index].baseFortitude += gv.mod.darkFightModifier;
+                                    gv.sf.UpdateStats(gv.mod.playerList[index]);
+                                    gv.cc.addLogText("<font color='yellow'>Darkness debuff of " + gv.mod.nightFightModifier.ToString() + " applied on " + gv.mod.playerList[index].name + ".<BR></font>");
+                                }
+                                */
+            }
+            else
+            {
+                gv.mod.poorVisionModifier = 0;
+            }
+
             isPlayerTurn = true;
             currentPlayerIndex = 0;
             creatureIndex = 0;
@@ -444,6 +930,369 @@ namespace IBx
             }
             pf = new PathFinderEncounters(gv, gv.mod);
             tutorialMessageCombat(false);
+
+            //duisdorf
+            //get name of assassination target
+            foreach (Creature at in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (at.cr_tag == gv.mod.currentEncounter.assassinationTargetTag)
+                {
+                    gv.mod.currentEncounter.assassinationTargetName = at.cr_name;
+                }
+            }
+
+            if (gv.mod.currentEncounter.standGroundVictory)
+            {
+                gv.mod.currentEncounter.standGroundInternalTimer = gv.mod.currentEncounter.standGroundTimer;
+            }
+
+            if (gv.mod.currentEncounter.timeLimitDefeat)
+            {
+                gv.mod.currentEncounter.timeLimitInternalTimer = gv.mod.currentEncounter.timeLimitTimer;
+            }
+
+            string battleStartMessage = "";
+            if (gv.sf.ThisProp != null)
+            {
+                if (gv.sf.ThisProp.moved2)
+                {
+                    battleStartMessage = "A very fast moving enemy (double move) has caught the party. <br><br>";
+                }
+
+                if (gv.sf.ThisProp.isStealthed)
+                {
+                    battleStartMessage += "A stealthy enemy steps out of the shadows. <br><br>";
+                }
+            }
+
+            if (gv.mod.currentEncounter.customTextforMessageBoxAtStartOfEncounter != "none" && gv.mod.currentEncounter.customTextforMessageBoxAtStartOfEncounter != "None" && gv.mod.currentEncounter.customTextforMessageBoxAtStartOfEncounter != "")
+            {
+                gv.sf.MessageBox(battleStartMessage + gv.mod.currentEncounter.customTextforMessageBoxAtStartOfEncounter);
+            }
+            else if (gv.mod.currentEncounter.showDefaultMessageBoxAtStartOfEncounter)
+            {
+                //to do: adjust to victory/loss conditions and battlefield modifiers
+                //gv.sf.MessageBox("Win this battle by defeating all enemies.");
+                //string battleStartMessage = "";
+
+                if (gv.mod.currentEncounter.assassinationVictory || gv.mod.currentEncounter.standGroundVictory || gv.mod.currentEncounter.conquerVictory)
+                {
+                    battleStartMessage += "Additional victory term(s):<br><br>";
+                }
+
+                if (gv.mod.currentEncounter.assassinationVictory)
+                {
+                    battleStartMessage += "- win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".<br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.standGroundVictory)
+                {
+                    battleStartMessage += "- win this battle instantly by surviving " + gv.mod.currentEncounter.standGroundInternalTimer + " rounds.<br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.conquerVictory)
+                {
+                    if (gv.mod.currentEncounter.conquerTargetsCumulative)
+                    {
+                        //1 and 2 and 3
+                        if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget2Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying ALL of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1+2
+                        else if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget2Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying ALL of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]" + ".<br><br>";
+                        }
+                        //1+3
+                        else if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying ALL of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                        //2+3
+                        else if (gv.mod.currentEncounter.conquerTarget2Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying ALL of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1
+                        else if (gv.mod.currentEncounter.conquerTarget1Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]" + ".<br><br>";
+                        }
+                        //2
+                        else if (gv.mod.currentEncounter.conquerTarget2Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]" + ".<br><br>";
+                        }
+                        //3
+                        else if (gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                    }
+                    //alternative target locations
+                    else
+                    {
+                        //1 and 2 and 3
+                        if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget2Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying at least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1+2
+                        else if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget2Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying at least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]" + ".<br><br>";
+                        }
+                        //1+3
+                        else if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying at least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                        //2+3
+                        else if (gv.mod.currentEncounter.conquerTarget2Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying at least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]," + " [" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1
+                        else if (gv.mod.currentEncounter.conquerTarget1Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget1X + "," + gv.mod.currentEncounter.conquerTarget1Y + "]" + ".<br><br>";
+                        }
+                        //2
+                        else if (gv.mod.currentEncounter.conquerTarget2Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget2X + "," + gv.mod.currentEncounter.conquerTarget2Y + "]" + ".<br><br>";
+                        }
+                        //3
+                        else if (gv.mod.currentEncounter.conquerTarget3Y != -1)
+                        {
+                            battleStartMessage += "- win this battle instantly by occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.conquerTarget3X + "," + gv.mod.currentEncounter.conquerTarget3Y + "]" + ".<br><br>";
+                        }
+                    }
+                }
+
+                if (gv.mod.currentEncounter.timeLimitDefeat || gv.mod.currentEncounter.protectionDefeat || gv.mod.currentEncounter.holdDefeat)
+                {
+                    battleStartMessage += "Additional defeat term(s): <br><br>";
+                }
+
+                if (gv.mod.currentEncounter.timeLimitDefeat)
+                {
+                    battleStartMessage += "- loose this battle instantly after " + gv.mod.currentEncounter.timeLimitInternalTimer + " rounds.<br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.protectionDefeat)
+                {
+                    battleStartMessage += "- loose this battle instantly if " + gv.mod.currentEncounter.protectionTargetName + " drops to 0 or less hit points.<br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.holdDefeat)
+                {
+                    //battleStartMessage += "- loose this battle instantly if " + gv.mod.currentEncounter.protectionTargetName + " drops to 0 or less hit points.<br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    //gv.sf.MessageBox(battleStartMessage);
+                    if (gv.mod.currentEncounter.holdTargetsCumulative)
+                    {
+                        //1 and 2 and 3
+                        if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget2Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy ANY of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]," + " [" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]," + " [" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1+2
+                        else if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget2Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy ANY of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]," + " [" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]" + ".<br><br>";
+                        }
+                        //1+3
+                        else if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy ANY of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]," + " [" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                        //2+3
+                        else if (gv.mod.currentEncounter.holdTarget2Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy ANY of the following locations simultaneously with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]," + " [" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1
+                        else if (gv.mod.currentEncounter.holdTarget1Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]" + ".<br><br>";
+                        }
+                        //2
+                        else if (gv.mod.currentEncounter.holdTarget2Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]" + ".<br><br>";
+                        }
+                        //3
+                        else if (gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly by failing to occupy the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                    }
+                    //alternative target locations
+                    else
+                    {
+                        //1 and 2 and 3
+                        if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget2Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]," + " [" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]," + " [" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1+2
+                        else if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget2Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]," + " [" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]" + ".<br><br>";
+                        }
+                        //1+3
+                        else if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]," + " [" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                        //2+3
+                        else if (gv.mod.currentEncounter.holdTarget2Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying least ONE of the following locations with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]," + " [" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                        //1
+                        else if (gv.mod.currentEncounter.holdTarget1Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget1X + "," + gv.mod.currentEncounter.holdTarget1Y + "]" + ".<br><br>";
+                        }
+                        //2
+                        else if (gv.mod.currentEncounter.holdTarget2Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget2X + "," + gv.mod.currentEncounter.holdTarget2Y + "]" + ".<br><br>";
+                        }
+                        //3
+                        else if (gv.mod.currentEncounter.holdTarget3Y != -1)
+                        {
+                            battleStartMessage += "- loose this battle instantly if not occupying the following location with a conscious pc at the start of a round: ";
+                            battleStartMessage += "[" + gv.mod.currentEncounter.holdTarget3X + "," + gv.mod.currentEncounter.holdTarget3Y + "]" + ".<br><br>";
+                        }
+                    }
+                }
+
+                //battle modfiers
+                if (gv.mod.currentEncounter.noSpellCastModifier || gv.mod.currentEncounter.noTraitUseModifier || gv.mod.currentEncounter.noItemUseModifier || gv.mod.currentEncounter.onlyOneMoveModifier || gv.mod.currentEncounter.reducedDamageofPcMeleeAttack || gv.mod.currentEncounter.reducedDamageofPcRangedAttack || gv.mod.currentEncounter.allSpellsWithoutAoE || gv.mod.currentEncounter.allSpellsSPCostDoubled || gv.mod.currentEncounter.noHealingAllowed || gv.mod.currentEncounter.hpDamageEachRound > 0 || gv.mod.currentEncounter.spDamageEachRound > 0)
+                {
+                    battleStartMessage += "Additional battle rule(s): <br><br>";
+                }
+                if (gv.mod.currentEncounter.spDamageEachRound > 0)
+                {
+                    battleStartMessage += "- player characters are drained by " + gv.mod.currentEncounter.spDamageEachRound + " sp each round. <br><br>";
+                }
+                if (gv.mod.currentEncounter.hpDamageEachRound > 0)
+                {
+                    battleStartMessage += "- player characters are damaged for " + gv.mod.currentEncounter.hpDamageEachRound + " hp each round. <br><br>";
+                }
+                if (gv.mod.currentEncounter.noHealingAllowed)
+                {
+                    battleStartMessage += "- player characters cannot be healed by spell, trait or item. <br><br>";
+                }
+                if (gv.mod.currentEncounter.allSpellsSPCostDoubled)
+                {
+                    battleStartMessage += "- all spells and traits cost twice the amount of sp than usually. <br><br>";
+                }
+                if (gv.mod.currentEncounter.allSpellsWithoutAoE)
+                {
+                    battleStartMessage += "- all spells and traits have their area of effect reduced to a single target square. <br><br>";
+                }
+                if (gv.mod.currentEncounter.reducedDamageofPcRangedAttack)
+                {
+                    battleStartMessage += "- all player characters do only 1/3 of their normal damage with ranged weapons. <br><br>";
+                }
+                if (gv.mod.currentEncounter.reducedDamageofPcMeleeAttack)
+                {
+                    battleStartMessage += "- all player characters do only 1/3 of their normal damage with melee weapons. <br><br>";
+                }
+                if (gv.mod.currentEncounter.noSpellCastModifier)
+                {
+                    battleStartMessage += "- casting of spells not possible for the party in this encounter. <br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.noTraitUseModifier)
+                {
+                    battleStartMessage += "- using of traits not possible for the party in this encounter. <br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.noItemUseModifier)
+                {
+                    battleStartMessage += "- using of items not possible for the party in this encounter. <br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (gv.mod.currentEncounter.onlyOneMoveModifier)
+                {
+                    battleStartMessage += "- every player character has only one move per turn in this encounter. <br><br>";
+                    //gv.sf.MessageBox("Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + ".");
+                    ///gv.sf.MessageBox(battleStartMessage);
+                }
+
+                if (battleStartMessage != "")
+                {
+                    gv.sf.MessageBox(battleStartMessage);
+                }
+            }
+
+            if (gv.mod.currentEncounter.customTextforLogTextAtStartOfEncounter != "none" && gv.mod.currentEncounter.customTextforLogTextAtStartOfEncounter != "None" && gv.mod.currentEncounter.customTextforLogTextAtStartOfEncounter != "")
+            {
+                gv.cc.addLogText(gv.mod.currentEncounter.customTextforLogTextAtStartOfEncounter);
+            }
+            else if (gv.mod.currentEncounter.showDefaultMessageBoxAtStartOfEncounter)
+            {
+                /*
+                //to do: adjust to victory/loss conditions and battlefield modifiers
+                if (gv.mod.currentEncounter.assassinationVictory)
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + "Win this battle instantly by slaying " + gv.mod.currentEncounter.assassinationTargetName + "." + "<BR></font>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='yellow'>" + "Win this battle by defeating all enemies." + "<BR></font>");
+                }
+                */
+                gv.cc.addLogText("<font color='yellow'>" + battleStartMessage + "<BR></font>");
+            }
+
             //IBScript Setup Combat Hook (run only once)
             //gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnSetupCombatIBScript, gv.mod.currentEncounter.OnSetupCombatIBScriptParms);
             //IBScript Start Combat Round Hook
@@ -452,6 +1301,34 @@ namespace IBx
             calcualteMoveOrder();
             //do turn controller
             recalculateCreaturesShownInInitiativeBar();
+            floatyTextOn = false;
+            if (!creaturesHaveUpperHand && !partyHasUpperHand)
+            {
+                gv.cc.addFloatyText(new Coordinate(0, 0), "Round " + roundCounter, "yellow");
+                gv.cc.addLogText("<font color='yellow'>" + "Round " + roundCounter + "</font><BR>");
+            }
+            else if (partyHasUpperHand)
+            {
+                gv.cc.addFloatyText(new Coordinate(0, 0), "Enemy is caught flat-footed, Round " + roundCounter, "green");
+                gv.cc.addLogText("<font color='lime'>" + "Round " + roundCounter + "</font><BR>");
+            }
+            else if (creaturesHaveUpperHand)
+            {
+                gv.cc.addFloatyText(new Coordinate(0, 0), "Party is caught flat-footed, Round " + roundCounter, "red");
+                gv.cc.addLogText("<font color='red'>" + "Round " + roundCounter + "</font><BR>");
+            }
+            if (gv.mod.currentEncounter.standGroundVictory)
+            {
+                gv.cc.addLogText("<font color='lime'>" + "Survive " + gv.mod.currentEncounter.standGroundInternalTimer + " more round(s).</font><BR>");
+            }
+            if (gv.mod.currentEncounter.timeLimitDefeat)
+            {
+                gv.cc.addLogText("<font color='red'>" + "You have to win within " + gv.mod.currentEncounter.timeLimitInternalTimer + " round(s) or this battle is lost.</font><BR>");
+            }
+            floatyTextEnlargerOn = true;
+            //floatyTextOn = true;
+
+            roundCounter++;
             turnController();
         }
         public void calcualteMoveOrder()
@@ -553,8 +1430,10 @@ namespace IBx
         */
         public void turnController()
         {
-            if ((animationSeqStack.Count == 0) && (!continueTurn))
+            if ((animationSeqStack.Count == 0) && (!continueTurn) && !gv.mod.currentEncounter.isOver && !allDone)
             {
+                //zulaufen
+
                 recalculateCreaturesShownInInitiativeBar();
                 attackAnimationFrameCounter = 0;
                 attackAnimationDelayCounter = 0;
@@ -578,8 +1457,10 @@ namespace IBx
                             {
                                 gv.cc.addLogText("<font color='blue'>" + gv.mod.playerList[i].name + " vanishes." + "</font><BR>");
                                 gv.mod.playerList[i].hp = -20;
-                                recalculateCreaturesShownInInitiativeBar();
+                                //recalculateCreaturesShownInInitiativeBar();
                                 gv.mod.playerList.RemoveAt(i);
+
+                                recalculateCreaturesShownInInitiativeBar();
                             }
                             else if (gv.mod.playerList[i].stayDurationInTurns < 10)
                             {
@@ -590,20 +1471,45 @@ namespace IBx
 
                     for (int i = gv.mod.currentEncounter.encounterCreatureList.Count - 1; i >= 0; i--)
                     {
-                            gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns--;
-                            if (gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns <= 0)
+                        gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns--;
+                        if (gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns <= 0)
+                        {
+                            gv.cc.addLogText("<font color='blue'>" + gv.mod.currentEncounter.encounterCreatureList[i].cr_name + " vanishes." + "</font><BR>");
+                            gv.mod.currentEncounter.encounterCreatureList[i].hp = -20;
+
+                            recalculateCreaturesShownInInitiativeBar();
+                            int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - i;
+                            if (deadIdx < idx)
                             {
-                                gv.cc.addLogText("<font color='blue'>" + gv.mod.currentEncounter.encounterCreatureList[i].cr_name + " vanishes." + "</font><BR>");
-                                gv.mod.currentEncounter.encounterCreatureList[i].hp = -20;
-                                recalculateCreaturesShownInInitiativeBar();
-                                gv.mod.currentEncounter.encounterCreatureList.RemoveAt(i);
+                                idx--;
+                                if (idx < 0)
+                                {
+                                    idx = 0;
+                                }
                             }
-                            else if (gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns < 10)
+                            if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[i].cr_tag)
                             {
-                                gv.cc.addLogText("<font color='blue'>" + gv.mod.currentEncounter.encounterCreatureList[i].cr_name + " has " + gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns + " turns left." + "</font><BR>");
-                            }   
+                                gv.mod.currentEncounter.assassinationConditionMet = true;
+                            }
+
+                            gv.mod.currentEncounter.encounterCreatureList.RemoveAt(i);
+                        }
+                        else if (gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns < 10)
+                        {
+                            gv.cc.addLogText("<font color='blue'>" + gv.mod.currentEncounter.encounterCreatureList[i].cr_name + " has " + gv.mod.currentEncounter.encounterCreatureList[i].stayDurationInTurns + " turns left." + "</font><BR>");
+                        }
                     }
 
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                        {
+                            if (p.hp <= 0)
+                            {
+                                gv.mod.currentEncounter.protectionConditionMet = true;
+                            }
+                        }
+                    }
                     //hit the end so start the next round
                     startNextRoundStuff();
                     return;
@@ -614,181 +1520,28 @@ namespace IBx
                 {
                     if (pc.moveOrder == currentMoveOrderIndex)
                     {
-
-                        //write the pc's name to log whsoe turn it is
-                        gv.cc.addLogText("<font color='blue'>It's the turn of " + pc.name + ". </font><BR>");
-
-                        if ((pc.hp <= 0) && (pc.hp > -20))
+                        //tiereimpark
+                        checkEndEncounter();
+                        if (!allDone)
                         {
-                            pc.hp -= 1;
-                            gv.cc.addLogText("<font color='red'>" + pc.name + " bleeds 1 HP, dead at -20 HP!" + "</font><BR>");
-                            pc.charStatus = "Dead";
-                            if (pc.hp <= -20)
+                            //deathAnimationLocations.Clear();
+                            //write the pc's name to log whsoe turn it is
+                            if (pc.hp > 0)
                             {
-                                gv.cc.addLogText("<font color='red'>" + pc.name + " has DIED!" + "</font><BR>");
+                                gv.cc.addLogText("<font color='blue'>It's the turn of " + pc.name + ". </font><BR>");
                             }
-                        }
 
-                        /*
-                        //add code for interrupting the caster of a spell with long duration here
-                        if ((pc.hp < pc.hpLastTurn) && (pc.hp > 0) && (!pc.isHeld()))
-                        {
-                            foreach (Effect ef in pc.effectsList)
+                            if ((pc.hp <= 0) && (pc.hp > -20) && !pc.hasDelayedAlready)
                             {
-                                if (ef.allowCastingWithoutRiskOfInterruption)
+                                pc.hp -= 1;
+                                gv.cc.addLogText("<font color='red'>" + pc.name + " bleeds 1 HP, dead at -20 HP!" + "</font><BR>");
+                                pc.charStatus = "Dead";
+                                if (pc.hp <= -20)
                                 {
-                                    pc.thisCasterCanBeInterrupted = false;
-                                    break;
+                                    gv.cc.addLogText("<font color='red'>" + pc.name + " has DIED!" + "</font><BR>");
                                 }
                             }
 
-                            if (pc.isPreparingSpell && pc.thisCasterCanBeInterrupted)
-                            {
-                                #region Do Calc Save and DC
-                                int saveChkRoll = gv.sf.RandInt(20);
-                                int saveChk = 0;
-                                int DC = 100 + (pc.hpLastTurn - pc.hp);
-                                int saveChkAdder = pc.will;
-
-                                saveChk = saveChkRoll + saveChkAdder;
-                                #endregion
-
-                                if (saveChk >= DC)
-                                {
-                                    gv.cc.addLogText("<font color='yellow'>" + pc.name + " makes will save(" + saveChkRoll + "+" + saveChkAdder + " >= " + DC + ") and " + pc.playerClass.labelForCastAction + " still despite damage during last turn." + "</font><BR>");
-                                }
-                                else
-                                {
-                                    gv.cc.addLogText("<font color='yellow'>" + pc.name + " fails will save(" + saveChkRoll + "+" + saveChkAdder + " <= " + DC + ") - " + pc.playerClass.spellLabelSingular + " cancelled due to damage during last turn." + "</font><BR>");
-
-                                    //reset all relevant values to default
-                                    pc.isPreparingSpell = false;
-                                    pc.doCastActionInXFullTurns = 0;
-                                    pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                                    pc.thisCastIsFreeOfCost = false;
-                                    pc.thisCasterCanBeInterrupted = true;
-                                    currentCombatMode = "info";
-                                    animationSeqStack.Clear();
-                                    endPcTurn(true);
-                                }
-                            }
-                        }
-                        */
-
-                        spriteList.Clear();
-                        gv.cc.floatyTextList.Clear();
-                        //highlight the portrait of the pc whose current turn it is
-                        //ratti
-
-                        gv.cc.ptrPc0.glowOn = false;
-                        gv.cc.ptrPc1.glowOn = false;
-                        gv.cc.ptrPc2.glowOn = false;
-                        gv.cc.ptrPc3.glowOn = false;
-                        gv.cc.ptrPc4.glowOn = false;
-                        gv.cc.ptrPc5.glowOn = false;
-
-                        if (idx == 0)
-                        {
-                            if (gv.mod.playerList.Count > 0)
-                            {
-                                if (!gv.mod.playerList[0].isTemporaryAllyForThisEncounterOnly)
-                                {
-                                    gv.cc.ptrPc0.glowOn = true;
-                                }
-                            }
-                        }
-                        if (idx == 1)
-                        {
-                            if (gv.mod.playerList.Count > 1)
-                            {
-                                if (!gv.mod.playerList[1].isTemporaryAllyForThisEncounterOnly)
-                                {
-                                    gv.cc.ptrPc1.glowOn = true;
-                                }
-                            }
-                        }
-                        if (idx == 2)
-                        {
-                            if (gv.mod.playerList.Count > 2)
-                            {
-                                if (!gv.mod.playerList[2].isTemporaryAllyForThisEncounterOnly)
-                                {
-                                    gv.cc.ptrPc2.glowOn = true;
-                                }
-                            }
-                        }
-                        if (idx == 3)
-                        {
-                            if (gv.mod.playerList.Count > 3)
-                            {
-                                if (!gv.mod.playerList[3].isTemporaryAllyForThisEncounterOnly)
-                                {
-                                    gv.cc.ptrPc3.glowOn = true;
-                                }
-                            }
-                        }
-                        if (idx == 4)
-                        {
-                            if (gv.mod.playerList.Count > 4)
-                            {
-                                if (!gv.mod.playerList[4].isTemporaryAllyForThisEncounterOnly)
-                                {
-                                    gv.cc.ptrPc4.glowOn = true;
-                                }
-                            }
-                        }
-                        if (idx == 5)
-                        {
-                            if (gv.mod.playerList.Count > 5)
-                            {
-                                if (!gv.mod.playerList[5].isTemporaryAllyForThisEncounterOnly)
-                                {
-                                    gv.cc.ptrPc5.glowOn = true;
-                                }
-                            }
-                        }
-                        //blubb
-
-                        //switching to a system where effects last from turn they are applied to start of the target creature's next turn (multiplied with duration of effect)
-                        applyEffectsCombat(pc);
-
-                        //reduce existing cooldown times
-                        if (pc.coolingSpellsByTag.Count > 0)
-                        {
-                            for (int i = pc.coolingSpellsByTag.Count - 1; i >= 0; i--)
-                            {
-                                pc.coolDownTimes[i]--;
-                                if (pc.coolDownTimes[i] <= -1)
-                                {
-                                    pc.coolDownTimes.RemoveAt(i);
-                                    pc.coolingSpellsByTag.RemoveAt(i);
-                                }
-                            }
-                        }
-
-                        //change creatureIndex or currentPlayerIndex
-                        currentPlayerIndex = idx;
-                        //set isPlayerTurn 
-                        isPlayerTurn = true;
-
-                        currentCombatMode = "info";
-                        currentMoveOrderIndex++;
-                        gv.mod.enteredFirstTime = false;
-                        //Karl
-                        //gv.Render();
-                        //go to start PlayerTurn or start CreatureTurn
-                        if ((pc.isHeld()) || (pc.isDead()))
-                        {
-                            pc.thisCastIsFreeOfCost = false;
-                            pc.isPreparingSpell = false;
-                            pc.doCastActionInXFullTurns = 0;
-                            pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                            pc.thisCasterCanBeInterrupted = true;
-                            endPcTurn(true);
-                        }
-                        else
-                        {
-                            //********************************************************************
                             /*
                             //add code for interrupting the caster of a spell with long duration here
                             if ((pc.hp < pc.hpLastTurn) && (pc.hp > 0) && (!pc.isHeld()))
@@ -807,7 +1560,7 @@ namespace IBx
                                     #region Do Calc Save and DC
                                     int saveChkRoll = gv.sf.RandInt(20);
                                     int saveChk = 0;
-                                    int DC = 10 + (pc.hpLastTurn - pc.hp);
+                                    int DC = 100 + (pc.hpLastTurn - pc.hp);
                                     int saveChkAdder = pc.will;
 
                                     saveChk = saveChkRoll + saveChkAdder;
@@ -827,64 +1580,167 @@ namespace IBx
                                         pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
                                         pc.thisCastIsFreeOfCost = false;
                                         pc.thisCasterCanBeInterrupted = true;
-                                        //currentCombatMode = "info";
-                                        //animationSeqStack.Clear();
+                                        currentCombatMode = "info";
+                                        animationSeqStack.Clear();
                                         endPcTurn(true);
                                     }
                                 }
                             }
                             */
 
-                            //**********************************************************************
-                            //no normal turn if player is preparing spell
-                            //it is either passing move while reducing remaining cast time by 1
-                            //it is doing the cast of the stored spell, jumping to select target mode ("cast") (note: without spell cost that was paid upfront)
-                            if (pc.isPreparingSpell)
+                            spriteList.Clear();
+                            if (!floatyTextEnlargerOn)
                             {
-                                //AoO code
-                                foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                                gv.cc.floatyTextList.Clear();
+                            }
+                            //highlight the portrait of the pc whose current turn it is
+                            //ratti
+
+                            gv.cc.ptrPc0.glowOn = false;
+                            gv.cc.ptrPc1.glowOn = false;
+                            gv.cc.ptrPc2.glowOn = false;
+                            gv.cc.ptrPc3.glowOn = false;
+                            gv.cc.ptrPc4.glowOn = false;
+                            gv.cc.ptrPc5.glowOn = false;
+
+                            if (idx == 0)
+                            {
+                                if (gv.mod.playerList.Count > 0)
                                 {
-                                    if (gv.screenCombat.CalcDistance(crt, crt.combatLocX, crt.combatLocY, pc.combatLocX, pc.combatLocY) == 1)
+                                    if (!gv.mod.playerList[0].isTemporaryAllyForThisEncounterOnly)
                                     {
-                                        bool triggersAoO = false;
-                                        foreach (Spell sp in gv.mod.moduleSpellsList)
-                                        {
-                                            if (sp.tag == pc.tagOfSpellToBeCastAfterCastTimeIsDone)
-                                            {
-                                                if (sp.triggersAoO)
-                                                {
-                                                    triggersAoO = true;
-                                                }
-                                                break;
-                                            }
-                                        }
+                                        gv.cc.ptrPc0.glowOn = true;
+                                    }
+                                }
+                            }
+                            if (idx == 1)
+                            {
+                                if (gv.mod.playerList.Count > 1)
+                                {
+                                    if (!gv.mod.playerList[1].isTemporaryAllyForThisEncounterOnly)
+                                    {
+                                        gv.cc.ptrPc1.glowOn = true;
+                                    }
+                                }
+                            }
+                            if (idx == 2)
+                            {
+                                if (gv.mod.playerList.Count > 2)
+                                {
+                                    if (!gv.mod.playerList[2].isTemporaryAllyForThisEncounterOnly)
+                                    {
+                                        gv.cc.ptrPc2.glowOn = true;
+                                    }
+                                }
+                            }
+                            if (idx == 3)
+                            {
+                                if (gv.mod.playerList.Count > 3)
+                                {
+                                    if (!gv.mod.playerList[3].isTemporaryAllyForThisEncounterOnly)
+                                    {
+                                        gv.cc.ptrPc3.glowOn = true;
+                                    }
+                                }
+                            }
+                            if (idx == 4)
+                            {
+                                if (gv.mod.playerList.Count > 4)
+                                {
+                                    if (!gv.mod.playerList[4].isTemporaryAllyForThisEncounterOnly)
+                                    {
+                                        gv.cc.ptrPc4.glowOn = true;
+                                    }
+                                }
+                            }
+                            if (idx == 5)
+                            {
+                                if (gv.mod.playerList.Count > 5)
+                                {
+                                    if (!gv.mod.playerList[5].isTemporaryAllyForThisEncounterOnly)
+                                    {
+                                        gv.cc.ptrPc5.glowOn = true;
+                                    }
+                                }
+                            }
+                            //blubb
 
-                                        foreach (Effect ef in pc.effectsList)
-                                        {
-                                            if (ef.allowCastingWithoutTriggeringAoO)
-                                            {
-                                                triggersAoO = false;
-                                                break;
-                                            }
-                                        }
+                            //switching to a system where effects last from turn they are applied to start of the target creature's next turn (multiplied with duration of effect)
+                            if (!pc.hasDelayedAlready)
+                            {
+                                applyEffectsFromSquare(pc.combatLocX, pc.combatLocY);
+                                applyEffectsCombat(pc, false);
+                            }
+                            //applyEffectsFromSquare(pc.combatLocX, pc.combatLocY);
 
-                                        if (triggersAoO)
+                            //tiereimpark
+                            checkEndEncounter();
+
+                            //reduce existing cooldown times
+                            if (!pc.hasDelayedAlready)
+                            {
+                                if (pc.coolingSpellsByTag.Count > 0)
+                                {
+                                    for (int i = pc.coolingSpellsByTag.Count - 1; i >= 0; i--)
+                                    {
+                                        pc.coolDownTimes[i]--;
+                                        if (pc.coolDownTimes[i] <= -1)
                                         {
-                                            gv.cc.addLogText("<font color='blue'>Attack of Opportunity by: " + crt.cr_name + "</font><BR>");
-                                            //int dcForSaveAdder = pc.hp;
-                                            //gv.screenCombat.doStandardCreatureAttackAoO(pc, crt, 1);
-                                            //gv.screenType = "combat";
-                                            gv.sf.CombatTarget = pc;
-                                            gv.screenCombat.CreatureDoesAttack(crt, false, pc);
-                                            if ((pc.hp <= 0) || (pc.isHeld()))
-                                            {
-                                                gv.screenType = "combat";
-                                                gv.screenCombat.endPcTurn(true);
-                                            }
+                                            pc.coolDownTimes.RemoveAt(i);
+                                            pc.coolingSpellsByTag.RemoveAt(i);
                                         }
                                     }
                                 }
-                                //TODO check flow from here (interruption?)
+                            }
+
+                            //change creatureIndex or currentPlayerIndex
+                            currentPlayerIndex = idx;
+                            //set isPlayerTurn 
+                            isPlayerTurn = true;
+
+                            currentCombatMode = "info";
+                            currentMoveOrderIndex++;
+                            tagsOfTriggersAndPropTriggersCalledThisTurn.Clear();
+                            triggerIndexCombat = 0;
+                            CalculateUpperLeft();
+                            if (!pc.hasDelayedAlready)
+                            {
+                                doPropTriggers();
+                            }
+                            //tiereimpark
+                            checkEndEncounter();
+                            floatyTextOn = true;
+                            gv.mod.enteredFirstTime = false;
+                            //Karl
+                            //gv.Render();
+                            //go to start PlayerTurn or start CreatureTurn
+
+                            //surprise round
+
+                            bool partySkipDueToSurprise = false;
+                            if (roundCounter <= 2 && creaturesHaveUpperHand)
+                            {
+                                gv.cc.addLogText("<font color='red'>" + pc.name + " skips this turn (flat-footed)." + "</font><BR>");
+                                partySkipDueToSurprise = true;
+                            }
+                            if (roundCounter > 2)
+                            {
+                                partySkipDueToSurprise = false;
+                            }
+                            //partySkipDueToSurprise = true;
+                            if ((pc.isHeld()) || (pc.isDead()) || partySkipDueToSurprise)
+                            {
+                                pc.thisCastIsFreeOfCost = false;
+                                pc.isPreparingSpell = false;
+                                pc.doCastActionInXFullTurns = 0;
+                                pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                pc.thisCasterCanBeInterrupted = true;
+                                endPcTurn(true);
+                            }
+                            else
+                            {
+                                //********************************************************************
+                                /*
                                 //add code for interrupting the caster of a spell with long duration here
                                 if ((pc.hp < pc.hpLastTurn) && (pc.hp > 0) && (!pc.isHeld()))
                                 {
@@ -928,45 +1784,141 @@ namespace IBx
                                         }
                                     }
                                 }
+                                */
 
-                                //takes this full turn still to prepare spell
-                                if (pc.doCastActionInXFullTurns > 1)
+                                //**********************************************************************
+                                //no normal turn if player is preparing spell
+                                //it is either passing move while reducing remaining cast time by 1
+                                //it is doing the cast of the stored spell, jumping to select target mode ("cast") (note: without spell cost that was paid upfront)
+                                if (pc.isPreparingSpell)
                                 {
+                                    //AoO code
+                                    foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (gv.screenCombat.CalcDistance(crt, crt.combatLocX, crt.combatLocY, pc.combatLocX, pc.combatLocY) == 1)
+                                        {
+                                            bool triggersAoO = false;
+                                            foreach (Spell sp in gv.mod.moduleSpellsList)
+                                            {
+                                                if (sp.tag == pc.tagOfSpellToBeCastAfterCastTimeIsDone)
+                                                {
+                                                    if (sp.triggersAoO)
+                                                    {
+                                                        triggersAoO = true;
+                                                    }
+                                                    break;
+                                                }
+                                            }
 
-                                    //reduce cast timer by 1
-                                    pc.doCastActionInXFullTurns--;
+                                            foreach (Effect ef in pc.effectsList)
+                                            {
+                                                if (ef.allowCastingWithoutTriggeringAoO)
+                                                {
+                                                    triggersAoO = false;
+                                                    break;
+                                                }
+                                            }
 
-                                    //log
-                                    gv.cc.addLogText("<font color='yellow'>" + pc.name + " prepares a " + pc.playerClass.spellLabelSingular + " that takes still " + pc.doCastActionInXFullTurns + " full turn(s)..." + " </font><BR>");
+                                            if (triggersAoO)
+                                            {
+                                                gv.cc.addLogText("<font color='blue'>Attack of Opportunity by: " + crt.cr_name + "</font><BR>");
+                                                //int dcForSaveAdder = pc.hp;
+                                                //gv.screenCombat.doStandardCreatureAttackAoO(pc, crt, 1);
+                                                //gv.screenType = "combat";
+                                                gv.sf.CombatTarget = pc;
+                                                gv.screenCombat.CreatureDoesAttack(crt, false, pc);
+                                                if ((pc.hp <= 0) || (pc.isHeld()))
+                                                {
+                                                    gv.screenType = "combat";
+                                                    gv.screenCombat.endPcTurn(true);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //TODO check flow from here (interruption?)
+                                    //add code for interrupting the caster of a spell with long duration here
+                                    if ((pc.hp < pc.hpLastTurn) && (pc.hp > 0) && (!pc.isHeld()))
+                                    {
+                                        foreach (Effect ef in pc.effectsList)
+                                        {
+                                            if (ef.allowCastingWithoutRiskOfInterruption)
+                                            {
+                                                pc.thisCasterCanBeInterrupted = false;
+                                                break;
+                                            }
+                                        }
 
-                                    //end turn
-                                    endPcTurn(true);
+                                        if (pc.isPreparingSpell && pc.thisCasterCanBeInterrupted)
+                                        {
+                                            #region Do Calc Save and DC
+                                            int saveChkRoll = gv.sf.RandInt(20);
+                                            int saveChk = 0;
+                                            int DC = 10 + (pc.hpLastTurn - pc.hp);
+                                            int saveChkAdder = pc.will;
+
+                                            saveChk = saveChkRoll + saveChkAdder;
+                                            #endregion
+
+                                            if (saveChk >= DC)
+                                            {
+                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " makes will save(" + saveChkRoll + "+" + saveChkAdder + " >= " + DC + ") and " + pc.playerClass.labelForCastAction + " still despite damage during last turn." + "</font><BR>");
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " fails will save(" + saveChkRoll + "+" + saveChkAdder + " <= " + DC + ") - " + pc.playerClass.spellLabelSingular + " cancelled due to damage during last turn." + "</font><BR>");
+
+                                                //reset all relevant values to default
+                                                pc.isPreparingSpell = false;
+                                                pc.doCastActionInXFullTurns = 0;
+                                                pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                                pc.thisCastIsFreeOfCost = false;
+                                                pc.thisCasterCanBeInterrupted = true;
+                                                //currentCombatMode = "info";
+                                                //animationSeqStack.Clear();
+                                                endPcTurn(true);
+                                            }
+                                        }
+                                    }
+
+                                    //takes this full turn still to prepare spell
+                                    if (pc.doCastActionInXFullTurns > 1)
+                                    {
+
+                                        //reduce cast timer by 1
+                                        pc.doCastActionInXFullTurns--;
+
+                                        //log
+                                        gv.cc.addLogText("<font color='yellow'>" + pc.name + " prepares a " + pc.playerClass.spellLabelSingular + " that takes still " + pc.doCastActionInXFullTurns + " full turn(s)..." + " </font><BR>");
+
+                                        //end turn
+                                        endPcTurn(true);
+                                    }
+                                    //the cast shall happen this turn, pc.doCastActionInXFullTurn is 1
+                                    else
+                                    {
+                                        //preparation is over we come to the act of casting
+                                        pc.isPreparingSpell = false;
+
+                                        //setting cast timer to deafult zero again
+                                        pc.doCastActionInXFullTurns--;
+
+                                        //do a very special pc turn now, that directly begins with targeting the preselected spell
+                                        startPcTurnPreparedCast();
+                                    }
                                 }
-                                //the cast shall happen this turn, pc.doCastActionInXFullTurn is 1
+                                //a normal turn
                                 else
                                 {
-                                    //preparation is over we come to the act of casting
+                                    pc.thisCastIsFreeOfCost = false;
                                     pc.isPreparingSpell = false;
-
-                                    //setting cast timer to deafult zero again
-                                    pc.doCastActionInXFullTurns--;
-
-                                    //do a very special pc turn now, that directly begins with targeting the preselected spell
-                                    startPcTurnPreparedCast();
+                                    pc.doCastActionInXFullTurns = 0;
+                                    pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                    pc.thisCasterCanBeInterrupted = true;
+                                    startPcTurn();
                                 }
                             }
-                            //a normal turn
-                            else
-                            {
-                                pc.thisCastIsFreeOfCost = false;
-                                pc.isPreparingSpell = false;
-                                pc.doCastActionInXFullTurns = 0;
-                                pc.tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                                pc.thisCasterCanBeInterrupted = true;
-                                startPcTurn();
-                            }
+                            return;
                         }
-                        return;
                     }
                     idx++;
                 }
@@ -975,14 +1927,24 @@ namespace IBx
                 {
                     if (crt.moveOrder == currentMoveOrderIndex)
                     {
+                        //tiereimpark
+                        checkEndEncounter();
                         spriteList.Clear();
-                        gv.cc.floatyTextList.Clear();
+                        if (!floatyTextEnlargerOn)
+                        {
+                            gv.cc.floatyTextList.Clear();
+                        }
                         coordinatesOfPcTheCreatureMovesTowards.X = -1;
                         coordinatesOfPcTheCreatureMovesTowards.Y = -1;
                         storedPathOfCurrentCreature.Clear();
+                        //deathAnimationLocations.Clear();
                         gv.cc.addLogText("<font color='blue'>It's the turn of " + crt.cr_name + ". </font><BR>");
                         //switching to a system where effects last from turn they are applied to start of the target creature's next turn (multiplied with duration of effect)
-                        applyEffectsCombat(crt);
+                        applyEffectsFromSquare(crt.combatLocX, crt.combatLocY);
+                        applyEffectsCombat(crt, false);
+                        //applyEffectsFromSquare(crt.combatLocX, crt.combatLocY);
+                        //tiereimpark
+                        checkEndEncounter();
                         //change creatureIndex or currentPlayerIndex
                         creatureIndex = idx;
                         //set isPlayerTurn
@@ -995,10 +1957,28 @@ namespace IBx
 
                         currentCombatMode = "info";
                         currentMoveOrderIndex++;
+                        tagsOfTriggersAndPropTriggersCalledThisTurn.Clear();
+                        triggerIndexCombat = 0;
+                        CalculateUpperLeft();
+                        doPropTriggers();
+                        //tiereimpark
+                        checkEndEncounter();
+                        floatyTextOn = true;
                         //Karl
                         //gv.Render();
                         //go to start PlayerTurn or start CreatureTurn
-                        if ((crt.hp > 0) && (!crt.isHeld()))
+                        bool skipDueToSurprise = false;
+                        if (roundCounter <= 2 && partyHasUpperHand)
+                        {
+                            gv.cc.addLogText("<font color='blue'>" + crt.cr_name + " skips this turn (flat-footed)." + "</font><BR>");
+                            skipDueToSurprise = true;
+                        }
+                        if (roundCounter > 2)
+                        {
+                            skipDueToSurprise = false;
+                        }
+                        //skipDueToSurprise = false;
+                        if ((crt.hp > 0) && (!crt.isHeld()) && !skipDueToSurprise)
                         {
                             //upperLeftInFastForwardX = -100;
                             //upperLeftInFastForwardY = -100;
@@ -1012,26 +1992,1117 @@ namespace IBx
                     }
                     idx++;
                 }
-            //didn't find one so increment moveOrderIndex and try again
-            if (animationSeqStack.Count == 0)
-            {
-                currentMoveOrderIndex++;
-            }
+                //didn't find one so increment moveOrderIndex and try again
+                if (animationSeqStack.Count == 0)
+                {
+                    currentMoveOrderIndex++;
+                    //tagsOfTriggersAndPropTriggersCalledThisTurn.Clear();
+                    //triggerIndexCombat = 0;
+                    //doPropTriggers();
+                }
                 turnController();
-           }
-           
-           //else
-           //{
-                //animationsOn = true;
-                //Update2(gv.elapsed);
-                //turnController();
-           //}
+            }
+
+            //else
+            //{
+            //animationsOn = true;
+            //Update2(gv.elapsed);
+            //turnController();
+            //}
         }
 
         public void startNextRoundStuff()
         {
+            foreach (Player p in gv.mod.playerList)
+            {
+                p.hasDelayedAlready = false;
+            }
+            if (gv.mod.currentEncounter.conquerVictory)
+            {
+                //bool conquerConditionMet = false;
+                if (gv.mod.currentEncounter.conquerVictory)
+                {
+                    int locationsConquered = 0;
+                    int locationsRequired = 0;
+
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        if (p.hp >= 0)
+                        {
+                            if (p.combatLocX == gv.mod.currentEncounter.conquerTarget1X && p.combatLocY == gv.mod.currentEncounter.conquerTarget1Y)
+                            {
+                                locationsConquered++;
+                            }
+                            if (p.combatLocX == gv.mod.currentEncounter.conquerTarget2X && p.combatLocY == gv.mod.currentEncounter.conquerTarget2Y)
+                            {
+                                locationsConquered++;
+                            }
+                            if (p.combatLocX == gv.mod.currentEncounter.conquerTarget3X && p.combatLocY == gv.mod.currentEncounter.conquerTarget3Y)
+                            {
+                                locationsConquered++;
+                            }
+
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                            if (gv.mod.currentEncounter.conquerTargetsCumulative)
+                            {
+                                //1 and 2 and 3
+                                if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget2Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                                {
+                                    locationsRequired = 3;
+                                }
+                                //1+2
+                                else if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget2Y != -1)
+                                {
+                                    locationsRequired = 2;
+                                }
+                                //1+3
+                                else if (gv.mod.currentEncounter.conquerTarget1Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                                {
+                                    locationsRequired = 2;
+                                }
+                                //2+3
+                                else if (gv.mod.currentEncounter.conquerTarget2Y != -1 && gv.mod.currentEncounter.conquerTarget3Y != -1)
+                                {
+                                    locationsRequired = 2;
+                                }
+                                //1
+                                else if (gv.mod.currentEncounter.conquerTarget1Y != -1)
+                                {
+                                    locationsRequired = 1;
+                                }
+                                //2
+                                else if (gv.mod.currentEncounter.conquerTarget2Y != -1)
+                                {
+                                    locationsRequired = 1;
+                                }
+                                //3
+                                else if (gv.mod.currentEncounter.conquerTarget3Y != -1)
+                                {
+                                    locationsRequired = 1;
+                                }
+                            }
+                            //alternative target locations
+                            else
+                            {
+                                locationsRequired = 1;
+                            }
+
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        }
+                    }
+
+                    if (locationsConquered > 0 && locationsConquered >= locationsRequired)
+                    {
+                        gv.mod.currentEncounter.conquerConditionMet = true;
+                    }
+                }
+                checkEndEncounter();
+            }
+
+            if (gv.mod.currentEncounter.holdDefeat)
+            {
+                //bool holdConditionMet = false;
+                if (gv.mod.currentEncounter.holdDefeat)
+                {
+                    int locationsholded = 0;
+                    int locationsRequired = 0;
+
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        if (p.hp >= 0)
+                        {
+                            if (p.combatLocX == gv.mod.currentEncounter.holdTarget1X && p.combatLocY == gv.mod.currentEncounter.holdTarget1Y)
+                            {
+                                locationsholded++;
+                            }
+                            if (p.combatLocX == gv.mod.currentEncounter.holdTarget2X && p.combatLocY == gv.mod.currentEncounter.holdTarget2Y)
+                            {
+                                locationsholded++;
+                            }
+                            if (p.combatLocX == gv.mod.currentEncounter.holdTarget3X && p.combatLocY == gv.mod.currentEncounter.holdTarget3Y)
+                            {
+                                locationsholded++;
+                            }
+
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                            if (gv.mod.currentEncounter.holdTargetsCumulative)
+                            {
+                                //1 and 2 and 3
+                                if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget2Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                                {
+                                    locationsRequired = 3;
+                                }
+                                //1+2
+                                else if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget2Y != -1)
+                                {
+                                    locationsRequired = 2;
+                                }
+                                //1+3
+                                else if (gv.mod.currentEncounter.holdTarget1Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                                {
+                                    locationsRequired = 2;
+                                }
+                                //2+3
+                                else if (gv.mod.currentEncounter.holdTarget2Y != -1 && gv.mod.currentEncounter.holdTarget3Y != -1)
+                                {
+                                    locationsRequired = 2;
+                                }
+                                //1
+                                else if (gv.mod.currentEncounter.holdTarget1Y != -1)
+                                {
+                                    locationsRequired = 1;
+                                }
+                                //2
+                                else if (gv.mod.currentEncounter.holdTarget2Y != -1)
+                                {
+                                    locationsRequired = 1;
+                                }
+                                //3
+                                else if (gv.mod.currentEncounter.holdTarget3Y != -1)
+                                {
+                                    locationsRequired = 1;
+                                }
+                            }
+                            //alternative target locations
+                            else
+                            {
+                                locationsRequired = 1;
+                            }
+
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        }
+                    }
+
+                    if (locationsholded < locationsRequired)
+                    {
+                        gv.mod.currentEncounter.holdConditionMet = true;
+                    }
+                }
+                checkEndEncounter();
+            }
+
+            if (gv.mod.currentEncounter.standGroundVictory)
+            {
+                gv.mod.currentEncounter.standGroundInternalTimer--;
+                checkEndEncounter();
+            }
+
+            if (gv.mod.currentEncounter.timeLimitDefeat)
+            {
+                gv.mod.currentEncounter.timeLimitInternalTimer--;
+                checkEndEncounter();
+            }
+            //summe
+            //gv.sf.MessageBox("New round started.");
+            floatyTextOn = false;
+            gv.cc.addFloatyText(new Coordinate(0, 0), "Round " + roundCounter, "green");
+            gv.cc.addLogText("<font color='lime'>" + "Round " + roundCounter + "</font><BR>");
+            if (gv.mod.currentEncounter.standGroundVictory)
+            {
+                //gv.mod.currentEncounter.standGroundInternalTimer--;
+                gv.cc.addLogText("<font color='lime'>" + "Survive " + gv.mod.currentEncounter.standGroundInternalTimer + " more round(s).</font><BR>");
+            }
+            if (gv.mod.currentEncounter.timeLimitDefeat)
+            {
+                //gv.mod.currentEncounter.standGroundInternalTimer--;
+                gv.cc.addLogText("<font color='red'>" + "You have to win within " + gv.mod.currentEncounter.timeLimitInternalTimer + " round(s) or this battle is lost.</font><BR>");
+            }
+            floatyTextEnlargerOn = true;
+            //floatyTextOn = true;
+
             currentMoveOrderIndex = 0;
             //gv.sf.dsWorldTime();
+
+            //add new wave / delayed spawn here
+            foreach (CreatureRefs cr in gv.mod.currentEncounter.encounterCreatureRefsList)
+            {
+                if (roundCounter != 1)
+                {
+                    if (roundCounter == cr.spawnAtStartOfRoundX)
+                    {
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        Coordinate target = new Coordinate();
+                        target.X = Convert.ToInt32(cr.creatureStartLocationX);
+                        target.Y = Convert.ToInt32(cr.creatureStartLocationY);
+
+                        bool foundPlace = true;
+
+                        //holla
+                        //we must determine the size of the summoned creature
+                        Creature summon = new Creature();
+                        foreach (Creature c in gv.mod.moduleCreaturesList)
+                        {
+                            if (c.cr_resref == cr.creatureResRef)
+                            {
+                                summon.creatureSize = c.creatureSize;
+                            }
+                        }
+
+                        Coordinate plusX = new Coordinate();
+                        plusX.X = target.X + 1;
+                        plusX.Y = target.Y;
+                        Coordinate plusY = new Coordinate();
+                        plusY.X = target.X;
+                        plusY.Y = target.Y + 1;
+                        Coordinate plusXandY = new Coordinate();
+                        plusXandY.X = target.X + 1;
+                        plusXandY.Y = target.Y + 1;
+
+                        if (summon.creatureSize == 1)
+                        {
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        if (summon.creatureSize == 2)
+                        {
+
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusX))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        if (summon.creatureSize == 3)
+                        {
+
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusY))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        if (summon.creatureSize == 4)
+                        {
+
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusX))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusY))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusXandY.X < gv.mod.currentEncounter.MapSizeX && plusXandY.Y < gv.mod.currentEncounter.MapSizeY)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusXandY))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        //try to find a nearby square
+                        if (foundPlace)
+                        {
+                            //AddCreatureToCurrentEncounter(p1, target.X.ToString(), target.Y.ToString(), p4);
+                            gv.sf.AddCreatureToCurrentEncounter(cr.creatureResRef, target.X.ToString(), target.Y.ToString(), "10000");
+                        }
+                        else
+                        {
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                            //find correct summon spot, replace with nearest location if neccessary  
+
+                            bool changeSummonLocation = false;// used as switch for cycling through all tiles in case the originally intended spot was occupied/not-walkable  
+                            int targetTile = target.Y * gv.mod.currentEncounter.MapSizeX + target.X;//the index of the original target spot in the encounter's tiles list  
+                            List<int> freeTilesByIndex = new List<int>();// a new list used to store the indices of all free tiles in the enocunter  
+                            int tileLocX = 0;//just temporary storage in for locations of tiles  
+                            int tileLocY = 0;//just temporary storage in for locations of tiles  
+                            double floatTileLocY = 0;//was uncertain about rounding and conversion details, therefore need this one (see below)  
+                            bool tileIsFree = true;//identify a tile suited as new summon loaction  
+                            int nearestTileByIndex = -1;//store the nearest tile by index; as the relevant loop runs this will be replaced several times likely with ever nearer tiles  
+                            int dist = 0;//distance between the orignally intended summon location and a free tile  
+                            int lowestDist = 10000;//this storest the lowest ditance found while the loop runs  
+                            int deltaX = 0;//temporary value used for distance calculation   
+                            int deltaY = 0;//temporary value used for distance calculation   
+
+                            //Check whether the target tile is free (then it's not neccessary to loop through any other tiles)  
+                            //three checks are done in the following: walkable, occupied by creature, occupied by pc  
+
+                            //TODO: for oversized cretaures
+                            //which squares will the cretaure cover
+
+                            //first check: check walkable  
+                            //if (gv.mod.currentEncounter.encounterTiles[targetTile].Walkable == false)
+                            /*
+                            if (gv.mod.currentEncounter.encounterTiles[targetTile].Walkable == false)
+                            {
+                                changeSummonLocation = true;
+                            }
+
+                            //second check: check occupied by creature (only necceessary if walkable)  
+                            if (changeSummonLocation == false)
+                            {
+                                foreach (Creature cr in gv.mod.currentEncounter.encounterCreatureList)
+                                {
+                                    if ((cr.combatLocX == target.X) && (cr.combatLocY == target.Y))
+                                    {
+                                        changeSummonLocation = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            //third check: check occupied by pc (only necceessary if walkable and not occupied by creature)  
+                            if (changeSummonLocation == false)
+                            {
+                                foreach (Player pc in gv.mod.playerList)
+                                {
+                                    if ((pc.combatLocX == target.X) && (pc.combatLocY == target.Y))
+                                    {
+                                        changeSummonLocation = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            */
+                            changeSummonLocation = true;
+                            Coordinate target2 = new Coordinate();
+                            //target square was already occupied/non-walkable, so all other tiles are searched for the NEAREST FREE tile to switch the summon location to  
+                            if (changeSummonLocation == true)
+                            {
+                                //FIRST PART: get all FREE tiles in the current encounter  
+                                for (int i = 0; i < gv.mod.currentEncounter.encounterTiles.Count; i++)
+                                {
+                                    //get the x and y location of current tile by calculation derived from index number, assuming that counting starts at top left corner of a map (0x, 0y)  
+                                    //and that each horizintal x-line is counted first, then counting next horizonal x-line starting from the left again  
+                                    tileIsFree = true;
+                                    //Note: When e.g. MapsizeY is 7, the y values range from 0 to 6  
+                                    //MODULO
+                                    tileLocX = i % gv.mod.currentEncounter.MapSizeX;
+                                    //Note: ensure rounding down here   
+                                    floatTileLocY = i / gv.mod.currentEncounter.MapSizeX;
+                                    tileLocY = (int)Math.Floor(floatTileLocY);
+                                    target2.X = tileLocX;
+                                    target2.Y = tileLocY;
+
+                                    //code for large summons goes here, see above
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                    plusX.X = target2.X + 1;
+                                    plusX.Y = target2.Y;
+                                    plusY.X = target2.X;
+                                    plusY.Y = target2.Y + 1;
+                                    plusXandY.X = target2.X + 1;
+                                    plusXandY.Y = target2.Y + 1;
+
+                                    foundPlace = true;
+
+                                    if (summon.creatureSize == 1)
+                                    {
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+                                    if (summon.creatureSize == 2)
+                                    {
+
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusX))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+                                    if (summon.creatureSize == 3)
+                                    {
+
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusY))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+                                    if (summon.creatureSize == 4)
+                                    {
+
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusX))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusY))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusXandY.X < gv.mod.currentEncounter.MapSizeX && plusXandY.Y < gv.mod.currentEncounter.MapSizeY)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusXandY))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                                    if (foundPlace)
+                                    {
+                                        tileIsFree = true;
+                                    }
+                                    else
+                                    {
+                                        tileIsFree = false;
+                                    }
+                                    /*
+                                        //look at content of currently checked tile, again with three checks for walkable, occupied by creature, occupied by pc  
+                                        //walkbale check  
+                                        if (gv.mod.currentEncounter.encounterTiles[i].Walkable == false)
+                                    {
+                                        tileIsFree = false;
+                                    }
+
+                                    //creature occupied check  
+                                    if (tileIsFree == true)
+                                    {
+                                        foreach (Creature cr in gv.mod.currentEncounter.encounterCreatureList)
+                                        {
+                                            if ((cr.combatLocX == tileLocX) && (cr.combatLocY == tileLocY))
+                                            {
+                                                tileIsFree = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    //pc occupied check  
+                                    if (tileIsFree == true)
+                                    {
+                                        foreach (Player pc in gv.mod.playerList)
+                                        {
+                                            if ((pc.combatLocX == tileLocX) && (pc.combatLocY == tileLocY))
+                                            {
+                                                tileIsFree = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    */
+
+                                    //this writes all free tiles into a fresh list; please note that the values of the elements of this new list are our relevant index values  
+                                    //therefore it's not the index (which doesnt correalte to locations) in this list that's relevant, but the value of the element at that index  
+                                    if (tileIsFree == true)
+                                    {
+                                        freeTilesByIndex.Add(i);
+                                    }
+                                }
+
+                                //SECOND PART: find the free tile NEAREST to originally intended summon location  
+                                for (int i = 0; i < freeTilesByIndex.Count; i++)
+                                {
+                                    dist = 0;
+
+                                    //get location x and y of the tile stored at the index number i, i.e. get the value of elment indexed with i and transform to x and y location  
+                                    tileLocX = freeTilesByIndex[i] % gv.mod.currentEncounter.MapSizeX;
+                                    floatTileLocY = freeTilesByIndex[i] / gv.mod.currentEncounter.MapSizeX;
+                                    tileLocY = (int)Math.Floor(floatTileLocY);
+
+                                    //get distance between the current free tile and the originally intended summon location  
+                                    deltaX = (int)Math.Abs((tileLocX - target.X));
+                                    deltaY = (int)Math.Abs((tileLocY - target.Y));
+                                    if (deltaX > deltaY)
+                                    {
+                                        dist = deltaX;
+                                    }
+                                    else
+                                    {
+                                        dist = deltaY;
+                                    }
+
+                                    //filter out the nearest tile by remembering it and its distance for further comparison while the loop runs through all free tiles  
+                                    if (dist < lowestDist)
+                                    {
+                                        lowestDist = dist;
+                                        nearestTileByIndex = freeTilesByIndex[i];
+                                    }
+                                }
+
+                                if (nearestTileByIndex != -1)
+                                {
+                                    //get the nearest tile's x and y location and use it as creature summon coordinates  
+                                    tileLocX = nearestTileByIndex % gv.mod.currentEncounter.MapSizeX;
+                                    floatTileLocY = nearestTileByIndex / gv.mod.currentEncounter.MapSizeX;
+                                    tileLocY = (int)Math.Floor(floatTileLocY);
+
+                                    target.X = tileLocX;
+                                    target.Y = tileLocY;
+                                }
+
+                            }
+
+                            //just check whether a free squre does exist at all; if not, do not complete the summon  
+                            if ((nearestTileByIndex != -1) || (changeSummonLocation == false))
+                            {
+                                gv.sf.AddCreatureToCurrentEncounter(cr.creatureResRef, target.X.ToString(), target.Y.ToString(), "10000");
+                            }
+                            else
+                            {
+                                gv.cc.addLogText("<yl>" + "Creature fails to appear, no valid space.</yl><BR>");
+                            }
+
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        }
+
+
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+                        //gv.sf.AddCreatureToCurrentEncounter(cr.creatureResRef, cr.creatureStartLocationX.ToString(), cr.creatureStartLocationY.ToString(), "10000");
+
+
+                        string name = "";
+                        foreach (Creature c in gv.mod.moduleCreaturesList)
+                        {
+                            if (cr.creatureResRef == c.cr_resref)
+                            {
+                                name = c.cr_name;
+                            }
+                        }
+                        gv.cc.addLogText("<font color='lime'>" + name + " has just appeared. </font><BR>");
+                    }
+
+                    else if (cr.spawnAnotherEveryXRoundsAfterFirstSpawn != 0 && (roundCounter > cr.spawnAtStartOfRoundX) && (((roundCounter - cr.spawnAtStartOfRoundX) % cr.spawnAnotherEveryXRoundsAfterFirstSpawn) == 0))
+                    {
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        Coordinate target = new Coordinate();
+                        target.X = Convert.ToInt32(cr.creatureStartLocationX);
+                        target.Y = Convert.ToInt32(cr.creatureStartLocationY);
+
+                        bool foundPlace = true;
+
+                        //holla
+                        //we must determine the size of the summoned creature
+                        Creature summon = new Creature();
+                        foreach (Creature c in gv.mod.moduleCreaturesList)
+                        {
+                            if (c.cr_resref == cr.creatureResRef)
+                            {
+                                summon.creatureSize = c.creatureSize;
+                            }
+                        }
+
+                        Coordinate plusX = new Coordinate();
+                        plusX.X = target.X + 1;
+                        plusX.Y = target.Y;
+                        Coordinate plusY = new Coordinate();
+                        plusY.X = target.X;
+                        plusY.Y = target.Y + 1;
+                        Coordinate plusXandY = new Coordinate();
+                        plusXandY.X = target.X + 1;
+                        plusXandY.Y = target.Y + 1;
+
+                        if (summon.creatureSize == 1)
+                        {
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        if (summon.creatureSize == 2)
+                        {
+
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusX))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        if (summon.creatureSize == 3)
+                        {
+
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusY))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        if (summon.creatureSize == 4)
+                        {
+
+                            if (!gv.sf.IsSquareOpen(target))
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusX))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusY))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+
+                            if (plusXandY.X < gv.mod.currentEncounter.MapSizeX && plusXandY.Y < gv.mod.currentEncounter.MapSizeY)
+                            {
+                                if (!gv.sf.IsSquareOpen(plusXandY))
+                                {
+                                    foundPlace = false;
+                                }
+                            }
+                            else
+                            {
+                                foundPlace = false;
+                            }
+                        }
+
+                        //try to find a nearby square
+                        if (foundPlace)
+                        {
+                            //AddCreatureToCurrentEncounter(p1, target.X.ToString(), target.Y.ToString(), p4);
+                            gv.sf.AddCreatureToCurrentEncounter(cr.creatureResRef, target.X.ToString(), target.Y.ToString(), "10000");
+                        }
+                        else
+                        {
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                            //find correct summon spot, replace with nearest location if neccessary  
+
+                            bool changeSummonLocation = false;// used as switch for cycling through all tiles in case the originally intended spot was occupied/not-walkable  
+                            int targetTile = target.Y * gv.mod.currentEncounter.MapSizeX + target.X;//the index of the original target spot in the encounter's tiles list  
+                            List<int> freeTilesByIndex = new List<int>();// a new list used to store the indices of all free tiles in the enocunter  
+                            int tileLocX = 0;//just temporary storage in for locations of tiles  
+                            int tileLocY = 0;//just temporary storage in for locations of tiles  
+                            double floatTileLocY = 0;//was uncertain about rounding and conversion details, therefore need this one (see below)  
+                            bool tileIsFree = true;//identify a tile suited as new summon loaction  
+                            int nearestTileByIndex = -1;//store the nearest tile by index; as the relevant loop runs this will be replaced several times likely with ever nearer tiles  
+                            int dist = 0;//distance between the orignally intended summon location and a free tile  
+                            int lowestDist = 10000;//this storest the lowest ditance found while the loop runs  
+                            int deltaX = 0;//temporary value used for distance calculation   
+                            int deltaY = 0;//temporary value used for distance calculation   
+
+                            //Check whether the target tile is free (then it's not neccessary to loop through any other tiles)  
+                            //three checks are done in the following: walkable, occupied by creature, occupied by pc  
+
+                            //TODO: for oversized cretaures
+                            //which squares will the cretaure cover
+
+                            //first check: check walkable  
+                            //if (gv.mod.currentEncounter.encounterTiles[targetTile].Walkable == false)
+                            /*
+                            if (gv.mod.currentEncounter.encounterTiles[targetTile].Walkable == false)
+                            {
+                                changeSummonLocation = true;
+                            }
+
+                            //second check: check occupied by creature (only necceessary if walkable)  
+                            if (changeSummonLocation == false)
+                            {
+                                foreach (Creature cr in gv.mod.currentEncounter.encounterCreatureList)
+                                {
+                                    if ((cr.combatLocX == target.X) && (cr.combatLocY == target.Y))
+                                    {
+                                        changeSummonLocation = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            //third check: check occupied by pc (only necceessary if walkable and not occupied by creature)  
+                            if (changeSummonLocation == false)
+                            {
+                                foreach (Player pc in gv.mod.playerList)
+                                {
+                                    if ((pc.combatLocX == target.X) && (pc.combatLocY == target.Y))
+                                    {
+                                        changeSummonLocation = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            */
+                            changeSummonLocation = true;
+                            Coordinate target2 = new Coordinate();
+                            //target square was already occupied/non-walkable, so all other tiles are searched for the NEAREST FREE tile to switch the summon location to  
+                            if (changeSummonLocation == true)
+                            {
+                                //FIRST PART: get all FREE tiles in the current encounter  
+                                for (int i = 0; i < gv.mod.currentEncounter.encounterTiles.Count; i++)
+                                {
+                                    //get the x and y location of current tile by calculation derived from index number, assuming that counting starts at top left corner of a map (0x, 0y)  
+                                    //and that each horizintal x-line is counted first, then counting next horizonal x-line starting from the left again  
+                                    tileIsFree = true;
+                                    //Note: When e.g. MapsizeY is 7, the y values range from 0 to 6  
+                                    //MODULO
+                                    tileLocX = i % gv.mod.currentEncounter.MapSizeX;
+                                    //Note: ensure rounding down here   
+                                    floatTileLocY = i / gv.mod.currentEncounter.MapSizeX;
+                                    tileLocY = (int)Math.Floor(floatTileLocY);
+                                    target2.X = tileLocX;
+                                    target2.Y = tileLocY;
+
+                                    //code for large summons goes here, see above
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                    plusX.X = target2.X + 1;
+                                    plusX.Y = target2.Y;
+                                    plusY.X = target2.X;
+                                    plusY.Y = target2.Y + 1;
+                                    plusXandY.X = target2.X + 1;
+                                    plusXandY.Y = target2.Y + 1;
+
+                                    foundPlace = true;
+
+                                    if (summon.creatureSize == 1)
+                                    {
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+                                    if (summon.creatureSize == 2)
+                                    {
+
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusX))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+                                    if (summon.creatureSize == 3)
+                                    {
+
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusY))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+                                    if (summon.creatureSize == 4)
+                                    {
+
+                                        if (!gv.sf.IsSquareOpen(target2))
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusX.X < gv.mod.currentEncounter.MapSizeX)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusX))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusY.Y < gv.mod.currentEncounter.MapSizeY)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusY))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+
+                                        if (plusXandY.X < gv.mod.currentEncounter.MapSizeX && plusXandY.Y < gv.mod.currentEncounter.MapSizeY)
+                                        {
+                                            if (!gv.sf.IsSquareOpen(plusXandY))
+                                            {
+                                                foundPlace = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foundPlace = false;
+                                        }
+                                    }
+
+
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                                    if (foundPlace)
+                                    {
+                                        tileIsFree = true;
+                                    }
+                                    else
+                                    {
+                                        tileIsFree = false;
+                                    }
+                                    /*
+                                        //look at content of currently checked tile, again with three checks for walkable, occupied by creature, occupied by pc  
+                                        //walkbale check  
+                                        if (gv.mod.currentEncounter.encounterTiles[i].Walkable == false)
+                                    {
+                                        tileIsFree = false;
+                                    }
+
+                                    //creature occupied check  
+                                    if (tileIsFree == true)
+                                    {
+                                        foreach (Creature cr in gv.mod.currentEncounter.encounterCreatureList)
+                                        {
+                                            if ((cr.combatLocX == tileLocX) && (cr.combatLocY == tileLocY))
+                                            {
+                                                tileIsFree = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    //pc occupied check  
+                                    if (tileIsFree == true)
+                                    {
+                                        foreach (Player pc in gv.mod.playerList)
+                                        {
+                                            if ((pc.combatLocX == tileLocX) && (pc.combatLocY == tileLocY))
+                                            {
+                                                tileIsFree = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    */
+
+                                    //this writes all free tiles into a fresh list; please note that the values of the elements of this new list are our relevant index values  
+                                    //therefore it's not the index (which doesnt correalte to locations) in this list that's relevant, but the value of the element at that index  
+                                    if (tileIsFree == true)
+                                    {
+                                        freeTilesByIndex.Add(i);
+                                    }
+                                }
+
+                                //SECOND PART: find the free tile NEAREST to originally intended summon location  
+                                for (int i = 0; i < freeTilesByIndex.Count; i++)
+                                {
+                                    dist = 0;
+
+                                    //get location x and y of the tile stored at the index number i, i.e. get the value of elment indexed with i and transform to x and y location  
+                                    tileLocX = freeTilesByIndex[i] % gv.mod.currentEncounter.MapSizeX;
+                                    floatTileLocY = freeTilesByIndex[i] / gv.mod.currentEncounter.MapSizeX;
+                                    tileLocY = (int)Math.Floor(floatTileLocY);
+
+                                    //get distance between the current free tile and the originally intended summon location  
+                                    deltaX = (int)Math.Abs((tileLocX - target.X));
+                                    deltaY = (int)Math.Abs((tileLocY - target.Y));
+                                    if (deltaX > deltaY)
+                                    {
+                                        dist = deltaX;
+                                    }
+                                    else
+                                    {
+                                        dist = deltaY;
+                                    }
+
+                                    //filter out the nearest tile by remembering it and its distance for further comparison while the loop runs through all free tiles  
+                                    if (dist < lowestDist)
+                                    {
+                                        lowestDist = dist;
+                                        nearestTileByIndex = freeTilesByIndex[i];
+                                    }
+                                }
+
+                                if (nearestTileByIndex != -1)
+                                {
+                                    //get the nearest tile's x and y location and use it as creature summon coordinates  
+                                    tileLocX = nearestTileByIndex % gv.mod.currentEncounter.MapSizeX;
+                                    floatTileLocY = nearestTileByIndex / gv.mod.currentEncounter.MapSizeX;
+                                    tileLocY = (int)Math.Floor(floatTileLocY);
+
+                                    target.X = tileLocX;
+                                    target.Y = tileLocY;
+                                }
+
+                            }
+
+                            //just check whether a free squre does exist at all; if not, do not complete the summon  
+                            if ((nearestTileByIndex != -1) || (changeSummonLocation == false))
+                            {
+                                gv.sf.AddCreatureToCurrentEncounter(cr.creatureResRef, target.X.ToString(), target.Y.ToString(), "10000");
+                            }
+                            else
+                            {
+                                gv.cc.addLogText("<yl>" + "Creature fails to appear, no valid space.</yl><BR>");
+                            }
+
+                            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        }
+
+
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        //gv.sf.AddCreatureToCurrentEncounter(cr.creatureResRef, cr.creatureStartLocationX.ToString(), cr.creatureStartLocationY.ToString(), "10000");
+                        string name = "";
+                        foreach (Creature c in gv.mod.moduleCreaturesList)
+                        {
+                            if (cr.creatureResRef == c.cr_resref)
+                            {
+                                name = c.cr_name;
+                            }
+                        }
+                        gv.cc.addLogText("<font color='lime'>" + name + " has just appeared. </font><BR>");
+                    }
+                }
+            }
+            roundCounter++;
+
             doHardToKillTrait();
             doBattleRegenTrait();
             foreach (Player pc in gv.mod.playerList)
@@ -1074,11 +3145,485 @@ namespace IBx
 
             }
             //TODO:creature regeneration!
-            applyEffectsFromSquares();
+
+
+            //burning man
+            //applyEffectsFromSquares();
+
             //applyEffectsCombat();
+            timerForLingeringEffects();
+
             //IBScript Start Combat Round Hook
             gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnStartCombatRoundIBScript, gv.mod.currentEncounter.OnStartCombatRoundIBScriptParms);
             turnController();
+        }
+
+        public void timerForLingeringEffects()
+        {
+            for (int i = gv.mod.currentEncounter.effectsList.Count; i > 0; i--)
+            {
+                gv.mod.currentEncounter.effectsList[i - 1].durationOnSquareInUnits -= gv.mod.TimePerRound;
+                if (gv.mod.currentEncounter.effectsList[i - 1].durationOnSquareInUnits <= 0)
+                {
+                    gv.mod.currentEncounter.effectsList.RemoveAt(i - 1);
+                }
+            }
+        }
+
+        public void applyEffectsFromSquare(int x, int y)
+        {
+            if (gv.mod.currentEncounter.effectsList.Count > 0)
+            {
+                foreach (Effect ef in gv.mod.currentEncounter.effectsList)
+                {
+                    if (ef.combatLocX == x && ef.combatLocY == y)
+                    {
+                        foreach (Player pc in gv.mod.playerList)
+                        {
+                            if ((pc.combatLocX == x) && (pc.combatLocY == y) && pc.hp > 0)
+                            {
+                                if (!ef.usedForUpdateStats) //not used for stat updates
+                                {
+
+                                    bool skip = false;
+                                    //go through creature local vars and compare with this spellEffect's affectOnly and affectNever lists
+
+                                    //when finding a matching apply never, skip
+                                    foreach (LocalImmunityString s in ef.affectNeverList)
+                                    {
+                                        foreach (string ls in pc.knownTraitsTags)
+                                        {
+                                            if (s.Value.Equals(ls))
+                                            {
+                                                skip = true;
+                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " is immune to " + ef.name + "</font><BR>");
+                                                break;
+                                            }
+                                        }
+
+                                        if (skip)
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    //when finding an entry in affectOnlyList, skip unless it matches
+                                    if (!skip)
+                                    {
+                                        if (ef.affectOnlyList.Count > 0)
+                                        {
+                                            skip = true;
+
+                                            foreach (LocalImmunityString s in ef.affectOnlyList)
+                                            {
+                                                foreach (string ls in pc.knownTraitsTags)
+                                                {
+                                                    if (s.Value.Equals(ls))
+                                                    {
+                                                        skip = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if (skip)
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!skip)
+                                    {
+                                        //nerdlove
+                                        #region Do Calc Save and DC
+                                        int saveChkRoll = gv.sf.RandInt(20);
+                                        int saveChk = 0;
+                                        int DC = 0;
+                                        int saveChkAdder = 0;
+                                        if (ef.saveCheckType.Equals("will"))
+                                        {
+                                            saveChkAdder = pc.will;
+                                        }
+                                        else if (ef.saveCheckType.Equals("reflex"))
+                                        {
+                                            saveChkAdder = pc.reflex;
+                                        }
+                                        else if (ef.saveCheckType.Equals("fortitude"))
+                                        {
+                                            saveChkAdder = pc.fortitude;
+                                        }
+                                        else
+                                        {
+                                            saveChkAdder = -99;
+                                        }
+                                        saveChk = saveChkRoll + saveChkAdder;
+                                        DC = ef.saveCheckDC;
+                                        #endregion
+                                        if (saveChk >= DC) //passed save check
+                                        {
+                                            //if ((ef.doBuff || ef.doDeBuff) && (currentMoves == 0))
+                                            //{
+                                            //do notshow in log
+                                            //}
+                                            //else
+                                            //{
+                                            gv.cc.addLogText("<font color='yellow'>" + pc.name + " makes successful " + ef.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + " and avoids " + ef.name + " </font><BR>");
+                                            //}
+                                        }
+                                        else//failed save roll or no roll allowed
+                                        {
+                                            //failed save roll
+                                            if (saveChkAdder > -99)
+                                            {
+                                                //if ((ef.doBuff || ef.doDeBuff) && (currentMoves == 0))
+                                                //{
+                                                //do notshow in log
+                                                //}
+                                                //else
+                                                //{
+                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " failed " + ef.saveCheckType + " saving roll for " + ef.name + "(" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
+                                                //}
+                                                //gv.cc.addLogText("<font color='yellow'>" + pc.name + " failed " + thisSpellEffect.saveCheckType + " saving roll against " + thisSpellEffect.name + "</font><BR>");
+                                                //gv.cc.addLogText("<font color='yellow'>" + "(" + saveChkRoll.ToString() + "+" + saveChkAdder.ToString() + "<" + DC.ToString() + ")" + "</font><BR>");
+                                            }
+                                            else//no save roll allowed
+                                            {
+                                                //gv.cc.addLogText("<font color='yellow'>" + "No saving roll allowed against longer lasting effect of " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                            int numberOfRounds = ef.durationInUnits / gv.mod.TimePerRound;
+                                            //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
+
+                                            if (ef.durationInUnits > 0 || ef.doBuff || ef.doDeBuff)
+                                            {
+                                                //if ((ef.doBuff || ef.doDeBuff) && (currentMoves == 0))
+                                                //{
+                                                //do not add as it cannot be used
+                                                //}
+                                                //else
+                                                //{
+                                                pc.AddEffectByObject(ef, ef.classLevelOfSender);
+                                                //}
+                                            }
+                                            else
+                                            {
+                                                //if ((ef.doBuff || ef.doDeBuff) && (currentMoves == 0))
+                                                //{
+                                                //do not add as it cannot be used
+                                                //}
+                                                //else
+                                                //{
+                                                gv.cc.doEffectScript(pc, ef);
+                                                //}
+                                            }
+                                            //gv.cc.doEffectScript(pc, ef);
+
+                                            /*
+                                            if (ef.statusType == "Held")
+                                            {
+                                                //currentMoveOrderIndex++;
+                                                //endPcTurn(true);
+                                                if (pc.hp > 0)
+                                                {
+                                                    pc.charStatus = "Held";
+                                                }
+                                            }
+
+                                            if (ef.statusType == "Immobile")
+                                            {
+                                                currentMoves = pc.moveDistance;
+                                            }
+                                            */
+
+
+                                        }
+                                    }
+
+
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                    //gv.cc.doEffectScript(pc, ef);
+                                    //todo: ad eath/ending anmations here?
+                                    //freedom
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                    if (!isPlayerTurn)
+                                    {
+                                        string filename = ef.spriteFilename;
+                                        AnimationSequence newSeq = new AnimationSequence();
+                                        gv.screenCombat.animationSeqStack.Add(newSeq);
+                                        AnimationStackGroup newGroup = new AnimationStackGroup();
+                                        gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+                                        foreach (Coordinate coor in gv.sf.AoeSquaresList)
+                                        {
+                                            //gv.screenCombat.addEndingAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)), filename);
+                                        }
+
+                                        //add floaty text  
+                                        //add death animations
+
+                                        newGroup = new AnimationStackGroup();
+                                        gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+                                        gv.screenCombat.deathAnimationLocations.Clear();
+                                        gv.screenCombat.blockCreatureDrawLocations.Clear();
+
+                                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                        {
+                                            if (c.hp <= 0)
+                                            {
+                                                Coordinate coord = new Coordinate();
+                                                coord.X = c.combatLocX;
+                                                coord.Y = c.combatLocY;
+                                                gv.screenCombat.deathAnimationLocations.Add(coord);
+                                                gv.screenCombat.blockCreatureDrawLocations.Add(coord);
+                                            }
+                                        }
+                                        foreach (Coordinate coor in gv.screenCombat.deathAnimationLocations)
+                                        {
+                                            gv.screenCombat.addDeathAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)));
+                                        }
+
+                                        //gv.screenCombat.animationsOn = true;
+                                        gv.screenCombat.stepAnimationsOn = true;
+                                    }
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                }
+                            }
+                        }
+                        foreach (Creature crtr in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            //foreach (Coordinate coord in crtr.tokenCoveredSquares)
+                            //{
+                            ///if ((coord.X == ef.combatLocX) && (coord.Y == ef.combatLocY))
+                            if ((crtr.combatLocX == x) && (crtr.combatLocY == y))
+                            {
+                                if (!ef.usedForUpdateStats) //not used for stat updates
+                                {
+                                    //to do: add immunities
+                                    bool skip = false;
+                                    //go through creature local vars and compare with this spellEffect's affectOnly and affectNever lists
+
+                                    //when finding a matching apply never, skip
+                                    foreach (LocalImmunityString s in ef.affectNeverList)
+                                    {
+                                        foreach (LocalString ls in crtr.CreatureLocalStrings)
+                                        {
+                                            if (s.Value.Equals(ls.Value))
+                                            {
+                                                skip = true;
+                                                gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + " is immune to " + ef.name + "</font><BR>");
+                                                break;
+                                            }
+                                        }
+
+                                        if (skip)
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    //when finding an entry in affectOnlyList, skip unless it matches
+                                    if (!skip)
+                                    {
+                                        if (ef.affectOnlyList.Count > 0)
+                                        {
+                                            skip = true;
+
+                                            foreach (LocalImmunityString s in ef.affectOnlyList)
+                                            {
+                                                foreach (LocalString ls in crtr.CreatureLocalStrings)
+                                                {
+                                                    if (s.Value.Equals(ls.Value))
+                                                    {
+                                                        skip = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if (skip)
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!skip)
+                                    {
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                        #region Do Calc Save and DC
+                                        int saveChkRoll = gv.sf.RandInt(20);
+                                        int saveChk = 0;
+                                        int DC = 0;
+                                        int saveChkAdder = 0;
+                                        if (ef.saveCheckType.Equals("will"))
+                                        {
+                                            saveChkAdder = crtr.getWill();
+                                        }
+                                        else if (ef.saveCheckType.Equals("reflex"))
+                                        {
+                                            saveChkAdder = crtr.getReflex();
+                                        }
+                                        else if (ef.saveCheckType.Equals("fortitude"))
+                                        {
+                                            saveChkAdder = crtr.getFortitude();
+                                        }
+                                        else
+                                        {
+                                            saveChkAdder = -99;
+                                        }
+                                        saveChk = saveChkRoll + saveChkAdder;
+                                        DC = ef.saveCheckDC;
+                                        #endregion
+                                        //europa
+                                        if (saveChk >= DC) //passed save check
+                                        {
+                                            //if ((ef.doBuff || ef.doDeBuff) && (creatureMoves == 0))
+                                            //{
+                                            //do not show in log as it does not work
+                                            //}
+                                            //else
+                                            //{
+                                            gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + " makes successful " + ef.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + " and avoids " + ef.name + " </font><BR>");
+                                            //}
+                                            //gv.cc.addLogText("<font color='yellow'>" + "(" + thisSpellEffect.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + " and avoids the longer lasting effect of" + thisSpellEffect.name + " </font><BR>");
+                                            //gv.cc.addLogText("<font color='yellow'>" + "(" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
+                                            //gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " avoids the " + thisSpellEffect.name + " effect.</font><BR>");
+                                        }
+                                        else//failed save roll or no roll allowed
+                                        {
+                                            //failed save roll 
+                                            if (saveChkAdder > -99)
+                                            {
+                                                //if ((ef.doBuff || ef.doDeBuff) && (creatureMoves == 0))
+                                                //{
+                                                //do not show in log as it does not work
+                                                //}
+                                                //else
+                                                //{
+                                                gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + " failed " + ef.saveCheckType + " saving roll for " + ef.name + "(" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
+                                                //}
+                                            }
+                                            //else//no save roll allowed
+                                            //{
+                                            //gv.cc.addLogText("<font color='yellow'>" + "No save roll against longer lasting effect of " + thisSpellEffect.name + " allowed" + "</font><BR>");
+                                            //}
+                                            int numberOfRounds = ef.durationInUnits / gv.mod.TimePerRound;
+                                            //gv.cc.addLogText("<font color='lime'>" + ef.name + " is applied on " + crtr.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                            // 
+                                            if (ef.durationInUnits > 0 || ef.doBuff || ef.doDeBuff)
+                                            {
+                                                //if ((ef.doBuff || ef.doDeBuff) && (creatureMoves == 0))
+                                                //{
+                                                //do not add as it cannot be used
+                                                //}
+                                                //else
+                                                //{
+                                                crtr.AddEffectByObject(ef, ef.classLevelOfSender);
+                                                //}
+                                            }
+                                            else
+                                            {
+                                                //if ((ef.doBuff || ef.doDeBuff) && (creatureMoves == 0))
+                                                //{
+                                                //do not add as it cannot be used
+                                                //}
+                                                //else
+                                                //{
+                                                gv.cc.doEffectScript(crtr, ef);
+                                                //}
+                                            }
+
+                                            /*
+                                            if (ef.statusType == "Held")
+                                            {
+                                                //currentMoveOrderIndex++;
+                                                //endCreatureTurn(crtr);
+                                                if (crtr.hp > 0)
+                                                {
+                                                    crtr.cr_status = "Held";
+                                                }
+                                            }
+
+                                            if (ef.statusType == "Immobile")
+                                            {
+                                                creatureMoves = crtr.moveDistance;
+                                            }
+                                            */
+
+
+                                        }
+
+                                    }
+
+
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+
+
+
+
+                                    //gv.cc.doEffectScript(crtr, ef);
+                                    //break;
+                                    //todo: ad eath/ending anmations here?
+                                    //freedom
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                    if (!isPlayerTurn)
+                                    {
+                                        string filename = ef.spriteFilename;
+                                        AnimationSequence newSeq = new AnimationSequence();
+                                        gv.screenCombat.animationSeqStack.Add(newSeq);
+                                        AnimationStackGroup newGroup = new AnimationStackGroup();
+                                        gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+                                        foreach (Coordinate coor in gv.sf.AoeSquaresList)
+                                        {
+                                            //gv.screenCombat.addEndingAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)), filename);
+                                        }
+
+                                        //add floaty text  
+                                        //add death animations
+
+                                        newGroup = new AnimationStackGroup();
+                                        gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+                                        gv.screenCombat.deathAnimationLocations.Clear();
+                                        gv.screenCombat.blockCreatureDrawLocations.Clear();
+
+                                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                        {
+                                            if (c.hp <= 0)
+                                            {
+                                                Coordinate coord = new Coordinate();
+                                                coord.X = c.combatLocX;
+                                                coord.Y = c.combatLocY;
+                                                gv.screenCombat.deathAnimationLocations.Add(coord);
+                                                gv.screenCombat.blockCreatureDrawLocations.Add(coord);
+                                            }
+                                        }
+                                        foreach (Coordinate coor in gv.screenCombat.deathAnimationLocations)
+                                        {
+                                            gv.screenCombat.addDeathAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)));
+                                        }
+
+                                        //gv.screenCombat.animationsOn = true;
+                                        gv.screenCombat.stepAnimationsOn = true;
+                                    }
+                                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                }
+                            }
+                            //}
+                        }
+                    }
+                }
+                /*
+                for (int i = gv.mod.currentEncounter.effectsList.Count; i > 0; i--)
+                {
+                    //decrement duration of all effects on the encounter map squares
+                    if (gv.mod.currentEncounter.effectsList[i - 1].combatLocX == x && gv.mod.currentEncounter.effectsList[i - 1].combatLocY == y)
+                    {
+                        gv.mod.currentEncounter.effectsList[i - 1].durationInUnits -= gv.mod.TimePerRound;
+                        if (gv.mod.currentEncounter.effectsList[i - 1].durationInUnits <= 0)
+                        {
+                            gv.mod.currentEncounter.effectsList.RemoveAt(i - 1);
+                        }
+                    }
+                }
+                */
+            }
         }
 
         public void applyEffectsFromSquares()
@@ -1320,7 +3865,7 @@ namespace IBx
             crt.hp += increment;
             if (crt.hp > crt.hpMax)
             {
-                increment = increment - (crt.hp- crt.hpMax);
+                increment = increment - (crt.hp - crt.hpMax);
                 crt.hp = crt.hpMax;
             }
             if (increment > 0)
@@ -1405,17 +3950,20 @@ namespace IBx
         }
         */
 
-        public void applyEffectsCombat(Creature crtr)
+        public void applyEffectsCombat(Creature crtr, bool onlyStepBasedEffects)
         {
 
-            if (crtr.hp < crtr.hpLastTurn)
+            if (!onlyStepBasedEffects)
             {
-                for (int i = crtr.cr_effectsList.Count - 1; i >= 0; i--)
+                if (crtr.hp < crtr.hpLastTurn)
                 {
-                    if (crtr.cr_effectsList[i].endEffectWhenCarrierTakesDamage)
+                    for (int i = crtr.cr_effectsList.Count - 1; i >= 0; i--)
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + "took damage and is freed from" + crtr.cr_effectsList[i].name + "</font><BR>");
-                        crtr.cr_effectsList.Remove(crtr.cr_effectsList[i]);
+                        if (crtr.cr_effectsList[i].endEffectWhenCarrierTakesDamage)
+                        {
+                            gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + "took damage and is freed from" + crtr.cr_effectsList[i].name + "</font><BR>");
+                            crtr.cr_effectsList.Remove(crtr.cr_effectsList[i]);
+                        }
                     }
                 }
             }
@@ -1425,58 +3973,77 @@ namespace IBx
 
                 for (int i = crtr.cr_effectsList.Count - 1; i >= 0; i--)
                 {
-                if (crtr.cr_effectsList[i].repeatTerminalSaveEachRound)
-                {
-                    //sean
-                    #region Do Calc Save and DC
-                    int saveChkRoll = gv.sf.RandInt(20);
-                    int saveChk = 0;
-                    int DC = 0;
-                    int saveChkAdder = 0;
-                    if (crtr.cr_effectsList[i].saveCheckType.Equals("will"))
+                    if (crtr.cr_effectsList[i].repeatTerminalSaveEachRound && !onlyStepBasedEffects)
                     {
-                        saveChkAdder = crtr.getWill();
-                    }
-                    else if (crtr.cr_effectsList[i].saveCheckType.Equals("reflex"))
-                    {
-                        saveChkAdder = crtr.getReflex();
-                    }
-                    else if (crtr.cr_effectsList[i].saveCheckType.Equals("fortitude"))
-                    {
-                        saveChkAdder = crtr.getFortitude();
-                    }
-                    else
-                    {
-                        saveChkAdder = -99;
-                    }
-                    saveChk = saveChkRoll + saveChkAdder;
-                    DC = crtr.cr_effectsList[i].saveCheckDC;
-                    #endregion
-
-                    if (saveChk >= DC)
-                    {
-                        gv.cc.addLogText("<font color='yellow'>" + "The " + crtr.cr_effectsList[i].name + " effect on " + crtr.cr_name + " has been shrugged off." + " </font><BR>");
-                        crtr.cr_effectsList.RemoveAt(i);
-                    }
-                    else
-                    {
-                        gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + " fails to shrug off " + crtr.cr_effectsList[i].name + "." + " </font><BR>");
-                    }
-                }
-            }
-
-                //if remaining duration <= 0, remove from list
-                for (int i = crtr.cr_effectsList.Count-1; i >= 0; i--)
-                {
-                    if (crtr.cr_effectsList[i].durationInUnits <= 0)
-                    {
-                        if (!crtr.cr_effectsList[i].isPermanent)
+                        //sean
+                        #region Do Calc Save and DC
+                        int saveChkRoll = gv.sf.RandInt(20);
+                        int saveChk = 0;
+                        int DC = 0;
+                        int saveChkAdder = 0;
+                        if (crtr.cr_effectsList[i].saveCheckType.Equals("will"))
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + "The " + crtr.cr_effectsList[i].name + " effect on " + crtr.cr_name + " has just ended." + " </font><BR>");
+                            saveChkAdder = crtr.getWill();
+                        }
+                        else if (crtr.cr_effectsList[i].saveCheckType.Equals("reflex"))
+                        {
+                            saveChkAdder = crtr.getReflex();
+                        }
+                        else if (crtr.cr_effectsList[i].saveCheckType.Equals("fortitude"))
+                        {
+                            saveChkAdder = crtr.getFortitude();
+                        }
+                        else
+                        {
+                            saveChkAdder = -99;
+                        }
+                        saveChk = saveChkRoll + saveChkAdder;
+                        DC = crtr.cr_effectsList[i].saveCheckDC;
+                        #endregion
+
+                        if (saveChk >= DC)
+                        {
+                            gv.cc.addLogText("<font color='yellow'>" + "The " + crtr.cr_effectsList[i].name + " effect on " + crtr.cr_name + " has been shrugged off." + " </font><BR>");
                             crtr.cr_effectsList.RemoveAt(i);
+                        }
+                        else
+                        {
+                            gv.cc.addLogText("<font color='yellow'>" + crtr.cr_name + " fails to shrug off " + crtr.cr_effectsList[i].name + "." + " </font><BR>");
                         }
                     }
                 }
+
+
+                if (!onlyStepBasedEffects)
+                {
+                    //if remaining duration <= 0, remove from list
+                    for (int i = crtr.cr_effectsList.Count - 1; i >= 0; i--)
+                    {
+                        if (crtr.cr_effectsList[i].doBuff || crtr.cr_effectsList[i].doDeBuff)
+                        {
+                            if (crtr.cr_effectsList[i].durationInUnits <= -gv.mod.TimePerRound)
+                            {
+                                if (!crtr.cr_effectsList[i].isPermanent)
+                                {
+                                    gv.cc.addLogText("<font color='yellow'>" + "The " + crtr.cr_effectsList[i].name + " effect on " + crtr.cr_name + " has just ended." + " </font><BR>");
+                                    crtr.cr_effectsList.RemoveAt(i);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (crtr.cr_effectsList[i].durationInUnits <= 0)
+                            {
+                                if (!crtr.cr_effectsList[i].isPermanent)
+                                {
+                                    gv.cc.addLogText("<font color='yellow'>" + "The " + crtr.cr_effectsList[i].name + " effect on " + crtr.cr_name + " has just ended." + " </font><BR>");
+                                    crtr.cr_effectsList.RemoveAt(i);
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 //maybe reorder all based on their order property            
                 foreach (Effect ef in crtr.cr_effectsList)
@@ -1486,10 +4053,20 @@ namespace IBx
                     if ((!ef.usedForUpdateStats) && (!ef.isPermanent)) //not used for stat updates
                     {
                         //do script for each effect
-                        gv.cc.doEffectScript(crtr, ef);
+                        if (onlyStepBasedEffects)
+                        {
+                            if (ef.triggeredEachStepToo)
+                            {
+                                gv.cc.doEffectScript(crtr, ef);
+                            }
+                        }
+                        else
+                        {
+                            gv.cc.doEffectScript(crtr, ef);
+                        }
                     }
 
-                    if (!ef.isPermanent)
+                    if (!ef.isPermanent && !onlyStepBasedEffects)
                     {
                         ef.durationInUnits -= gv.mod.TimePerRound;
                     }
@@ -1504,27 +4081,29 @@ namespace IBx
             checkEndEncounter();
         }
 
-        public void applyEffectsCombat(Player pc)
+        public void applyEffectsCombat(Player pc, bool onlyStepBasedEffects)
         {
-            if (pc.hp < pc.hpLastTurn)
+            if (!onlyStepBasedEffects)
             {
-                for (int i = pc.effectsList.Count - 1; i >= 0; i--)
+                if (pc.hp < pc.hpLastTurn)
                 {
-                    if (pc.effectsList[i].endEffectWhenCarrierTakesDamage)
+                    for (int i = pc.effectsList.Count - 1; i >= 0; i--)
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + pc.name + "took damage and is freed from" + pc.effectsList[i].name + "</font><BR>");
-                        pc.effectsList.Remove(pc.effectsList[i]);
+                        if (pc.effectsList[i].endEffectWhenCarrierTakesDamage)
+                        {
+                            gv.cc.addLogText("<font color='yellow'>" + pc.name + "took damage and is freed from" + pc.effectsList[i].name + "</font><BR>");
+                            pc.effectsList.Remove(pc.effectsList[i]);
+                        }
                     }
                 }
             }
-
             try
             {
 
                 //**********************************************************
-                for (int i = pc.effectsList.Count-1; i >= 0; i--)
+                for (int i = pc.effectsList.Count - 1; i >= 0; i--)
                 {
-                    if (pc.effectsList[i].repeatTerminalSaveEachRound)
+                    if (pc.effectsList[i].repeatTerminalSaveEachRound && !onlyStepBasedEffects)
                     {
                         //sean
                         #region Do Calc Save and DC
@@ -1567,17 +4146,38 @@ namespace IBx
 
                 //**********************************************************
                 //europa3
-                for (int i = pc.effectsList.Count-1; i >= 0; i--)
+
+                if (!onlyStepBasedEffects)
                 {
-                    if (pc.effectsList[i].durationInUnits <= 0)
+                    for (int i = pc.effectsList.Count - 1; i >= 0; i--)
                     {
-                        if (!pc.effectsList[i].isPermanent)
+                        //pc.effectsList[i].durationOnSquareInUnits
+                        if (pc.effectsList[i].doBuff || pc.effectsList[i].doDeBuff)
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + "The " + pc.effectsList[i].name + " effect on " + pc.name + " has just ended." + " </font><BR>");
-                            pc.effectsList.RemoveAt(i);
+                            if (pc.effectsList[i].durationInUnits <= -gv.mod.TimePerRound)
+                            {
+                                if (!pc.effectsList[i].isPermanent)
+                                {
+                                    gv.cc.addLogText("<font color='yellow'>" + "The " + pc.effectsList[i].name + " effect on " + pc.name + " has just ended." + " </font><BR>");
+                                    pc.effectsList.RemoveAt(i);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (pc.effectsList[i].durationInUnits <= 0)
+                            {
+                                if (!pc.effectsList[i].isPermanent)
+                                {
+                                    gv.cc.addLogText("<font color='yellow'>" + "The " + pc.effectsList[i].name + " effect on " + pc.name + " has just ended." + " </font><BR>");
+                                    pc.effectsList.RemoveAt(i);
+                                }
+                            }
                         }
                     }
                 }
+
+
 
                 //maybe reorder all based on their order property            
                 foreach (Effect ef in pc.effectsList)
@@ -1586,14 +4186,25 @@ namespace IBx
                     //ef.durationInUnits -= gv.mod.TimePerRound;
                     if ((!ef.usedForUpdateStats) && (!ef.isPermanent)) //not used for stat updates
                     {
-                        gv.cc.doEffectScript(pc, ef);
+                        if (onlyStepBasedEffects)
+                        {
+                            if (ef.triggeredEachStepToo)
+                            {
+                                gv.cc.doEffectScript(pc, ef);
+                            }
+                        }
+                        else
+                        {
+                            gv.cc.doEffectScript(pc, ef);
+                        }
                     }
 
-                    if (!ef.isPermanent)
+                    if (!ef.isPermanent && !onlyStepBasedEffects)
                     {
                         ef.durationInUnits -= gv.mod.TimePerRound;
                     }
                 }
+
 
             }
             catch (Exception ex)
@@ -1678,28 +4289,62 @@ namespace IBx
 
         public void startPcTurn()
         {
-            gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Clear();
-            gv.mod.swiftActionHasBeenUsedThisTurn = false;
-
-            CalculateUpperLeft();
-            //karl
-            //gv.Render();
-            isPlayerTurn = true;
-            gv.touchEnabled = true;
-            currentCombatMode = "move";
-            Player pc = gv.mod.playerList[currentPlayerIndex];
-            gv.sf.UpdateStats(pc);
-            currentMoves = 0;
-            //do onTurn IBScript
-            gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnStartCombatTurnIBScript, gv.mod.currentEncounter.OnStartCombatTurnIBScriptParms);
-
-            if ((pc.isHeld()) || (pc.isDead()) || (pc.isUnconcious()))
+            if (gv.mod.playerList.Count > 0)
             {
-                endPcTurn(false);
-            }
-            if (pc.isImmobile())
-            {
-                currentMoves = 99;
+                gv.mod.nonRepeatableFreeActionsUsedThisTurnBySpellTag.Clear();
+                gv.mod.swiftActionHasBeenUsedThisTurn = false;
+                CalculateUpperLeft();
+                //karl
+                //gv.Render();
+                isPlayerTurn = true;
+                gv.touchEnabled = true;
+                currentCombatMode = "move";
+                Player pc = gv.mod.playerList[currentPlayerIndex];
+                gv.sf.UpdateStats(pc);
+                currentMoves = 0;
+                if (gv.mod.currentEncounter.onlyOneMoveModifier)
+                {
+                    currentMoves = pc.moveDistance - 1.5f;
+                }
+                //do onTurn IBScript
+                if (!pc.hasDelayedAlready)
+                {
+                    gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnStartCombatTurnIBScript, gv.mod.currentEncounter.OnStartCombatTurnIBScriptParms);
+                }
+                //damage battle conditions
+                if (!pc.hasDelayedAlready)
+                {
+                    if (gv.mod.currentEncounter.hpDamageEachRound > 0)
+                    {
+                        if (pc.hp > -20)
+                        {
+                            pc.hp -= gv.mod.currentEncounter.hpDamageEachRound;
+                            gv.cc.addLogText("<font color='red'>" + pc.name + " lost " + gv.mod.currentEncounter.hpDamageEachRound + " hp.</font><BR>");
+                        }
+                    }
+
+                    if (gv.mod.currentEncounter.spDamageEachRound > 0)
+                    {
+                        if (pc.sp > 0)
+                        {
+                            pc.sp -= gv.mod.currentEncounter.spDamageEachRound;
+                            gv.cc.addLogText("<font color='red'>" + pc.name + " lost " + gv.mod.currentEncounter.spDamageEachRound + " sp.</font><BR>");
+                            if (pc.sp < 0)
+                            {
+                                pc.sp = 0;
+                            }
+                        }
+                    }
+                }
+
+                if ((pc.isHeld()) || (pc.isDead()) || (pc.isUnconcious()))
+                {
+                    endPcTurn(false);
+                }
+                if (pc.isImmobile())
+                {
+                    currentMoves = 99;
+                }
             }
         }
         public void doCombatAttack(Player pc)
@@ -1707,6 +4352,7 @@ namespace IBx
             dontEndTurn = false;
             if (isInRange(pc))
             {
+
                 foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
                 {
                     //if ((crt.combatLocX == targetHighlightCenterLocation.X) && (crt.combatLocY == targetHighlightCenterLocation.Y))
@@ -1762,7 +4408,7 @@ namespace IBx
                                 for (int j = 1; j < numSweep; j++)
                                 {
                                     Creature crt2 = GetNextAdjacentCreature(pc);
-                                    if (crt2 != null)
+                                    if (crt2 != null && crt2 != crt)
                                     {
                                         crtLocX = crt2.combatLocX;
                                         crtLocY = crt2.combatLocY;
@@ -1790,7 +4436,7 @@ namespace IBx
                                             for (int j = 0; j < numCleave; j++)
                                             {
                                                 Creature crt2 = GetNextAdjacentCreature(pc);
-                                                if (crt2 != null)
+                                                if (crt2 != null && crt2 != crt)
                                                 {
                                                     crtLocX = crt2.combatLocX;
                                                     crtLocY = crt2.combatLocY;
@@ -1842,7 +4488,9 @@ namespace IBx
 
                             return;
                         }
+                        //break here?
                     }
+
                 }
             }
         }
@@ -1915,9 +4563,9 @@ namespace IBx
                 {
                     gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> could not pay cost for attack, -10 to hit." + "</font><BR>");
                 }
+
                 gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> attacks </font><font color='silver'>" + crt.cr_name + "</font>");
                 gv.cc.addLogText("<font color='white'> and HITS (</font><font color='lime'>" + damage + "</font><font color='white'> damage)</font><BR>");
-
                 if (!automaticallyHits)
                 {
                     gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " >= " + defense + "</font><BR>");
@@ -1964,6 +4612,7 @@ namespace IBx
                     foreach (Coordinate coor in crt.tokenCoveredSquares)
                     {
                         deathAnimationLocations.Add(new Coordinate(coor.X, coor.Y));
+                        //gv.screenCombat.blockCreatureDrawLocations.Add();
                     }
                     gv.cc.addLogText("<font color='lime'>You killed the " + crt.cr_name + "</font><BR>");
                     return 2; //killed
@@ -2005,13 +4654,33 @@ namespace IBx
             gv.screenCombat.TargetCastPressed(pc, it);
             //gv.cc.doSpellBasedOnScriptOrEffectTag(sp, it, trg, false, false);
         }
+
         public void endPcTurn(bool endStealthMode)
         {
+            /*
+            if (currentPlayerIndex <= gv.mod.playerList.Count - 1)
+            {
+                for (int i = gv.mod.playerList[currentPlayerIndex].effectsList.Count - 1; i >= 0; i--)
+                {
+                    //pc.effectsList[i].durationOnSquareInUnits
+                    if (gv.mod.playerList[currentPlayerIndex].effectsList[i].durationInUnits <= 0)
+                    {
+                        if (!gv.mod.playerList[currentPlayerIndex].effectsList[i].isPermanent)
+                        {
+                            gv.cc.addLogText("<font color='yellow'>" + "The " + gv.mod.playerList[currentPlayerIndex].effectsList[i].name + " effect on " + gv.mod.playerList[currentPlayerIndex].name + " has just ended." + " </font><BR>");
+                            gv.mod.playerList[currentPlayerIndex].effectsList.RemoveAt(i);
+                        }
+                    }
+                }
+            }
+            */
             updateStatsAllCreatures();
+            currentMoves = 0;
+            creatureMoves = 0;
             //if (currentCombatMode != "cast")
             if ((!gv.cc.currentSelectedSpell.usesTurnToActivate && currentCombatMode == "cast") || currentCombatMode != "cast")
             {
-                
+
                 /*
                 while (animationSeqStack.Count > 0)
                 {
@@ -2028,6 +4697,12 @@ namespace IBx
                 if (currentPlayerIndex <= gv.mod.playerList.Count - 1)
                 {
                     Player pc = gv.mod.playerList[currentPlayerIndex];
+                    /*
+                    if (pc.charStatus == "Held" && pc.hp > 0)
+                    {
+                        pc.charStatus = "Alive";
+                    }
+                    */
                     if (pc.hp >= 0)
                     {
                         pc.hpLastTurn = pc.hp;
@@ -2038,41 +4713,60 @@ namespace IBx
                     }
                     else //else test to see if enter/stay in stealth gv.mode if has trait
                     {
-                        doStealthModeCheck(pc);
+                        if (roundCounter <= 2 && creaturesHaveUpperHand)
+                        {
+                            //no stealthing during surprise round of creatures
+                        }
+                        else
+                        {
+                            doStealthModeCheck(pc);
+                        }
                     }
                     canMove = true;
                 }
                 //if (!continueTurn)
                 //{
-                    turnController();
+                deathAnimationLocations.Clear();
+
+                turnController();
                 //}
                 //else
                 //{
-                    //continueTurn = false;
+                //continueTurn = false;
                 //}
             }
         }
         public void doStealthModeCheck(Player pc)
         {
             int skillMod = 0;
-            if (pc.knownTraitsTags.Contains("stealth4"))
+            if (pc.knownTraitsTags.Contains(gv.mod.tagOfStealthCombatTrait + "6"))
             {
-                Trait tr = gv.mod.getTraitByTag("stealth4");
+                Trait tr = gv.mod.getTraitByTag(gv.mod.tagOfStealthCombatTrait + "6");
                 skillMod = tr.skillModifier;
             }
-            else if (pc.knownTraitsTags.Contains("stealth3"))
+            else if (pc.knownTraitsTags.Contains(gv.mod.tagOfStealthCombatTrait + "5"))
             {
-                Trait tr = gv.mod.getTraitByTag("stealth3");
+                Trait tr = gv.mod.getTraitByTag(gv.mod.tagOfStealthCombatTrait + "5");
                 skillMod = tr.skillModifier;
             }
-            else if (pc.knownTraitsTags.Contains("stealth2"))
+            else if (pc.knownTraitsTags.Contains(gv.mod.tagOfStealthCombatTrait + "4"))
             {
-                Trait tr = gv.mod.getTraitByTag("stealth2");
+                Trait tr = gv.mod.getTraitByTag(gv.mod.tagOfStealthCombatTrait + "4");
                 skillMod = tr.skillModifier;
             }
-            else if (pc.knownTraitsTags.Contains("stealth"))
+            else if (pc.knownTraitsTags.Contains(gv.mod.tagOfStealthCombatTrait + "3"))
             {
-                Trait tr = gv.mod.getTraitByTag("stealth");
+                Trait tr = gv.mod.getTraitByTag(gv.mod.tagOfStealthCombatTrait + "3");
+                skillMod = tr.skillModifier;
+            }
+            else if (pc.knownTraitsTags.Contains(gv.mod.tagOfStealthCombatTrait + "2"))
+            {
+                Trait tr = gv.mod.getTraitByTag(gv.mod.tagOfStealthCombatTrait + "2");
+                skillMod = tr.skillModifier;
+            }
+            else if (pc.knownTraitsTags.Contains(gv.mod.tagOfStealthCombatTrait))
+            {
+                Trait tr = gv.mod.getTraitByTag(gv.mod.tagOfStealthCombatTrait);
                 skillMod = tr.skillModifier;
             }
             else
@@ -2112,7 +4806,16 @@ namespace IBx
         public void doCreatureTurn()
         {
             canMove = true;
-            Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            Creature crt = new Creature();
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (c.moveOrder == currentMoveOrderIndex - 1)
+                {
+                    crt = c;
+                    break;
+                }
+            }
+            //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
             crt.targetPcTag = "none";
 
             //do onStartTurn IBScript
@@ -2123,7 +4826,16 @@ namespace IBx
         }
         public void doCreatureNextAction()
         {
-            Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            Creature crt = new Creature();
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (c.moveOrder == currentMoveOrderIndex - 1)
+                {
+                    crt = c;
+                    break;
+                }
+            }
+            //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
             CalculateUpperLeftCreature(crt);
             if ((crt.hp > 0) && (!crt.isHeld()))
             {
@@ -2144,7 +4856,7 @@ namespace IBx
                         gv.postDelayed("doAnimation", (int)(2.5f * gv.mod.combatAnimationSpeed));
                         ///while (gv.animationTimer.Enabled)
                         //{
-                            //gv.postDelayed("doAnimation", (int)(2.5f * gv.mod.combatAnimationSpeed));
+                        //gv.postDelayed("doAnimation", (int)(2.5f * gv.mod.combatAnimationSpeed));
                         //}
                         //doCreatureTurnAfterDelay();
                     }
@@ -2163,7 +4875,16 @@ namespace IBx
         }
         public void doCreatureTurnAfterDelay()
         {
-            Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            Creature crt = new Creature();
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (c.moveOrder == currentMoveOrderIndex - 1)
+                {
+                    crt = c;
+                    break;
+                }
+            }
+            //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
 
             gv.sf.ActionToTake = null;
             gv.sf.SpellToCast = null;
@@ -2222,7 +4943,32 @@ namespace IBx
         }
         public void CreatureMoves()
         {
-            Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            Creature crt = new Creature();
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (c.moveOrder == currentMoveOrderIndex - 1)
+                {
+                    crt = c;
+                    break;
+                }
+            }
+            //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+
+            foreach (string eTag in crt.tagsOfEffectsToRemoveOnMove)
+            {
+                for (int i = crt.cr_effectsList.Count - 1; i >= 0; i--)
+                {
+                    if (crt.cr_effectsList[i].tag == eTag)
+                    {
+                        crt.cr_effectsList.RemoveAt(i);
+                    }
+                }
+            }
+            //burning man
+            //updateStatsAllCreatures();
+            //update stats
+            crt.tagsOfEffectsToRemoveOnMove.Clear();
+
             if (creatureMoves + 0.5f < crt.getMoveDistance())
             {
                 /*
@@ -2419,11 +5165,11 @@ namespace IBx
                             }
                         }
                     }
-                        //if only one, target this pc
+                    //if only one, target this pc
 
-                        //if more than one, target the pc with lowest hp in this group
+                    //if more than one, target the pc with lowest hp in this group
 
-                        //if none,jump to check below
+                    //if none,jump to check below
 
                     //check all player characters on the battlefield and target nearest (nomral routine below)
                 }
@@ -2733,35 +5479,35 @@ namespace IBx
                     InterimPath2 = new List<Coordinate>();
                     //if ((crt.cr_ai == "BasicAttacker") || (crt.cr_ai == "simpleHunter") || (crt.cr_ai == "GeneralCaster"))
                     //{
-                        foreach (Player p in gv.mod.playerList)
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        //EXPI: add stealth to the conditions
+                        if (p.isAlive() && !p.steathModeOn && !p.isInvisible())
                         {
-                            //EXPI: add stealth to the conditions
-                            if (p.isAlive() && !p.steathModeOn && !p.isInvisible())
+                            //if ((p.combatLocX != coordinatesOfPcTheCreatureMovesTowards.X) || (p.combatLocY != coordinatesOfPcTheCreatureMovesTowards.Y))
+                            //{
+                            coordinatesOfPcTheCreatureMovesTowards.X = p.combatLocX;
+                            coordinatesOfPcTheCreatureMovesTowards.Y = p.combatLocY;
+                            //run pathFinder to get new location
+                            pf.resetGrid(crt);
+                            InterimPath.Clear();
+                            InterimPath2.Clear();
+                            InterimPath2 = pf.findNewPoint(crt, new Coordinate(coordinatesOfPcTheCreatureMovesTowards.X, coordinatesOfPcTheCreatureMovesTowards.Y), true);
+                            foreach (Coordinate cord in InterimPath2)
                             {
-                                //if ((p.combatLocX != coordinatesOfPcTheCreatureMovesTowards.X) || (p.combatLocY != coordinatesOfPcTheCreatureMovesTowards.Y))
-                                //{
-                                coordinatesOfPcTheCreatureMovesTowards.X = p.combatLocX;
-                                coordinatesOfPcTheCreatureMovesTowards.Y = p.combatLocY;
-                                //run pathFinder to get new location
-                                pf.resetGrid(crt);
-                                InterimPath.Clear();
-                                InterimPath2.Clear();
-                                InterimPath2 = pf.findNewPoint(crt, new Coordinate(coordinatesOfPcTheCreatureMovesTowards.X, coordinatesOfPcTheCreatureMovesTowards.Y), true);
-                                foreach (Coordinate cord in InterimPath2)
-                                {
-                                    InterimPath.Add(cord);
-                                }
+                                InterimPath.Add(cord);
+                            }
 
-                                //InterimPath = pf.findNewPoint(crt, new Coordinate(coordinatesOfPcTheCreatureMovesTowards.X, coordinatesOfPcTheCreatureMovesTowards.Y), true);
-                                if (InterimPath != null)
+                            //InterimPath = pf.findNewPoint(crt, new Coordinate(coordinatesOfPcTheCreatureMovesTowards.X, coordinatesOfPcTheCreatureMovesTowards.Y), true);
+                            if (InterimPath != null)
+                            {
+                                if ((InterimPath.Count < shortestPath) && (InterimPath.Count > 0))
                                 {
-                                    if ((InterimPath.Count < shortestPath) && (InterimPath.Count > 0))
-                                    {
-                                        //coordinatesOfPcTheCreatureMovesTowards.X = p.combatLocX;
-                                        //coordinatesOfPcTheCreatureMovesTowards.Y = p.combatLocY;
-                                        shortestPath = InterimPath.Count;
-                                        pc = p;
-                                        crt.targetPcTag = pc.tag;
+                                    //coordinatesOfPcTheCreatureMovesTowards.X = p.combatLocX;
+                                    //coordinatesOfPcTheCreatureMovesTowards.Y = p.combatLocY;
+                                    shortestPath = InterimPath.Count;
+                                    pc = p;
+                                    crt.targetPcTag = pc.tag;
 
                                     //trying jers way
                                     //storedPathOfCurrentCreature.Clear();
@@ -2772,33 +5518,33 @@ namespace IBx
 
 
                                 }//if inner
-                                }//if outer
-                                 //}//if
-                            }//if
-                        }//foreach
+                            }//if outer
+                             //}//if
+                        }//if
+                    }//foreach
 
 
-                        List<Coordinate> bestPath = new List<Coordinate>();
-                        for (int i = 0; i < InterimPath.Count - 2; i++)
+                    List<Coordinate> bestPath = new List<Coordinate>();
+                    for (int i = 0; i < InterimPath.Count - 2; i++)
+                    {
+                        //bestPath.Clear();
+                        pf.resetGrid(crt);
+                        foreach (Coordinate c in pf.findNewPoint(crt, new Coordinate(InterimPath[i].X, InterimPath[i].Y), false))
                         {
-                            //bestPath.Clear();
-                            pf.resetGrid(crt);
-                            foreach (Coordinate c in pf.findNewPoint(crt, new Coordinate(InterimPath[i].X, InterimPath[i].Y), false))
-                            {
-                                bestPath.Add(c);
-                            }
-                            //pf.resetGrid(crt);
-                            //bestPath = pf.findNewPoint(crt, InterimPath[i], false);
-                            if (bestPath.Count > 1)
-                            {
-                                storedPathOfCurrentCreature.Clear();
-                                foreach (Coordinate c in bestPath)
-                                {
-                                    storedPathOfCurrentCreature.Add(c);
-                                }
-                                break;
-                            }
+                            bestPath.Add(c);
                         }
+                        //pf.resetGrid(crt);
+                        //bestPath = pf.findNewPoint(crt, InterimPath[i], false);
+                        if (bestPath.Count > 1)
+                        {
+                            storedPathOfCurrentCreature.Clear();
+                            foreach (Coordinate c in bestPath)
+                            {
+                                storedPathOfCurrentCreature.Add(c);
+                            }
+                            break;
+                        }
+                    }
                     //}
 
                     //*************************************************
@@ -2944,7 +5690,7 @@ namespace IBx
                     {
                         gv.cc.addLogText("<yl>newCoor:" + crt.newCoor.X + "," + crt.newCoor.Y + "</yl><BR>");
                     }
-                    
+
                     //it's a diagonal move
                     if ((crt.combatLocX != crt.newCoor.X) && (crt.combatLocY != crt.newCoor.Y))
                     {
@@ -2982,7 +5728,9 @@ namespace IBx
                                 destinationPixelLocY = crt.newCoor.Y * gv.squareSize;
                             }
                              * */
-                            if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (gv.mod.useCombatSmoothMovement))
+                            //if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (gv.mod.useCombatSmoothMovement))
+                            if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (gv.mod.useCombatSmoothMovement))
+
                             {
                                 blockAnimationBridge = true;
                             }
@@ -3066,7 +5814,8 @@ namespace IBx
                             //CHANGE FACING BASED ON MOVE
                             doCreatureCombatFacing(crt, crt.newCoor.X, crt.newCoor.Y);
                             moveCost = 1;
-                            if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (gv.mod.useCombatSmoothMovement))
+                            //if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (gv.mod.useCombatSmoothMovement))
+                            if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (gv.mod.useCombatSmoothMovement))
                             {
                                 blockAnimationBridge = true;
                             }
@@ -3138,7 +5887,8 @@ namespace IBx
                         //CHANGE FACING BASED ON MOVE
                         doCreatureCombatFacing(crt, crt.newCoor.X, crt.newCoor.Y);
 
-                        if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (gv.mod.useCombatSmoothMovement))
+                        //if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (gv.mod.useCombatSmoothMovement))
+                        if ((IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) && (gv.mod.useCombatSmoothMovement))
                         {
                             blockAnimationBridge = true;
                         }
@@ -3264,9 +6014,9 @@ namespace IBx
                         creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
                         //set attack animation and do a delay
                         attackAnimationTimeElapsed = 0;
-                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f) );
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) );
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
 
                         //add projectile animation
                         startX = getPixelLocX(crt.combatLocX);
@@ -3342,8 +6092,8 @@ namespace IBx
 
                         attackAnimationTimeElapsed = 0;
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f));
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
 
                         //do melee attack stuff and animations  
                         AnimationSequence newSeq = new AnimationSequence();
@@ -3439,9 +6189,9 @@ namespace IBx
                         creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
                         //set attack animation and do a delay
                         attackAnimationTimeElapsed = 0;
-                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f) );
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) );
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
 
                         //add projectile animation
                         startX = getPixelLocX(crt.combatLocX);
@@ -3516,8 +6266,8 @@ namespace IBx
 
                         attackAnimationTimeElapsed = 0;
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f));
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
 
                         //do melee attack stuff and animations  
                         AnimationSequence newSeq = new AnimationSequence();
@@ -3628,8 +6378,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.Height / 100f));
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f));
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -3892,14 +6642,14 @@ namespace IBx
             }
             */
 
-                //just pick a random spell from KnownSpells
-                //try a few times to pick a random spell that has enough SP
-                for (int i = 0; i < crt.knownSpellsTags.Count; i++)
-                {
-                int rnd = gv.sf.RandInt(crt.knownSpellsTags.Count)-1;
+            //just pick a random spell from KnownSpells
+            //try a few times to pick a random spell that has enough SP
+            for (int i = 0; i < crt.knownSpellsTags.Count; i++)
+            {
+                int rnd = gv.sf.RandInt(crt.knownSpellsTags.Count) - 1;
                 while (usedSpellNumbers.Contains(rnd))
                 {
-                    rnd = gv.sf.RandInt(crt.knownSpellsTags.Count)-1;
+                    rnd = gv.sf.RandInt(crt.knownSpellsTags.Count) - 1;
                 }
                 usedSpellNumbers.Add(rnd);
 
@@ -3935,7 +6685,7 @@ namespace IBx
                         {
                             castingChance = lint.Value;
                         }
-                    } 
+                    }
 
                     int rnd2 = gv.sf.RandInt(remainingCastCeiling);
                     remainingCastCeiling -= castingChance;
@@ -3951,7 +6701,7 @@ namespace IBx
 
                     }
                 }
-               
+
                 if (sp != null)
                 {
                     if (sp.costSP <= crt.sp)
@@ -3964,7 +6714,7 @@ namespace IBx
 
                             bool inRange = false;
                             int endX = pc.combatLocX * gv.squareSize + (gv.squareSize / 2);
-                            int endY = pc.combatLocY* gv.squareSize + (gv.squareSize / 2);
+                            int endY = pc.combatLocY * gv.squareSize + (gv.squareSize / 2);
                             int startX = crt.combatLocX * gv.squareSize + (gv.squareSize / 2);
                             int startY = crt.combatLocY * gv.squareSize + (gv.squareSize / 2);
                             if ((getDistance(new Coordinate(pc.combatLocX, pc.combatLocY), new Coordinate(crt.combatLocX, crt.combatLocY)) <= sp.range)
@@ -3990,7 +6740,7 @@ namespace IBx
                                             break;
                                         }
                                     }
-                                } 
+                                }
                             }
 
 
@@ -4012,7 +6762,7 @@ namespace IBx
                         {
                             gv.sf.SpellToCast = sp;
                             Coordinate bestLoc = targetBestPointLocation(crt);
-                            if (bestLoc.X == -1 &&  bestLoc.Y == -1)
+                            if (bestLoc.X == -1 && bestLoc.Y == -1)
                             {
                                 //didn't find a target so use closest PC
                                 Player pc = targetClosestPC(crt);
@@ -4063,10 +6813,20 @@ namespace IBx
                                     break;
                                 }
                             }
-                            
+
                             if (sp.spellScript == "spHeal")
                             {
                                 isHPHealing = true;
+                            }
+
+                            if (sp.spellEffectTag != "none" && sp.spellEffectTag != "None" && sp.spellEffectTag != "")
+                            {
+                                effectToCheck = gv.mod.getEffectByTag(sp.spellEffectTag);
+                                if (effectToCheck.doHeal == true && effectToCheck.healHP == true)
+                                {
+                                    isHPHealing = true;
+                                    // break;
+                                }
                             }
 
                             //if not healing, let us see if sp restoring
@@ -4082,20 +6842,30 @@ namespace IBx
                                     }
                                 }
 
+                                if (sp.spellEffectTag != "none" && sp.spellEffectTag != "None" && sp.spellEffectTag != "")
+                                {
+                                    effectToCheck = gv.mod.getEffectByTag(sp.spellEffectTag);
+                                    if (effectToCheck.doHeal == true && effectToCheck.healHP == false)
+                                    {
+                                        isSPRestoring = true;
+                                        //break;
+                                    }
+                                }
+
                             }
 
-                            Creature targetCrt = new Creature(); 
+                            Creature targetCrt = new Creature();
                             //add sp healing
                             if (isHPHealing)
                             {
                                 //also only have these helper functions only return cretaure in spell range and visible
                                 gv.sf.SpellToCast = sp;
-                                targetCrt = GetCreatureWithMostDamaged(crt); 
+                                targetCrt = GetCreatureWithMostDamaged(crt);
                             }
                             else if (isSPRestoring)
                             {
                                 //also only have these helper functions only return cretaure in spell range and visible
-     
+
                                 gv.sf.SpellToCast = sp;
                                 targetCrt = GetCreatureWithMostSPMissing(crt);
                             }
@@ -4143,7 +6913,7 @@ namespace IBx
                             }
                             */
                         }
-                        else if (gv.sf.SpellToCast.spellTargetType.Equals("Self"))
+                        else if (sp.spellTargetType.Equals("Self"))
                         {
                             //target is self (currently assumed that spell is a heal spell)
                             Creature targetCrt = crt;
@@ -4330,17 +7100,33 @@ namespace IBx
                 {
                     if (crt.cr_resref == crtOrg.cr_resref)
                     {
-                                crt.hpMax = crtOrg.hpMax + crt.getMaxHPModifier();
-                               
+                        crt.hpMax = crtOrg.hpMax + crt.getMaxHPModifier();
+
                     }
                 }
             }
-        } 
+        }
 
         public void endCreatureTurn(Creature crt)
         {
+            /*
+            //if remaining duration <= 0, remove from list
+            for (int i = crt.cr_effectsList.Count - 1; i >= 0; i--)
+            {
+                if (crt.cr_effectsList[i].durationInUnits <= 0)
+                {
+                    if (!crt.cr_effectsList[i].isPermanent)
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + "The " + crt.cr_effectsList[i].name + " effect on " + crt.cr_name + " has just ended." + " </font><BR>");
+                        crt.cr_effectsList.RemoveAt(i);
+                    }
+                }
+            }
+            */
             crt.targetPcTag = "none";
             updateStatsAllCreatures();
+            creatureMoves = 0;
+            currentMoves = 0;
             //store current hp of cretaure, use it at start of creature next turn to see whether damage occured in the meantime
             //if it ccured, effet prone too breaking on damage are removed from the creature
             /*
@@ -4359,6 +7145,66 @@ namespace IBx
             {
                 crt.hpLastTurn = crt.hp;
             }
+            /*
+            if (crt.hp > 0)
+            {
+                if (crt.cr_status == "Held")
+                {
+                    crt.cr_status = "Alive";
+                }
+            }
+            */
+            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            //remove any dead creatures
+            if (!stepAnimationsOn)
+            {
+                for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
+                {
+                    if (gv.mod.currentEncounter.encounterCreatureList[x].hp <= 0)
+                    {
+                        try
+                        {
+                            //do OnDeath IBScript
+                            gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
+                            //project repeatable
+                            int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - x;
+                            if (deadIdx < idx)
+                            {
+                                idx--;
+                                if (idx < 0)
+                                {
+                                    idx = 0;
+                                }
+                            }
+                            if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[x].cr_tag)
+                            {
+                                gv.mod.currentEncounter.assassinationConditionMet = true;
+                            }
+                            gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
+                            if (!gv.mod.currentEncounter.isRepeatable)
+                            {
+                                //gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            gv.errorLog(ex.ToString());
+                        }
+                    }
+                }
+                foreach (Player p in gv.mod.playerList)
+                {
+                    if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                    {
+                        if (p.hp <= 0)
+                        {
+                            gv.mod.currentEncounter.protectionConditionMet = true;
+                        }
+                    }
+                }
+            }
+
+            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
             canMove = true;
             gv.sf.ActionToTake = null;
@@ -4508,12 +7354,12 @@ namespace IBx
 
                 if (pc.hp <= 0)
                 {
-                    gv.cc.addLogText("<font color='red'>" + pc.name + " drops down unconsciously!" + "</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
                     pc.charStatus = "Dead";
                 }
                 if (pc.hp <= -20)
                 {
-                    deathAnimationLocations.Add(new Coordinate(pc.combatLocX, pc.combatLocY));
+                    // deathAnimationLocations.Add(new Coordinate(pc.combatLocX, pc.combatLocY));
                 }
                 return true;
             }
@@ -4735,10 +7581,11 @@ namespace IBx
         {
             Spell sp = gv.mod.getSpellByTag(crt.onScoringHitCastSpellTag);
             if (sp == null) { return; }
-            gv.cc.doSpellBasedOnScriptOrEffectTag(sp, crt, pc, false,false);
+            gv.cc.doSpellBasedOnScriptOrEffectTag(sp, crt, pc, false, false);
         }
         public bool checkEndEncounter()
         {
+            //chaweng2
             int foundOneCrtr = 0;
             foreach (Creature crtr in gv.mod.currentEncounter.encounterCreatureList)
             {
@@ -4747,19 +7594,168 @@ namespace IBx
                     foundOneCrtr = 1;
                 }
             }
-            if ((foundOneCrtr == 0) && (gv.screenType.Equals("combat")))
+            if (foundOneCrtr == 0)
             {
+                gv.mod.currentEncounter.encounterCreatureList.Clear();
+            }
+            bool standGroundConditionMet = false;
+            if (gv.mod.currentEncounter.standGroundVictory && gv.mod.currentEncounter.standGroundInternalTimer <= 0)
+            {
+                standGroundConditionMet = true;
+            }
+
+            bool timeLimitConditionMet = false;
+            if (gv.mod.currentEncounter.timeLimitDefeat && gv.mod.currentEncounter.timeLimitInternalTimer <= 0)
+            {
+                timeLimitConditionMet = true;
+                gv.mod.currentEncounter.timeLimitInternalTimer = gv.mod.currentEncounter.timeLimitTimer;
+            }
+
+            foreach (Player p in gv.mod.playerList)
+            {
+                if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                {
+                    if (p.hp <= 0)
+                    {
+                        gv.mod.currentEncounter.protectionConditionMet = true;
+                    }
+                }
+            }
+
+            //Victory:
+
+            if (gv.screenType.Equals("combat") && (gv.mod.currentEncounter.assassinationConditionMet || foundOneCrtr == 0 || standGroundConditionMet) || gv.mod.currentEncounter.conquerConditionMet)
+            {
+
+                for (int i = gv.mod.currentEncounter.encounterCreatureList.Count - 1; i >= 0; i--)
+                {
+                    gv.mod.currentEncounter.encounterCreatureList.RemoveAt(i);
+                }
+                gv.mod.currentEncounter.encounterCreatureList.Clear();
+
+                if (gv.mod.currentEncounter.allSpellsWithoutAoE)
+                {
+                    for (int i = 0; i < gv.mod.moduleSpellsList.Count; i++)
+                    {
+                        gv.mod.moduleSpellsList[i].aoeRadius = gv.mod.currentEncounter.originalAoEofSpells[i];
+                    }
+                }
+
+                if (gv.mod.currentEncounter.allSpellsSPCostDoubled)
+                {
+                    foreach (Spell sp in gv.mod.moduleSpellsList)
+                    {
+                        sp.costSP /= 2;
+                    }
+                }
+
+                /*
+                //reset all conditions
+                gv.mod.currentEncounter.assassinationConditionMet = false;
+
+                //kill all creatures, check whether encounter is repeatable
+                gv.mod.currentEncounter.encounterCreatureList.Clear();
+                if (!gv.mod.currentEncounter.isRepeatable)
+                {
+                    gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
+                }
+                */
+                //zulaufen
+
+                //gv.screenType = "main";
                 gv.mod.currentEncounter.isOver = true;
+                allDone = true;
+                roundCounter = 1;
                 gv.touchEnabled = true;
+                animationsOn = false;
+                stepAnimationsOn = false;
+
+                //testing
+                attackAnimationFrameCounter = 0;
+                attackAnimationDelayCounter = 0;
+                idx = 0;
+                currentMoveOrderIndex = 0;
+                currentPlayerIndex = 0;
+                creatureIndex = 0;
+
+                gv.screenCombat.animationSeqStack.Clear();
+                gv.screenCombat.deathAnimationLocations.Clear();
+                gv.screenCombat.hitAnimationLocation = null;
+                gv.screenCombat.endingAnimationLocation = null;
+                gv.cc.floatyTextList.Clear();
+
+
+                //remove night and nolight debuffs
+                gv.mod.poorVisionModifier = 0;
+                for (int index = 0; index < gv.mod.playerList.Count; index++)
+                {
+                    gv.sf.UpdateStats(gv.mod.playerList[index]);
+                }
 
                 //remove temporary allies
-                for (int i = gv.mod.playerList.Count-1; i >= 0; i--)
+                for (int i = gv.mod.playerList.Count - 1; i >= 0; i--)
                 {
                     if (gv.mod.playerList[i].isTemporaryAllyForThisEncounterOnly)
                     {
                         gv.mod.playerList.RemoveAt(i);
                     }
                 }
+
+                //build the text, depending on victory conditions fullfilled and exp, gold, items gained
+
+                //EXP
+                int giveEachXP = encounterXP / gv.mod.playerList.Count;
+                foreach (Player givePcXp in gv.mod.playerList)
+                {
+                    givePcXp.XP = givePcXp.XP + giveEachXP;
+                }
+                string expText = "";
+                if (giveEachXP > 0)
+                {
+                    expText = "Each party member receives " + giveEachXP.ToString() + " XP.<BR>";
+                }
+
+                //Gold
+                gv.mod.partyGold += gv.mod.currentEncounter.goldDrop;
+                string goldText = "";
+                if (gv.mod.currentEncounter.goldDrop > 0)
+                {
+                    goldText = "The party found " + gv.mod.currentEncounter.goldDrop.ToString() + " " + gv.mod.goldLabelPlural + ".<BR>";
+                }
+
+                //Items 
+                string itemsText = "";
+                if (gv.mod.currentEncounter.encounterInventoryRefsList.Count > 0)
+                {
+                    itemsText = "The party found the following item(s):<BR>";
+                    foreach (ItemRefs itRef in gv.mod.currentEncounter.encounterInventoryRefsList)
+                    {
+                        gv.mod.partyInventoryRefsList.Add(itRef.DeepCopy());
+                        itemsText += itRef.name + "<BR>";
+                    }
+                }
+
+                //Vcitory type description: victoryText
+                string victoryText = "The party has won the encounter. <BR>";
+                if (foundOneCrtr == 0)
+                {
+                    victoryText += "All enemies have been defeated. <BR>";
+                }
+                else if (gv.mod.currentEncounter.assassinationConditionMet)
+                {
+                    victoryText += "The main target, " + gv.mod.currentEncounter.assassinationTargetName + ", has been defeated. <BR>";
+                }
+                else if (standGroundConditionMet)
+                {
+                    victoryText += "The party survived " + gv.mod.currentEncounter.standGroundTimer + " rounds. <BR>";
+                }
+                else if (gv.mod.currentEncounter.conquerConditionMet)
+                {
+                    victoryText += "The party has occupied the required location(s). <BR>";
+                }
+
+                //after all vicotry conditions...
+                victoryText += expText + goldText + itemsText;
 
                 if (gv.mod.currentEncounter.isFriendlyContest)
                 {
@@ -4771,38 +7767,76 @@ namespace IBx
                         }
                         pc.charStatus = "Alive";
                     }
-                    gv.sf.MessageBox("Your party has won this contest - the knocked out characters recover a bit.");
+                    gv.sf.MessageBox(victoryText + "The knocked out characters recover a bit as this was just a contest.<BR>");
+                    gv.cc.addLogText("<font color='yellow'>" + "Your party has won this contest." + "<BR></font>");
                 }
-
-                    // give gold drop
-                    if (gv.mod.currentEncounter.goldDrop > 0)
+                else
                 {
-                    gv.cc.addLogText("<font color='yellow'>The party finds " + gv.mod.currentEncounter.goldDrop + " " + gv.mod.goldLabelPlural + ".<BR></font>");
-                }
-                gv.mod.partyGold += gv.mod.currentEncounter.goldDrop;
-                // give InventoryList
-                if (gv.mod.currentEncounter.encounterInventoryRefsList.Count > 0)
-                {
-
-                    string s = "<font color='fuchsia'>" + "The party has found:<BR>";
-                    foreach (ItemRefs itRef in gv.mod.currentEncounter.encounterInventoryRefsList)
+                    if (gv.mod.currentEncounter.customTextforMessageBoxAtEndOfEncounter != "none" && gv.mod.currentEncounter.customTextforMessageBoxAtEndOfEncounter != "None" && gv.mod.currentEncounter.customTextforMessageBoxAtEndOfEncounter != "")
                     {
-                        gv.mod.partyInventoryRefsList.Add(itRef.DeepCopy());
-                        s += itRef.name + "<BR>";
-                        //find this creatureRef in gv.mod creature list
-
+                        gv.sf.MessageBox(gv.mod.currentEncounter.customTextforMessageBoxAtEndOfEncounter);
                     }
-                    gv.cc.addLogText(s + "</font>" + "<BR>");
+                    else if (gv.mod.currentEncounter.showDefaultMessageBoxAtEndOfEncounter)
+                    {
+                        gv.sf.MessageBox(victoryText);
+                    }
+
+                    if (gv.mod.currentEncounter.customTextforLogTextAtEndOfEncounter != "none" && gv.mod.currentEncounter.customTextforLogTextAtEndOfEncounter != "None" && gv.mod.currentEncounter.customTextforLogTextAtEndOfEncounter != "")
+                    {
+                        gv.cc.addLogText(gv.mod.currentEncounter.customTextforLogTextAtEndOfEncounter);
+                    }
+                    else if (gv.mod.currentEncounter.showDefaultLogTextAtEndOfEncounter)
+                    {
+                        gv.cc.addLogText("<font color='yellow'>" + victoryText + "<BR></font>");
+                    }
+
+
+
+
+                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    //gv.sf.MessageBox("Your party has won this battle by defeating all enemies.<br> <br> Each character gained: " + giveEachXP + "XP.");
+                    //gv.cc.addLogText("<font color='yellow'>" + "Your party has won this battle by defeating all enemies." + "<BR></font>");
+
                 }
 
-                int giveEachXP = encounterXP / gv.mod.playerList.Count;
-                gv.cc.addLogText("fuchsia", "Each receives " + giveEachXP + " XP");
-                foreach (Player givePcXp in gv.mod.playerList)
+                //reset all conditions
+                gv.mod.currentEncounter.assassinationConditionMet = false;
+                gv.mod.currentEncounter.standGroundInternalTimer = gv.mod.currentEncounter.standGroundTimer;
+                gv.mod.currentEncounter.conquerConditionMet = false;
+
+                //kill all creatures, check whether encounter is repeatable
+                gv.mod.currentEncounter.encounterCreatureList.Clear();
+                if (!gv.mod.currentEncounter.isRepeatable)
                 {
-                    givePcXp.XP = givePcXp.XP + giveEachXP;
+                    gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
                 }
-                //btnSelect.Text = "SELECT";
+
+                //prevent any auto scrolling
+
+                gv.mod.blockRightKey = false;
+                gv.mod.blockLeftKey = false;
+                gv.mod.blockUpKey = false;
+                gv.mod.blockDownKey = false;
+
+
+                gv.aTimer = false;
+                gv.a2Timer = false;
+                gv.mod.scrollModeSpeed = 1.15f;
+
+                //gv.mod.isScrollingNow = false;
+                //gv.mod.doNotStartScrolling = true;
+                //gv.mod.scrollingDirection = "none";
+
+                //gv.blockMoveBecausOfCurrentScrolling = true;
+                gv.mod.scrollingTimer = 100;
+                if (gv.mod.mainMapMovementRelevantKeyPressed)
+                {
+                    gv.mod.justLeftCombat = true;
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 gv.screenType = "main";
+
+
                 if (gv.mod.playMusic)
                 {
                     gv.stopCombatMusic();
@@ -4811,22 +7845,59 @@ namespace IBx
                 }
                 //do END ENCOUNTER IBScript
                 gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnEndCombatIBScript, gv.mod.currentEncounter.OnEndCombatIBScriptParms);
+
+                gv.mod.comningFromBattle = true;
+                //aegon2
+                /*
                 if (gv.cc.calledEncounterFromProp)
                 {
+                    if (gv.sf.ThisProp != null)
+                    {
+                        gv.sf.ThisProp.wasKilled = true;
+                        gv.mod.PlayerLocationX = gv.sf.ThisProp.LocationX;
+                        gv.mod.PlayerLocationY = gv.sf.ThisProp.LocationY;
+                        gv.mod.EncounterOfTurnDone = false;
+                        gv.cc.doPropTriggers();
+                    }
+                }
+                */
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx
+                //was running good (minus chest)
+                if (gv.cc.EncCalled)
+                {
+                    foreach (Prop pKill in gv.mod.currentArea.Props)
+                    {
+                        if (pKill.PropTag == gv.cc.TagOFPropToKill)
+                        {
+                            //aegon2
+                            //gv.sf.ThisProp.wasKilled = true;
+                            pKill.wasKilled = true;
+                            gv.mod.PlayerLocationX = pKill.LocationX;
+                            gv.mod.PlayerLocationY = pKill.LocationY;
+
+                        }
+                    }
                     //gv.mod.isRecursiveDoTriggerCallMovingProp = true;
                     //gv.mod.isRecursiveCall = true;
+                    //gv.sf.ThisProp.wasKilled = true; 
                     gv.mod.EncounterOfTurnDone = false;
+                    //gv.triggerPropIndex = 4;
                     gv.cc.doPropTriggers();
                     //gv.mod.isRecursiveCall = false;
                 }
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+
                 else
                 {
                     gv.mod.EncounterOfTurnDone = false;
+                    //gv.triggerPropIndex = 4;
                     gv.cc.doTrigger();
                 }
                 return true;
             }
 
+            //lost battle
             int foundOnePc = 0;
             foreach (Player pc in gv.mod.playerList)
             {
@@ -4839,12 +7910,75 @@ namespace IBx
                     }
                 }
             }
-            if (foundOnePc == 0)
+
+            if (gv.screenType.Equals("combat") && (foundOnePc == 0 || timeLimitConditionMet || gv.mod.currentEncounter.protectionConditionMet || gv.mod.currentEncounter.holdConditionMet))
             {
+
+                if (gv.mod.currentEncounter.allSpellsSPCostDoubled)
+                {
+                    foreach (Spell sp in gv.mod.moduleSpellsList)
+                    {
+                        sp.costSP /= 2;
+                    }
+                }
+
+                if (gv.mod.currentEncounter.allSpellsWithoutAoE)
+                {
+                    for (int i = 0; i < gv.mod.moduleSpellsList.Count; i++)
+                    {
+                        gv.mod.moduleSpellsList[i].aoeRadius = gv.mod.currentEncounter.originalAoEofSpells[i];
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                gv.mod.currentEncounter.isOver = true;
+                allDone = true;
+                roundCounter = 1;
+                gv.touchEnabled = true;
+                animationsOn = false;
+                stepAnimationsOn = false;
+
+                //testing
+                attackAnimationFrameCounter = 0;
+                attackAnimationDelayCounter = 0;
+                idx = 0;
+                currentMoveOrderIndex = 0;
+                currentPlayerIndex = 0;
+                creatureIndex = 0;
+
+                gv.screenCombat.animationSeqStack.Clear();
+                gv.screenCombat.deathAnimationLocations.Clear();
+                gv.screenCombat.hitAnimationLocation = null;
+                gv.screenCombat.endingAnimationLocation = null;
+                gv.cc.floatyTextList.Clear();
+
+
+                //remove night and nolight debuffs
+                gv.mod.poorVisionModifier = 0;
+                for (int index = 0; index < gv.mod.playerList.Count; index++)
+                {
+                    gv.sf.UpdateStats(gv.mod.playerList[index]);
+                }
+
+                //remove temporary allies
+                for (int i = gv.mod.playerList.Count - 1; i >= 0; i--)
+                {
+                    if (gv.mod.playerList[i].isTemporaryAllyForThisEncounterOnly)
+                    {
+                        gv.mod.playerList.RemoveAt(i);
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+
+                //roundCounter = 1;
                 if (gv.mod.currentEncounter.isFriendlyContest)
                 {
 
+                    //if (!gv.mod.currentEncounter.isRepeatable)
+                    //{
                     gv.mod.currentEncounter.isOver = true;
+                    //}
                     gv.touchEnabled = true;
 
                     //remove temporary allies
@@ -4864,8 +7998,42 @@ namespace IBx
                         }
                         pc.charStatus = "Alive";
                     }
-                    gv.sf.MessageBox("Your party has lost this contest - the knocked out characters recover a bit.");
+                    string defeatText = "";
+
+                    if (timeLimitConditionMet)
+                    {
+                        defeatText += "Time limit is over.<br>";
+                        timeLimitConditionMet = false;
+                        gv.mod.currentEncounter.timeLimitInternalTimer = gv.mod.currentEncounter.timeLimitTimer;
+                    }
+
+                    if (gv.mod.currentEncounter.protectionConditionMet)
+                    {
+                        defeatText += "Failed to protect " + gv.mod.currentEncounter.protectionTargetName + " from dropping to 0 or less hp.<br>";
+                        gv.mod.currentEncounter.protectionConditionMet = false;
+                    }
+
+                    if (gv.mod.currentEncounter.holdConditionMet)
+                    {
+                        defeatText += "The party has failed to hold the required location(s). <BR>";
+                        gv.mod.currentEncounter.holdConditionMet = false;
+                    }
+
+                    defeatText += "Your party has lost this contest - the knocked out characters recover a bit.<br>";
+
+                    gv.sf.MessageBox(defeatText);
+                    //gv.cc.addLogText("red", defeatText);
+                    gv.cc.addLogText("<font color='red'>" + defeatText + "<BR></font>");
+
+                    //chaweng
+
                     gv.screenType = "main";
+                    gv.screenCombat.animationSeqStack.Clear();
+                    gv.screenCombat.deathAnimationLocations.Clear();
+                    gv.screenCombat.hitAnimationLocation = null;
+                    gv.screenCombat.endingAnimationLocation = null;
+                    gv.cc.floatyTextList.Clear();
+                    roundCounter = 1;
                     if (gv.mod.playMusic)
                     {
                         gv.stopCombatMusic();
@@ -4879,27 +8047,61 @@ namespace IBx
                         //gv.mod.isRecursiveDoTriggerCallMovingProp = true;
                         //gv.mod.isRecursiveCall = true;
                         gv.mod.EncounterOfTurnDone = false;
+                        //gv.triggerPropIndex = 4;
                         gv.cc.doPropTriggers();
                         //gv.mod.isRecursiveCall = false;
                     }
                     else
                     {
                         gv.mod.EncounterOfTurnDone = false;
+                        //gv.triggerPropIndex = 4;
                         gv.cc.doTrigger();
                     }
                     return true;
 
                 }
+
+                //no friendly contest, but real battle
                 else
                 {
+                    animationsOn = false;
+                    stepAnimationsOn = false;
                     gv.touchEnabled = true;
-                    gv.sf.MessageBox("Your party has been defeated!");
+                    string defeatText = "";
+
+                    if (timeLimitConditionMet)
+                    {
+                        defeatText += "Time limit is over.<br>";
+                        timeLimitConditionMet = false;
+                        gv.mod.currentEncounter.timeLimitInternalTimer = gv.mod.currentEncounter.timeLimitTimer;
+                    }
+
+                    if (gv.mod.currentEncounter.protectionConditionMet)
+                    {
+                        defeatText += "Failed to protect " + gv.mod.currentEncounter.protectionTargetName + " from dropping to 0 or less hp.<br>";
+                        gv.mod.currentEncounter.protectionConditionMet = false;
+                    }
+
+                    if (gv.mod.currentEncounter.holdConditionMet)
+                    {
+                        defeatText += "The party has failed to hold the required location(s). <BR>";
+                        gv.mod.currentEncounter.holdConditionMet = false;
+                    }
+
+                    defeatText += "Your party has been defeated!<br>";
+
+                    gv.sf.MessageBox(defeatText);
+                    //gv.cc.addLogText("red", defeatText);
+                    gv.cc.addLogText("<font color='red'>" + defeatText + "<BR></font>");
+
+                    //gv.sf.MessageBox("Your party has been defeated!");
                     if (gv.mod.playMusic)
                     {
                         gv.stopCombatMusic();
                         gv.startMusic();
                         gv.startAmbient();
                     }
+                    //gv.screenType = "title";
                     gv.resetGame();
                     gv.screenType = "title";
                     return true;
@@ -4910,11 +8112,68 @@ namespace IBx
 
         public void afterEachMoveCalls()
         {
-            //gv.triggerIndex = 0;
-            //doTriggers();
-
+            if (isPlayerTurn)
+            {
+                Player pc = gv.mod.playerList[currentPlayerIndex];
+                foreach (Effect e in gv.mod.currentEncounter.effectsList)
+                {
+                    if (e.combatLocX == pc.combatLocX && e.combatLocY == pc.combatLocY && e.triggeredEachStepToo)
+                    {
+                        applyEffectsFromSquare(pc.combatLocX, pc.combatLocY);
+                        applyEffectsCombat(pc, true);
+                    }
+                }
+            }
+            else
+            {
+                Creature crt = new Creature();
+                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt = c;
+                        break;
+                    }
+                }
+                //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+                foreach (Effect e in gv.mod.currentEncounter.effectsList)
+                {
+                    if (e.combatLocX == crt.combatLocX && e.combatLocY == crt.combatLocY && e.triggeredEachStepToo)
+                    {
+                        applyEffectsFromSquare(crt.combatLocX, crt.combatLocY);
+                        applyEffectsCombat(crt, true);
+                    }
+                }
+                if (crt.isHeld())
+                {
+                    endCreatureTurn(crt);
+                }
+                if (crt.isImmobile())
+                {
+                    creatureMoves = crt.moveDistance;
+                }
+            }
             triggerIndexCombat = 0;
             doPropTriggers();
+            //tiereimpark
+            //schnecke
+            //endCreatureTurn(crt);
+            checkEndEncounter();
+            floatyTextOn = true;
+            /*
+            if (gv.mod.currentEncounter.encounterCreatureList[creatureIndex].hp <= 0)
+            {
+                AnimationStackGroup newGroup = new AnimationStackGroup();
+                newGroup = new AnimationStackGroup();
+                gv.screenCombat.animationSeqStack[0].AnimationSeq.Add(newGroup);
+                foreach (Coordinate coor in gv.screenCombat.deathAnimationLocations)
+                {
+                    gv.screenCombat.addDeathAnimation(newGroup, new Coordinate(gv.screenCombat.getPixelLocX(coor.X), gv.screenCombat.getPixelLocY(coor.Y)));
+                }
+
+                gv.screenCombat.animationsOn = true;
+            }
+            */
         }
 
         public void doPropTriggers()
@@ -4930,18 +8189,47 @@ namespace IBx
                 {
                     Player pc = gv.mod.playerList[currentPlayerIndex];
                     prp = gv.mod.currentEncounter.getPropByLocation(pc.combatLocX, pc.combatLocY);
+                    ThisProp = prp;
                     gv.mod.currentEncounter.triggerScriptCalledFromSquareLocX = pc.combatLocX;
                     gv.mod.currentEncounter.triggerScriptCalledFromSquareLocY = pc.combatLocY;
                 }
                 else
                 {
-                    Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+                    //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+                    Creature crt = new Creature();
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            crt = c;
+                            break;
+                        }
+                    }
                     prp = gv.mod.currentEncounter.getPropByLocation(crt.combatLocX, crt.combatLocY);
+                    ThisProp = prp;
                     gv.mod.currentEncounter.triggerScriptCalledFromSquareLocX = crt.combatLocX;
                     gv.mod.currentEncounter.triggerScriptCalledFromSquareLocY = crt.combatLocY;
                 }
-                if ((prp != null) && (prp.isActive))
+
+                bool alreadyTriggered = false;
+                foreach (string s in tagsOfTriggersAndPropTriggersCalledThisTurn)
                 {
+                    //rdr5
+                    if (prp != null)
+                    {
+                        if (s == prp.PropTag)
+                        {
+                            alreadyTriggered = true;
+                        }
+                    }
+                }
+
+                if ((prp != null) && (prp.isActive) && !alreadyTriggered)
+                {
+                    if (!prp.encounterPropTriggerOnEveryStep)
+                    {
+                        tagsOfTriggersAndPropTriggersCalledThisTurn.Add(prp.PropTag);
+                    }
                     //check to see if using an IBScript   
                     if (!prp.OnEnterSquareIBScript.Equals("none"))
                     {
@@ -4990,6 +8278,7 @@ namespace IBx
             prp.numberOfScriptCallsRemaining--;
             if (prp.numberOfScriptCallsRemaining < 1)
             {
+                gv.cc.addLogText("lime", "Removing this square based trigger - no more charges");
                 gv.mod.currentEncounter.propsList.Remove(prp);
             }
         }
@@ -4999,6 +8288,7 @@ namespace IBx
             trg.numberOfScriptCallsRemaining--;
             if (trg.numberOfScriptCallsRemaining < 1)
             {
+                gv.cc.addLogText("lime", "Removing this square based trigger - no more charges");
                 gv.mod.currentEncounter.Triggers.Remove(trg);
             }
         }
@@ -5025,15 +8315,40 @@ namespace IBx
                 }
                 else
                 {
-                    Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+                    Creature crt = new Creature();
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            crt = c;
+                            break;
+                        }
+                    }
+                    //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
                     trig = gv.mod.currentEncounter.getTriggerByLocation(crt.combatLocX, crt.combatLocY);
                     gv.mod.currentEncounter.triggerScriptCalledFromSquareLocX = crt.combatLocX;
                     gv.mod.currentEncounter.triggerScriptCalledFromSquareLocY = crt.combatLocY;
 
                 }
 
-                if ((trig != null) && (trig.Enabled))
+                bool alreadyTriggered = false;
+                foreach (string s in tagsOfTriggersAndPropTriggersCalledThisTurn)
                 {
+                    if (trig != null)
+                    {
+                        if (s == trig.TriggerTag)
+                        {
+                            alreadyTriggered = true;
+                        }
+                    }
+                }
+
+                if ((trig != null) && (trig.Enabled) && !alreadyTriggered)
+                {
+                    if (!trig.encounterTriggerOnEveryStep)
+                    {
+                        tagsOfTriggersAndPropTriggersCalledThisTurn.Add(trig.TriggerTag);
+                    }
                     //iterate through each event                  
                     #region Event1 stuff
                     //check to see if enabled and parm not "none"                    
@@ -5083,42 +8398,45 @@ namespace IBx
                     //check to see if enabled and parm not "none"
                     else if ((triggerIndexCombat == 2) && (trig.EnabledEvent2) && (!trig.Event2FilenameOrTag.Equals("none")))
                     {
-                        //check to see what type of event
-                        if (trig.Event2Type.Equals("script"))
+                        if (!trig.event2RequiresTrueReturnCheck || (trig.event2RequiresTrueReturnCheck && gv.mod.returnCheck))
                         {
-                            //gv.cc.doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
-                            if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
+                            //check to see what type of event
+                            if (trig.Event2Type.Equals("script"))
                             {
-                                gv.cc.doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
-                                didTriggerEvent = true;
-                            }
-                            else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
-                            {
-                                gv.cc.doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
-                                didTriggerEvent = true;
-                            }
+                                //gv.cc.doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
+                                if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
+                                {
+                                    gv.cc.doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
+                                    didTriggerEvent = true;
+                                }
+                                else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
+                                {
+                                    gv.cc.doScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1, trig.Event2Parm2, trig.Event2Parm3, trig.Event2Parm4);
+                                    didTriggerEvent = true;
+                                }
 
-                            doTriggers();
-                        }
-                        else if (trig.Event1Type.Equals("ibscript"))
-                        {
-                            //gv.cc.doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
-                            if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
-                            {
-                                gv.cc.doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
-                                didTriggerEvent = true;
+                                doTriggers();
                             }
-                            else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
+                            else if (trig.Event1Type.Equals("ibscript"))
                             {
-                                gv.cc.doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
-                                didTriggerEvent = true;
+                                //gv.cc.doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
+                                if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
+                                {
+                                    gv.cc.doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
+                                    didTriggerEvent = true;
+                                }
+                                else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
+                                {
+                                    gv.cc.doIBScriptBasedOnFilename(trig.Event2FilenameOrTag, trig.Event2Parm1);
+                                    didTriggerEvent = true;
+                                }
+                                doTriggers();
                             }
-                            doTriggers();
-                        }
-                        //do that event
-                        if (trig.DoOnceOnlyEvent2)
-                        {
-                            trig.EnabledEvent2 = false;
+                            //do that event
+                            if (trig.DoOnceOnlyEvent2)
+                            {
+                                trig.EnabledEvent2 = false;
+                            }
                         }
                     }
                     #endregion
@@ -5126,42 +8444,45 @@ namespace IBx
                     //check to see if enabled and parm not "none"
                     else if ((triggerIndexCombat == 3) && (trig.EnabledEvent3) && (!trig.Event3FilenameOrTag.Equals("none")))
                     {
-                        //check to see what type of event
-                        if (trig.Event3Type.Equals("script"))
+                        if (!trig.event3RequiresFalseReturnCheck || (trig.event3RequiresFalseReturnCheck && !gv.mod.returnCheck))
                         {
-                            //gv.cc.doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
-                            if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
+                            //check to see what type of event
+                            if (trig.Event3Type.Equals("script"))
                             {
-                                gv.cc.doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
-                                didTriggerEvent = true;
-                            }
-                            else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
-                            {
-                                gv.cc.doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
-                                didTriggerEvent = true;
-                            }
+                                //gv.cc.doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
+                                if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
+                                {
+                                    gv.cc.doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
+                                    didTriggerEvent = true;
+                                }
+                                else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
+                                {
+                                    gv.cc.doScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1, trig.Event3Parm2, trig.Event3Parm3, trig.Event3Parm4);
+                                    didTriggerEvent = true;
+                                }
 
-                            doTriggers();
-                        }
-                        else if (trig.Event3Type.Equals("ibscript"))
-                        {
-                            //gv.cc.doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
-                            if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
-                            {
-                                gv.cc.doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
-                                didTriggerEvent = true;
+                                doTriggers();
                             }
-                            else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
+                            else if (trig.Event3Type.Equals("ibscript"))
                             {
-                                gv.cc.doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
-                                didTriggerEvent = true;
+                                //gv.cc.doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
+                                if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
+                                {
+                                    gv.cc.doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
+                                    didTriggerEvent = true;
+                                }
+                                else if ((!isPlayerTurn) && (trig.canBeTriggeredByCreature)) //only do if creature can trigger  
+                                {
+                                    gv.cc.doIBScriptBasedOnFilename(trig.Event3FilenameOrTag, trig.Event3Parm1);
+                                    didTriggerEvent = true;
+                                }
+                                doTriggers();
                             }
-                            doTriggers();
-                        }
-                        //do that event
-                        if (trig.DoOnceOnlyEvent3)
-                        {
-                            trig.EnabledEvent3 = false;
+                            //do that event
+                            if (trig.DoOnceOnlyEvent3)
+                            {
+                                trig.EnabledEvent3 = false;
+                            }
                         }
                     }
                     else if (triggerIndexCombat < 4)
@@ -5203,7 +8524,7 @@ namespace IBx
             //if spell target type is coor, use coor...else use creature or PC on square  
             if (sp.spellTargetType.Equals("PointLocation"))
             {
-                gv.cc.doSpellBasedOnScriptOrEffectTag(sp, srcCoor, srcCoor, false,false);
+                gv.cc.doSpellBasedOnScriptOrEffectTag(sp, srcCoor, srcCoor, false, false);
             }
             else
             {
@@ -5211,7 +8532,7 @@ namespace IBx
                 {
                     if ((crt.combatLocX == gv.mod.currentEncounter.triggerScriptCalledFromSquareLocX) && (crt.combatLocY == gv.mod.currentEncounter.triggerScriptCalledFromSquareLocY))
                     {
-                        gv.cc.doSpellBasedOnScriptOrEffectTag(sp, srcCoor, crt, false,false);
+                        gv.cc.doSpellBasedOnScriptOrEffectTag(sp, srcCoor, crt, false, false);
                     }
                 }
                 foreach (Player pc in gv.mod.playerList)
@@ -5274,7 +8595,7 @@ namespace IBx
             #endregion
 
             #region COMBAT ANIMATION SPRITES
-            if (animationsOn)
+            if (animationsOn && !stepAnimationsOn)
             {
                 attackAnimationTimeElapsed += elapsed;
                 //hurgh1000
@@ -5361,6 +8682,7 @@ namespace IBx
                     {
                         animationsOn = false;
                         deathAnimationLocations.Clear();
+                        blockCreatureDrawLocations.Clear();
 
                         //remove any dead creatures                        
                         for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
@@ -5372,15 +8694,38 @@ namespace IBx
                                     //do OnDeath IBScript
                                     gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
                                     //project repeatable
+                                    int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - x;
+                                    if (deadIdx < idx)
+                                    {
+                                        idx--;
+                                        if (idx < 0)
+                                        {
+                                            idx = 0;
+                                        }
+                                    }
+                                    if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[x].cr_tag)
+                                    {
+                                        gv.mod.currentEncounter.assassinationConditionMet = true;
+                                    }
                                     gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
                                     if (!gv.mod.currentEncounter.isRepeatable)
                                     {
-                                        gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
+                                        //gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
                                     }
                                 }
                                 catch (Exception ex)
                                 {
                                     gv.errorLog(ex.ToString());
+                                }
+                            }
+                        }
+                        foreach (Player p in gv.mod.playerList)
+                        {
+                            if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                            {
+                                if (p.hp <= 0)
+                                {
+                                    gv.mod.currentEncounter.protectionConditionMet = true;
                                 }
                             }
                         }
@@ -5390,7 +8735,18 @@ namespace IBx
                             gv.touchEnabled = true;
                             animationState = AnimationState.None;
                             //endPcTurn(true);
-                            if (dontEndTurn)
+                            //update all player stats in case their was a recently added spell or trait effect that would change them  
+                            foreach (Player p in gv.mod.playerList)
+                            {
+                                gv.sf.UpdateStats(p);
+                            }
+
+                            if (gv.mod.playerList[currentPlayerIndex].hp <= 0 || gv.mod.playerList[currentPlayerIndex].isHeld())
+                            {
+                                endPcTurn(true);
+                            }
+
+                            if (dontEndTurn && currentCombatMode != "move")
                             {
                                 //don't end turn just yet..probably called from a trait that is meant to be used right away like Power Attack or Set Trap  
                                 dontEndTurn = false;
@@ -5398,21 +8754,67 @@ namespace IBx
                                 {
                                     currentCombatMode = "move";
                                 }
-                                //update all player stats in case their was a recently added spell or trait effect that would change them  
-                                foreach (Player p in gv.mod.playerList)
-                                {
-                                    gv.sf.UpdateStats(p);
-                                }
+                                /*
+                                    //update all player stats in case their was a recently added spell or trait effect that would change them  
+                                    foreach (Player p in gv.mod.playerList)
+                                    {
+                                        gv.sf.UpdateStats(p);
+                                    }
+                                    */
                             }
                             else
                             {
-                                endPcTurn(true);
+
+                                if (currentCombatMode != "move")
+                                {
+                                    endPcTurn(true);
+                                }
+
                             }
                         }
                         else
                         {
                             animationState = AnimationState.None;
+
+                            //if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
+                            //{
+                            //idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
+                            //}
+                            //if (dontEndCreatureTurn && gv.mod.currentEncounter.encounterCreatureList[idx].hp > 0 && !gv.mod.currentEncounter.encounterCreatureList[idx].isHeld())
+                            //{
+                            //dontEndCreatureTurn = false;
+                            //animationsOn = false;
+                            //}
+                            //else
+                            //{
+                            /*
+                            for (int i = gv.mod.currentEncounter.encounterCreatureList.Count-1; i >= 0; i--)
+                            {
+                                if (gv.mod.currentEncounter.encounterCreatureList[i].moveOrder == currentMoveOrderIndex)
+                                {
+                                    endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[i]);
+                                }
+                            }
+                            */
+                            /*
+                            if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
+                            {
+                                idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
+                            }
                             endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[idx]);
+                            */
+                            Creature crt = new Creature();
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    crt = c;
+                                    break;
+                                }
+                            }
+                            endCreatureTurn(crt);
+
+                            //}
                         }
                     }
                 }
@@ -5420,77 +8822,15 @@ namespace IBx
                 {
                     gv.touchEnabled = true;
                 }
-            }
-            #endregion
+            }//animationsonend
 
-            #region FLOATY TEXT
-            if (floatyTextOn)
-            {
-                //move up 50pxl per second (50px/1000ms)*elapsed
-                float multiplier = 100.0f / gv.mod.attackAnimationSpeed;
-                int shiftUp = (int)(0.05f * elapsed * multiplier);
-                foreach (FloatyText ft in gv.cc.floatyTextList)
-                {
-                    ft.location.Y -= shiftUp;
-                    ft.timeToLive -= (int)(elapsed * multiplier);
-                }
-                //remove sprite if hit end of life
-                for (int x = gv.cc.floatyTextList.Count - 1; x >= 0; x--)
-                {
-                    if (gv.cc.floatyTextList[x].timeToLive <= 0)
-                    {
-                        try
-                        {
-                            gv.cc.floatyTextList.RemoveAt(x);
-                        }
-                        catch (Exception ex)
-                        {
-                            gv.errorLog(ex.ToString());
-                        }
-                    }
-                }
-                if (gv.cc.floatyTextList.Count == 0)
-                {
-                    floatyTextOn = false;
-                }
-            }
-            #endregion
-        }
-
-        public void Update2(int elapsed)
-        {
-            //combatUiLayout.Update(elapsed);
-            //refreshCreatureCoveredSquares();
-
-            #region PROP AMBIENT SPRITES
-            foreach (Sprite spr in spriteList)
-            {
-                spr.Update(elapsed, gv);
-            }
-            //remove sprite if hit end of life
-            for (int x = spriteList.Count - 1; x >= 0; x--)
-            {
-                if (spriteList[x].timeToLiveInMilliseconds <= 0)
-                {
-                    try
-                    {
-                        spriteList.RemoveAt(x);
-                    }
-                    catch (Exception ex)
-                    {
-                        gv.errorLog(ex.ToString());
-                    }
-                }
-            }
-            #endregion
-
-            #region COMBAT ANIMATION SPRITES
-            if (animationsOn)
+            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            if (stepAnimationsOn)
             {
                 attackAnimationTimeElapsed += elapsed;
                 //hurgh1000
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
-                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && (attackAnimationFrameCounter >= maxUsableCounterValue))
+                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
                 {
                     //time is up, reset attack animations to null
@@ -5570,33 +8910,70 @@ namespace IBx
                     //if all animation sequences are done, end this turn
                     if (animationSeqStack.Count == 0)
                     {
-                        animationsOn = false;
+                        stepAnimationsOn = false;
                         deathAnimationLocations.Clear();
+                        blockCreatureDrawLocations.Clear();
 
-                        //remove any dead creatures                        
-                        for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
+                        /*
+                        //Creature crt = new Creature();
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                         {
-                            if (gv.mod.currentEncounter.encounterCreatureList[x].hp <= 0)
+                            if (c.hp <= 0 || c.isHeld())
                             {
-                                try
-                                {
-                                    //do OnDeath IBScript
-                                    gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
-                                    //project repeatable
-                                    gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
-                                    if (!gv.mod.currentEncounter.isRepeatable)
-                                    {
-                                        gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    gv.errorLog(ex.ToString());
-                                }
+                                endCreatureTurn(c);
                             }
                         }
+                        */
+
                         if (isPlayerTurn)
                         {
+
+                            //remove any dead creatures                        
+                            for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
+                            {
+                                if (gv.mod.currentEncounter.encounterCreatureList[x].hp <= 0)
+                                {
+                                    try
+                                    {
+                                        //do OnDeath IBScript
+                                        gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
+                                        //project repeatable
+                                        int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - x;
+                                        if (deadIdx < idx)
+                                        {
+                                            idx--;
+                                            if (idx < 0)
+                                            {
+                                                idx = 0;
+                                            }
+                                        }
+                                        if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[x].cr_tag)
+                                        {
+                                            gv.mod.currentEncounter.assassinationConditionMet = true;
+                                        }
+                                        gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
+                                        if (!gv.mod.currentEncounter.isRepeatable)
+                                        {
+                                            //gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        gv.errorLog(ex.ToString());
+                                    }
+                                }
+                            }
+                            foreach (Player p in gv.mod.playerList)
+                            {
+                                if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                                {
+                                    if (p.hp <= 0)
+                                    {
+                                        gv.mod.currentEncounter.protectionConditionMet = true;
+                                    }
+                                }
+                            }
+
                             checkEndEncounter();
                             gv.touchEnabled = true;
                             animationState = AnimationState.None;
@@ -5617,13 +8994,138 @@ namespace IBx
                             }
                             else
                             {
+                                if (currentCombatMode != "move")
+                                {
+                                    endPcTurn(true);
+                                }
+                            }
+                            Player tempP = new Player();
+                            foreach (Player p in gv.mod.playerList)
+                            {
+                                if (p.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    tempP = p;
+                                    break;
+                                }
+                            }
+                            if (tempP.hp <= 0 || tempP.isHeld())
+                            {
                                 endPcTurn(true);
                             }
+
                         }
                         else
                         {
-                            animationState = AnimationState.None;
+                            //alarmknopf
+                            Creature cr = new Creature();
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+
+                            if (cr.hp <= 0 || cr.isHeld())
+                            {
+                                endCreatureTurn(cr);
+                            }
+                            else
+                            {
+                                //remove any dead creatures                        
+                                for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
+                                {
+                                    if (gv.mod.currentEncounter.encounterCreatureList[x].hp <= 0 && gv.mod.currentEncounter.encounterCreatureList[x] != cr)
+                                    {
+                                        try
+                                        {
+                                            //do OnDeath IBScript
+                                            gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
+                                            //project repeatable
+                                            int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - x;
+                                            if (deadIdx < idx)
+                                            {
+                                                idx--;
+                                                if (idx < 0)
+                                                {
+                                                    idx = 0;
+                                                }
+                                            }
+                                            if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[x].cr_tag)
+                                            {
+                                                gv.mod.currentEncounter.assassinationConditionMet = true;
+                                            }
+                                            gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
+                                            if (!gv.mod.currentEncounter.isRepeatable)
+                                            {
+                                                //gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            gv.errorLog(ex.ToString());
+                                        }
+                                    }
+                                }
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                                    {
+                                        if (p.hp <= 0)
+                                        {
+                                            gv.mod.currentEncounter.protectionConditionMet = true;
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+
+                            //animationState = AnimationState.None;
+
+                            //if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
+                            //{
+                            //idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
+                            //}
+                            //if (dontEndCreatureTurn && gv.mod.currentEncounter.encounterCreatureList[idx].hp > 0 && !gv.mod.currentEncounter.encounterCreatureList[idx].isHeld())
+                            //{
+                            //dontEndCreatureTurn = false;
+                            //animationsOn = false;
+                            //}
+                            //else
+                            //{
+                            /*
+                            for (int i = gv.mod.currentEncounter.encounterCreatureList.Count-1; i >= 0; i--)
+                            {
+                                if (gv.mod.currentEncounter.encounterCreatureList[i].moveOrder == currentMoveOrderIndex)
+                                {
+                                    endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[i]);
+                                }
+                            }
+                            */
+                            /*
+                            if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
+                            {
+                                idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
+                            }
                             endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[idx]);
+                            */
+                            /*
+                            Creature crt = new Creature();
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    crt = c;
+                                    break;
+                                }
+                            }
+                            */
+                            //endCreatureTurn(crt);
+
+                            //}
                         }
                     }
                 }
@@ -5631,15 +9133,21 @@ namespace IBx
                 {
                     gv.touchEnabled = true;
                 }
-            }
+            }//animationsonend
+
+            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             #endregion
 
             #region FLOATY TEXT
-            if (floatyTextOn)
+            if (floatyTextOn || floatyTextEnlargerOn)
             {
                 //move up 50pxl per second (50px/1000ms)*elapsed
                 float multiplier = 100.0f / gv.mod.attackAnimationSpeed;
                 int shiftUp = (int)(0.05f * elapsed * multiplier);
+                if (shiftUp < 1)
+                {
+                    shiftUp = 1;
+                }
                 foreach (FloatyText ft in gv.cc.floatyTextList)
                 {
                     ft.location.Y -= shiftUp;
@@ -5662,11 +9170,20 @@ namespace IBx
                 }
                 if (gv.cc.floatyTextList.Count == 0)
                 {
-                    floatyTextOn = false;
+                    if (floatyTextOn)
+                    {
+                        floatyTextOn = false;
+                    }
+                    if (floatyTextEnlargerOn)
+                    {
+                        floatyTextEnlargerOn = false;
+                    }
                 }
             }
             #endregion
         }
+
+
 
         //we will need player covered squares, too
         public void refreshCreatureCoveredSquares()
@@ -5752,8 +9269,9 @@ namespace IBx
             {
                 drawMovingCombatCreatures();
             }
-            //drawCombatPlayers();
             drawSprites();
+            drawHeightShadows();
+
             if (gv.mod.currentEncounter.UseDayNightCycle)
             {
                 drawOverlayTints();
@@ -5767,6 +9285,13 @@ namespace IBx
             drawHPText();
             drawSPText();
             drawFloatyTextList();
+
+            //draw hotkey text
+            if (gv.showHotKeys)
+            {
+                drawCombatHotKeys();
+            }
+
             //started work on iniative bar for creatures and pc
             if (showIniBar)
             {
@@ -5787,8 +9312,306 @@ namespace IBx
             drawUiLayout();
         }
 
+        public void drawHeightShadows()
+        {
+            for (int y = 0; y < gv.mod.currentEncounter.MapSizeY; y++)
+            {
+                for (int x = 0; x < gv.mod.currentEncounter.MapSizeX; x++)
+                {
+
+                    TileEnc tile = gv.mod.currentEncounter.encounterTiles[y * gv.mod.currentEncounter.MapSizeX + x];
+                    IbRectF src = new IbRectF(0, 0, gv.cc.GetFromBitmapList("longShadow").Width, gv.cc.GetFromBitmapList("longShadow").Height);
+                    //SharpDX.RectangleF dst = new SharpDX.RectangleF(getPixelLocX(x), getPixelLocY(y) + (float)(gv.squareSize * 0.5f), (gv.squareSize), (gv.squareSize));
+                    IbRectF dst = new IbRectF(getPixelLocX(x), getPixelLocY(y) + gv.oYshift, (gv.squareSize), (gv.squareSize));
+
+                    //gv.oYshift
+                    if (tile.isInShortShadeN)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadow"), src, dst, 180, false);
+                    }
+
+                    if (tile.isInShortShadeE)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadow"), src, dst, 270, false);
+                    }
+
+                    if (tile.isInShortShadeS)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadow"), src, dst, 0, false);
+                    }
+
+                    if (tile.isInShortShadeW)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadow"), src, dst, 90, false);
+                    }
+
+                    if (tile.isInShortShadeNW && !tile.isInShortShadeN && !tile.isInShortShadeW)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadowCorner"), src, dst, 180, false);
+                    }
+
+                    if (tile.isInShortShadeNE && !tile.isInShortShadeN && !tile.isInShortShadeE)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadowCorner"), src, dst, 270, false);
+                    }
+
+                    if (tile.isInShortShadeSW && !tile.isInShortShadeS && !tile.isInShortShadeW)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadowCorner"), src, dst, 90, false);
+                    }
+
+                    if (tile.isInShortShadeSE && !tile.isInShortShadeS && !tile.isInShortShadeE)
+                    {
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList("shortShadowCorner"), src, dst, 0, false);
+                    }
+                }
+            }
+        }
+        public void drawCombatHotKeys()
+        {
+            int txtH = (int)gv.drawFontRegHeight;
+            int lineCounter = 1;
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Show/Hide Hotkeys: H", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Show/Hide Hotkeys: H", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Show/Hide Interface: X", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Show/Hide Interface: X", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            //lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Scroll log up: R / mouse wheel up", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Scroll log up: R / mouse wheel up", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Scroll log down: F / mouse wheel down", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Scroll log down: F / mouse wheel down", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Attack mode: K", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Attack mode: K", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move mode: M", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move mode: M", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move up: Keypad8 / (W or arrow up)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move up: Keypad8 / (W or arrow up)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move down: Keypad2 / (S or arrow down)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move down: Keypad2 / (S or arrow down)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move right: Keypad6 / (D or arrow right)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move right: Keypad6 / (D or arrow right)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move left: Keypad4 / (A or arrow left)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move left: Keypad4 / (A or arrow left)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move diagonal up-left: Keypad7 / (Q)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move diagonal up-left: Keypad7 / (Q)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move diagonal up-right: Keypad9 / (E)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move diagonal up-right: Keypad9 / (E)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move diagonal bottom-left: Keypad1 / (Y,Z)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move diagonal bottom-left: Keypad1 / (Y,Z)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Move diagonal bottom-right: Keypad3 / (C)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Move diagonal bottom-right: Keypad3 / (C)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Camera up: (W or arrow up)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Camera up: (W or arrow up)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Camera down: (S or arrow down)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Camera down: (S or arrow down)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Camera right: (D or arrow right)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Camera right: (D or arrow right)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+
+            /*
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    gv.DrawText("Camera left: (A or arrow left)", new IbRect(x + gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, y + (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, Color.Black);
+                }
+            }
+            */
+            gv.DrawTextOutlinedRect("Camera left: (A or arrow left)", new IbRect(gv.oXshift + (gv.playerOffsetY) * gv.squareSize - 4 * gv.pS, (gv.playerOffsetX - 8) * gv.squareSize + (int)(txtH * 1.25f * lineCounter) + (int)(3 * gv.pS), 1000, 100), 1.0f, "red");
+            lineCounter++;
+        }
+
         public void drawProps()
         {
+
+            //code for drawing conquer and hold locations
+            if (gv.mod.currentEncounter.conquerVictory)
+            {
+                if (gv.mod.currentEncounter.conquerTarget1X != -1 && gv.mod.currentEncounter.conquerTarget1Y != -1)
+                {
+                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList("conquerLocation").Width, gv.cc.GetFromBitmapList("conquerLocation").Width);
+                    IbRect dst = new IbRect(getPixelLocX(gv.mod.currentEncounter.conquerTarget1X), getPixelLocY(gv.mod.currentEncounter.conquerTarget1Y), gv.squareSize, gv.squareSize);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList("conquerLocation"), src, dst);
+                }
+            }
+
+            if (gv.mod.currentEncounter.holdDefeat)
+            {
+                if (gv.mod.currentEncounter.holdTarget1X != -1 && gv.mod.currentEncounter.holdTarget1Y != -1)
+                {
+                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList("holdLocation").Width, gv.cc.GetFromBitmapList("holdLocation").Width);
+                    IbRect dst = new IbRect(getPixelLocX(gv.mod.currentEncounter.holdTarget1X), getPixelLocY(gv.mod.currentEncounter.holdTarget1Y), gv.squareSize, gv.squareSize);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList("holdLocation"), src, dst);
+                }
+            }
+
             foreach (Prop prp in gv.mod.currentEncounter.propsList)
             {
                 IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(prp.ImageFileName).Width, gv.cc.GetFromBitmapList(prp.ImageFileName).Width);
@@ -5801,9 +9624,9 @@ namespace IBx
         {
             foreach (Effect ef in gv.mod.currentEncounter.effectsList)
             {
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ef.spriteFilename).Width, gv.cc.GetFromBitmapList(ef.spriteFilename).Width);
+                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ef.squareIndicatorFilename).Width, gv.cc.GetFromBitmapList(ef.squareIndicatorFilename).Width);
                 IbRect dst = new IbRect(getPixelLocX(ef.combatLocX), getPixelLocY(ef.combatLocY), gv.squareSize, gv.squareSize);
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(ef.spriteFilename), src, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(ef.squareIndicatorFilename), src, dst);
             }
         }
 
@@ -5906,6 +9729,9 @@ namespace IBx
                     }
                 }
             }
+
+
+
 
             //calculate buttons/i needed
             int buttonsNeededOverall = 0;
@@ -6288,40 +10114,45 @@ namespace IBx
                 {
                     if (m2 == moveOrderNumberOfCheckedCreatureFromAllCreatures)
                     {
+                        //rdr4: added positive hp requirement
                         if (isCreature)
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
-                            int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2 * gv.pS;
-                            int startBarY = 0 * gv.squareSize + 2 * gv.pS;
-                            int targetSizeX = gv.squareSize / 2;
-                            int targetSizeY = gv.squareSize / 2;
-                            int marchingLineHeight = gv.squareSize / 2;
-                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                            //rdr4: added positive hp requirement
+                            if (crt.hp > 0)
                             {
-                                targetSizeX = gv.squareSize;
-                                targetSizeY = gv.squareSize;
-                                marchingLineHeight = 0;
-                            }
-                            IbRect dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
-                            if (crt.moveOrder + 1 == currentMoveOrderIndex)
-                            {
-                                gv.DrawBitmap(gv.cc.turn_marker, src, dst, false);
-                            }
+                                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
+                                int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2 * gv.pS;
+                                int startBarY = 0 * gv.squareSize + 2 * gv.pS;
+                                int targetSizeX = gv.squareSize / 2;
+                                int targetSizeY = gv.squareSize / 2;
+                                int marchingLineHeight = gv.squareSize / 2;
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                {
+                                    targetSizeX = gv.squareSize;
+                                    targetSizeY = gv.squareSize;
+                                    marchingLineHeight = 0;
+                                }
+                                IbRect dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
+                                if (crt.moveOrder + 1 == currentMoveOrderIndex)
+                                {
+                                    gv.DrawBitmap(gv.cc.turn_marker, src, dst, false);
+                                }
 
-                            gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, false);
-                            int mo = crt.moveOrder + 1;
-                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width <= 100)
-                            {
-                                creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
-                                drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), "red");
-                            }
-                            else
-                            {
-                                creatureSpacesUsed++;
-                                creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
-                                drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, crt.hp.ToString(), "red");
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, false);
+                                int mo = crt.moveOrder + 1;
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width <= 100)
+                                {
+                                    creatureSpacesUsed++;
+                                    drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
+                                    drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), "red");
+                                }
+                                else
+                                {
+                                    creatureSpacesUsed++;
+                                    creatureSpacesUsed++;
+                                    drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
+                                    drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, crt.hp.ToString(), "red");
+                                }
                             }
                         }
                         else
@@ -6428,7 +10259,7 @@ namespace IBx
              {
                  continue;
              }
-             if (crt.token.Width > 100)
+             if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
              {
                  numberOfBackgroundTiles++;
              }
@@ -6445,7 +10276,7 @@ namespace IBx
              {
                  continue;
              }
-             if (crt.token.Width > 100)
+             if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
              {
                  numberOfBackgroundTiles++;
              }
@@ -6524,7 +10355,7 @@ namespace IBx
              if (crt.hp <= 0)
              {
                  adderForTheFallen++;
-                 if (crt.token.Width > 100)
+                 if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                  {
                      adderForTheFallen++;
                  }
@@ -6538,7 +10369,7 @@ namespace IBx
              if (crt.hp <= 0)
              {
                  adderForTheFallen++;
-                 if (crt.token.Width > 100)
+                 if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                  {
                      adderForTheFallen++;
                  }
@@ -6631,13 +10462,13 @@ namespace IBx
              {
                  continue;
              }
-             IbRect src = new IbRect(0, 0, crt.token.Width, crt.token.Width);
+             IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
              int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2*gv.pS;
              int startBarY = 0 * gv.squareSize + 2*gv.pS;
              int targetSizeX = gv.squareSize / 2;
              int targetSizeY = gv.squareSize / 2;
              int marchingLineHeight = gv.squareSize / 2;
-             if (crt.token.Width > 100)
+             if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
              {
                  targetSizeX = gv.squareSize;
                  targetSizeY = gv.squareSize;
@@ -6653,7 +10484,7 @@ namespace IBx
              {
                  gv.DrawBitmap(crt.token, src, dst, false);
                  int mo = crt.moveOrder + 1;
-                 if (crt.token.Width <= 100)
+                 if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width <= 100)
                  {
                      drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
                      drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), Color.Lime);
@@ -6670,7 +10501,7 @@ namespace IBx
              {
                  creatureCounter2++;
              }
-                 if (crt.token.Width > 100)
+                 if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
              {
                  creatureCounter++;
                  if (crt.moveOrder + 1 <= currentMoveOrderIndex)
@@ -6688,13 +10519,13 @@ namespace IBx
              {
                  continue;
              }
-             IbRect src = new IbRect(0, 0, crt.token.Width, crt.token.Width);
+             IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
              int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2*gv.pS;
              int startBarY = 0 * gv.squareSize + 2*gv.pS;
              int targetSizeX = gv.squareSize / 2;
              int targetSizeY = gv.squareSize / 2;
              int marchingLineHeight = gv.squareSize / 2; ;
-             if (crt.token.Width > 100)
+             if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
              {
                  targetSizeX = gv.squareSize;
                  targetSizeY = gv.squareSize;
@@ -6710,7 +10541,7 @@ namespace IBx
              {
                  gv.DrawBitmap(crt.token, src, dst, false);
                  int mo = crt.moveOrder + 1;
-                 if (crt.token.Width <= 100)
+                 if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width <= 100)
                  {
                      drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
                      drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), Color.Red);
@@ -6726,7 +10557,7 @@ namespace IBx
              {
                  creatureCounter2++;
              }
-             if (crt.token.Width > 100)
+             if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
              {
                  largeCreaturesInBand++;
                  creatureCounter++;
@@ -6822,7 +10653,7 @@ namespace IBx
                     btn.Text = "0";
                 }
             }
-            
+
 
             //SET KILL BUTTON
             if (gv.mod.debugMode)
@@ -6951,8 +10782,8 @@ namespace IBx
                 if (gv.mod.currentEncounter.UseMapImage)
                 {
                     /*
-                    int sqrsizeW = mapBitmap.Width / gv.mod.currentEncounter.MapSizeX;
-                    int sqrsizeH = mapBitmap.Height / gv.mod.currentEncounter.MapSizeY;
+                    int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
+                    int sqrsizeH = mapBitmap.PixelSize.Height / gv.mod.currentEncounter.MapSizeY;
                     IbRect src = new IbRect(UpperLeftSquare.X * sqrsizeW, UpperLeftSquare.Y * sqrsizeH, sqrsizeW * 9, sqrsizeH * 9);
                     IbRect dst = new IbRect(0 + gv.oXshift + mapStartLocXinPixels, 0, gv.squareSize * 9, gv.squareSize * 9);
                     gv.DrawBitmap(mapBitmap, src, dst);
@@ -6963,7 +10794,7 @@ namespace IBx
                     int sqrsizeH = gv.cc.GetFromBitmapList(mapBitmap).Height / gv.mod.currentEncounter.MapSizeY;
                     int dstX = -(UpperLeftSquare.X * gv.squareSize);
                     int dstY = -(UpperLeftSquare.Y * gv.squareSize);
-                    float singleImageTileSizeProxy = 100f / ((float)gv.cc.GetFromBitmapList(mapBitmap).Width/ (float)gv.mod.currentEncounter.MapSizeX);
+                    float singleImageTileSizeProxy = 100f / ((float)gv.cc.GetFromBitmapList(mapBitmap).Width / (float)gv.mod.currentEncounter.MapSizeX);
                     if (!gv.mod.encounterSingleImageAutoScale)
                     {
                         singleImageTileSizeProxy = 2;
@@ -7227,6 +11058,7 @@ namespace IBx
                                 continue;
                             }
                             TileEnc tile = gv.mod.currentEncounter.encounterTiles[y * gv.mod.currentEncounter.MapSizeX + x];
+
                             try
                             {
                                 //insert1                        
@@ -7301,6 +11133,26 @@ namespace IBx
                             }
                             catch
                             { }
+                            /*
+                            //code for drawing conquer and hold locations
+                            if (gv.mod.currentEncounter.conquerVictory)
+                            {
+                                if (x == gv.mod.currentEncounter.conquerTarget1X && y == gv.mod.currentEncounter.conquerTarget1Y)
+                                {
+                                    //trainieren
+                                }
+
+                                if (x == gv.mod.currentEncounter.conquerTarget2X && y == gv.mod.currentEncounter.conquerTarget2Y)
+                                {
+
+                                }
+
+                                if (x == gv.mod.currentEncounter.conquerTarget3X && y == gv.mod.currentEncounter.conquerTarget3Y)
+                                {
+
+                                }
+                            }
+                            */
                         }
                     }
                     #endregion
@@ -7379,7 +11231,7 @@ namespace IBx
                             }
                             //if ((pf.values != null) && (gv.mod.debugMode))
                             //{
-                                //gv.DrawText(pf.values[x, y].ToString(), (x - UpperLeftSquare.X) * gv.squareSize + gv.oXshift + mapStartLocXinPixels, (y - UpperLeftSquare.Y) * gv.squareSize);
+                            //gv.DrawText(pf.values[x, y].ToString(), (x - UpperLeftSquare.X) * gv.squareSize + gv.oXshift + mapStartLocXinPixels, (y - UpperLeftSquare.Y) * gv.squareSize);
                             //}
                         }
                     }
@@ -7412,8 +11264,8 @@ namespace IBx
                     IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(mapBitmap), src, dst);
 
-                    //int sqrsizeW = mapBitmap.Width / gv.mod.currentEncounter.MapSizeX;
-                    //int sqrsizeH = mapBitmap.Height / gv.mod.currentEncounter.MapSizeY;
+                    //int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
+                    //int sqrsizeH = mapBitmap.PixelSize.Height / gv.mod.currentEncounter.MapSizeY;
                     //IbRect src = new IbRect(UpperLeftSquare.X * sqrsizeW, UpperLeftSquare.Y * sqrsizeH, sqrsizeW * (gv.playerOffsetX + gv.playerOffsetX + 1), sqrsizeH * (gv.playerOffsetY + gv.playerOffsetY + 1));
                     //IbRect dst = new IbRect(0 + gv.oXshift + mapStartLocXinPixels, 0, gv.squareSize * (gv.playerOffsetX + gv.playerOffsetX + 1), gv.squareSize * (gv.playerOffsetY + gv.playerOffsetY + 1));
                     //gv.DrawBitmap(mapBitmap, src, dst);                    
@@ -7744,75 +11596,154 @@ namespace IBx
                     }
                 }
             }
+            //too: te livin on topthe unconciou
             foreach (Player pc in gv.mod.playerList)
             {
-                if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
+                if (pc.hp <= 0)
                 {
-                    IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
-                    //check if drawing animation of player
-                    if ((playerToAnimate != null) && (playerToAnimate == pc))
+                    if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                     {
-                        attackAnimationDelayCounter++;
-                        if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(pc.tokenFilename).Height / 100f - 1))
+                        IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
+                        //check if drawing animation of player
+                        if ((playerToAnimate != null) && (playerToAnimate == pc))
                         {
-                            attackAnimationFrameCounter++;
-                            attackAnimationDelayCounter = 0;
-                        }
-                        //maxUsableCounterValue = (int)(pc.token.Height / 100f - 1);
-                        maxUsableCounterValue = 1;
-                        if (attackAnimationFrameCounter >= maxUsableCounterValue)
-                        {
-                            attackAnimationFrameCounter = maxUsableCounterValue;
-                            blockAnimationBridge = false;
-                        }
-                        src = new IbRect(0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
-                    }
-                    IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft);
-                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
-                    if (!animationsOn)
-                    {
-                        foreach (Effect ef in pc.effectsList)
-                        {
-                            if ((!ef.isPermanent) && (ef.spriteFilename != "none") && (ef.spriteFilename != ""))
+                            attackAnimationDelayCounter++;
+                            if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(pc.tokenFilename).Height / 100f - 1))
                             {
-                                string fx = ef.spriteFilename;
-                                src = new IbRect(0, 0, gv.cc.GetFromBitmapList(fx).Width, gv.cc.GetFromBitmapList(fx).Width);
-                                gv.DrawBitmap(gv.cc.GetFromBitmapList(fx), src, dst);
-                                //gv.cc.DisposeOfBitmap(ref fx);
+                                attackAnimationFrameCounter++;
+                                attackAnimationDelayCounter = 0;
+                            }
+                            //maxUsableCounterValue = (int)(pc.token.PixelSize.Height / 100f - 1);
+                            maxUsableCounterValue = 1;
+                            if (attackAnimationFrameCounter >= maxUsableCounterValue)
+                            {
+                                attackAnimationFrameCounter = maxUsableCounterValue;
+                                blockAnimationBridge = false;
+                            }
+                            src = new IbRect(0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
+                        }
+                        IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft, false);
+                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
+                        if (!animationsOn)
+                        {
+                            foreach (Effect ef in pc.effectsList)
+                            {
+                                if ((!ef.isPermanent) && (ef.spriteFilename != "none") && (ef.spriteFilename != ""))
+                                {
+                                    //Bitmap fx = gv.cc.LoadBitmap(ef.spriteFilename);
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ef.spriteFilename).Width, gv.cc.GetFromBitmapList(ef.spriteFilename).Width);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ef.spriteFilename), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref fx);
+                                }
                             }
                         }
-                    }
-                    if ((pc.isDead()) || (pc.isUnconcious()))
-                    {
-                        src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Width);
-                        gv.DrawBitmap(gv.cc.pc_dead, src, dst);
-                    }
-                    if (pc.steathModeOn)
-                    {
-                        src = new IbRect(0, 0, gv.cc.pc_stealth.Width, gv.cc.pc_stealth.Width);
-                        gv.DrawBitmap(gv.cc.pc_stealth, src, dst);
-                    }
-                    //PLAYER FACING
-                    src = new IbRect(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
-                    if (pc.hp > 0)
-                    {
-                        if (pc.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
-                        else if (pc.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
-                        else if (pc.combatFacing == 6) { gv.DrawBitmap(gv.cc.facing6, src, dst); }
-                        else if (pc.combatFacing == 3) { gv.DrawBitmap(gv.cc.facing3, src, dst); }
-                        else if (pc.combatFacing == 2) { gv.DrawBitmap(gv.cc.facing2, src, dst); }
-                        else if (pc.combatFacing == 1) { gv.DrawBitmap(gv.cc.facing1, src, dst); }
-                        else if (pc.combatFacing == 4) { gv.DrawBitmap(gv.cc.facing4, src, dst); }
-                        else if (pc.combatFacing == 7) { gv.DrawBitmap(gv.cc.facing7, src, dst); }
-                        else { } //didn't find one
-                    }
+                        if ((pc.isDead()) || (pc.isUnconcious()))
+                        {
+                            src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Width);
+                            gv.DrawBitmap(gv.cc.pc_dead, src, dst);
+                        }
+                        if (pc.steathModeOn)
+                        {
+                            src = new IbRect(0, 0, gv.cc.pc_stealth.Width, gv.cc.pc_stealth.Width);
+                            gv.DrawBitmap(gv.cc.pc_stealth, src, dst);
+                        }
+                        //PLAYER FACING
+                        src = new IbRect(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
+                        if (pc.hp > 0)
+                        {
+                            if (pc.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
+                            else if (pc.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
+                            else if (pc.combatFacing == 6) { gv.DrawBitmap(gv.cc.facing6, src, dst); }
+                            else if (pc.combatFacing == 3) { gv.DrawBitmap(gv.cc.facing3, src, dst); }
+                            else if (pc.combatFacing == 2) { gv.DrawBitmap(gv.cc.facing2, src, dst); }
+                            else if (pc.combatFacing == 1) { gv.DrawBitmap(gv.cc.facing1, src, dst); }
+                            else if (pc.combatFacing == 4) { gv.DrawBitmap(gv.cc.facing4, src, dst); }
+                            else if (pc.combatFacing == 7) { gv.DrawBitmap(gv.cc.facing7, src, dst); }
+                            else { } //didn't find one
+                        }
 
 
-                    if (showMoveOrder)
+                        if (showMoveOrder)
+                        {
+                            int mo = pc.moveOrder + 1;
+                            drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                        }
+                    }
+                }
+            }
+            foreach (Player pc in gv.mod.playerList)
+            {
+                if (pc.hp > 0)
+                {
+                    if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                     {
-                        int mo = pc.moveOrder + 1;
-                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                        IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
+                        //check if drawing animation of player
+                        if ((playerToAnimate != null) && (playerToAnimate == pc))
+                        {
+                            attackAnimationDelayCounter++;
+                            if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(pc.tokenFilename).Height / 100f - 1))
+                            {
+                                attackAnimationFrameCounter++;
+                                attackAnimationDelayCounter = 0;
+                            }
+                            //maxUsableCounterValue = (int)(pc.token.Height / 100f - 1);
+                            maxUsableCounterValue = 1;
+                            if (attackAnimationFrameCounter >= maxUsableCounterValue)
+                            {
+                                attackAnimationFrameCounter = maxUsableCounterValue;
+                                blockAnimationBridge = false;
+                            }
+                            src = new IbRect(0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
+                        }
+                        IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft);
+                        src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
+                        if (!animationsOn)
+                        {
+                            foreach (Effect ef in pc.effectsList)
+                            {
+                                if ((!ef.isPermanent) && (ef.spriteFilename != "none") && (ef.spriteFilename != ""))
+                                {
+                                    string fx = ef.spriteFilename;
+                                    src = new IbRect(0, 0, gv.cc.GetFromBitmapList(fx).Width, gv.cc.GetFromBitmapList(fx).Width);
+                                    gv.DrawBitmap(gv.cc.GetFromBitmapList(fx), src, dst);
+                                    //gv.cc.DisposeOfBitmap(ref fx);
+                                }
+                            }
+                        }
+                        if ((pc.isDead()) || (pc.isUnconcious()))
+                        {
+                            src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Width);
+                            gv.DrawBitmap(gv.cc.pc_dead, src, dst);
+                        }
+                        if (pc.steathModeOn)
+                        {
+                            src = new IbRect(0, 0, gv.cc.pc_stealth.Width, gv.cc.pc_stealth.Width);
+                            gv.DrawBitmap(gv.cc.pc_stealth, src, dst);
+                        }
+                        //PLAYER FACING
+                        src = new IbRect(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
+                        if (pc.hp > 0)
+                        {
+                            if (pc.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
+                            else if (pc.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
+                            else if (pc.combatFacing == 6) { gv.DrawBitmap(gv.cc.facing6, src, dst); }
+                            else if (pc.combatFacing == 3) { gv.DrawBitmap(gv.cc.facing3, src, dst); }
+                            else if (pc.combatFacing == 2) { gv.DrawBitmap(gv.cc.facing2, src, dst); }
+                            else if (pc.combatFacing == 1) { gv.DrawBitmap(gv.cc.facing1, src, dst); }
+                            else if (pc.combatFacing == 4) { gv.DrawBitmap(gv.cc.facing4, src, dst); }
+                            else if (pc.combatFacing == 7) { gv.DrawBitmap(gv.cc.facing7, src, dst); }
+                            else { } //didn't find one
+                        }
+
+
+                        if (showMoveOrder)
+                        {
+                            int mo = pc.moveOrder + 1;
+                            drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                        }
                     }
                 }
             }
@@ -7897,154 +11828,157 @@ namespace IBx
             {
                 if ((!IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) || (!gv.mod.useCombatSmoothMovement))
                 {
-                    if (creatureIndex <= (gv.mod.currentEncounter.encounterCreatureList.Count - 1))
-                    {
-                        if (((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (!isPlayerTurn)) || (!gv.mod.useCombatSmoothMovement))
-                        {
-                            if ((crt.newCoor.X != -1) && (crt.newCoor.Y != -1))
-                            {
-                                crt.combatLocX = crt.newCoor.X;
-                                crt.combatLocY = crt.newCoor.Y;
-                            }
+                    //if (creatureIndex <= (gv.mod.currentEncounter.encounterCreatureList.Count - 1))
+                    //{
+                    //if (((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (!isPlayerTurn)) || (!gv.mod.useCombatSmoothMovement))
+                    if (((crt.moveOrder == currentMoveOrderIndex - 1) && (!isPlayerTurn)) || (!gv.mod.useCombatSmoothMovement))
 
-                            blockAnimationBridge = false;
+                    {
+                        if ((crt.newCoor.X != -1) && (crt.newCoor.Y != -1))
+                        {
+                            crt.combatLocX = crt.newCoor.X;
+                            crt.combatLocY = crt.newCoor.Y;
                         }
+
+                        blockAnimationBridge = false;
                     }
+                    //}
                     continue;
                 }
 
-                if (creatureIndex < gv.mod.currentEncounter.encounterCreatureList.Count)
+                //if (creatureIndex < gv.mod.currentEncounter.encounterCreatureList.Count)
+                //{
+                //if ((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (!isPlayerTurn) && (gv.mod.useCombatSmoothMovement))
+                if ((crt.moveOrder == currentMoveOrderIndex - 1) && (!isPlayerTurn) && (gv.mod.useCombatSmoothMovement))
                 {
-                    if ((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (!isPlayerTurn) && (gv.mod.useCombatSmoothMovement))
+
+                    if ((crt.combatLocX != crt.newCoor.X) || (crt.combatLocY != crt.newCoor.Y))
                     {
-
-                        if ((crt.combatLocX != crt.newCoor.X) || (crt.combatLocY != crt.newCoor.Y))
+                        if ((crt.newCoor.X != -1) && (crt.newCoor.Y != -1))
                         {
-                            if ((crt.newCoor.X != -1) && (crt.newCoor.Y != -1))
+                            //glide east
+                            if ((crt.combatLocX < crt.newCoor.X) && (crt.combatLocY == crt.newCoor.Y))
                             {
-                                //glide east
-                                if ((crt.combatLocX < crt.newCoor.X) && (crt.combatLocY == crt.newCoor.Y))
+                                crt.glideAdderX += 0.5f * glideSpeed;
+                                if (getPixelLocX(crt.combatLocX) + crt.glideAdderX >= getPixelLocX(crt.newCoor.X))
                                 {
-                                    crt.glideAdderX += 0.5f * glideSpeed;
-                                    if (getPixelLocX(crt.combatLocX) + crt.glideAdderX >= getPixelLocX(crt.newCoor.X))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide west
-                                if ((crt.combatLocX > crt.newCoor.X) && (crt.combatLocY == crt.newCoor.Y))
+                            //glide west
+                            if ((crt.combatLocX > crt.newCoor.X) && (crt.combatLocY == crt.newCoor.Y))
+                            {
+                                crt.glideAdderX -= 0.5f * glideSpeed;
+                                if (getPixelLocX(crt.combatLocX) + crt.glideAdderX <= getPixelLocX(crt.newCoor.X))
                                 {
-                                    crt.glideAdderX -= 0.5f * glideSpeed;
-                                    if (getPixelLocX(crt.combatLocX) + crt.glideAdderX <= getPixelLocX(crt.newCoor.X))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide north
-                                if ((crt.combatLocX == crt.newCoor.X) && (crt.combatLocY > crt.newCoor.Y))
+                            //glide north
+                            if ((crt.combatLocX == crt.newCoor.X) && (crt.combatLocY > crt.newCoor.Y))
+                            {
+                                crt.glideAdderY -= 0.5f * glideSpeed;
+                                if (getPixelLocY(crt.combatLocY) + crt.glideAdderY <= getPixelLocY(crt.newCoor.Y))
                                 {
-                                    crt.glideAdderY -= 0.5f * glideSpeed;
-                                    if (getPixelLocY(crt.combatLocY) + crt.glideAdderY <= getPixelLocY(crt.newCoor.Y))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide south
-                                if ((crt.combatLocX == crt.newCoor.X) && (crt.combatLocY < crt.newCoor.Y))
+                            //glide south
+                            if ((crt.combatLocX == crt.newCoor.X) && (crt.combatLocY < crt.newCoor.Y))
+                            {
+                                crt.glideAdderY += 0.5f * glideSpeed;
+                                if (getPixelLocY(crt.combatLocY) + crt.glideAdderY >= getPixelLocY(crt.newCoor.Y))
                                 {
-                                    crt.glideAdderY += 0.5f * glideSpeed;
-                                    if (getPixelLocY(crt.combatLocY) + crt.glideAdderY >= getPixelLocY(crt.newCoor.Y))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide southeast
-                                if ((crt.combatLocX < crt.newCoor.X) && (crt.combatLocY < crt.newCoor.Y))
+                            //glide southeast
+                            if ((crt.combatLocX < crt.newCoor.X) && (crt.combatLocY < crt.newCoor.Y))
+                            {
+                                crt.glideAdderX += 0.5f * glideSpeed;
+                                crt.glideAdderY += 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX >= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY >= getPixelLocY(crt.newCoor.Y)))
                                 {
-                                    crt.glideAdderX += 0.5f * glideSpeed;
-                                    crt.glideAdderY += 0.5f * glideSpeed;
-
-                                    if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX >= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY >= getPixelLocY(crt.newCoor.Y)))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide southwest
-                                if ((crt.combatLocX > crt.newCoor.X) && (crt.combatLocY < crt.newCoor.Y))
+                            //glide southwest
+                            if ((crt.combatLocX > crt.newCoor.X) && (crt.combatLocY < crt.newCoor.Y))
+                            {
+                                crt.glideAdderX -= 0.5f * glideSpeed;
+                                crt.glideAdderY += 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX <= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY >= getPixelLocY(crt.newCoor.Y)))
                                 {
-                                    crt.glideAdderX -= 0.5f * glideSpeed;
-                                    crt.glideAdderY += 0.5f * glideSpeed;
-
-                                    if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX <= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY >= getPixelLocY(crt.newCoor.Y)))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide northwest
-                                if ((crt.combatLocX > crt.newCoor.X) && (crt.combatLocY > crt.newCoor.Y))
+                            //glide northwest
+                            if ((crt.combatLocX > crt.newCoor.X) && (crt.combatLocY > crt.newCoor.Y))
+                            {
+                                crt.glideAdderX -= 0.5f * glideSpeed;
+                                crt.glideAdderY -= 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX <= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY <= getPixelLocY(crt.newCoor.Y)))
                                 {
-                                    crt.glideAdderX -= 0.5f * glideSpeed;
-                                    crt.glideAdderY -= 0.5f * glideSpeed;
-
-                                    if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX <= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY <= getPixelLocY(crt.newCoor.Y)))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
+                            }
 
-                                //glide northeast
-                                if ((crt.combatLocX < crt.newCoor.X) && (crt.combatLocY > crt.newCoor.Y))
+                            //glide northeast
+                            if ((crt.combatLocX < crt.newCoor.X) && (crt.combatLocY > crt.newCoor.Y))
+                            {
+                                crt.glideAdderX += 0.5f * glideSpeed;
+                                crt.glideAdderY -= 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX >= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY <= getPixelLocY(crt.newCoor.Y)))
                                 {
-                                    crt.glideAdderX += 0.5f * glideSpeed;
-                                    crt.glideAdderY -= 0.5f * glideSpeed;
-
-                                    if ((getPixelLocX(crt.combatLocX) + crt.glideAdderX >= getPixelLocX(crt.newCoor.X)) && (getPixelLocY(crt.combatLocY) + crt.glideAdderY <= getPixelLocY(crt.newCoor.Y)))
-                                    {
-                                        crt.combatLocX = crt.newCoor.X;
-                                        crt.combatLocY = crt.newCoor.Y;
-                                        crt.glideAdderX = 0;
-                                        crt.glideAdderY = 0;
-                                        blockAnimationBridge = false;
-                                    }
+                                    crt.combatLocX = crt.newCoor.X;
+                                    crt.combatLocY = crt.newCoor.Y;
+                                    crt.glideAdderX = 0;
+                                    crt.glideAdderY = 0;
+                                    blockAnimationBridge = false;
                                 }
                             }
                         }
                     }
                 }
+                //}
 
                 int randXInt = 0;
                 int randYInt = 0;
@@ -8122,6 +12056,1113 @@ namespace IBx
                     crt.roamDistanceX += randX;
                     crt.roamDistanceY += randY;
                 }
+
+                //stopmichael
+
+                //north on map for nomral and tall creatures
+                if ((crt.creatureSize == 1 || crt.creatureSize == 3) && crt.roamDistanceY < 0)
+                {
+                    if ((crt.combatLocY - 1) > 0)
+                    {
+                        //north not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //north occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if (coord.X == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //north not on map
+                    else
+                    {
+                        crt.roamDistanceY = 0;
+                    }
+                }
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                //north for wide(2) and large(4) creatures
+                if ((crt.creatureSize == 2 || crt.creatureSize == 4) && crt.roamDistanceY < 0)
+                {
+                    if ((crt.combatLocY - 1) > 0)
+                    {
+                        //north not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //north occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if (coord.X == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+
+                                                if ((coord.X + 1) == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //north not on map
+                    else
+                    {
+                        crt.roamDistanceY = 0;
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+
+                //west on map: for normal(1) and wide creatures (2)
+                if ((crt.creatureSize == 1 || crt.creatureSize == 2) && crt.roamDistanceX < 0)
+                {
+                    if ((crt.combatLocX - 1) > 0)
+                    {
+                        //north not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //north occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if ((coord.X - 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //west not on map
+                    else
+                    {
+                        crt.roamDistanceX = 0;
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                //west on map: for  tall (3) and large creatures (4)
+                if ((crt.creatureSize == 3 || crt.creatureSize == 4) && crt.roamDistanceX < 0)
+                {
+                    if ((crt.combatLocX - 1) > 0)
+                    {
+                        //west not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //west occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                    if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if ((coord.X - 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                                if ((coord.X - 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //west not on map
+                    else
+                    {
+                        crt.roamDistanceX = 0;
+                    }
+                }
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                //south and east will require four different cases each
+
+                //south on map (for normal)
+                if ((crt.creatureSize == 1) && crt.roamDistanceY > 0)
+                {
+                    if ((crt.combatLocY + 1 < gv.mod.currentEncounter.MapSizeY))
+                    {
+                        //south not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //north occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //south not on map
+                    else
+                    {
+                        crt.roamDistanceY = 0;
+                    }
+                }
+                //south on map for tall (Size 3) tall creatures - the relevant y is one higher
+                else if ((crt.creatureSize == 3) && crt.roamDistanceY > 0)
+                {
+                    if ((crt.combatLocY + 2 < gv.mod.currentEncounter.MapSizeY))
+                    {
+                        //south not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 2) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //south occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 2) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if (coord.X == coordOther.X && (coord.Y + 2) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //south not on map
+                    else
+                    {
+                        crt.roamDistanceY = 0;
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+                //south on map (for wide, 2)
+                else if ((crt.creatureSize == 2) && crt.roamDistanceY > 0)
+                {
+                    if ((crt.combatLocY + 1 < gv.mod.currentEncounter.MapSizeY))
+                    {
+                        //south not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //north occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+
+                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+
+                                                if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //south not on map
+                    else
+                    {
+                        crt.roamDistanceY = 0;
+                    }
+                }
+
+                //souht for large cretaures (4)
+                else if ((crt.creatureSize == 4) && crt.roamDistanceY > 0)
+                {
+                    if ((crt.combatLocY + 2 < gv.mod.currentEncounter.MapSizeY))
+                    {
+                        //south not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 2) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 2) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            {
+                                crt.roamDistanceY = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //south occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 2) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 2) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceY = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if (coord.X == coordOther.X && (coord.Y + 2) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                                if ((coord.X + 1) == coordOther.X && (coord.Y + 2) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceY = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //south not on map
+                    else
+                    {
+                        crt.roamDistanceY = 0;
+                    }
+                }
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+                //Now finally the four east (right) cases
+                //east on map (for normal)
+                if ((crt.creatureSize == 1) && crt.roamDistanceX > 0)
+                {
+                    if ((crt.combatLocX + 1 < gv.mod.currentEncounter.MapSizeX))
+                    {
+                        //east not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //east occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //east not on map
+                    else
+                    {
+                        crt.roamDistanceX = 0;
+                    }
+                }
+                //TODO from here; think aboiut purley diagonal obstacles???
+                //east on map for wide (Size 2) creatures - the relevant x is one higher
+                else if ((crt.creatureSize == 2) && crt.roamDistanceX > 0)
+                {
+                    if ((crt.combatLocX + 2 < gv.mod.currentEncounter.MapSizeX))
+                    {
+                        //south not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 2)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //south occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && (coord.X + 2) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if ((coord.X + 2) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //east not on map
+                    else
+                    {
+                        crt.roamDistanceX = 0;
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+                //east on map (for tall, 3)
+                else if ((crt.creatureSize == 3) && crt.roamDistanceX > 0)
+                {
+                    if ((crt.combatLocX + 1 < gv.mod.currentEncounter.MapSizeX))
+                    {
+                        //south not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //east occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+
+                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+
+                                                if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //east not on map
+                    else
+                    {
+                        crt.roamDistanceX = 0;
+                    }
+                }
+
+                //east for large cretaures (4)
+                else if ((crt.creatureSize == 4) && crt.roamDistanceX > 0)
+                {
+                    if ((crt.combatLocX + 2 < gv.mod.currentEncounter.MapSizeX))
+                    {
+                        //east not walkable
+                        bool lookForOthers = true;
+                        foreach (Coordinate coord in crt.tokenCoveredSquares)
+                        {
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 2)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 2)].Walkable)
+                            {
+                                crt.roamDistanceX = 0;
+                                lookForOthers = false;
+                                break;
+                            }
+                        }
+
+                        //south occupied by player or creature
+                        if (lookForOthers)
+                        {
+                            //player
+                            bool lookForCreatures = true;
+                            bool foundPlayer = false;
+                            foreach (Coordinate coord in crt.tokenCoveredSquares)
+                            {
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.hp > 0 && (coord.X + 2) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                    if (p.hp > 0 && (coord.X + 2) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    {
+                                        crt.roamDistanceX = 0;
+                                        lookForCreatures = false;
+                                        foundPlayer = true;
+                                        break;
+                                    }
+                                }
+                                if (foundPlayer)
+                                {
+                                    break;
+                                }
+                            }
+
+                            //creature
+                            if (lookForCreatures)
+                            {
+                                bool breakAllNested = false;
+                                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                                {
+                                    foreach (Creature cOther in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (cOther != crt && cOther.hp > 0)
+                                        {
+                                            foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
+                                            {
+                                                if ((coord.X + 2) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                                if ((coord.X + 2) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                {
+                                                    crt.roamDistanceX = 0;
+                                                    breakAllNested = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (breakAllNested)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (breakAllNested)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //east not on map
+                    else
+                    {
+                        crt.roamDistanceX = 0;
+                    }
+                }
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                //XXXXXXXXXXXXXXXXXXXXXx
                 //IbRect dst = new IbRect((int)this.position.X, (int)(this.position.Y + randY), (int)((gv.squareSize * this.scaleX) + randX), (int)(gv.squareSize * this.scaleY));
 
                 int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width;
@@ -8131,8 +13172,8 @@ namespace IBx
                 IbRectF src = new IbRectF(0, 0, width, height / 2);
 
                 //if ((creatureToAnimate != null) && (creatureToAnimate == crt))
-                if ( (creatureToAnimate.Count > 0) && (creatureToAnimate.Contains(crt)) )
-                    {
+                if ((creatureToAnimate.Count > 0) && (creatureToAnimate.Contains(crt)))
+                {
                     //blockAnimationBridge = true;
                     attackAnimationDelayCounter++;
                     if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 100f - 1))
@@ -8176,46 +13217,83 @@ namespace IBx
                     dst = new IbRectF(getPixelLocX(crt.combatLocX) + crt.roamDistanceX + crt.glideAdderX, getPixelLocY(crt.combatLocY) + crt.roamDistanceY + crt.glideAdderY, gv.squareSize * 2, gv.squareSize * 2);
                 }
 
-                //if (crt.token.Width > 100)
+                //if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                 //{
                 //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
                 //}
 
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
+                bool drawCreature = true;
+                foreach (Coordinate c in gv.screenCombat.deathAnimationLocations)
+                {
+                    if (c.X == crt.combatLocX && c.Y == crt.combatLocY)
+                    {
+                        drawCreature = false;
+                        break;
+                    }
+                }
+                if (drawCreature)
+                {
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
+                }
+                else
+                {
+                    //normal
+                    dst = new IbRectF(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize, gv.squareSize);
+
+                    //wide  
+                    if (crtSize == 2)
+                    {
+                        dst = new IbRectF(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize);
+                    }
+
+                    //tall  
+                    if (crtSize == 3)
+                    {
+                        //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
+                        dst = new IbRectF(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize, gv.squareSize * 2);
+                    }
+
+                    //large  
+                    if (crtSize == 4)
+                    {
+                        dst = new IbRectF(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize * 2);
+                    }
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
+                }
 
                 /*
                 //start
                 IbRectF dst = new IbRectF(getPixelLocX(crt.combatLocX) + crt.roamDistanceX + crt.glideAdderX, getPixelLocY(crt.combatLocY) + crt.roamDistanceY + crt.glideAdderY, gv.squareSize, gv.squareSize);
-                if (crt.token.Width > 100)
+                if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                 {
                     dst = new IbRectF(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2) + crt.roamDistanceX + crt.glideAdderX, getPixelLocY(crt.combatLocY) - (gv.squareSize / 2) + crt.roamDistanceY + crt.glideAdderY, gv.squareSize * 2, gv.squareSize * 2);
                 }
 
-                IbRectF src = new IbRectF(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Height);
+                IbRectF src = new IbRectF(0, 0, gv.cc.turn_marker.PixelSize.Width, gv.cc.turn_marker.PixelSize.Height);
                 //if ((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex]) && (!isPlayerTurn))
                 //{
                 //gv.DrawBitmap(gv.cc.turn_marker, src, dst);
                 //}
-                src = new IbRectF(0, 0, crt.token.Width, crt.token.Width);
+                src = new IbRectF(0, 0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
                 //for 100x100px per frame creatures
-                if (crt.token.Width <= 100)
+                if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width <= 100)
                 {
                     if ((creatureToAnimate != null) && (creatureToAnimate == crt))
                     {
                         //blockAnimationBridge = true;
                         attackAnimationDelayCounter++;
-                        if (attackAnimationDelayCounter >= (int)(crt.token.Height / 100f - 1))
+                        if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f - 1))
                         {
                             attackAnimationFrameCounter++;
                             attackAnimationDelayCounter = 0;
                         }
-                        maxUsableCounterValue = (int)(crt.token.Height / 100f - 1);
+                        maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f - 1);
                         if (attackAnimationFrameCounter >= maxUsableCounterValue)
                         {
                             attackAnimationFrameCounter = maxUsableCounterValue;
                             blockAnimationBridge = false;
                         }
-                        src = new IbRectF(0, crt.token.Width * attackAnimationFrameCounter, crt.token.Width, crt.token.Width);
+                        src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
                     }
                 }
                 //for 200x200 per frame creatures
@@ -8225,18 +13303,18 @@ namespace IBx
                     {
                         //blockAnimationBridge = true;
                         attackAnimationDelayCounter++;
-                        if (attackAnimationDelayCounter >= (int)(crt.token.Height / 200f - 1))
+                        if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 200f - 1))
                         {
                             attackAnimationFrameCounter++;
                             attackAnimationDelayCounter = 0;
                         }
-                        maxUsableCounterValue = (int)(crt.token.Height / 200f - 1);
+                        maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 200f - 1);
                         if (attackAnimationFrameCounter >= maxUsableCounterValue)
                         {
                             attackAnimationFrameCounter = maxUsableCounterValue;
                             blockAnimationBridge = false;
                         }
-                        src = new IbRectF(0, crt.token.Width * attackAnimationFrameCounter, crt.token.Width, crt.token.Width);
+                        src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
                     }
                 }
                 if (attackAnimationFrameCounter > 2)
@@ -8248,7 +13326,7 @@ namespace IBx
                 //end
                 */
 
-                if (!animationsOn)
+                if (!animationsOn && drawCreature)
                 {
                     foreach (Effect ef in crt.cr_effectsList)
                     {
@@ -8261,20 +13339,23 @@ namespace IBx
                 //CREATURE FACING
                 src = new IbRectF(0, 0, gv.cc.facing1.Width, gv.cc.facing1.Height);
 
-                if (crt.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
-                else if (crt.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
-                else if (crt.combatFacing == 6) { gv.DrawBitmap(gv.cc.facing6, src, dst); }
-                else if (crt.combatFacing == 3) { gv.DrawBitmap(gv.cc.facing3, src, dst); }
-                else if (crt.combatFacing == 2) { gv.DrawBitmap(gv.cc.facing2, src, dst); }
-                else if (crt.combatFacing == 1) { gv.DrawBitmap(gv.cc.facing1, src, dst); }
-                else if (crt.combatFacing == 4) { gv.DrawBitmap(gv.cc.facing4, src, dst); }
-                else if (crt.combatFacing == 7) { gv.DrawBitmap(gv.cc.facing7, src, dst); }
-                else { } //didn't find one
-
-                if (showMoveOrder)
+                if (drawCreature)
                 {
-                    int mo = crt.moveOrder + 1;
-                    drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY + (int)crt.glideAdderY, mo.ToString(), "white");
+                    if (crt.combatFacing == 8) { gv.DrawBitmap(gv.cc.facing8, src, dst); }
+                    else if (crt.combatFacing == 9) { gv.DrawBitmap(gv.cc.facing9, src, dst); }
+                    else if (crt.combatFacing == 6) { gv.DrawBitmap(gv.cc.facing6, src, dst); }
+                    else if (crt.combatFacing == 3) { gv.DrawBitmap(gv.cc.facing3, src, dst); }
+                    else if (crt.combatFacing == 2) { gv.DrawBitmap(gv.cc.facing2, src, dst); }
+                    else if (crt.combatFacing == 1) { gv.DrawBitmap(gv.cc.facing1, src, dst); }
+                    else if (crt.combatFacing == 4) { gv.DrawBitmap(gv.cc.facing4, src, dst); }
+                    else if (crt.combatFacing == 7) { gv.DrawBitmap(gv.cc.facing7, src, dst); }
+                    else { } //didn't find one
+
+                    if (showMoveOrder)
+                    {
+                        int mo = crt.moveOrder + 1;
+                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY + (int)crt.glideAdderY, mo.ToString(), "white");
+                    }
                 }
             }
         }
@@ -8284,21 +13365,30 @@ namespace IBx
             {
                 if (!isPlayerTurn)
                 {
-                    if (creatureIndex < gv.mod.currentEncounter.encounterCreatureList.Count)
+                    //if (creatureIndex < gv.mod.currentEncounter.encounterCreatureList.Count)
+                    //{
+                    Creature cr = new Creature();
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                     {
-                        Creature cr = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
-                        if (IsInVisibleCombatWindow(cr.combatLocX, cr.combatLocY))
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
                         {
-                            IbRect src = new IbRect(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Height);
-                            //IbRect dst = new IbRect(getPixelLocX(cr.combatLocX), getPixelLocY(cr.combatLocY), gv.squareSize, gv.squareSize);
-                            //gv.DrawBitmap(gv.cc.turn_marker, src, dst);
-                            foreach (Coordinate coor in cr.tokenCoveredSquares)
-                            {
-                                IbRect dst = new IbRect(getPixelLocX(coor.X), getPixelLocY(coor.Y), gv.squareSize, gv.squareSize);
-                                gv.DrawBitmap(gv.cc.turn_marker, src, dst);
-                            }
+                            cr = c;
+                            break;
                         }
                     }
+                    //Creature cr = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+                    if (IsInVisibleCombatWindow(cr.combatLocX, cr.combatLocY))
+                    {
+                        IbRect src = new IbRect(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Height);
+                        //IbRect dst = new IbRect(getPixelLocX(cr.combatLocX), getPixelLocY(cr.combatLocY), gv.squareSize, gv.squareSize);
+                        //gv.DrawBitmap(gv.cc.turn_marker, src, dst);
+                        foreach (Coordinate coor in cr.tokenCoveredSquares)
+                        {
+                            IbRect dst = new IbRect(getPixelLocX(coor.X), getPixelLocY(coor.Y), gv.squareSize, gv.squareSize);
+                            gv.DrawBitmap(gv.cc.turn_marker, src, dst);
+                        }
+                    }
+                    //}
                 }
             }
             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
@@ -8322,8 +13412,68 @@ namespace IBx
                 //continue;
                 //}
 
-                //IbRect src = new IbRect(0, 0, crt.token.Width, crt.token.Width);
+                //IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
 
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                /*
+                int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Width;
+                int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).PixelSize.Height;
+                //1=normal, 2=wide, 3=tall, 4=large  
+                int crtSize = crt.creatureSize;
+                IbRect src = new IbRect(0, 0, width, height / 2);
+
+                //if ((creatureToAnimate != null) && (creatureToAnimate == crt))
+                if ((creatureToAnimate.Count > 0) && (creatureToAnimate.Contains(crt)))
+                {
+                    //blockAnimationBridge = true;
+                    attackAnimationDelayCounter++;
+                    if (attackAnimationDelayCounter >= (int)(gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f - 1))
+                    {
+                        attackAnimationFrameCounter++;
+                        attackAnimationDelayCounter = 0;
+                    }
+                    int maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f - 1);
+                    if (attackAnimationFrameCounter > maxUsableCounterValue)
+                    {
+                        attackAnimationFrameCounter = maxUsableCounterValue;
+                        blockAnimationBridge = false;
+                    }
+                    src = new IbRect(0, gv.cc.GetFromBitmapList(crt.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.tokenFilename).Width, gv.cc.GetFromBitmapList(crt.tokenFilename).Width);
+                    //src = new IbRect(0, height / 2, width, height / 2);
+                }
+
+                //normal
+                IbRect dst = new IbRect(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize, gv.squareSize);
+
+                //wide  
+                if (crtSize == 2)
+                {
+                    dst = new IbRect(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize);
+                }
+
+                //tall  
+                if (crtSize == 3)
+                {
+                    //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
+                    dst = new IbRect(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize, gv.squareSize * 2);
+                }
+
+                //large  
+                if (crtSize == 4)
+                {
+                    dst = new IbRect(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize * 2);
+                }
+
+                //if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                //{
+                //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
+                //}
+
+                gv.DrawBitmap(crt.token, src, dst, !crt.combatFacingLeft);
+                */
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 int width = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width;
                 int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height;
                 //1=normal, 2=wide, 3=tall, 4=large  
@@ -8341,6 +13491,10 @@ namespace IBx
                         attackAnimationDelayCounter = 0;
                     }
                     int maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 100f - 1);
+                    if ((crtSize == 3) || (crtSize == 4))
+                    {
+                        maxUsableCounterValue = (int)(gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / 200f - 1);
+                    }
                     if (attackAnimationFrameCounter > maxUsableCounterValue)
                     {
                         attackAnimationFrameCounter = maxUsableCounterValue;
@@ -8372,12 +13526,16 @@ namespace IBx
                     dst = new IbRect(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize * 2);
                 }
 
-                //if (crt.token.Width > 100)
+                //if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                 //{
                 //dst = new IbRect(getPixelLocX(crt.combatLocX) - (gv.squareSize / 2), getPixelLocY(crt.combatLocY) - (gv.squareSize / 2), gv.squareSize * 2, gv.squareSize * 2);
                 //}
 
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft, false);
+
+
+
+                //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 if (!animationsOn)
                 {
                     foreach (Effect ef in crt.cr_effectsList)
@@ -8440,7 +13598,7 @@ namespace IBx
 
                 if (it.onScoringHitCastSpellTag != "none")
                 {
-                    foreach(Spell sp in gv.mod.moduleSpellsList)
+                    foreach (Spell sp in gv.mod.moduleSpellsList)
                     {
                         if (sp.tag == it.onScoringHitCastSpellTag)
                         {
@@ -8562,19 +13720,26 @@ namespace IBx
                 }
             }
         }
+
+
         public void drawFloatyText()
         {
             int txtH = (int)gv.drawFontRegHeight;
 
-            for (int x = -2; x <= 2; x++)
+            /*
+            for (int x = -1; x <= 1; x++)
             {
-                for (int y = -2; y <= 2; y++)
+                for (int y = -1; y <= 1; y++)
                 {
-                    gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + txtH + y, "black");
-                    gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 2) + y, "black");
-                    gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 3) + y, "black");
+                    if (x != 0 || y != 0)
+                    {
+                        gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + txtH + y, 1.0f, Color.Black);
+                        gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 2) + y, 1.0f, Color.Black);
+                        gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X + x, gv.cc.floatyTextLoc.Y + (txtH * 3) + y, 1.0f, Color.Black);
+                    }
                 }
             }
+            */
             gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, "yellow");
             gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, "yellow");
             gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 3, "yellow");
@@ -8624,43 +13789,62 @@ namespace IBx
         {
             int txtH = (int)gv.drawFontRegHeight;
 
-            for (int x = -2; x <= 2; x++)
+            /*
+            for (int x = -1; x <= 1; x++)
             {
-                for (int y = -2; y <= 2; y++)
+                for (int y = -1; y <= 1; y++)
                 {
-                    gv.DrawText(text, xLoc + x, yLoc + txtH + y, "black");
+                    if (x != 0 || y != 0)
+                    {
+                        gv.DrawText(text, xLoc + x, yLoc + txtH + y, 1.0f, Color.Black);
+                    }
                 }
             }
-            gv.DrawText(text, xLoc, yLoc + txtH, colr);
+            */
+            gv.DrawTextOutlined(text, xLoc, yLoc + txtH, 1.0f, colr);
         }
         public void drawMiniText(int xLoc, int yLoc, string text, string colr)
         {
             int txtH = (int)gv.drawFontRegHeight;
 
-            for (int x = -2; x <= 2; x++)
+            /*
+            for (int x = -1; x <= 1; x++)
             {
-                for (int y = -2; y <= 2; y++)
+                for (int y = -1; y <= 1; y++)
                 {
-                    gv.DrawText(text, xLoc + x, yLoc + txtH + y, "small", "black");
+                    if (x != 0 || y != 0)
+                    {
+                        gv.DrawText(text, xLoc + x, yLoc + txtH + y, 0.5f, Color.Black);
+                    }
                 }
             }
-            gv.DrawText(text, xLoc, yLoc + txtH, "small", colr);
+            */
+            gv.DrawTextOutlined(text, xLoc, yLoc + txtH, 0.5f, colr);
         }
         public void drawFloatyTextList()
         {
+            //summe
             if (floatyTextOn)
             {
                 int txtH = (int)gv.drawFontRegHeight;
 
                 foreach (FloatyText ft in gv.cc.floatyTextList)
                 {
-                    for (int x = -2; x <= 2; x++)
+                    /*
+                    for (int x = -1; x <= 1; x++)
                     {
-                        for (int y = -2; y <= 2; y++)
+                        for (int y = -1; y <= 1; y++)
                         {
-                            gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + x + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize) + y, "black");
+                            if (x != 0 || y != 0)
+                            {
+                                if (!ft.value.Contains("Round"))
+                                {
+                                    gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + x + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize) + y, 1.0f, Color.Black);
+                                }
+                            }
                         }
                     }
+                    */
                     string colr = "yellow";
                     if (ft.color.Equals("yellow"))
                     {
@@ -8678,7 +13862,52 @@ namespace IBx
                     {
                         colr = "red";
                     }
-                    gv.DrawText(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize), colr);
+                    if (!ft.value.Contains("Round"))
+                    {
+                        gv.DrawTextOutlined(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize), 1.0f, colr);
+                    }
+                }
+            }
+            if (floatyTextEnlargerOn)
+            {
+                int txtH = (int)gv.drawFontRegHeight;
+
+                foreach (FloatyText ft in gv.cc.floatyTextList)
+                {
+                    /*
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        for (int y = -1; y <= 1; y++)
+                        {
+                            if (ft.value.Contains("Round"))
+                            {
+                                gv.DrawText(ft.value, ft.location.X + mapStartLocXinPixels + x, ft.location.Y + y, 3.0f, Color.Black);
+                            }
+                        }
+                    }
+                    */
+                    string colr = ft.color;
+                    /*if (ft.color.Equals("yellow"))
+                    {
+                        colr = Color.Yellow;
+                    }
+                    else if (ft.color.Equals("blue"))
+                    {
+                        colr = Color.Blue;
+                    }
+                    else if (ft.color.Equals("green"))
+                    {
+                        colr = Color.Lime;
+                    }
+                    else
+                    {
+                        colr = Color.Red;
+                    }*/
+                    if (ft.value.Contains("Round"))
+                    {
+                        //summe 
+                        gv.DrawTextOutlined(ft.value, ft.location.X + mapStartLocXinPixels, ft.location.Y, 3.0f, colr);
+                    }
                 }
             }
         }
@@ -8727,7 +13956,7 @@ namespace IBx
             {
                 spr.Draw(gv);
             }
-            if (animationsOn)
+            if (animationsOn || stepAnimationsOn)
             {
                 if (attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds)
                 {
@@ -8753,8 +13982,12 @@ namespace IBx
         #region Keyboard Input
         public void onKeyUp()
         {
-            /*TODO if (keyData == Keys.M || keyData == Keys.Q)
+            /*TODO
+            //rdr2 added
+            //recalculateCreaturesShownInInitiativeBar();
+            if (keyData == Keys.M)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 if (canMove)
                 {
                     if (isPlayerTurn)
@@ -8771,6 +14004,7 @@ namespace IBx
             }
             else if (keyData == Keys.R)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 //scroll log up
                 //do same for combat screen
                 //wheel
@@ -8783,11 +14017,13 @@ namespace IBx
                 {
                     gv.log.SetCurrentTopLineIndex(-numberOfTextLinesToMove);
                     //gv.Invalidate();
-                    gv.Render(0);
+                    //bloodbus
+                    //gv.Render(0);
                 }
             }
             else if (keyData == Keys.F)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 //scroll log up
                 //do same for combat screen
                 //wheel
@@ -8800,11 +14036,13 @@ namespace IBx
                 {
                     gv.log.SetCurrentTopLineIndex(+numberOfTextLinesToMove);
                     //gv.Invalidate();
-                    gv.Render(0);
+                    //bloodbus
+                    //gv.Render(0);
                 }
             }
-            else if (keyData == Keys.E)
+            else if (keyData == Keys.K)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 if (isPlayerTurn)
                 {
                     gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
@@ -8820,6 +14058,7 @@ namespace IBx
             }
             else if (keyData == Keys.P)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 if ((isPlayerTurn) && (!gv.mod.playerList[currentPlayerIndex].isTemporaryAllyForThisEncounterOnly))
                 {
                     if (currentPlayerIndex > gv.mod.playerList.Count - 1)
@@ -8833,7 +14072,7 @@ namespace IBx
                     gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
                     //if (!gv.mod.playerList[currentPlayerIndex].isTemporaryAllyForThisEncounterOnly)
                     //{
-                        gv.cc.partyScreenPcIndex = currentPlayerIndex;
+                    gv.cc.partyScreenPcIndex = currentPlayerIndex;
                     //}
                     gv.screenParty.resetPartyScreen();
                     gv.screenType = "combatParty";
@@ -8841,19 +14080,22 @@ namespace IBx
             }
             else if (keyData == Keys.I)
             {
-                if ((isPlayerTurn) && (!gv.mod.playerList[currentPlayerIndex].isTemporaryAllyForThisEncounterOnly))
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
+                if ((isPlayerTurn) && (!gv.mod.playerList[currentPlayerIndex].isTemporaryAllyForThisEncounterOnly) && !gv.mod.currentEncounter.noItemUseModifier)
                 {
                     gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                     gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
                     gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
                     gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
                     gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                    //gv.screenInventory.resetInventory(true);
                     gv.screenType = "combatInventory";
                     gv.screenInventory.resetInventory(true);
                 }
             }
             else if (keyData == Keys.Space)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 if (isPlayerTurn)
                 {
                     continueTurn = false;
@@ -8866,10 +14108,12 @@ namespace IBx
                     endPcTurn(false);
                 }
             }
-            else if (keyData == Keys.C)
+            else if (keyData == Keys.O)
             {
-                if (isPlayerTurn)
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
+                if (isPlayerTurn && !gv.mod.currentEncounter.noSpellCastModifier)
                 {
+                    gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                     continueTurn = false;
                     gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                     gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
@@ -8891,10 +14135,83 @@ namespace IBx
                     }
                 }
             }
-            else if (keyData == Keys.T)
+            else if (keyData == Keys.L)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 if (isPlayerTurn)
                 {
+                    int highestMoveOrderFound = 0;
+
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if (c.moveOrder > highestMoveOrderFound)
+                        {
+                            highestMoveOrderFound = c.moveOrder;
+                        }
+                    }
+
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        if (p.moveOrder > highestMoveOrderFound)
+                        {
+                            highestMoveOrderFound = p.moveOrder;
+                        }
+                    }
+
+                    if (highestMoveOrderFound != gv.mod.playerList[currentPlayerIndex].moveOrder && !gv.mod.playerList[currentPlayerIndex].hasDelayedAlready)
+                    {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                        gv.mod.playerList[currentPlayerIndex].moveOrder = highestMoveOrderFound + 1;
+                        /*
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (c.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder)
+                            {
+                                gv.mod.playerList[currentPlayerIndex].moveOrder++;
+                            }
+                        }
+                        foreach (Player p in gv.mod.playerList)
+                        {
+                            if (p.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder && p != gv.mod.playerList[currentPlayerIndex])
+                            {
+                                gv.mod.playerList[currentPlayerIndex].moveOrder++;
+                            }
+                        }
+                        */
+                        /*
+                        //add to end of move order  
+                        MoveOrder newMO = new MoveOrder();
+                        newMO.PcOrCreature = gv.mod.playerList[currentPlayerIndex];
+                        newMO.rank = highestMoveOrderFound + 1;
+                        gv.screenCombat.moveOrderList.Add(newMO);
+                        for (int i = gv.screenCombat.moveOrderList.Count - 2; i >= 0; i--)
+                        {
+                            if (gv.screenCombat.moveOrderList[i].PcOrCreature == newMO.PcOrCreature)
+                            {
+                                gv.screenCombat.moveOrderList.RemoveAt(i);
+                            }
+                        }
+
+                        //increment the number of initial move order objects
+                        //note: check how ini bar system will interact with creatures added while battle is running  
+                        gv.screenCombat.initialMoveOrderListSize++;
+
+                        recalculateCreaturesShownInInitiativeBar();
+
+                        endPcTurn(false);
+                    }
+                    else
+                    {
+                        gv.cc.addLogText("red", "Delaying not possible for this character this turn.");
+                    }
+                }
+            }
+            else if (keyData == Keys.U)
+            {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
+                if (isPlayerTurn && !gv.mod.currentEncounter.noTraitUseModifier)
+                {
+                    gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                     continueTurn = false;
                     gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                     gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
@@ -8918,6 +14235,7 @@ namespace IBx
             }
             else if (keyData == Keys.X)
             {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
                 foreach (IB2Panel pnl in combatUiLayout.panelList)
                 {
                     //hides left
@@ -8978,6 +14296,14 @@ namespace IBx
             #region Move Map
             if (keyData == Keys.Up && !showMoveKeys)
             {
+                if (gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.Y > -gv.playerOffsetY)
@@ -8997,6 +14323,14 @@ namespace IBx
             }
             else if (keyData == Keys.Left && !showMoveKeys)
             {
+                if (gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.X > -gv.playerOffsetX)
@@ -9016,6 +14350,14 @@ namespace IBx
             }
             else if (keyData == Keys.Down && !showMoveKeys)
             {
+                if (gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
@@ -9035,6 +14377,14 @@ namespace IBx
             }
             else if (keyData == Keys.Right && !showMoveKeys)
             {
+                if (gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
@@ -9052,8 +14402,17 @@ namespace IBx
                     return;
                 }
             }
+
             if (keyData == Keys.W && showMoveKeys)
             {
+                if (!gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.Y > -gv.playerOffsetY)
@@ -9073,6 +14432,14 @@ namespace IBx
             }
             else if (keyData == Keys.A && showMoveKeys)
             {
+                if (!gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.X > -gv.playerOffsetX)
@@ -9092,6 +14459,14 @@ namespace IBx
             }
             else if (keyData == Keys.S && showMoveKeys)
             {
+                if (!gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
@@ -9111,6 +14486,14 @@ namespace IBx
             }
             else if (keyData == Keys.D && showMoveKeys)
             {
+                if (!gv.screenMainMap.showMoveKeys)
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = true;
+                }
+                else
+                {
+                    gv.mod.mainMapMovementRelevantKeyPressed = false;
+                }
                 if (gv.mod.useManualCombatCam)
                 {
                     if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
@@ -9133,23 +14516,81 @@ namespace IBx
             if (currentCombatMode.Equals("move"))
             {
                 Player pc = gv.mod.playerList[currentPlayerIndex];
-                if (keyData == Keys.NumPad7)
+                if ((keyData == Keys.NumPad7) || (keyData == Keys.Q && !showMoveKeys))
                 {
                     continueTurn = false;
                     MoveUpLeft(pc);
                 }
-                else if ( (keyData == Keys.NumPad8) || (keyData == Keys.Up && showMoveKeys) || (keyData == Keys.W && !showMoveKeys) )
+                else if ((keyData == Keys.NumPad8) || (keyData == Keys.Up && showMoveKeys) || (keyData == Keys.W && !showMoveKeys))
                 {
+
+                    if (keyData == Keys.NumPad8)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
+                    if (keyData == Keys.Up)
+                    {
+                        if (gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
+
+                    if (keyData == Keys.W)
+                    {
+                        if (!gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
+
                     continueTurn = false;
                     MoveUp(pc);
                 }
-                else if (keyData == Keys.NumPad9)
+                else if ((keyData == Keys.NumPad9) || (keyData == Keys.E && !showMoveKeys))
                 {
                     continueTurn = false;
                     MoveUpRight(pc);
                 }
                 else if ((keyData == Keys.NumPad4) || (keyData == Keys.Left && showMoveKeys) || (keyData == Keys.A && !showMoveKeys))
                 {
+                    if (keyData == Keys.NumPad4)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
+                    if (keyData == Keys.Left)
+                    {
+                        if (gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
+
+                    if (keyData == Keys.A)
+                    {
+                        if (!gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
                     continueTurn = false;
                     MoveLeft(pc);
                 }
@@ -9157,22 +14598,78 @@ namespace IBx
                 {
                     CenterScreenOnPC();
                 }
-                else if ( (keyData == Keys.NumPad6) || (keyData == Keys.Right && showMoveKeys) || (keyData == Keys.D && !showMoveKeys) )
+                else if ((keyData == Keys.NumPad6) || (keyData == Keys.Right && showMoveKeys) || (keyData == Keys.D && !showMoveKeys))
                 {
+                    if (keyData == Keys.NumPad6)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
+                    if (keyData == Keys.Right)
+                    {
+                        if (gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
+
+                    if (keyData == Keys.D)
+                    {
+                        if (!gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
                     continueTurn = false;
                     MoveRight(pc);
                 }
-                else if (keyData == Keys.NumPad1)
+                else if ((keyData == Keys.NumPad1) || (keyData == Keys.Y && !showMoveKeys) || (keyData == Keys.Z && !showMoveKeys))
                 {
                     continueTurn = false;
                     MoveDownLeft(pc);
                 }
-                else if ( (keyData == Keys.NumPad2) || (keyData == Keys.Down && showMoveKeys) || (keyData == Keys.S && !showMoveKeys) )
+                else if ((keyData == Keys.NumPad2) || (keyData == Keys.Down && showMoveKeys) || (keyData == Keys.S && !showMoveKeys))
                 {
+                    if (keyData == Keys.NumPad2)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
+                    if (keyData == Keys.Down)
+                    {
+                        if (gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
+
+                    if (keyData == Keys.S)
+                    {
+                        if (!gv.screenMainMap.showMoveKeys)
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = true;
+                        }
+                        else
+                        {
+                            gv.mod.mainMapMovementRelevantKeyPressed = false;
+                        }
+                    }
                     continueTurn = false;
                     MoveDown(pc);
                 }
-                else if (keyData == Keys.NumPad3)
+                else if ((keyData == Keys.NumPad3) || (keyData == Keys.C && !showMoveKeys))
                 {
                     continueTurn = false;
                     MoveDownRight(pc);
@@ -9210,6 +14707,11 @@ namespace IBx
                 }
                 else if (keyData == Keys.NumPad8)
                 {
+                    if (keyData == Keys.NumPad8)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
                     continueTurn = false;
                     MoveTargetHighlight(8);
                 }
@@ -9220,6 +14722,11 @@ namespace IBx
                 }
                 else if (keyData == Keys.NumPad4)
                 {
+                    if (keyData == Keys.NumPad4)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
                     continueTurn = false;
                     MoveTargetHighlight(4);
                 }
@@ -9235,6 +14742,12 @@ namespace IBx
                 }
                 else if (keyData == Keys.NumPad2)
                 {
+                    if (keyData == Keys.NumPad2)
+                    {
+                        gv.mod.mainMapMovementRelevantKeyPressed = true;
+                    }
+
+
                     continueTurn = false;
                     MoveTargetHighlight(2);
                 }
@@ -9250,7 +14763,1031 @@ namespace IBx
         }
         #endregion
 
-        #region Mouse Input        
+        #region Mouse Input
+        /*public void onTouchCombatOld(MouseEventArgs e, MouseEventType.EventType eventType)
+        {
+            switch (eventType)
+            {
+                case MouseEventType.EventType.MouseDown:
+                    int x = (int)e.X;
+                    int y = (int)e.Y;
+
+                    int gridx = (int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
+                    int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
+
+                    #region FloatyText
+                    gv.cc.floatyText = "";
+                    gv.cc.floatyText2 = "";
+                    gv.cc.floatyText3 = "";
+                    foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
+                        {
+                            gv.cc.floatyText = crt.cr_name;
+                            gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
+                            gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
+                            gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
+                        }
+                    }
+                    foreach (Player pc in gv.mod.playerList)
+                    {
+                        if ((pc.combatLocX == gridx + UpperLeftSquare.X) && (pc.combatLocY == gridy + UpperLeftSquare.Y))
+                        {
+                            string am = "";
+                            ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc.AmmoRefs.resref);
+                            if (itr != null)
+                            {
+                                am = itr.quantity + "";
+                            }
+                            else
+                            {
+                                am = "";
+                            }
+
+                            gv.cc.floatyText = pc.name;
+                            int actext = 0;
+                            if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
+                            else { actext = 20 - pc.AC; }
+                            gv.cc.floatyText2 = "AC:" + actext + " " + pc.charStatus;
+                            gv.cc.floatyText3 = "Ammo: " + am;
+                            gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY));
+
+                        }
+                    }
+                    #endregion
+                    #region Toggles
+                    if (tglHP.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        if (tglHP.toggleOn)
+                        {
+                            tglHP.toggleOn = false;
+                        }
+                        else
+                        {
+                            tglHP.toggleOn = true;
+                        }
+                    }
+                    if (tglSP.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        if (tglSP.toggleOn)
+                        {
+                            tglSP.toggleOn = false;
+                        }
+                        else
+                        {
+                            tglSP.toggleOn = true;
+                        }
+                    }
+                    if (tglMoveOrder.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        if (tglMoveOrder.toggleOn)
+                        {
+                            tglMoveOrder.toggleOn = false;
+                        }
+                        else
+                        {
+                            tglMoveOrder.toggleOn = true;
+                        }
+                    }
+                    if (tglSpeed.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        
+                        if (gv.mod.combatAnimationSpeed == 100)
+                        {
+                            gv.mod.combatAnimationSpeed = 50;
+                            gv.cc.addLogText("lime", "combat speed: 2x");
+                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
+                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_2");
+                        }
+                        else if (gv.mod.combatAnimationSpeed == 50)
+                        {
+                            gv.mod.combatAnimationSpeed = 25;
+                            gv.cc.addLogText("lime", "combat speed: 4x");
+                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
+                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_4");
+                        }
+                        else if (gv.mod.combatAnimationSpeed == 25)
+                        {
+                            gv.mod.combatAnimationSpeed = 10;
+                            gv.cc.addLogText("lime", "combat speed: 10x");
+                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
+                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_10");
+                        }
+                        else if (gv.mod.combatAnimationSpeed == 10)
+                        {
+                            gv.mod.combatAnimationSpeed = 100;
+                            gv.cc.addLogText("lime", "combat speed: 1x");
+                            gv.cc.DisposeOfBitmap(ref tglSpeed.ImgOff);
+                            tglSpeed.ImgOff = gv.cc.LoadBitmap("tgl_speed_1");
+                        }
+                    }
+                    if (gv.cc.tglSound.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        if (gv.cc.tglSound.toggleOn)
+                        {
+                            gv.cc.tglSound.toggleOn = false;
+                            gv.mod.playMusic = false;
+                            gv.stopCombatMusic();
+                            //addLogText("lime","Music Off");
+                        }
+                        else
+                        {
+                            gv.cc.tglSound.toggleOn = true;
+                            gv.mod.playMusic = true;
+                            gv.startCombatMusic();
+                            //addLogText("lime","Music On");
+                        }
+                    }
+                    if (tglSoundFx.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        if (tglSoundFx.toggleOn)
+                        {
+                            tglSoundFx.toggleOn = false;
+                            gv.mod.playSoundFx = false;
+                            //gv.stopCombatMusic();
+                            //addLogText("lime","Music Off");
+                        }
+                        else
+                        {
+                            tglSoundFx.toggleOn = true;
+                            gv.mod.playSoundFx = true;
+                            //gv.startCombatMusic();
+                            //addLogText("lime","Music On");
+                        }
+                    }
+                    if (tglGrid.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        if (tglGrid.toggleOn)
+                        {
+                            tglGrid.toggleOn = false;
+                            gv.mod.com_showGrid = false;
+                        }
+                        else
+                        {
+                            tglGrid.toggleOn = true;
+                            gv.mod.com_showGrid = true;
+                        }
+                    }
+                    if (tglHelp.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        tutorialMessageCombat(true);
+                    }
+                    if ((tglKill.getImpact(x, y)) && (gv.mod.debugMode))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.mod.currentEncounter.encounterCreatureList.Clear();
+                        gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
+                        checkEndEncounter();
+                    }
+                    #endregion
+
+                    if (btnSwitchWeapon.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+
+                        if (currentPlayerIndex > gv.mod.playerList.Count - 1)
+                        {
+                            return;
+                        }
+                        gv.cc.partyScreenPcIndex = currentPlayerIndex;
+                        gv.screenParty.resetPartyScreen();
+                        gv.screenType = "combatParty";
+                    }
+                    break;
+            }
+            //if MoveMode(move), AttackMode(attack), CastMode(cast), or InfoMode(info)
+            if (currentCombatMode.Equals("info"))
+            {
+                onTouchCombatInfo(e, eventType);
+            }
+            else if (currentCombatMode.Equals("move"))
+            {
+                onTouchCombatMove(e, eventType);
+            }
+            else if (currentCombatMode.Equals("attack"))
+            {
+                onTouchCombatAttack(e, eventType);
+            }
+            else if (currentCombatMode.Equals("castSelector"))
+            {
+                //onTouchCombatCastSelector(event);
+            }
+            else if (currentCombatMode.Equals("cast"))
+            {
+                onTouchCombatCast(e, eventType);
+            }
+            else
+            {
+                //info gv.mode
+            }
+        }*/
+        /*public void onTouchCombatInfo(MouseEventArgs e, MouseEventType.EventType eventType)
+        {
+            //TODOgv.cc.onTouchLog();
+            Player pc = gv.mod.playerList[currentPlayerIndex];
+
+            btnMove.glowOn = false;
+            gv.cc.btnInventory.glowOn = false;
+            btnAttack.glowOn = false;
+            btnCast.glowOn = false;
+            btnSkipTurn.glowOn = false;
+            //btnKill.glowOn = false;
+            //btnCombatHelp.glowOn = false;
+
+            //int eventAction = event.getAction();
+            switch (eventType)
+            {
+                case MouseEventType.EventType.MouseDown:
+                case MouseEventType.EventType.MouseMove:
+                    int x = (int)e.X;
+                    int y = (int)e.Y;
+                    if (btnMove.getImpact(x, y))
+                    {
+                        btnMove.glowOn = true;
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        gv.cc.btnInventory.glowOn = true;
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        btnAttack.glowOn = true;
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        btnCast.glowOn = true;
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        btnSkipTurn.glowOn = true;
+                    }
+                    break;
+
+                case MouseEventType.EventType.MouseUp:
+                    x = (int)e.X;
+                    y = (int)e.Y;
+
+                    btnMove.glowOn = false;
+                    gv.cc.btnInventory.glowOn = false;
+                    btnAttack.glowOn = false;
+                    btnCast.glowOn = false;
+                    btnSkipTurn.glowOn = false;
+
+                    //BUTTONS			
+                    if (btnMove.getImpact(x, y))
+                    {
+                        if (canMove)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "move";
+                            gv.screenType = "combat";
+                        }
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.screenType = "combatInventory";
+                        gv.screenInventory.resetInventory();
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        currentCombatMode = "attack";
+                        gv.screenType = "combat";
+                        setTargetHighlightStartLocation(pc);
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        if (pc.knownSpellsTags.Count > 0)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "castSelector";
+                            gv.screenType = "combatCast";
+                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+                            spellSelectorIndex = 0;
+                            setTargetHighlightStartLocation(pc);
+                        }
+                        else
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.screenType = "combat";
+                        endPcTurn(false);
+                    }
+                    break;
+            }
+        }*/
+        /*public void onTouchCombatMove(MouseEventArgs e, MouseEventType.EventType eventType)
+        {
+            //gv.cc.onTouchLog();
+            Player pc = gv.mod.playerList[currentPlayerIndex];
+
+            gv.cc.ctrlUpArrow.glowOn = false;
+            gv.cc.ctrlDownArrow.glowOn = false;
+            gv.cc.ctrlLeftArrow.glowOn = false;
+            gv.cc.ctrlRightArrow.glowOn = false;
+            gv.cc.ctrlUpRightArrow.glowOn = false;
+            gv.cc.ctrlDownRightArrow.glowOn = false;
+            gv.cc.ctrlUpLeftArrow.glowOn = false;
+            gv.cc.ctrlDownLeftArrow.glowOn = false;
+            btnMove.glowOn = false;
+            gv.cc.btnInventory.glowOn = false;
+            btnAttack.glowOn = false;
+            btnCast.glowOn = false;
+            btnSkipTurn.glowOn = false;
+
+            //int eventAction = event.getAction();
+            switch (eventType)
+            {
+                case MouseEventType.EventType.MouseDown:
+                case MouseEventType.EventType.MouseMove:
+                    int x = (int)e.X;
+                    int y = (int)e.Y;
+                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlLeftArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpLeftArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownLeftArrow.glowOn = true;
+                    }
+                    else if (btnMove.getImpact(x, y))
+                    {
+                        btnMove.glowOn = true;
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        gv.cc.btnInventory.glowOn = true;
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        btnAttack.glowOn = true;
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        btnCast.glowOn = true;
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        btnSkipTurn.glowOn = true;
+                    }
+                    break;
+
+                case MouseEventType.EventType.MouseUp:
+                    x = (int)e.X;
+                    y = (int)e.Y;
+
+                    gv.cc.ctrlUpArrow.glowOn = false;
+                    gv.cc.ctrlDownArrow.glowOn = false;
+                    gv.cc.ctrlLeftArrow.glowOn = false;
+                    gv.cc.ctrlRightArrow.glowOn = false;
+                    gv.cc.ctrlUpRightArrow.glowOn = false;
+                    gv.cc.ctrlDownRightArrow.glowOn = false;
+                    gv.cc.ctrlUpLeftArrow.glowOn = false;
+                    gv.cc.ctrlDownLeftArrow.glowOn = false;
+                    btnMove.glowOn = false;
+                    gv.cc.btnInventory.glowOn = false;
+                    btnAttack.glowOn = false;
+                    btnCast.glowOn = false;
+                    btnSkipTurn.glowOn = false;
+
+                    //TOUCH ON MAP AREA
+                    int gridx = (int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
+                    int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
+                    //int gridx = (int)e.X / gv.squareSize - 4;
+                    //int gridy = (int)(e.Y - (gv.squareSize / 2)) / gv.squareSize;
+
+                    if (gridy < gv.mod.currentEncounter.MapSizeY)
+                    {
+                        gv.cc.floatyText = "";
+                        gv.cc.floatyText2 = "";
+                        gv.cc.floatyText3 = "";
+                        //Check for second tap so TARGET
+                    }
+
+                    //BUTTONS
+                    if ((gv.cc.ctrlUpArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX) && (gridy + UpperLeftSquare.Y == pc.combatLocY - 1)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveUp(pc);
+                    }
+                    else if ((gv.cc.ctrlDownArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX) && (gridy + UpperLeftSquare.Y == pc.combatLocY + 1)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveDown(pc);
+                    }
+                    else if ((gv.cc.ctrlLeftArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX - 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveLeft(pc);
+                    }
+                    else if ((gv.cc.ctrlRightArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX + 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveRight(pc);
+                    }
+                    else if ((gv.cc.ctrlUpRightArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX + 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY - 1)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveUpRight(pc);
+                    }
+                    else if ((gv.cc.ctrlDownRightArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX + 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY + 1)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveDownRight(pc);
+                    }
+                    else if ((gv.cc.ctrlUpLeftArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX - 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY - 1)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveUpLeft(pc);
+                    }
+                    else if ((gv.cc.ctrlDownLeftArrow.getImpact(x, y)) || ((gridx + UpperLeftSquare.X == pc.combatLocX - 1) && (gridy + UpperLeftSquare.Y == pc.combatLocY + 1)))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveDownLeft(pc);
+                    }
+                    else if (btnMove.getImpact(x, y))
+                    {
+                        if (canMove)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "info";
+                            gv.screenType = "combat";
+                            //Toast.makeText(gameContext, "Move gv.mode", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.screenType = "combatInventory";
+                        gv.screenInventory.resetInventory();
+                        //Toast.makeText(gameContext, "Inventory Button", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        currentCombatMode = "attack";
+                        gv.screenType = "combat";
+                        setTargetHighlightStartLocation(pc);
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        if (pc.knownSpellsTags.Count > 0)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "castSelector";
+                            gv.screenType = "combatCast";
+                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+                            spellSelectorIndex = 0;
+                            setTargetHighlightStartLocation(pc);
+                        }
+                        else
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.screenType = "combat";
+                        endPcTurn(false);
+                    }
+                    break;
+            }
+        }*/
+        /*public void onTouchCombatAttack(MouseEventArgs e, MouseEventType.EventType eventType)
+        {
+            Player pc = gv.mod.playerList[currentPlayerIndex];
+
+            gv.cc.ctrlUpArrow.glowOn = false;
+            gv.cc.ctrlDownArrow.glowOn = false;
+            gv.cc.ctrlLeftArrow.glowOn = false;
+            gv.cc.ctrlRightArrow.glowOn = false;
+            gv.cc.ctrlUpRightArrow.glowOn = false;
+            gv.cc.ctrlDownRightArrow.glowOn = false;
+            gv.cc.ctrlUpLeftArrow.glowOn = false;
+            gv.cc.ctrlDownLeftArrow.glowOn = false;
+            btnSelect.glowOn = false;
+            btnMove.glowOn = false;
+            gv.cc.btnInventory.glowOn = false;
+            btnAttack.glowOn = false;
+            btnCast.glowOn = false;
+            btnSkipTurn.glowOn = false;
+
+            //int eventAction = event.getAction();
+            switch (eventType)
+            {
+                case MouseEventType.EventType.MouseDown:
+                case MouseEventType.EventType.MouseMove:
+                    int x = (int)e.X;
+                    int y = (int)e.Y;
+                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlLeftArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpLeftArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownLeftArrow.glowOn = true;
+                    }
+                    else if (btnSelect.getImpact(x, y))
+                    {
+                        btnSelect.glowOn = true;
+                    }
+                    else if (btnMove.getImpact(x, y))
+                    {
+                        btnMove.glowOn = true;
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        gv.cc.btnInventory.glowOn = true;
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        btnAttack.glowOn = true;
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        btnCast.glowOn = true;
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        btnSkipTurn.glowOn = true;
+                    }
+                    break;
+
+                case MouseEventType.EventType.MouseUp:
+                    x = (int)e.X;
+                    y = (int)e.Y;
+
+                    gv.cc.ctrlUpArrow.glowOn = false;
+                    gv.cc.ctrlDownArrow.glowOn = false;
+                    gv.cc.ctrlLeftArrow.glowOn = false;
+                    gv.cc.ctrlRightArrow.glowOn = false;
+                    gv.cc.ctrlUpRightArrow.glowOn = false;
+                    gv.cc.ctrlDownRightArrow.glowOn = false;
+                    gv.cc.ctrlUpLeftArrow.glowOn = false;
+                    gv.cc.ctrlDownLeftArrow.glowOn = false;
+                    btnSelect.glowOn = false;
+                    btnMove.glowOn = false;
+                    gv.cc.btnInventory.glowOn = false;
+                    btnAttack.glowOn = false;
+                    btnCast.glowOn = false;
+                    btnSkipTurn.glowOn = false;
+
+                    //TOUCH ON MAP AREA
+                    int gridx = ((int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
+                    int gridy = ((int)(e.Y - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
+
+                    if (IsInVisibleCombatWindow(gridx, gridy))
+                    {
+                        gv.cc.floatyText = "";
+                        gv.cc.floatyText2 = "";
+                        gv.cc.floatyText3 = "";
+                        //Check for second tap so TARGET
+                        if ((gridx == targetHighlightCenterLocation.X) && (gridy == targetHighlightCenterLocation.Y))
+                        {
+                            TargetAttackPressed(pc);                            
+                        }
+                        //targetHighlightCenterLocation.Y = gridy + UpperLeftSquare.Y;
+                        //targetHighlightCenterLocation.X = gridx + UpperLeftSquare.X;
+                        targetHighlightCenterLocation.Y = gridy;
+                        targetHighlightCenterLocation.X = gridx;
+                    }
+
+                    //BUTTONS
+                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(8);
+                    }
+                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(2);
+                    }
+                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(4);
+                    }
+                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(6);
+                    }
+                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(9);
+                    }
+                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(3);
+                    }
+                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(7);
+                    }
+                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(1);
+                    }
+                    else if (btnSelect.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        TargetAttackPressed(pc);                        
+                    }
+                    else if (btnMove.getImpact(x, y))
+                    {
+                        if (canMove)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "move";
+                            gv.screenType = "combat";
+                        }
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.screenType = "combatInventory";
+                        gv.screenInventory.resetInventory();
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        currentCombatMode = "info";
+                        gv.screenType = "combat";
+                        setTargetHighlightStartLocation(pc);
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        if (pc.knownSpellsTags.Count > 0)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "castSelector";
+                            gv.screenType = "combatCast";
+                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+                            spellSelectorIndex = 0;
+                            setTargetHighlightStartLocation(pc);
+                        }
+                        else
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        endPcTurn(false);
+                    }
+                    break;
+            }
+        }*/
+        /*public void onTouchCombatCast(MouseEventArgs e, MouseEventType.EventType eventType)
+        {
+            //gv.cc.onTouchLog();
+            Player pc = gv.mod.playerList[currentPlayerIndex];
+
+            gv.cc.ctrlUpArrow.glowOn = false;
+            gv.cc.ctrlDownArrow.glowOn = false;
+            gv.cc.ctrlLeftArrow.glowOn = false;
+            gv.cc.ctrlRightArrow.glowOn = false;
+            gv.cc.ctrlUpRightArrow.glowOn = false;
+            gv.cc.ctrlDownRightArrow.glowOn = false;
+            gv.cc.ctrlUpLeftArrow.glowOn = false;
+            gv.cc.ctrlDownLeftArrow.glowOn = false;
+            btnSelect.glowOn = false;
+            btnMove.glowOn = false;
+            gv.cc.btnInventory.glowOn = false;
+            btnAttack.glowOn = false;
+            btnCast.glowOn = false;
+            btnSkipTurn.glowOn = false;
+
+            //int eventAction = event.getAction();
+            switch (eventType)
+            {
+                case MouseEventType.EventType.MouseDown:
+                case MouseEventType.EventType.MouseMove:
+                    int x = (int)e.X;
+                    int y = (int)e.Y;
+                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlLeftArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownRightArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlUpLeftArrow.glowOn = true;
+                    }
+                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
+                    {
+                        gv.cc.ctrlDownLeftArrow.glowOn = true;
+                    }
+                    else if (btnSelect.getImpact(x, y))
+                    {
+                        btnSelect.glowOn = true;
+                    }
+                    else if (btnMove.getImpact(x, y))
+                    {
+                        btnMove.glowOn = true;
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        gv.cc.btnInventory.glowOn = true;
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        btnAttack.glowOn = true;
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        btnCast.glowOn = true;
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        btnSkipTurn.glowOn = true;
+                    }
+                    break;
+
+                case MouseEventType.EventType.MouseUp:
+                    x = (int)e.X;
+                    y = (int)e.Y;
+
+                    gv.cc.ctrlUpArrow.glowOn = false;
+                    gv.cc.ctrlDownArrow.glowOn = false;
+                    gv.cc.ctrlLeftArrow.glowOn = false;
+                    gv.cc.ctrlRightArrow.glowOn = false;
+                    gv.cc.ctrlUpRightArrow.glowOn = false;
+                    gv.cc.ctrlDownRightArrow.glowOn = false;
+                    gv.cc.ctrlUpLeftArrow.glowOn = false;
+                    gv.cc.ctrlDownLeftArrow.glowOn = false;
+                    btnSelect.glowOn = false;
+                    btnMove.glowOn = false;
+                    gv.cc.btnInventory.glowOn = false;
+                    btnAttack.glowOn = false;
+                    btnCast.glowOn = false;
+                    btnSkipTurn.glowOn = false;
+
+                    //TOUCH ON MAP AREA
+                    int gridx = ((int)(e.X - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
+                    int gridy = ((int)(e.Y - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
+
+                    if (IsInVisibleCombatWindow(gridx, gridy))
+                    //if (gridy < gv.mod.currentEncounter.MapSizeY)
+                    {
+                        gv.cc.floatyText = "";
+                        gv.cc.floatyText2 = "";
+                        gv.cc.floatyText3 = "";
+                        //Check for second tap so TARGET
+                        if ((gridx == targetHighlightCenterLocation.X) && (gridy == targetHighlightCenterLocation.Y))
+                        {
+                            TargetCastPressed(pc);
+                        }
+                        targetHighlightCenterLocation.Y = gridy;
+                        targetHighlightCenterLocation.X = gridx;
+                    }
+
+                    //BUTTONS
+                    if (gv.cc.ctrlUpArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(8);
+                    }
+                    else if (gv.cc.ctrlDownArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(2);
+                    }
+                    else if (gv.cc.ctrlLeftArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(4);
+                    }
+                    else if (gv.cc.ctrlRightArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(6);
+                    }
+                    else if (gv.cc.ctrlUpRightArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(9);
+                    }
+                    else if (gv.cc.ctrlDownRightArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(3);
+                    }
+                    else if (gv.cc.ctrlUpLeftArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(7);
+                    }
+                    else if (gv.cc.ctrlDownLeftArrow.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        MoveTargetHighlight(1);
+                    }
+                    else if (btnSelect.getImpact(x, y))
+                    {
+                        TargetCastPressed(pc);
+                        //Toast.makeText(gameContext, "Selected", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (btnMove.getImpact(x, y))
+                    {
+                        if (canMove)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "move";
+                            gv.screenType = "combat";
+                            //Toast.makeText(gameContext, "Move gv.mode", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else if (gv.cc.btnInventory.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        gv.screenType = "combatInventory";
+                        gv.screenInventory.resetInventory();
+                        //Toast.makeText(gameContext, "Inventory Button", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (btnAttack.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        currentCombatMode = "attack";
+                        gv.screenType = "combat";
+                        setTargetHighlightStartLocation(pc);
+                        //Toast.makeText(gameContext, "Attack gv.mode", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (btnCast.getImpact(x, y))
+                    {
+                        if (pc.knownSpellsTags.Count > 0)
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            currentCombatMode = "castSelector";
+                            gv.screenType = "combatCast";
+                            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+                            spellSelectorIndex = 0;
+                            setTargetHighlightStartLocation(pc);
+                        }
+                        else
+                        {
+                            //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                            //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else if (btnSkipTurn.getImpact(x, y))
+                    {
+                        //if (gv.mod.playButtonSounds) {gv.playSoundEffect(android.view.SoundEffectConstants.CLICK);}
+                        //if (gv.mod.playButtonHaptic) {gv.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);}
+                        endPcTurn(false);
+                    }
+                    break;
+            }
+        }*/
+
         public void onTouchCombat(int eX, int eY, MouseEventType.EventType eventType)
         {
             switch (eventType)
@@ -9263,6 +15800,9 @@ namespace IBx
                     //NEW SYSTEM
                     combatUiLayout.setHover(x, y);
 
+                    //rdr2 added
+                    //recalculateCreaturesShownInInitiativeBar();
+
                     int gridx = (int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
                     int gridy = (int)(eY - (gv.squareSize / 2)) / gv.squareSize;
 
@@ -9270,6 +15810,10 @@ namespace IBx
                     gv.cc.floatyText = "";
                     gv.cc.floatyText2 = "";
                     gv.cc.floatyText3 = "";
+                    gv.cc.floatyText4 = "";
+                    gv.cc.floatyText0 = "";
+                    gv.cc.floatyTextA = "";
+                    gv.cc.floatyTextB = "";
                     foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
                     {
                         //if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
@@ -9408,8 +15952,17 @@ namespace IBx
                         tgl.toggleOn = !tgl.toggleOn;
                         if (gv.mod.fastMode)
                         {
-                            UpperLeftSquare.X = gv.mod.currentEncounter.encounterCreatureList[creatureIndex].combatLocX - gv.playerOffsetX;
-                            UpperLeftSquare.Y = gv.mod.currentEncounter.encounterCreatureList[creatureIndex].combatLocY - gv.playerOffsetY;
+                            Creature crt = new Creature();
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    crt = c;
+                                    break;
+                                }
+                            }
+                            UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                            UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
                         }
                         gv.mod.fastMode = !gv.mod.fastMode;
                     }
@@ -9534,7 +16087,7 @@ namespace IBx
                     if ((rtn.Equals("tglKill")) && (gv.mod.debugMode))
                     {
                         gv.mod.currentEncounter.encounterCreatureList.Clear();
-                        gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
+                        //gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
                         checkEndEncounter();
                     }
                     #endregion
@@ -9550,6 +16103,10 @@ namespace IBx
                         gv.cc.floatyText = "";
                         gv.cc.floatyText2 = "";
                         gv.cc.floatyText3 = "";
+                        gv.cc.floatyText4 = "";
+                        gv.cc.floatyText0 = "";
+                        gv.cc.floatyTextA = "";
+                        gv.cc.floatyTextB = "";
                         if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         {
                             //Check for second tap so TARGET
@@ -9746,7 +16303,7 @@ namespace IBx
                     }
                     else if (rtn.Equals("btnMove"))
                     {
-                     
+
                         if (canMove)
                         {
                             if (currentCombatMode.Equals("move"))
@@ -9770,13 +16327,14 @@ namespace IBx
                     }
                     else if (rtn.Equals("btnInventory"))
                     {
-                        if (isPlayerTurn)
+                        if (isPlayerTurn && !gv.mod.currentEncounter.noItemUseModifier)
                         {
                             gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                             gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
                             gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
                             gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
                             gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                            //gv.screenInventory.resetInventory(true);
                             gv.screenType = "combatInventory";
                             gv.screenInventory.resetInventory(true);
                         }
@@ -12161,6 +18719,7 @@ namespace IBx
                             }
                             else
                             {
+                                gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                                 gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                                 gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
                                 gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
@@ -12174,8 +18733,9 @@ namespace IBx
                     }
                     else if (rtn.Equals("btnCast"))
                     {
-                        if (isPlayerTurn)
+                        if (isPlayerTurn && !gv.mod.currentEncounter.noSpellCastModifier)
                         {
+                            gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                             continueTurn = false;
                             gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                             gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
@@ -12198,14 +18758,16 @@ namespace IBx
                     }
                     else if (rtn.Equals("btnTraitUse"))
                     {
-                        if (isPlayerTurn)
+                        if (isPlayerTurn && !gv.mod.currentEncounter.noTraitUseModifier)
                         {
+                            gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                             continueTurn = false;
                             gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                             gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
                             gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
                             gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
                             gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                            //potential reason
                             if (pc.knownInCombatUsableTraitsTags.Count > 0)
                             {
                                 currentCombatMode = "traitUseSelector";
@@ -12233,6 +18795,80 @@ namespace IBx
                             gv.screenType = "combat";
                             endPcTurn(false);
                         }
+                    }
+                    else if (rtn.Equals("btnDelay"))
+                    {
+                        if (isPlayerTurn)
+                        {
+                            int highestMoveOrderFound = 0;
+
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (c.moveOrder > highestMoveOrderFound)
+                                {
+                                    highestMoveOrderFound = c.moveOrder;
+                                }
+                            }
+
+                            foreach (Player p in gv.mod.playerList)
+                            {
+                                if (p.moveOrder > highestMoveOrderFound)
+                                {
+                                    highestMoveOrderFound = p.moveOrder;
+                                }
+                            }
+
+                            if (highestMoveOrderFound != gv.mod.playerList[currentPlayerIndex].moveOrder && !gv.mod.playerList[currentPlayerIndex].hasDelayedAlready)
+                            {
+                                gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                                gv.mod.playerList[currentPlayerIndex].moveOrder = highestMoveOrderFound + 1;
+                                /*
+                                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                {
+                                    if (c.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder)
+                                    {
+                                        gv.mod.playerList[currentPlayerIndex].moveOrder++;
+                                    }
+                                }
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder && p != gv.mod.playerList[currentPlayerIndex])
+                                    {
+                                        gv.mod.playerList[currentPlayerIndex].moveOrder++;
+                                    }
+                                }
+                                */
+
+                                //add to end of move order  
+                                MoveOrder newMO = new MoveOrder();
+                                newMO.PcOrCreature = gv.mod.playerList[currentPlayerIndex];
+                                newMO.rank = highestMoveOrderFound + 1;
+                                gv.screenCombat.moveOrderList.Add(newMO);
+                                for (int i = gv.screenCombat.moveOrderList.Count - 2; i >= 0; i--)
+                                {
+                                    if (gv.screenCombat.moveOrderList[i].PcOrCreature == newMO.PcOrCreature)
+                                    {
+                                        gv.screenCombat.moveOrderList.RemoveAt(i);
+                                    }
+                                }
+
+                                //increment the number of initial move order objects
+                                //note: check how ini bar system will interact with creatures added while battle is running  
+                                gv.screenCombat.initialMoveOrderListSize++;
+
+                                recalculateCreaturesShownInInitiativeBar();
+
+                                endPcTurn(false);
+                            }
+                            else
+                            {
+                                gv.cc.addLogText("red", "Delaying not possible for this character this turn.");
+                            }
+                        }
+                    }
+                    else if (rtn.Equals("btnExit"))
+                    {
+                        //TODO gv.Close();
                     }
                     else if (rtn.Equals("btnSelect"))
                     {
@@ -12279,7 +18915,7 @@ namespace IBx
         public void doUpdate(Player pc)
         {
             CalculateUpperLeft();
-            checkEndEncounter();
+            //checkEndEncounter();
             if (moveCost == gv.mod.diagonalMoveCost)
             {
                 currentMoves += gv.mod.diagonalMoveCost;
@@ -12293,6 +18929,12 @@ namespace IBx
             if (moveleft < 1) { moveleft = 0; }
             //do triggers and anything else needed after each creature or PC move
             afterEachMoveCalls();
+            floatyTextOn = true;
+            checkEndEncounter();
+            if ((pc.hp <= 0) || (pc.isHeld()))
+            {
+                endPcTurn(true);
+            }
         }
         public void MoveTargetHighlight(int numPadDirection)
         {
@@ -12406,6 +19048,7 @@ namespace IBx
                     if (c != null)
                     {
                         //attack creature
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX;
                         targetHighlightCenterLocation.Y = pc.combatLocY - 1;
@@ -12414,6 +19057,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= 1.0f)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX, pc.combatLocY - 1);
                         doPlayerCombatFacing(pc, pc.combatLocX, pc.combatLocY - 1);
                         pc.combatLocY--;
@@ -12436,6 +19080,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX + 1, pc.combatLocY - 1);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX + 1;
                         targetHighlightCenterLocation.Y = pc.combatLocY - 1;
@@ -12444,6 +19089,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= gv.mod.diagonalMoveCost)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX + 1, pc.combatLocY - 1);
                         doPlayerCombatFacing(pc, pc.combatLocX + 1, pc.combatLocY - 1);
                         pc.combatLocX++;
@@ -12472,6 +19118,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX - 1, pc.combatLocY - 1);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX - 1;
                         targetHighlightCenterLocation.Y = pc.combatLocY - 1;
@@ -12480,6 +19127,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= gv.mod.diagonalMoveCost)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX - 1, pc.combatLocY - 1);
                         doPlayerCombatFacing(pc, pc.combatLocX - 1, pc.combatLocY - 1);
                         pc.combatLocX--;
@@ -12508,6 +19156,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX, pc.combatLocY + 1);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX;
                         targetHighlightCenterLocation.Y = pc.combatLocY + 1;
@@ -12516,6 +19165,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= 1.0f)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX, pc.combatLocY + 1);
                         doPlayerCombatFacing(pc, pc.combatLocX, pc.combatLocY + 1);
                         pc.combatLocY++;
@@ -12538,6 +19188,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX + 1, pc.combatLocY + 1);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX + 1;
                         targetHighlightCenterLocation.Y = pc.combatLocY + 1;
@@ -12546,6 +19197,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= gv.mod.diagonalMoveCost)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX + 1, pc.combatLocY + 1);
                         doPlayerCombatFacing(pc, pc.combatLocX + 1, pc.combatLocY + 1);
                         pc.combatLocX++;
@@ -12574,6 +19226,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX - 1, pc.combatLocY + 1);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX - 1;
                         targetHighlightCenterLocation.Y = pc.combatLocY + 1;
@@ -12582,6 +19235,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= gv.mod.diagonalMoveCost)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX - 1, pc.combatLocY + 1);
                         doPlayerCombatFacing(pc, pc.combatLocX - 1, pc.combatLocY + 1);
                         pc.combatLocX--;
@@ -12610,6 +19264,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX + 1, pc.combatLocY);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX + 1;
                         targetHighlightCenterLocation.Y = pc.combatLocY;
@@ -12618,6 +19273,7 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= 1.0f)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         LeaveThreatenedCheck(pc, pc.combatLocX + 1, pc.combatLocY);
                         doPlayerCombatFacing(pc, pc.combatLocX + 1, pc.combatLocY);
                         pc.combatLocX++;
@@ -12644,6 +19300,7 @@ namespace IBx
                     Creature c = isBumpIntoCreature(pc.combatLocX - 1, pc.combatLocY);
                     if (c != null)
                     {
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
                         dontEndTurn = false;
                         targetHighlightCenterLocation.X = pc.combatLocX - 1;
                         targetHighlightCenterLocation.Y = pc.combatLocY;
@@ -12652,7 +19309,8 @@ namespace IBx
                     }
                     else if ((pc.moveDistance - currentMoves) >= 1.0f)
                     {
-                        LeaveThreatenedCheck(pc, pc.combatLocX, pc.combatLocY);
+                        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                        LeaveThreatenedCheck(pc, pc.combatLocX - 1, pc.combatLocY);
                         doPlayerCombatFacing(pc, pc.combatLocX - 1, pc.combatLocY);
                         pc.combatLocX--;
                         if (!pc.combatFacingLeft)
@@ -12670,7 +19328,7 @@ namespace IBx
             //{
             //CenterScreenOnPC();
             //}
-
+            gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
             if (isValidAttackTarget(pc))
             {
                 if ((targetHighlightCenterLocation.X < pc.combatLocX) && (!pc.combatFacingLeft)) //attack left
@@ -12688,8 +19346,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)pc.token.Height / 100f));
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)pc.token.PixelSize.Height / 100f));
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 100);
                 if ((gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).category.Equals("Melee"))
                         || (gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).name.Equals("none"))
                         || (gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).name.Equals("none")))
@@ -12754,7 +19412,7 @@ namespace IBx
             //{
             //CenterScreenOnPC();
             //}
-
+            gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
             //Uses Map Pixel Locations
             int endX = targetHighlightCenterLocation.X * gv.squareSize + (gv.squareSize / 2);
             int endY = targetHighlightCenterLocation.Y * gv.squareSize + (gv.squareSize / 2);
@@ -12778,8 +19436,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -12808,7 +19466,27 @@ namespace IBx
                     pc.coolingSpellsByTag.Add(gv.cc.currentSelectedSpell.tag);
                     pc.coolDownTimes.Add(gv.cc.currentSelectedSpell.coolDownTime);
                 }
-                gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, false, false);
+
+
+
+                if (gv.cc.isTraitUsage)
+                {
+                    gv.cc.isTraitUsage = false;
+                    string traitName = "";
+                    foreach (Trait t in gv.mod.moduleTraitsList)
+                    {
+                        if (t.associatedSpellTag == gv.cc.currentSelectedSpell.tag)
+                        {
+                            traitName = t.name;
+                            break;
+                        }
+                    }
+                    gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, false, true, traitName);
+                }
+                else
+                {
+                    gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, pc, target, false, false);
+                }
                 //add ending projectile animation
                 newGroup = new AnimationStackGroup();
                 animationSeqStack[0].AnimationSeq.Add(newGroup);
@@ -12876,8 +19554,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 2* gv.mod.attackAnimationSpeed);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)pc.token.PixelSize.Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -12900,7 +19578,27 @@ namespace IBx
                 {
                     target = getCastTarget(pc);
                 }
-                gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, it, target, false, false);
+
+                if (gv.cc.isTraitUsage)
+                {
+                    gv.cc.isTraitUsage = false;
+                    string traitName = "";
+                    foreach (Trait t in gv.mod.moduleTraitsList)
+                    {
+                        if (t.associatedSpellTag == gv.cc.currentSelectedSpell.tag)
+                        {
+                            traitName = t.name;
+                            break;
+                        }
+                    }
+                    gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, it, target, false, true, traitName);
+                }
+                else
+                {
+                    gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, it, target, false, false);
+                }
+
+                //gv.cc.doSpellBasedOnScriptOrEffectTag(gv.cc.currentSelectedSpell, it, target, false, false);
                 //add ending projectile animation
                 newGroup = new AnimationStackGroup();
                 animationSeqStack[0].AnimationSeq.Add(newGroup);
@@ -13017,163 +19715,29 @@ namespace IBx
         //Helper Methods
         public void CalculateUpperLeft()
         {
-            
+
             //if (animationSeqStack.Count == 0)
             //{
-                if (gv.mod.useManualCombatCam)
-                {
+            if (gv.mod.useManualCombatCam)
+            {
                 FormerUpperLeftSquare.X = UpperLeftSquare.X;
                 FormerUpperLeftSquare.Y = UpperLeftSquare.Y;
                 CenterScreenOnPC();
-                }
-                else
-                {
-                    Player pc = gv.mod.playerList[currentPlayerIndex];
-                    int minX = pc.combatLocX - gv.playerOffsetX;
-                    if (minX < 0) { minX = 0; }
-                    int minY = pc.combatLocY - gv.playerOffsetY;
-                    if (minY < 0) { minY = 0; }
-
-                    if ((pc.combatLocX <= (UpperLeftSquare.X + 7)) && (pc.combatLocX >= UpperLeftSquare.X + 2) && (pc.combatLocY <= (UpperLeftSquare.Y + 7)) && (pc.combatLocY >= UpperLeftSquare.Y + 2))
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        UpperLeftSquare.X = minX;
-                        UpperLeftSquare.Y = minY;
-                    int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
-                    int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                    deltaX = 0;
-                    deltaY = 0;
-                    foreach (Sprite spr in spriteList)
-                    {
-                        spr.position.X = spr.position.X + (deltaX * gv.squareSize);
-                        spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
-                    }
-                }
-                }
-            //}
-           
-        }
-
-        public void CalculateUpperLeftCreature(Creature crt)
-        {
-            FormerUpperLeftSquare.X = UpperLeftSquare.X;
-            FormerUpperLeftSquare.Y = UpperLeftSquare.Y;
-            
-            //if (animationSeqStack.Count == 0)
-            //{
-                //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
-                int minX = crt.combatLocX - gv.playerOffsetX;
-                if (!gv.mod.useManualCombatCam)
-                {
-                    if (minX < 0) { minX = 0; }
-                }
-                else
-                {
-                    if (minX < -gv.playerOffsetX) { minX = -gv.playerOffsetX; }
-                }
-                //if (minX < 0) { minX = 0; }
-                int minY = crt.combatLocY - gv.playerOffsetY;
-                if (!gv.mod.useManualCombatCam)
-                {
-                    if (minY < 0) { minY = 0; }
-                }
-                else
-                {
-                    if (minY < -gv.playerOffsetY) { minY = -gv.playerOffsetY; }
-                }
-            //if (minY < 0) { minY = 0; }
-
-            //do not adjust view port if creature is on screen already and ends move at least one square away from border
-            int oversizeMargin = 0;
-            if (crt.creatureSize > 1)
-            {
-                oversizeMargin = 2;
             }
-                if (((crt.combatLocX + 2 + oversizeMargin) <= (UpperLeftSquare.X + (gv.playerOffsetX * 2))) && ((crt.combatLocX - 2 - oversizeMargin) >= (UpperLeftSquare.X)) && ((crt.combatLocY + 2 + oversizeMargin) <= (UpperLeftSquare.Y + (gv.playerOffsetY * 2))) && ((crt.combatLocY - 2 - oversizeMargin) >= (UpperLeftSquare.Y)))
+            else
+            {
+                Player pc = gv.mod.playerList[currentPlayerIndex];
+                int minX = pc.combatLocX - gv.playerOffsetX;
+                if (minX < 0) { minX = 0; }
+                int minY = pc.combatLocY - gv.playerOffsetY;
+                if (minY < 0) { minY = 0; }
+
+                if ((pc.combatLocX <= (UpperLeftSquare.X + 7)) && (pc.combatLocX >= UpperLeftSquare.X + 2) && (pc.combatLocY <= (UpperLeftSquare.Y + 7)) && (pc.combatLocY >= UpperLeftSquare.Y + 2))
                 {
                     return;
                 }
-
                 else
                 {
-                    if ((gv.mod.useManualCombatCam) && !gv.mod.fastMode)
-                    {
-                        //bali2
-                        int relevantRange = 1;
-                        if (crt.cr_category.Equals("Melee"))
-                        {
-                            relevantRange = crt.cr_attRange;
-                        }
-                        //Melee or AoO situation
-                        foreach (Player p in gv.mod.playerList)
-                        {
-                            if (getDistance(new Coordinate(p.combatLocX, p.combatLocY), new Coordinate(crt.combatLocX, crt.combatLocY)) <= relevantRange)
-                            {
-                                UpperLeftSquare.X = minX;
-                                UpperLeftSquare.Y = minY;
-                            int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
-                            int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                            deltaX = 0;
-                            deltaY = 0;
-                            foreach (Sprite spr in spriteList)
-                            {
-                                spr.position.X = spr.position.X + (deltaX * gv.squareSize);
-                                spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
-                            }
-
-                            break;
-                            }
-
-                            //ranged situation
-                            //bali1
-                            if (adjustCamToRangedCreature)
-                            {
-                                UpperLeftSquare.X = minX;
-                                UpperLeftSquare.Y = minY;
-                            int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
-                            int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                            deltaX = 0;
-                            deltaY = 0;
-                            foreach (Sprite spr in spriteList)
-                            {
-                                spr.position.X = spr.position.X + (deltaX * gv.squareSize);
-                                spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
-                            }
-                            break;
-                                //cut out fo bugfixing
-                                /*
-                                if (getDistance(new Coordinate(p.combatLocX, p.combatLocY), new Coordinate(crt.combatLocX, crt.combatLocY)) < 9)
-                                {
-                                    if (p.combatLocX < crt.combatLocX)
-                                    {
-                                        UpperLeftSquare.X = p.combatLocX;
-                                    }
-                                    else
-                                    {
-                                        UpperLeftSquare.X = crt.combatLocX;
-                                    }
-
-                                    if (p.combatLocY < crt.combatLocY)
-                                    {
-                                        UpperLeftSquare.Y = p.combatLocY;
-                                    }
-                                    else
-                                    {
-                                        UpperLeftSquare.Y = crt.combatLocY;
-                                    }
-                                    break;
-                                }
-                                */
-                            }
-                        }
-
-                        //return;
-                    }
-                    else if (!gv.mod.fastMode)
-                    {
                     UpperLeftSquare.X = minX;
                     UpperLeftSquare.Y = minY;
                     int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
@@ -13186,7 +19750,141 @@ namespace IBx
                         spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
                     }
                 }
+            }
+            //}
+
+        }
+
+        public void CalculateUpperLeftCreature(Creature crt)
+        {
+            FormerUpperLeftSquare.X = UpperLeftSquare.X;
+            FormerUpperLeftSquare.Y = UpperLeftSquare.Y;
+
+            //if (animationSeqStack.Count == 0)
+            //{
+            //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            int minX = crt.combatLocX - gv.playerOffsetX;
+            if (!gv.mod.useManualCombatCam)
+            {
+                if (minX < 0) { minX = 0; }
+            }
+            else
+            {
+                if (minX < -gv.playerOffsetX) { minX = -gv.playerOffsetX; }
+            }
+            //if (minX < 0) { minX = 0; }
+            int minY = crt.combatLocY - gv.playerOffsetY;
+            if (!gv.mod.useManualCombatCam)
+            {
+                if (minY < 0) { minY = 0; }
+            }
+            else
+            {
+                if (minY < -gv.playerOffsetY) { minY = -gv.playerOffsetY; }
+            }
+            //if (minY < 0) { minY = 0; }
+
+            //do not adjust view port if creature is on screen already and ends move at least one square away from border
+            int oversizeMargin = 0;
+            if (crt.creatureSize > 1)
+            {
+                oversizeMargin = 2;
+            }
+            if (((crt.combatLocX + 2 + oversizeMargin) <= (UpperLeftSquare.X + (gv.playerOffsetX * 2))) && ((crt.combatLocX - 2 - oversizeMargin) >= (UpperLeftSquare.X)) && ((crt.combatLocY + 2 + oversizeMargin) <= (UpperLeftSquare.Y + (gv.playerOffsetY * 2))) && ((crt.combatLocY - 2 - oversizeMargin) >= (UpperLeftSquare.Y)))
+            {
+                return;
+            }
+
+            else
+            {
+                if ((gv.mod.useManualCombatCam) && !gv.mod.fastMode)
+                {
+                    //bali2
+                    int relevantRange = 1;
+                    if (crt.cr_category.Equals("Melee"))
+                    {
+                        relevantRange = crt.cr_attRange;
+                    }
+                    //Melee or AoO situation
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        if (getDistance(new Coordinate(p.combatLocX, p.combatLocY), new Coordinate(crt.combatLocX, crt.combatLocY)) <= relevantRange)
+                        {
+                            UpperLeftSquare.X = minX;
+                            UpperLeftSquare.Y = minY;
+                            int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
+                            int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
+                            deltaX = 0;
+                            deltaY = 0;
+                            foreach (Sprite spr in spriteList)
+                            {
+                                spr.position.X = spr.position.X + (deltaX * gv.squareSize);
+                                spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                            }
+
+                            break;
+                        }
+
+                        //ranged situation
+                        //bali1
+                        if (adjustCamToRangedCreature)
+                        {
+                            UpperLeftSquare.X = minX;
+                            UpperLeftSquare.Y = minY;
+                            int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
+                            int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
+                            deltaX = 0;
+                            deltaY = 0;
+                            foreach (Sprite spr in spriteList)
+                            {
+                                spr.position.X = spr.position.X + (deltaX * gv.squareSize);
+                                spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                            }
+                            break;
+                            //cut out fo bugfixing
+                            /*
+                            if (getDistance(new Coordinate(p.combatLocX, p.combatLocY), new Coordinate(crt.combatLocX, crt.combatLocY)) < 9)
+                            {
+                                if (p.combatLocX < crt.combatLocX)
+                                {
+                                    UpperLeftSquare.X = p.combatLocX;
+                                }
+                                else
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX;
+                                }
+
+                                if (p.combatLocY < crt.combatLocY)
+                                {
+                                    UpperLeftSquare.Y = p.combatLocY;
+                                }
+                                else
+                                {
+                                    UpperLeftSquare.Y = crt.combatLocY;
+                                }
+                                break;
+                            }
+                            */
+                        }
+                    }
+
+                    //return;
                 }
+                else if (!gv.mod.fastMode)
+                {
+                    UpperLeftSquare.X = minX;
+                    UpperLeftSquare.Y = minY;
+                    int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
+                    int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
+                    deltaX = 0;
+                    deltaY = 0;
+                    foreach (Sprite spr in spriteList)
+                    {
+                        spr.position.X = spr.position.X + (deltaX * gv.squareSize);
+                        spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                    }
+                }
+            }
             //}
         }
         public void CenterScreenOnPC()
@@ -13907,13 +20605,27 @@ namespace IBx
         }
         public void LeaveThreatenedCheck(Player pc, int futurePlayerLocationX, int futurePlayerLocationY)
         {
-            
+
+            foreach (string eTag in pc.tagsOfEffectsToRemoveOnMove)
+            {
+                for (int i = pc.effectsList.Count - 1; i >= 0; i--)
+                {
+                    if (pc.effectsList[i].tag == eTag)
+                    {
+                        pc.effectsList.RemoveAt(i);
+                    }
+                }
+            }
+            //burning man
+            gv.sf.UpdateStats(pc);
+            //update stats
+            pc.tagsOfEffectsToRemoveOnMove.Clear();
+
             //testing...
             if (currentCombatMode == "move")
             {
                 dontEndTurn = true;
             }
-            
 
             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
             {
@@ -14033,16 +20745,16 @@ namespace IBx
                 }
                 //else
                 //{
-                    if (gv.sf.hasTrait(pc, "preciseshot2"))
-                    {
-                        modifier += 2;
-                        gv.cc.addLogText("<font color='lime'> PreciseShotL2: +2 to hit</font><BR>");
-                    }
-                    else if (gv.sf.hasTrait(pc, "preciseshot"))
-                    {
-                        modifier++;
-                        gv.cc.addLogText("<font color='lime'> PreciseShotL1: +1 to hit</font><BR>");
-                    }
+                if (gv.sf.hasTrait(pc, "preciseshot2"))
+                {
+                    modifier += 2;
+                    gv.cc.addLogText("<font color='lime'> PreciseShotL2: +2 to hit</font><BR>");
+                }
+                else if (gv.sf.hasTrait(pc, "preciseshot"))
+                {
+                    modifier++;
+                    gv.cc.addLogText("<font color='lime'> PreciseShotL1: +1 to hit</font><BR>");
+                }
                 //}
             }
 
@@ -14058,13 +20770,13 @@ namespace IBx
                 gv.cc.addFloatyText(new Coordinate(pc.combatLocX, pc.combatLocY), "+" + situationalModifier + " att", "yellow");
             }
 
-            int attackMod = modifier + pc.baseAttBonus + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).attackBonus;
+            int attackMod = modifier + pc.baseAttBonus + gv.sf.CalcAttackBonusesNoAmmo(pc);
             Item it = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref);
             if (it != null)
             {
                 attackMod += gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).attackBonus;
             }
-            return attackMod;
+            return attackMod + gv.mod.poorVisionModifier;
         }
         public int CalcCreatureDefense(Player pc, Creature crt)
         {
@@ -14239,7 +20951,31 @@ namespace IBx
                     gv.cc.addLogText("<font color='lime'> sneak attack: +" + adding + " damage</font><BR>");
                 }
             }
-            return totalDam;
+
+            if (melee)
+            {
+                if (gv.mod.currentEncounter.reducedDamageofPcMeleeAttack)
+                {
+                    totalDam /= 3;
+                    return totalDam;
+                }
+                else
+                {
+                    return totalDam;
+                }
+            }
+            else
+            {
+                if (gv.mod.currentEncounter.reducedDamageofPcRangedAttack)
+                {
+                    totalDam /= 3;
+                    return totalDam;
+                }
+                else
+                {
+                    return totalDam;
+                }
+            }
         }
         public int CalcCreatureAttackModifier(Creature crt, Player pc)
         {
@@ -14367,7 +21103,7 @@ namespace IBx
                 if ((!p.isDead()) && (p.hp > 0) && (!p.steathModeOn))
                 {
                     int dist = CalcDistance(crt, crt.combatLocX, crt.combatLocY, p.combatLocX, p.combatLocY);
-                   
+
                     if (dist < farDist)
                     {
                         farDist = dist;
@@ -14427,16 +21163,16 @@ namespace IBx
 
             if (crt.targetPcTag != "none")
             {
-                foreach (Player p  in gv.mod.playerList)
+                foreach (Player p in gv.mod.playerList)
                 {
                     if (p.tag == crt.targetPcTag)
                     {
                         pc = p;
                     }
-                        
+
                 }
             }
-                return pc;
+            return pc;
         }
 
         public Player targetPCWithLeastHPInCombinedRange(Creature crt)
@@ -14522,18 +21258,18 @@ namespace IBx
 
 
                         //bool attackPossible = false;
-                        
-                            for (int j = InterimPath.Count -1; j >= 0; j--)
-                            {
-                                int endX = coordinatesOfPcTheCreatureMovesTowards.X * gv.squareSize + (gv.squareSize / 2);
-                                int endY = coordinatesOfPcTheCreatureMovesTowards.Y * gv.squareSize + (gv.squareSize / 2);
-                                int startX = InterimPath[j].X * gv.squareSize + (gv.squareSize / 2);
-                                int startY = InterimPath[j].Y * gv.squareSize + (gv.squareSize / 2);
 
-                                if (isVisibleLineOfSight(new Coordinate(startX, startY), new Coordinate(endX, endY)))
+                        for (int j = InterimPath.Count - 1; j >= 0; j--)
+                        {
+                            int endX = coordinatesOfPcTheCreatureMovesTowards.X * gv.squareSize + (gv.squareSize / 2);
+                            int endY = coordinatesOfPcTheCreatureMovesTowards.Y * gv.squareSize + (gv.squareSize / 2);
+                            int startX = InterimPath[j].X * gv.squareSize + (gv.squareSize / 2);
+                            int startY = InterimPath[j].Y * gv.squareSize + (gv.squareSize / 2);
+
+                            if (isVisibleLineOfSight(new Coordinate(startX, startY), new Coordinate(endX, endY)))
+                            {
+                                if (CalcDistance(crt, coordinatesOfPcTheCreatureMovesTowards.X, coordinatesOfPcTheCreatureMovesTowards.Y, InterimPath[j].X, InterimPath[j].Y) <= crt.cr_attRange)
                                 {
-                                    if (CalcDistance(crt, coordinatesOfPcTheCreatureMovesTowards.X, coordinatesOfPcTheCreatureMovesTowards.Y, InterimPath[j].X, InterimPath[j].Y) <= crt.cr_attRange)
-                                    {
 
                                     interimPathCountAdjustForDiagonalMoves = 0;
                                     for (int i = InterimPath.Count - 1; i > j; i--)
@@ -14555,9 +21291,9 @@ namespace IBx
                                         attackPossible = true;
                                         break;
                                     }
-                                 }
-                              }
-                          }
+                                }
+                            }
+                        }
 
                         /*
                         if ((crt.cr_attRange > 1) && (crt.cr_attRange > (InterimPath.Count-2)))
@@ -15527,7 +22263,7 @@ namespace IBx
         {
             Creature crtReturn = null;
             int farDist = 99;
-            
+
 
             foreach (Creature crtByCounter in gv.mod.currentEncounter.encounterCreatureList)
             {
@@ -15652,22 +22388,22 @@ namespace IBx
                     {
                         //if ((this.CalcDistance(tgt_pc.combatLocX, tgt_pc.combatLocY, selectedPoint.X, selectedPoint.Y) <= gv.sf.SpellToCast.aoeRadius) && (tgt_pc.hp > 0)) //if players are in the AOE burst, count how many, total count is utility  //&& sf.GetLocalInt(tgt_pc.Tag, "StealthModeOn") != 1  <-throws an annoying message if not found!!
                         //{
-                        
-                            List<Coordinate> targetSquareList = new List<Coordinate>();
-                            targetSquareList = gv.sf.CreateAoeSquaresListWithReturnValue(crt, selectedPoint, gv.sf.SpellToCast.aoeShape, gv.sf.SpellToCast.aoeRadius);
-                            //foreach (Creature crtr in gv.mod.currentEncounter.encounterCreatureList) //if its allies are in the burst subtract a point, or half depending on how evil it is.
-                            //{
-                                Coordinate playerCoord = new Coordinate();
-                                playerCoord.X = tgt_pc.combatLocX;
-                                playerCoord.Y = tgt_pc.combatLocY;
+
+                        List<Coordinate> targetSquareList = new List<Coordinate>();
+                        targetSquareList = gv.sf.CreateAoeSquaresListWithReturnValue(crt, selectedPoint, gv.sf.SpellToCast.aoeShape, gv.sf.SpellToCast.aoeRadius);
+                        //foreach (Creature crtr in gv.mod.currentEncounter.encounterCreatureList) //if its allies are in the burst subtract a point, or half depending on how evil it is.
+                        //{
+                        Coordinate playerCoord = new Coordinate();
+                        playerCoord.X = tgt_pc.combatLocX;
+                        playerCoord.Y = tgt_pc.combatLocY;
                         if (gv.sf.SpellToCast.aoeShape == AreaOfEffectShape.Line || (gv.sf.SpellToCast.aoeShape == AreaOfEffectShape.Cone))
                         {
                             //***********************************
                             foreach (Coordinate c in targetSquareList)
+                            {
+                                if (c.X == playerCoord.X && c.Y == playerCoord.Y)
                                 {
-                                    if (c.X == playerCoord.X && c.Y == playerCoord.Y)
-                                    {
-                                    if (tgt_pc.hp > 0 && tgt_pc.hp < (float)(tgt_pc.hpMax/4f))
+                                    if (tgt_pc.hp > 0 && tgt_pc.hp < (float)(tgt_pc.hpMax / 4f))
                                     {
                                         utility += 3;
                                     }
@@ -15675,29 +22411,29 @@ namespace IBx
                                     {
                                         utility += 2;
                                     }
-                                   
-                                        if ((utility > optimalUtil) && (utility > -4))
-                                        {
-                                            //optimal found, choose this point
-                                            optimalUtil = utility;
-                                            targetLoc = selectedPoint;
-                                        }
-                                    }
-                                }
 
-                                //***********************************
-                                /*
-                                if (targetSquareList.Contains(crtCoord))
-                                {
-                                    utility += 2;
-                                    if (utility > optimalUtil)
+                                    if ((utility > optimalUtil) && (utility > -4))
                                     {
                                         //optimal found, choose this point
                                         optimalUtil = utility;
                                         targetLoc = selectedPoint;
                                     }
                                 }
-                                */
+                            }
+
+                            //***********************************
+                            /*
+                            if (targetSquareList.Contains(crtCoord))
+                            {
+                                utility += 2;
+                                if (utility > optimalUtil)
+                                {
+                                    //optimal found, choose this point
+                                    optimalUtil = utility;
+                                    targetLoc = selectedPoint;
+                                }
+                            }
+                            */
                             //}
                         }
                         else if ((this.CalcDistance(null, tgt_pc.combatLocX, tgt_pc.combatLocY, selectedPoint.X, selectedPoint.Y) <= gv.sf.SpellToCast.aoeRadius) && (tgt_pc.hp > 0)) //if players are in the AOE burst, count how many, total count is utility  //&& sf.GetLocalInt(tgt_pc.Tag, "StealthModeOn") != 1  <-throws an annoying message if not found!!  
@@ -15710,7 +22446,7 @@ namespace IBx
                             {
                                 utility += 2;
                             }
-                            
+
                             if ((utility > optimalUtil) && (utility > -4))
                             {
                                 //optimal found, choose this point
@@ -15875,7 +22611,7 @@ namespace IBx
                         int dam = crt.hpMax - crt.hp;
                         float hpProxy = crt.hp;
                         float hpMaxProxy = crt.hpMax;
-                        float injuryLevel = (1 - (float)(hpProxy/hpMaxProxy)) * 100;
+                        float injuryLevel = (1 - (float)(hpProxy / hpMaxProxy)) * 100;
                         if (injuryLevel >= crt.percentRequirementOfTargetInjuryForHealSpells)
                         {
                             if (dam > damaged)

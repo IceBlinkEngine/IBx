@@ -15,14 +15,14 @@ namespace IBx
         public string ImgOffFilename = "";
         public bool toggleOn = false;
         public int X = 0;
-        public int Y = 0;        
+        public int Y = 0;
         public int Width = 0;
         public int Height = 0;
         public bool show = true;
 
         public IB2ToggleButton()
         {
-            
+
         }
 
         public IB2ToggleButton(GameView g)
@@ -39,13 +39,13 @@ namespace IBx
 
         public bool getImpact(IB2Panel parentPanel, int x, int y)
         {
-            //int Width = gv.cc.GetFromBitmapList(ImgOnFilename).Width;
-            //int Height = gv.cc.GetFromBitmapList(ImgOnFilename).Height;
+            //int Width = gv.cc.GetFromBitmapList(ImgOnFilename).PixelSize.Width;
+            //int Height = gv.cc.GetFromBitmapList(ImgOnFilename).PixelSize.Height;
             if (show)
             {
                 if ((x >= (int)((parentPanel.currentLocX + X) * gv.screenDensity)) && (x <= (int)((parentPanel.currentLocX + X + Width) * gv.screenDensity)))
                 {
-                    if ((y >= (int)((parentPanel.currentLocY + Y) * gv.screenDensity)) && (y <= (int)((parentPanel.currentLocY + Y + Height) * gv.screenDensity)))
+                    if ((y >= (int)((parentPanel.currentLocY + Y + gv.oYshift) * gv.screenDensity)) && (y <= (int)((parentPanel.currentLocY + Y + gv.oYshift + Height) * gv.screenDensity)))
                     {
                         return true;
                     }
@@ -62,7 +62,7 @@ namespace IBx
                 IbRect dst = new IbRect(0, 0, 0, 0);
                 if (gv.mod.useMinimalisticUI)
                 {
-                    dst = new IbRect((int)((parentPanel.currentLocX + this.X - 2 * gv.pS) * gv.screenDensity + gv.pS), (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + gv.pS), (int)((float)Width * gv.screenDensity) - 2*gv.pS, (int)((float)Height * gv.screenDensity) - 2*gv.pS);
+                    dst = new IbRect((int)((parentPanel.currentLocX + this.X - 2 * gv.pS) * gv.screenDensity + gv.pS), (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + gv.pS), (int)((float)Width * gv.screenDensity) - 2 * gv.pS, (int)((float)Height * gv.screenDensity) - 2 * gv.pS);
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace IBx
                 {
                     if (gv.mod.useMinimalisticUI)
                     {
-                        IbRect src2 = new IbRect(0,0,100,100);
+                        IbRect src2 = new IbRect(0, 0, 100, 100);
                         IbRect dst2 = new IbRect((int)((parentPanel.currentLocX + this.X - 2 * gv.pS) * gv.screenDensity), (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity), (int)((float)Width * gv.screenDensity), (int)((float)Height * gv.screenDensity));
                         gv.DrawBitmap(gv.cc.GetFromBitmapList("tgl_bg"), src2, dst2, 0, false, 0.75f);
                     }

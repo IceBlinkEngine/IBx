@@ -8,6 +8,9 @@ namespace IBx
 {
     public class Tile
     {
+        public int stealthModifier = 0; //highrt makes hiding/stealthing easier
+        public int speedModifier = 0;
+
         public string Layer0Filename = "";
         public string Layer1Filename = "t_blank";
         public string Layer2Filename = "t_blank";
@@ -91,11 +94,11 @@ namespace IBx
         public List<string> tilePositionInLitArea = new List<string>();
         //public List<Tile> tilesOfThisLightSource = new List<Tile>();
         public List<string> tileLightSourceTag = new List<string>();
-        public List <bool> isLit = new List<bool>();
+        public List<bool> isLit = new List<bool>();
         //each tilePosiitionInLitArea get a priority number assigned, only the position data for highest priority number
         //is used during draw call
         public List<int> priority = new List<int>();
-        public List <Coordinate> lightSourceCoordinate = new List<Coordinate>();
+        public List<Coordinate> lightSourceCoordinate = new List<Coordinate>();
 
         public List<float> lightSourceFocalHaloIntensity = new List<float>();
         public List<float> lightSourceRingHaloIntensity = new List<float>();
@@ -123,6 +126,8 @@ namespace IBx
         public bool isNSBridge = false;
         public bool isShadowCaster = true;
         public bool drawDownStairShadows = true;
+        public bool alwaysNormalShadow = false;
+        public bool isSecretPassage = false;
 
         public bool isInShortShadeN = false;
         public bool isInShortShadeE = false;
@@ -178,6 +183,8 @@ namespace IBx
         public bool inSmallStairSWVertical = false;
         public bool inSmallStairNWHorizontal = false;
         public bool inSmallStairNWVertical = false;
+
+        public bool drawEntranceLights = true;
 
         public bool hasEntranceLightNorth = false;
         public bool hasEntranceLightEast = false;

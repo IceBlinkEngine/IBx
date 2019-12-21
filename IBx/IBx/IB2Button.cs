@@ -11,6 +11,9 @@ namespace IBx
     {
         [JsonIgnore]
         public GameView gv;
+
+        //public TextFormat textFormat;
+        //public TextLayout textLayout;
         public string tag = "";
         public string ImgFilename = "";    //this is the normal button and color intensity
         public string ImgOffFilename = ""; //this is usually a grayed out button
@@ -37,7 +40,7 @@ namespace IBx
 
         public IB2Button()
         {
-            
+
         }
 
         public IB2Button(GameView g)
@@ -52,15 +55,15 @@ namespace IBx
 
         public void setHover(IB2Panel parentPanel, int x, int y)
         {
-            //int Width = gv.cc.GetFromBitmapList(ImgFilename).Width;
-            //int Height = gv.cc.GetFromBitmapList(ImgFilename).Height;
+            //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
+            //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
             if (show)
             {
                 glowOn = false;
 
                 if ((x >= (int)((parentPanel.currentLocX + X) * gv.screenDensity)) && (x <= (int)((parentPanel.currentLocX + X + Width) * gv.screenDensity)))
                 {
-                    if ((y >= (int)((parentPanel.currentLocY + Y) * gv.screenDensity)) && (y <= (int)((parentPanel.currentLocY + Y + Height) * gv.screenDensity)))
+                    if ((y >= (int)((parentPanel.currentLocY + Y + gv.oYshift) * gv.screenDensity)) && (y <= (int)((parentPanel.currentLocY + Y + gv.oYshift + Height) * gv.screenDensity)))
                     {
                         if (!playedHoverSound)
                         {
@@ -75,13 +78,13 @@ namespace IBx
 
         public bool getImpact(IB2Panel parentPanel, int x, int y)
         {
-            //int Width = gv.cc.GetFromBitmapList(ImgFilename).Width;
-            //int Height = gv.cc.GetFromBitmapList(ImgFilename).Height;
+            //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
+            //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
             if (show)
             {
                 if ((x >= (int)((parentPanel.currentLocX + X) * gv.screenDensity)) && (x <= (int)((parentPanel.currentLocX + X + Width) * gv.screenDensity)))
                 {
-                    if ((y >= (int)((parentPanel.currentLocY + Y) * gv.screenDensity)) && (y <= (int)((parentPanel.currentLocY + Y + Height) * gv.screenDensity)))
+                    if ((y >= (int)((parentPanel.currentLocY + Y + gv.oYshift) * gv.screenDensity)) && (y <= (int)((parentPanel.currentLocY + Y + gv.oYshift + Height) * gv.screenDensity)))
                     {
                         if (!playedHoverSound)
                         {
@@ -97,13 +100,176 @@ namespace IBx
 
         public void Draw(IB2Panel parentPanel)
         {
+            if (!gv.mod.currentArea.isOverviewMap)
+            {
+                if (gv.mod.currentArea.overviewOwnZoneMapExists && gv.mod.currentArea.showOverviewButtonOwnZoneMap && this.tag == "btnOwnZoneMap")
+                {
+                    this.show = true;
+                }
+                else if (this.tag == "btnOwnZoneMap")
+                {
+                    this.show = false;
+                }
+
+                if (gv.mod.currentArea.overviewMotherZoneMapExists && gv.mod.currentArea.showOverviewButtonMotherZoneMap && this.tag == "btnMotherZoneMap")
+                {
+                    this.show = true;
+                }
+                else if (this.tag == "btnMotherZoneMap")
+                {
+                    this.show = false;
+                }
+
+                if (gv.mod.currentArea.overviewGrandMotherZoneMapExists && gv.mod.currentArea.showOverviewButtonGrandMotherZoneMap && this.tag == "btnGrandMotherZoneMap")
+                {
+                    this.show = true;
+                }
+                else if (this.tag == "btnGrandMotherZoneMap")
+                {
+                    this.show = false;
+                }
+            }
+            else
+            {
+                foreach (Area a in gv.mod.moduleAreasObjects)
+                {
+                    if (a.filenameOfGrandMotherZoneMap == gv.mod.overviewReturnAreaName)
+                    {
+                        if (a.overviewOwnZoneMapExists && a.showOverviewButtonOwnZoneMap && this.tag == "btnOwnZoneMap")
+                        {
+                            this.show = true;
+                        }
+                        else if (this.tag == "btnOwnZoneMap")
+                        {
+                            this.show = false;
+                        }
+
+                        if (a.overviewMotherZoneMapExists && a.showOverviewButtonMotherZoneMap && this.tag == "btnMotherZoneMap")
+                        {
+                            this.show = true;
+                        }
+                        else if (this.tag == "btnMotherZoneMap")
+                        {
+                            this.show = false;
+                        }
+
+                        if (a.overviewGrandMotherZoneMapExists && a.showOverviewButtonGrandMotherZoneMap && this.tag == "btnGrandMotherZoneMap")
+                        {
+                            this.show = true;
+                        }
+                        else if (this.tag == "btnGrandMotherZoneMap")
+                        {
+                            this.show = false;
+                        }
+                    }
+                }
+            }
+
+            if (gv.mod.currentArea.isOverviewMap && (this.tag == "btnRation" || this.tag == "btnTorch" || this.tag == "btnZoom"))
+            {
+                this.show = false;
+            }
+            else if (this.tag == "btnRation" || this.tag == "btnTorch" || this.tag == "btnZoom")
+            {
+                this.show = true;
+            }
+
+            if (!gv.mod.useComplexCoordinateSystem && (this.tag == "btnZoom" || this.tag == "btnTorch" || this.tag == "btnRation"))
+            {
+                this.show = false;
+            }
+
+            if (!gv.mod.useRationSystem && this.tag == "btnRation")
+            {
+                this.show = false;
+            }
+
+            if (!gv.mod.useLightSystem && this.tag == "btnTorch")
+            {
+                this.show = false;
+            }
+
+            /*
+            if (gv.mod.currentArea.isOverviewMap && (this.tag == "btnRation" || this.tag == "btnTorch"|| this.tag == "btnZoom"))
+            {
+                this.show = false;
+            }
+            else if (this.tag == "btnRation" || this.tag == "btnTorch" || this.tag == "btnZoom")
+            {
+                this.show = true;
+            }
+            */
+            string timeOfDay = "none";
+            //iddo
+            if (this.tag == "btnZoom")
+            {
+                //int timeofday = gv.mod.WorldTime % (24 * 60);
+                //int hour = timeofday / 60;
+                //int minute = timeofday % 60;
+                //string sMinute = minute + "";
+                //if (minute < 10)
+                //{
+                //sMinute = "0" + minute;
+                //}
+
+                int dawn = 5 * 60;
+                int sunrise = 6 * 60;
+                int day = 7 * 60;
+                int sunset = 17 * 60;
+                int dusk = 18 * 60;
+                int night = 20 * 60;
+                int time = gv.mod.WorldTime % 1440;
+
+                //bool consumeLightEnergy = false;
+                if ((time >= dawn) && (time < sunrise))
+                {
+                    timeOfDay = "dawnButton";
+                    //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f / flickerReduction * flicker / 100f);
+                    //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= sunrise) && (time < day))
+                {
+                    timeOfDay = "sunriseButton";
+                    //gv.DrawBitmap(gv.cc.tint_sunrise, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= day) && (time < sunset))
+                {
+                    timeOfDay = "dayButton";
+                    //no tint for day
+                }
+                else if ((time >= sunset) && (time < dusk))
+                {
+                    timeOfDay = "sunsetButton";
+                    //gv.DrawBitmap(gv.cc.tint_sunset, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= dusk) && (time < night))
+                {
+                    timeOfDay = "duskButton";
+                    //gv.DrawBitmap(gv.cc.tint_dusk, src, dst, 0, false, 1.0f);
+                }
+                else if ((time >= night) || (time < dawn))
+                {
+                    timeOfDay = "nightButton";
+                    //berlin
+                    //consumeLightEnergy = true;
+                }
+                this.ImgFilename = timeOfDay;
+                ImgFilename = timeOfDay;
+                ImgOnFilename = timeOfDay;
+                Img2Filename = timeOfDay;
+                Img2OffFilename = timeOfDay;
+                Img3Filename = timeOfDay;
+                ImgOffFilename = timeOfDay;
+            }
+
+
             if (show)
             {
                 int pH = (int)((float)gv.screenHeight / 200.0f);
                 int pW = (int)((float)gv.screenHeight / 200.0f);
                 float fSize = (float)(gv.squareSize / 4) * scaler;
-                //int Width = gv.cc.GetFromBitmapList(ImgFilename).Width;
-                //int Height = gv.cc.GetFromBitmapList(ImgFilename).Height;
+                //int Width = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Width;
+                //int Height = gv.cc.GetFromBitmapList(ImgFilename).PixelSize.Height;
 
                 IbRect src = new IbRect(0, 0, Width, Height);
                 IbRect dst = new IbRect((int)((parentPanel.currentLocX + this.X) * gv.screenDensity), (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity), (int)((float)Width * gv.screenDensity), (int)((float)Height * gv.screenDensity));
@@ -117,35 +283,35 @@ namespace IBx
                 //draw glow first if on
                 if (glowOn)
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(GlowFilename), srcGlow, dstGlow);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(GlowFilename), srcGlow, dstGlow, true);
                 }
 
                 //draw the proper button State
                 if (btnState == buttonState.On)
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOnFilename), src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOnFilename), src, dst, true);
                 }
                 else if (btnState == buttonState.Off)
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOffFilename), src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOffFilename), src, dst, true);
                 }
                 else
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgFilename), src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgFilename), src, dst, true);
                 }
                 //draw the standard overlay image if has one
                 if ((btnState == buttonState.Off) && (!Img2OffFilename.Equals("")))
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2OffFilename), src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2OffFilename), src, dst, true);
                 }
                 else if (!Img2Filename.Equals(""))
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2Filename), src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2Filename), src, dst, true);
                 }
                 //draw the notification image if turned on (like a level up or additional convo nodes image)
                 if ((btnNotificationOn) && (!Img3Filename.Equals("")))
                 {
-                    gv.DrawBitmap(gv.cc.GetFromBitmapList(Img3Filename), src, dst);
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(Img3Filename), src, dst, true);
                 }
 
                 float thisFontHeight = gv.drawFontRegHeight;
@@ -168,63 +334,288 @@ namespace IBx
                 float ulX = ((Width * gv.screenDensity) - stringSize) / 2;
                 float ulY = ((Height * gv.screenDensity) - thisFontHeight) / 2;
 
-                for (int x = -2; x <= 2; x++)
+                if (scaler == 0.4f)
                 {
-                    for (int y = -2; y <= 2; y++)
+                    ulY = ((Height * gv.screenDensity));
+                }
+
+                if (this.tag == "btnZoom")
+                {
+                    int timeofday = gv.mod.WorldTime % (24 * 60);
+                    int hour = timeofday / 60;
+                    int minute = timeofday % 60;
+                    string sMinute = minute + "";
+                    if (minute < 10)
                     {
-                        int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
-                        int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
-                        gv.DrawText(Text, xLoc, yLoc, fontHeightInString, "black");
+                        sMinute = "0" + minute;
+                    }
+
+                    int txtH = (int)gv.drawFontRegHeight;
+                    //Text = hour + ":" + sMinute;
+                    Text = "";
+
+                }
+
+                if (this.tag == "btnTorch")
+                {
+                    int numberOfLightSources = 0;
+                    foreach (ItemRefs ir in gv.mod.partyInventoryRefsList)
+                    {
+                        if (ir.isLightSource)
+                        {
+                            numberOfLightSources += ir.quantity;
+                        }
+                    }
+
+                    Text = numberOfLightSources.ToString();
+                }
+                /*
+                    for (int x = -1; x <= 1; x++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        if (x != 0 || y != 0)
+                        {
+                            int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
+                            int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
+                            if (Text.Contains("green") && Text.Contains("Ld"))
+                            {
+                                int length = Text.Length;
+                                string text2 = "";
+                                //Ld 13green:10
+                                //ld 7green:9
+                                if (length == 10)
+                                {
+                                    text2 = Text.Remove(5);
+                                }
+                                if (length == 9)
+                                {
+                                    text2 = Text.Remove(4);
+                                }
+                                // DRAW TEXT
+                                stringSize = gv.cc.MeasureString(text2, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
+
+                                //place in the center
+                                ulX = ((Width * gv.screenDensity) - stringSize) / 2;
+                                ulY = ((Height * gv.screenDensity) - thisFontHeight) / 2;
+
+                                if (scaler == 0.4f)
+                                {
+                                    ulY = ((Height * gv.screenDensity));
+                                }
+                                xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
+                                yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
+                                //int test = text2.Length;
+                                gv.DrawTextOutlined(text2, xLoc, yLoc, scaler, Color.Black);
+                            }
+                            else
+                            {
+                                gv.DrawTextOutlined(Text, xLoc, yLoc, scaler, Color.Black);
+
+                            }
+                            //gv.DrawText(Text, xLoc, yLoc, scaler, Color.Black);
+                        }
                     }
                 }
+                */
                 int xLoc1 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
                 int yLoc1 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
-                gv.DrawText(Text, xLoc1, yLoc1, fontHeightInString, "white");
+                if (Text.Contains("green") && Text.Contains("Ld"))
+                {
+                    int length = Text.Length;
+                    string text2 = "";
+                    //Ld 13green:10
+                    //ld 7green:9
+                    if (length == 10)
+                    {
+                        text2 = Text.Remove(5);
+                    }
+                    if (length == 9)
+                    {
+                        text2 = Text.Remove(4);
+                    }
+                    // DRAW TEXT
+                    //stringSize = gv.cc.MeasureString(text2, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
+                    stringSize = gv.MeasureString(Quantity, fontHeightInString, "normal");
+
+                    //place in the center
+                    ulX = ((Width * gv.screenDensity) - stringSize) / 2;
+                    ulY = ((Height * gv.screenDensity) - thisFontHeight) / 2;
+
+                    if (scaler == 0.4f)
+                    {
+                        ulY = ((Height * gv.screenDensity));
+                    }
+                    xLoc1 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
+                    yLoc1 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
+                    gv.DrawTextOutlined(text2, xLoc1, yLoc1, scaler, "lime");
+                }
+                else
+                {
+                    gv.DrawTextOutlined(Text, xLoc1, yLoc1, scaler, "white");
+                }
 
                 // DRAW QUANTITY
+                //stringSize = gv.cc.MeasureString(Quantity, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
                 stringSize = gv.MeasureString(Quantity, fontHeightInString, "normal");
 
                 //place in the bottom right quadrant
                 ulX = (((Width * gv.screenDensity) - stringSize) / 8) * 7;
                 ulY = (((Height * gv.screenDensity) - thisFontHeight) / 8) * 7;
-
-                for (int x = -2; x <= 2; x++)
+                if (this.tag == "btnZoom")
                 {
-                    for (int y = -2; y <= 2; y++)
+                    //Quantity = gv.mod.timePerStepAfterSpeedCalc + " min";
+                    int timeofday = gv.mod.WorldTime % (24 * 60);
+                    int hour = timeofday / 60;
+                    int minute = timeofday % 60;
+                    string sMinute = minute + "";
+                    if (minute < 10)
                     {
-                        int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
-                        int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
-                        gv.DrawText(Quantity, xLoc, yLoc, fontHeightInString, "black");
+                        sMinute = "0" + minute;
+                    }
+
+                    int txtH = (int)gv.drawFontRegHeight;
+                    //Text = hour + ":" + sMinute;
+                    Quantity = hour + ":" + sMinute + "  ";
+                }
+                if (this.tag == "btnTorch")
+                {
+                    Quantity = gv.mod.currentLightUnitsLeft.ToString();
+                }
+                if (this.tag == "btnRation")
+                {
+                    Quantity = gv.mod.numberOfRationsRemaining.ToString();
+                }
+
+                /*
+                for (int x = -1; x <= 1; x++)
+                {
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        if (x != 0 || y != 0)
+                        {
+                            int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
+                            int yLoc = 0;
+                            if (this.tag == "btnZoom")
+                            {
+                                xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x - 3 * pW);
+                                yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y) - pW;
+                            }
+                            else
+                            {
+                                yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
+                            }
+                            //int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
+                            gv.DrawText(Quantity, xLoc, yLoc, scaler, Color.Black);
+                        }
+                        }
+                }
+                */
+                int xLoc2 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
+                int yLoc2 = 0;
+                if (this.tag == "btnZoom")
+                {
+                    xLoc2 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX - 3 * pW);
+                    yLoc2 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY) - pW;
+                }
+                else
+                {
+                    yLoc2 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
+                }
+                //int yLoc2 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
+                if (this.tag == "btnTorch" && gv.mod.partyLightOn)
+                {
+
+                    int dawn = 5 * 60;
+                    int sunrise = 6 * 60;
+                    int day = 7 * 60;
+                    int sunset = 17 * 60;
+                    int dusk = 18 * 60;
+                    int night = 20 * 60;
+                    int time = gv.mod.WorldTime % 1440;
+
+                    bool consumeLightEnergy = false;
+                    if ((time >= dawn) && (time < sunrise))
+                    {
+                        //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f / flickerReduction * flicker / 100f);
+                        //gv.DrawBitmap(gv.cc.tint_dawn, src, dst, 0, false, 1.0f);
+                    }
+                    else if ((time >= sunrise) && (time < day))
+                    {
+                        //gv.DrawBitmap(gv.cc.tint_sunrise, src, dst, 0, false, 1.0f);
+                    }
+                    else if ((time >= day) && (time < sunset))
+                    {
+                        //no tint for day
+                    }
+                    else if ((time >= sunset) && (time < dusk))
+                    {
+                        //gv.DrawBitmap(gv.cc.tint_sunset, src, dst, 0, false, 1.0f);
+                    }
+                    else if ((time >= dusk) && (time < night))
+                    {
+                        //gv.DrawBitmap(gv.cc.tint_dusk, src, dst, 0, false, 1.0f);
+                    }
+                    else if ((time >= night) || (time < dawn))
+                    {
+                        //berlin
+                        consumeLightEnergy = true;
+                    }
+
+                    if (!gv.mod.currentArea.UseDayNightCycle)
+                    {
+                        consumeLightEnergy = true;
+                    }
+
+                    if (!gv.mod.currentArea.useLightSystem)
+                    {
+                        consumeLightEnergy = false;
+                    }
+                    if (consumeLightEnergy)
+                    {
+                        gv.DrawTextOutlined(Quantity, xLoc2, yLoc2, scaler, "yellow");
+                    }
+                    else
+                    {
+                        gv.DrawTextOutlined(Quantity, xLoc2, yLoc2, scaler, "white");
                     }
                 }
-                int xLoc2 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
-                int yLoc2 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
-                gv.DrawText(Quantity, xLoc2, yLoc2, fontHeightInString, "white");
+                else
+                {
+                    gv.DrawTextOutlined(Quantity, xLoc2, yLoc2, scaler, "white");
+                }
 
                 // DRAW HOTKEY
                 if (gv.showHotKeys)
                 {
+                    //stringSize = gv.cc.MeasureString(HotKey, SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, thisFontHeight);
                     stringSize = gv.MeasureString(HotKey, fontHeightInString, "normal");
-
                     //place in the bottom center
                     ulX = ((Width * gv.screenDensity) - stringSize) / 2;
                     ulY = (((Height * gv.screenDensity) - thisFontHeight) / 4) * 3;
 
-                    for (int x = -2; x <= 2; x++)
+                    /*
+                    for (int x = -1; x <= 1; x++)
                     {
-                        for (int y = -2; y <= 2; y++)
+                        for (int y = -1; y <= 1; y++)
                         {
-                            int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
-                            int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
-                            gv.DrawText(HotKey, xLoc, yLoc, fontHeightInString, "black");
+                            if (x != 0 || y != 0)
+                            {
+                                int xLoc = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX + x);
+                                int yLoc = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY + y);
+                                gv.DrawText(HotKey, xLoc, yLoc, scaler, Color.Black);
+                            }
                         }
                     }
+                    */
                     int xLoc3 = (int)((parentPanel.currentLocX + this.X) * gv.screenDensity + ulX);
                     int yLoc3 = (int)((parentPanel.currentLocY + this.Y) * gv.screenDensity + ulY);
-                    gv.DrawText(HotKey, xLoc3, yLoc3, fontHeightInString, "red");
+                    gv.DrawTextOutlined(HotKey, xLoc3, yLoc3, scaler, "red");
                 }
             }
         }
+
+
 
         public void Update(int elapsed, IB2Panel parentPanel)
         {

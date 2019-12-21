@@ -8,7 +8,7 @@ namespace IBx
 {
     [Serializable]
     public class ContentNode
-    {        
+    {
         public int idNum = -1;
         public bool pcNode = true;
         public int linkTo = 0;
@@ -44,6 +44,6 @@ namespace IBx
                 }
             }
             return null;
-        }                
-    }        
+        }
+    }
 }

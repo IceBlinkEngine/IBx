@@ -9,6 +9,8 @@
                     />
     </ContentPage.Padding>
   <ListView x:Name="MyListView"
+            BackgroundColor="White"
+            SeparatorColor="Black"
             ItemsSource="{Binding Items}"
             ItemTapped="Handle_ItemTapped"
             CachingStrategy="RecycleElement">
@@ -16,7 +18,8 @@
     <!--Built in Cells-->
     <ListView.ItemTemplate>
         <DataTemplate>
-            <TextCell Text="{Binding .}" />
+            <TextCell Text="{Binding .}"
+                      TextColor="Black"/>
         </DataTemplate>
     </ListView.ItemTemplate>
     

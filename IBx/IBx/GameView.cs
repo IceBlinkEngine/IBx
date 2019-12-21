@@ -15,7 +15,10 @@ namespace IBx
     {
         public ContentPage cp;
         public SKCanvas canvas;
+        public bool textFormatSet = false;
         public int elapsed = 0;
+        public int elapsed2 = 0;
+        public int elapsed3 = 30;
         public float screenDensity;
         public int screenWidth;
         public int screenHeight;
@@ -136,7 +139,9 @@ namespace IBx
         public string sandstormType = "";
         public int smoothMoveCounter = 0;
         public bool useLargeLayout = true;
-                
+        public bool aTimer = false;
+        public bool a2Timer = false;
+
         public GameView(ContentPage conPage)
         {
             //InitializeComponent();
@@ -242,7 +247,7 @@ namespace IBx
             }
             else //this is a fixed module
             {
-                mod = cc.LoadModule(fixedModule + "/" + fixedModule + ".mod");
+                mod = cc.LoadModule(fixedModule + "/" + fixedModule + ".mod", false);
                 resetGame();
                 cc.LoadSaveListItems();
                 screenType = "title";
@@ -252,6 +257,790 @@ namespace IBx
             gameTimerStopwatch.Start();
             previousTime = gameTimerStopwatch.ElapsedMilliseconds;
             //gameTimer.Start();
+        }
+
+        public void onTimedEvent2()
+        {
+            //left slice
+            //(x < screenWidth/2) && (screenWidth/2 - x <= screenHeight/2 - y && screenWidth/2 - x >= ((-1)*screenHeight/2 - y))
+
+            bool isLeftSlice = false;
+            bool isRightSlice = false;
+            bool isTopSlice = false;
+            bool isBottomSlice = false;
+
+            if (mousePositionX <= (screenWidth / 2 + (int)(squareSize * 10f / 100f)))
+            {
+                if (mousePositionY <= (screenHeight / 2 + (int)(squareSize * 55f / 100f)))
+                {
+                    if (((screenWidth / 2 + (int)(squareSize * 10f / 100f)) - mousePositionX) >= ((screenHeight / 2 + (int)(squareSize * 55f / 100f)) - mousePositionY))
+                    {
+                        isLeftSlice = true;
+                    }
+                }
+                else
+                {
+                    if (((screenWidth / 2 + (int)(squareSize * 10f / 100f)) - mousePositionX) >= ((-1) * ((screenHeight / 2 + (int)(squareSize * 55f / 100f)) - mousePositionY)))
+                    {
+                        isLeftSlice = true;
+                    }
+                }
+            }
+
+            //top slice
+            if (!isLeftSlice)
+            {
+                if (mousePositionY <= (screenHeight / 2 + (int)(squareSize * 55f / 100f)))
+                {
+                    if (mousePositionX <= (screenWidth / 2 + (int)(squareSize * 10f / 100f)))
+                    {
+                        if (((screenHeight / 2 + (int)(squareSize * 55f / 100f)) - mousePositionY) >= ((screenWidth / 2 + (int)(squareSize * 10f / 100f)) - mousePositionX))
+                        {
+                            isTopSlice = true;
+                        }
+                    }
+                    else
+                    {
+                        if (((screenHeight / 2 + (int)(squareSize * 55f / 100f)) - mousePositionY) >= ((-1) * ((screenWidth / 2 + (int)(squareSize * 10f / 100f)) - mousePositionX)))
+                        {
+                            isTopSlice = true;
+                        }
+                    }
+                }
+            }
+
+            //right slice
+            if (!isLeftSlice && !isTopSlice)
+            {
+                if (mousePositionX > (screenWidth / 2 + (int)(squareSize * 10f / 100f)))
+                {
+                    if (mousePositionY <= (screenHeight / 2 + (int)(squareSize * 55f / 100f)))
+                    {
+                        if ((((screenWidth / 2 + (int)(squareSize * 10f / 100f)) - mousePositionX) * (-1)) >= ((screenHeight / 2 + (int)(squareSize * 55f / 100f)) - mousePositionY))
+                        {
+                            isRightSlice = true;
+                        }
+                    }
+                    else
+                    {
+                        if ((((screenWidth / 2 + (int)(squareSize * 10f / 100f)) - mousePositionX) * (-1)) >= ((-1) * ((screenHeight / 2 + (int)(squareSize * 55f / 100f)) - mousePositionY)))
+                        {
+                            isRightSlice = true;
+                        }
+                    }
+                }
+            }
+
+            //botttom slice
+            if (!isLeftSlice && !isRightSlice && !isTopSlice)
+            {
+                isBottomSlice = true;
+            }
+
+            //int x2 = mousePositionX + (int)(squareSize * 15f / 100f);
+            int x2 = mousePositionX - (int)(squareSize * 10f / 100f);
+            int y2 = mousePositionY - (int)(squareSize * 55f / 100f);
+
+            int xDistanceFromCenter = x2 - (int)(screenWidth / 2f);
+            if (xDistanceFromCenter < 0)
+            {
+                xDistanceFromCenter = xDistanceFromCenter * -1;
+            }
+
+            int yDistanceFromCenter = y2 - (int)(screenHeight / 2f);
+            if (yDistanceFromCenter < 0)
+            {
+                yDistanceFromCenter = yDistanceFromCenter * -1;
+            }
+
+            float moveSpeed = 1;
+            int rawValue = 0;
+            if (yDistanceFromCenter >= xDistanceFromCenter)
+            {
+                rawValue = (int)(yDistanceFromCenter);
+            }
+            else
+            {
+                rawValue = (int)(xDistanceFromCenter);
+            }
+            /*
+            if (rawValue <= 0.75f * squareSize)
+            {
+                moveSpeed = 0.4f;
+            }
+            if (rawValue >= 2.25 * squareSize)
+            {
+                moveSpeed = 1.75f;
+            }
+            mod.scrollModeSpeed = 0.5f * moveSpeed;
+            */
+            float disQ = (rawValue * 0.4f) / squareSize;
+            if (disQ > 1.4f)
+            {
+                disQ = 1.4f;
+            }
+            //mod.scrollModeSpeed = 0.5f * (0.15f + disQ);
+            mod.scrollModeSpeed = 0.7f * (0.15f + disQ);
+
+            int gridX = x2 / squareSize;
+            int gridY = y2 / squareSize;
+            int actualx2 = mod.PlayerLocationX + (gridX - playerOffsetX);
+            int actualy2 = mod.PlayerLocationY + (gridY - playerOffsetY);
+
+            //up/north
+            if (isTopSlice)
+            //if (mod.PlayerLocationX == actualx2 && mod.PlayerLocationY - 1 >= actualy2)
+            {
+                //a2Timer.Stop();
+                if (!moveTimerRuns)
+                {
+
+                    mod.doTriggerInspiteOfScrolling = false;
+                    bool blockMoveBecausOfCurrentScrolling = false;
+
+                    if (mod.useScrollingSystem)
+                    {
+                        if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                        {
+                            blockMoveBecausOfCurrentScrolling = true;
+                        }
+                    }
+
+                    blockMoveBecausOfCurrentScrolling = false;
+
+                    if (!blockMoveBecausOfCurrentScrolling)
+                    {
+                        if (mod.useScrollingSystem)
+                        {
+                            //single press
+                            if (!mod.isScrollingNow)
+                            {
+                                mod.isScrollingNow = true;
+                                //mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingTimer = 100;
+                                mod.scrollingDirection = "up";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goNorth();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveUp(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                            //continued press
+                            //else if (moveDelay2())
+                            else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                            {
+                                mod.isScrollingNow = true;
+                                mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingOverhang2 = 0;
+                                mod.scrollingDirection = "up";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goNorth();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveUp(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                        }
+
+
+                    }
+
+
+                }
+                //a2Timer.Start();
+                //mod.scrollModeSpeed = 0.5f;
+            }
+
+            //down/south
+            else if (isBottomSlice)
+            //else if (mod.PlayerLocationX == actualx2 && mod.PlayerLocationY + 1 <= actualy2)
+            //else if (rtn5.Equals("ctrlDownArrow"))
+
+            {
+                //a2Timer.Stop();
+                if (!moveTimerRuns)
+                {
+                    mod.doTriggerInspiteOfScrolling = false;
+                    bool blockMoveBecausOfCurrentScrolling = false;
+
+                    if (mod.useScrollingSystem)
+                    {
+                        if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                        {
+                            blockMoveBecausOfCurrentScrolling = true;
+                        }
+                    }
+
+                    blockMoveBecausOfCurrentScrolling = false;
+
+                    if (!blockMoveBecausOfCurrentScrolling)
+                    {
+                        if (mod.useScrollingSystem)
+                        {
+                            //single press
+                            if (!mod.isScrollingNow)
+                            {
+                                mod.isScrollingNow = true;
+                                //mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingTimer = 100;
+                                mod.scrollingDirection = "down";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goSouth();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveDown(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                            //continued press
+                            //else if (moveDelay2())
+                            else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                            {
+                                mod.isScrollingNow = true;
+                                mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingOverhang2 = 0;
+                                mod.scrollingDirection = "down";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goSouth();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveDown(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+                //a2Timer.Start();
+                //mod.scrollModeSpeed = 0.5f;
+            }
+
+            //left/west
+            else if (isLeftSlice)
+            //else if (mod.PlayerLocationX - 1 >= actualx2 && mod.PlayerLocationY == actualy2)
+            //else if (rtn.Equals("ctrlLeftArrow"))
+
+            {
+                //a2Timer.Stop();
+                if (!moveTimerRuns)
+                {
+                    mod.doTriggerInspiteOfScrolling = false;
+                    bool blockMoveBecausOfCurrentScrolling = false;
+
+                    if (mod.useScrollingSystem)
+                    {
+                        if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                        {
+                            blockMoveBecausOfCurrentScrolling = true;
+                        }
+                    }
+
+                    blockMoveBecausOfCurrentScrolling = false;
+
+                    if (!blockMoveBecausOfCurrentScrolling)
+                    {
+                        if (mod.useScrollingSystem)
+                        {
+                            //single press
+                            if (!mod.isScrollingNow)
+                            {
+                                mod.isScrollingNow = true;
+                                //mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingTimer = 100;
+                                mod.scrollingDirection = "left";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goWest();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveLeft(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                            //continued press
+                            //else if (moveDelay2())
+                            else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                            {
+                                mod.isScrollingNow = true;
+                                mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingOverhang2 = 0;
+                                mod.scrollingDirection = "left";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goWest();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveLeft(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+                //a2Timer.Start();
+                //mod.scrollModeSpeed = 0.5f;
+            }
+            else if (isRightSlice)
+            //else if (mod.PlayerLocationX + 1 <= actualx2 && mod.PlayerLocationY == actualy2)
+            //else if (rtn.Equals("ctrlRightArrow"))
+
+            {
+                //a2Timer.Stop();
+                if (!moveTimerRuns)
+                {
+                    mod.doTriggerInspiteOfScrolling = false;
+                    bool blockMoveBecausOfCurrentScrolling = false;
+
+                    if (mod.useScrollingSystem)
+                    {
+                        if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                        {
+                            blockMoveBecausOfCurrentScrolling = true;
+                        }
+                    }
+
+                    blockMoveBecausOfCurrentScrolling = false;
+
+                    if (!blockMoveBecausOfCurrentScrolling)
+                    {
+                        if (mod.useScrollingSystem)
+                        {
+                            //single press
+                            if (!mod.isScrollingNow)
+                            {
+                                mod.isScrollingNow = true;
+                                //mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingTimer = 100;
+                                mod.scrollingDirection = "right";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goEast();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveRight(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                            //continued press
+                            //else if (moveDelay2())
+                            else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                            {
+                                mod.isScrollingNow = true;
+                                mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                                mod.scrollingOverhang2 = 0;
+                                mod.scrollingDirection = "right";
+                                mod.doTriggerInspiteOfScrolling = true;
+                                bool isTransition = cc.goEast();
+                                if (!isTransition)
+                                {
+                                    mod.breakActiveSearch = false;
+                                    //mod.wasJustCalled = false;
+                                    //if (!mod.wasJustCalled)
+                                    //{
+                                    //if (screenType == "main")
+                                    //{
+                                    screenMainMap.moveRight(true);
+                                    //}
+                                    //mod.wasJustCalled = true;
+                                    //}
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+                //a2Timer.Start();
+                //mod.scrollModeSpeed = 0.5f;
+            }
+
+        }
+
+        public void onTimedEvent()
+        {
+            //check for diretion (set direction on button down)
+            //move code for each specific direction
+            //int zuz = 0;
+            //else if (gv.mod.currentArea.GetBlocked(gv.mod.PlayerLocationX + 1, gv.mod.PlayerLocationY, gv.mod.PlayerLocationX, gv.mod.PlayerLocationY, gv.mod.PlayerLastLocationX + gv.mod.lastXadjustment, gv.mod.PlayerLastLocationY + gv.mod.lastYadjustment) == false || gv.mod.currentArea.isOverviewMap)
+
+            if (this.mod.scrollingDirection == "up")
+            {
+
+
+                mod.doTriggerInspiteOfScrolling = false;
+                bool blockMoveBecausOfCurrentScrolling = false;
+
+                if (mod.useScrollingSystem)
+                {
+                    if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                    {
+                        blockMoveBecausOfCurrentScrolling = true;
+                    }
+                }
+
+                blockMoveBecausOfCurrentScrolling = false;
+
+                if (!blockMoveBecausOfCurrentScrolling)
+                {
+                    if (mod.useScrollingSystem)
+                    {
+                        //single press
+                        if (!mod.isScrollingNow)
+                        {
+                            mod.isScrollingNow = true;
+                            //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
+                            mod.scrollingTimer = 100;
+                            mod.scrollingDirection = "up";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goNorth();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX, mod.PlayerLocationY - 1, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveUp(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                        //continued press
+                        //else if (moveDelay2())
+                        else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                        {
+                            mod.isScrollingNow = true;
+                            mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                            mod.scrollingOverhang2 = 0;
+                            mod.scrollingDirection = "up";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goNorth();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX, mod.PlayerLocationY - 1, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveUp(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            //down
+            if (this.mod.scrollingDirection == "down")
+            {
+                mod.doTriggerInspiteOfScrolling = false;
+                bool blockMoveBecausOfCurrentScrolling = false;
+
+                if (mod.useScrollingSystem)
+                {
+                    if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                    {
+                        blockMoveBecausOfCurrentScrolling = true;
+                    }
+                }
+
+                blockMoveBecausOfCurrentScrolling = false;
+
+                if (!blockMoveBecausOfCurrentScrolling)
+                {
+                    if (mod.useScrollingSystem)
+                    {
+                        //single press
+                        if (!mod.isScrollingNow)
+                        {
+                            mod.isScrollingNow = true;
+                            //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
+                            mod.scrollingTimer = 100;
+                            mod.scrollingDirection = "down";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goSouth();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX, mod.PlayerLocationY + 1, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveDown(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                        //continued press
+                        //else if (moveDelay2())
+                        else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                        {
+                            mod.isScrollingNow = true;
+                            mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                            mod.scrollingOverhang2 = 0;
+                            mod.scrollingDirection = "down";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goSouth();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX, mod.PlayerLocationY + 1, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveDown(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            //left
+            if (this.mod.scrollingDirection == "left")
+            {
+
+
+
+                mod.doTriggerInspiteOfScrolling = false;
+                bool blockMoveBecausOfCurrentScrolling = false;
+
+                if (mod.useScrollingSystem)
+                {
+                    if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                    {
+                        blockMoveBecausOfCurrentScrolling = true;
+                    }
+                }
+
+                blockMoveBecausOfCurrentScrolling = false;
+
+                if (!blockMoveBecausOfCurrentScrolling)
+                {
+                    if (mod.useScrollingSystem)
+                    {
+                        //single press
+                        if (!mod.isScrollingNow)
+                        {
+                            mod.isScrollingNow = true;
+                            //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
+                            mod.scrollingTimer = 100;
+                            mod.scrollingDirection = "left";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goWest();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX - 1, mod.PlayerLocationY, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveLeft(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                        //continued press
+                        //else if (moveDelay2())
+                        else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                        {
+                            mod.isScrollingNow = true;
+                            mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                            mod.scrollingOverhang2 = 0;
+                            mod.scrollingDirection = "left";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goWest();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX - 1, mod.PlayerLocationY, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveLeft(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                    }
+
+                }
+            }
+            //right
+            if (this.mod.scrollingDirection == "right")
+            {
+
+                mod.doTriggerInspiteOfScrolling = false;
+                bool blockMoveBecausOfCurrentScrolling = false;
+
+                if (mod.useScrollingSystem)
+                {
+                    if (mod.scrollingTimer != 100 && mod.scrollingTimer != 0)
+                    {
+                        blockMoveBecausOfCurrentScrolling = true;
+                    }
+                }
+
+                blockMoveBecausOfCurrentScrolling = false;
+
+                if (!blockMoveBecausOfCurrentScrolling)
+                {
+                    if (mod.useScrollingSystem)
+                    {
+                        //single press
+                        if (!mod.isScrollingNow)
+                        {
+                            mod.isScrollingNow = true;
+                            //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
+                            mod.scrollingTimer = 100;
+                            mod.scrollingDirection = "right";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goEast();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX + 1, mod.PlayerLocationY, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveRight(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                        //continued press
+                        //else if (moveDelay2())
+                        else if (mod.scrollingTimer <= mod.lastScrollStep || mod.scrollingTimer >= 100)
+                        {
+                            mod.isScrollingNow = true;
+                            mod.scrollingTimer = 100 + mod.scrollingOverhang2;
+                            mod.scrollingOverhang2 = 0;
+                            mod.scrollingDirection = "right";
+                            mod.doTriggerInspiteOfScrolling = true;
+                            bool isTransition = cc.goEast();
+                            if (!isTransition)
+                            {
+                                //if (mod.currentArea.GetBlocked(mod.PlayerLocationX + 1, mod.PlayerLocationY, mod.PlayerLocationX, mod.PlayerLocationY, mod.PlayerLastLocationX + mod.lastXadjustment, mod.PlayerLastLocationY + mod.lastYadjustment) == false || mod.currentArea.isOverviewMap)
+                                //{
+                                mod.breakActiveSearch = false;
+                                //gv.mod.wasJustCalled = false;
+                                //if (!gv.mod.wasJustCalled)
+                                //{
+                                //if (gv.screenType == "main")
+                                //{
+                                screenMainMap.moveRight(true);
+                                //}
+                                //gv.mod.wasJustCalled = true;
+                                //}
+                                //}
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         public void createScreens()
@@ -361,7 +1150,7 @@ namespace IBx
 	    public void resetGame()
 	    {
 		    //mod = new Module();
-		    mod = cc.LoadModule(mod.moduleName + ".mod");
+		    mod = cc.LoadModule(mod.moduleName + ".mod", false);
             log.tagStack.Clear();
             log.logLinesList.Clear();
             log.currentTopLineIndex = 0;
@@ -868,6 +1657,14 @@ namespace IBx
                         AnimationTimer_Tick();
                     }
                 }
+                if (aTimer)
+                {
+                    onTimedEvent();
+                }
+                if (a2Timer)
+                {
+                    onTimedEvent2();
+                }
                 Update(elapsed); //runs AI and physics
                 sk_canvas.InvalidateSurface(); //draw the screen frame
                 if (reportFPScount >= 10)
@@ -894,6 +1691,39 @@ namespace IBx
         }
 
         //DRAW ROUTINES
+        //new, for all stuff outlined using rect
+        public void DrawTextOutlinedRect(string text, IbRect rect, float scaler, string fontColor)
+        {
+            DrawTextOutlined(text, rect.Left, rect.Top, "normal", "regular", fontColor, false);
+        }
+        public void DrawTextCenterOutlinedRect(string text, IbRect rect, float scaler, string fontColor)
+        {
+            DrawTextOutlined(text, rect.Left, rect.Top, "normal", "regular", fontColor, false);
+        }
+        public void DrawTextLeftOutlinedRect(string text, IbRect rect, float scaler, string fontColor)
+        {
+            DrawTextOutlined(text, rect.Left, rect.Top, "normal", "regular", fontColor, false);
+        }
+
+        //new, for all stuff outlined using locx, locy
+        public void DrawTextOutlined(string text, float xLoc, float yLoc, float scaler, string fontColor)
+        {
+            DrawTextOutlined(text, xLoc, yLoc, "normal", "regular", fontColor, false);
+        }
+
+        //our new method for everything outlined
+        public void DrawTextOutlined(string text, float x, float y, string style, string size, string color, bool isUnderlined)
+        {
+            for (int xx = -2; xx <= 2; xx++)
+            {
+                for (int yy = -2; yy <= 2; yy++)
+                {
+                    DrawText(text, x + xx, y + yy, size, "black", style, 255, isUnderlined);
+                }
+            }
+            DrawText(text, x, y, size, color, style, 255, isUnderlined);
+        }
+
         public void DrawText(string text, IbRect rect, string fontColor)
         {
             if (fontColor.Equals("black"))
@@ -930,6 +1760,10 @@ namespace IBx
             DrawText(text, xLoc, yLoc, "regular", "white", "normal", 255, false);
         }
         public void DrawText(string text, float xLoc, float yLoc, string color)
+        {
+            DrawText(text, xLoc, yLoc, "regular", color, "normal", 255, false);
+        }
+        public void DrawText(string text, float xLoc, float yLoc, float scaler, string color)
         {
             DrawText(text, xLoc, yLoc, "regular", color, "normal", 255, false);
         }
@@ -1198,11 +2032,21 @@ namespace IBx
         {
             DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
         }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror, bool isParty)
+        {
+            //chnaged to recognize party being drawn
+            //TODO add isParty part
+            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
+        }
         public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, bool mirror)
         {
             DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror)
+        {
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, int angleInDegrees, bool mirror)
         {
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
         }
@@ -1212,6 +2056,11 @@ namespace IBx
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity)
+        {
+            float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity, bool isParty)
         {
             float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
             DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1);

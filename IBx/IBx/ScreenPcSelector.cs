@@ -17,7 +17,7 @@ namespace IBx
         public string pcSelectorType = "spellcaster"; //spellcaster, target, itemuser
         public string callingScreen = "main"; //main, party, inventory        
         public int pcSelectorPcIndex = 0;
-        
+
         public ScreenPcSelector(Module m, GameView g)
         {
             //gv.mod = m;
@@ -30,7 +30,7 @@ namespace IBx
             int pW = (int)((float)gv.screenWidth / 100.0f);
             int pH = (int)((float)gv.screenHeight / 100.0f);
             int padW = gv.squareSize / 6;
-                        
+
             if (btnReturn == null)
             {
                 btnReturn = new IbbButton(gv, 1.0f);
@@ -41,7 +41,7 @@ namespace IBx
                 btnReturn.Y = 10 * gv.squareSize + pH * 2;
                 btnReturn.Height = (int)(50 * gv.screenDensity);
                 btnReturn.Width = (int)(170 * gv.screenDensity);
-            }            
+            }
 
             for (int x = 0; x < 6; x++)
             {
@@ -94,27 +94,27 @@ namespace IBx
 
             //DRAW LEFT STATS
             //name            
-            gv.DrawText("Name: " + pc.name, locX, locY += leftStartY);
+            gv.DrawText("Name: " + pc.name, locX, locY += leftStartY, 1.0f, "white");
 
             //race
-            gv.DrawText(gv.mod.raceLabel + ": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing);
+            gv.DrawText(gv.mod.raceLabel + ": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing, 1.0f, "white");
 
             //gender
             if (pc.isMale)
             {
-                gv.DrawText("Gender: Male", locX, locY += spacing);
+                gv.DrawText("Gender: Male", locX, locY += spacing, 1.0f, "white");
             }
             else
             {
-                gv.DrawText("Gender: Female", locX, locY += spacing);
+                gv.DrawText("Gender: Female", locX, locY += spacing, 1.0f, "white");
             }
 
             //class
-            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing);
-            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing);
-            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing);
-            gv.DrawText("---------------", locX, locY += spacing);
-            
+            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing, 1.0f, "white");
+            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing, 1.0f, "white");
+            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing, 1.0f, "white");
+            gv.DrawText("---------------", locX, locY += spacing, 1.0f, "white");
+
             //DRAW RIGHT STATS
             int actext = 0;
             if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
@@ -130,7 +130,7 @@ namespace IBx
             gv.DrawText("BAB: " + pc.baseAttBonus, tabX2, locY);
             gv.DrawText("WIS: " + pc.wisdom, tabX, locY += spacing);
             gv.DrawText("CHA: " + pc.charisma, tabX, locY += spacing);
-                        
+
             btnReturn.Draw();
         }
         public void onTouchPcSelector(int eX, int eY, MouseEventType.EventType eventType)
@@ -179,6 +179,6 @@ namespace IBx
             }
             catch
             { }
-         }        
+        }
     }
 }

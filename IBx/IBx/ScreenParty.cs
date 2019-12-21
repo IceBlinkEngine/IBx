@@ -12,7 +12,7 @@ namespace IBx
         public GameView gv;
         private IbbHtmlTextBox description;
         private IbbHtmlTextBox attackAndDamageInfo;
-         
+
         public List<IbbButton> btnPartyIndex = new List<IbbButton>();
         private IbbPortrait btnPortrait = null;
         private IbbButton btnToken = null;
@@ -26,6 +26,8 @@ namespace IBx
         private IbbButton btnRing2 = null;
         private IbbButton btnFeet = null;
         private IbbButton btnAmmo = null;
+        public IbbButton btnChat = null;
+        public IbbButton btnOrder = null;
         private IbbButton btnHelp = null;
         private IbbButton btnInfo = null;
         private IbbButton btnReturn = null;
@@ -62,10 +64,10 @@ namespace IBx
                 btnPortrait = new IbbPortrait(gv, 1.0f);
                 btnPortrait.ImgBG = "item_slot";
                 btnPortrait.Glow = "btn_small_glow";
-                btnPortrait.X = 2 * gv.squareSize - (pW * 2);
-                btnPortrait.Y = 1 * gv.squareSize + pH * 2;
-                btnPortrait.Height = (int)(gv.ibpheight * gv.screenDensity);
-                btnPortrait.Width = (int)(gv.ibpwidth * gv.screenDensity);
+                btnPortrait.X = (int)(0.5f * gv.squareSize) + (int)(pW * 0.75f);
+                btnPortrait.Y = (int)(0f * gv.squareSize) + pH * 2;
+                btnPortrait.Height = (int)(gv.ibpheight * gv.screenDensity * 2);
+                btnPortrait.Width = (int)(gv.ibpwidth * gv.screenDensity * 2);
             }
             if (btnToken == null)
             {
@@ -73,8 +75,8 @@ namespace IBx
                 btnToken.Img = "item_slot";
                 //btnToken.Img2 = "pc.tokenFilename);
                 btnToken.Glow = "btn_small_glow";
-                btnToken.X = 2 * gv.squareSize - (pW * 2);
-                btnToken.Y = 3 * gv.squareSize + pH * 2;
+                btnToken.X = (int)(1.5f * gv.squareSize) - (int)(pW * 1.5f);
+                btnToken.Y = (int)(3.5f * gv.squareSize) + pH * 4;
                 btnToken.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnToken.Width = (int)(gv.ibbwidthR * gv.screenDensity);
             }
@@ -193,7 +195,7 @@ namespace IBx
                 btnLevelUp.Text = "Level Up";
                 //btnLevelUp.X = 5 * gv.squareSize + padW * 1 + gv.oXshift;
                 //btnLevelUp.Y = 8 * gv.squareSize - pH * 2;
-                btnLevelUp.X = 10 * gv.squareSize + (padW * (7)) + gv.oXshift;
+                btnLevelUp.X = 12 * gv.squareSize + (padW * (10)) + gv.oXshift;
                 btnLevelUp.Y = pH * 2; ;
                 btnLevelUp.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnLevelUp.Width = (int)(gv.ibbwidthL * gv.screenDensity);
@@ -311,6 +313,31 @@ namespace IBx
                 btnAmmo.Width = (int)(gv.ibbwidthR * gv.screenDensity);
             }
 
+            if (btnChat == null)
+            {
+                btnChat = new IbbButton(gv, 1.0f);
+                btnChat.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+                btnChat.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnChat.X = ((7 + 3) * gv.squareSize) + (padW * (7 + 1)) + gv.oXshift;
+                btnChat.Y = pH * 2;
+                btnChat.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnChat.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnChat.Text = "CHAT";
+            }
+
+            if (btnOrder == null)
+            {
+                btnOrder = new IbbButton(gv, 1.0f);
+                btnOrder.Img = "btn_small"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.item_slot);
+                btnOrder.Glow = "btn_small_glow"; // BitmapFactory.decodeResource(gv.getResources(), R.drawable.btn_small_glow);
+                btnOrder.X = ((8 + 3) * gv.squareSize) + (padW * (8 + 1)) + gv.oXshift;
+                btnOrder.Y = pH * 2;
+                btnOrder.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnOrder.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnOrder.Text = "ORDER";
+            }
+
+
             for (int x = 0; x < 6; x++)
             {
                 IbbButton btnNew = new IbbButton(gv, 1.0f);
@@ -380,6 +407,28 @@ namespace IBx
                 {
                     if (cntPCs == gv.cc.partyScreenPcIndex) { btn.glowOn = true; }
                     else { btn.glowOn = false; }
+                    if (gv.mod.playerList[cntPCs].hasNewChatOption.Count > 0)
+                    {
+                        if (gv.mod.playerList[cntPCs].IsReadyToAdvanceLevel())
+                        {
+                            btn.Text = "Chat+";
+                        }
+                        else
+                        {
+                            btn.Text = "Chat";
+                        }
+                    }
+                    else
+                    {
+                        if (gv.mod.playerList[cntPCs].IsReadyToAdvanceLevel())
+                        {
+                            btn.Text = "+";
+                        }
+                        else
+                        {
+                            btn.Text = "";
+                        }
+                    }
                     btn.Draw();
                 }
                 cntPCs++;
@@ -390,30 +439,30 @@ namespace IBx
 
             //DRAW LEFT STATS
             //name            
-            gv.DrawText(pc.name, locX, locY += leftStartY);
+            gv.DrawText(pc.name, locX, locY += leftStartY, 1.0f, "white");
 
             //race
-            gv.DrawText(gv.mod.raceLabel +": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing);
+            gv.DrawText(gv.mod.raceLabel + ": " + gv.mod.getRace(pc.raceTag).name, locX, locY += spacing, 1.0f, "white");
 
             //gender
             if (pc.isMale)
             {
-                gv.DrawText("Gender: Male", locX, locY += spacing);
+                gv.DrawText("Gender: Male", locX, locY += spacing, 1.0f, "white");
             }
             else
             {
-                gv.DrawText("Gender: Female", locX, locY += spacing);
+                gv.DrawText("Gender: Female", locX, locY += spacing, 1.0f, "white");
             }
 
             //class
-            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing);
-            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing);
-            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing);
+            gv.DrawText("Class: " + gv.mod.getPlayerClass(pc.classTag).name, locX, locY += spacing, 1.0f, "white");
+            gv.DrawText("Level: " + pc.classLevel, locX, locY += spacing, 1.0f, "white");
+            gv.DrawText("XP: " + pc.XP + "/" + pc.XPNeeded, locX, locY += spacing, 1.0f, "white");
             //gv.DrawText("---------------", locX, locY += spacing, 1.0f, Color.White);
 
             //LOCATE STATS INFO BUTTONS
             locY += spacing;
-                        
+
             int bottomLocY = 7 * gv.squareSize + pH * 5;
             btnSpells.Y = (int)bottomLocY;
             btnTraits.Y = (int)bottomLocY;
@@ -443,6 +492,218 @@ namespace IBx
             if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
             else { actext = 20 - pc.AC; }
             locY = 0;
+
+            locX = tabX - (int)(0.5f * gv.squareSize);
+            locY += leftStartY;
+            //tabX2 = 0;
+            float locY2 = leftStartY - spacing * 3;
+            //STR              
+            gv.DrawText("STR:", locX + pW, locY);
+            gv.DrawText(pc.baseStr.ToString(), locX + 3 * pW * 2, locY);
+            if (pc.strength - pc.baseStr >= 0)
+            {
+                gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+            }
+            else
+            {
+                gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+            }
+            int racial = pc.strength - pc.baseStr;
+            if (racial < 0)
+            {
+                racial *= -1;
+            }
+            gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+            gv.DrawText(" = ", locX + 11 * pW, locY);
+            gv.DrawText(pc.strength.ToString(), locX + 13 * pW, locY);
+            if (((pc.strength - 10) / 2) > 0)
+            {
+                gv.DrawText(" (+" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            else
+            {
+                gv.DrawText(" (" + ((pc.strength - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+
+            gv.DrawText("AC: " + actext, tabX2, locY2 += (spacing * 3));
+            gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY2 += spacing);
+            //DEX             
+            gv.DrawText("DEX:", locX + pW, locY += (spacing));
+            gv.DrawText(pc.baseDex.ToString(), locX + 3 * pW * 2, locY);
+            if (pc.dexterity - pc.baseDex >= 0)
+            {
+                gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+            }
+            else
+            {
+                gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+            }
+            racial = pc.dexterity - pc.baseDex;
+            if (racial < 0)
+            {
+                racial *= -1;
+            }
+            gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+            gv.DrawText(" = ", locX + 11 * pW, locY);
+            gv.DrawText(pc.dexterity.ToString(), locX + 13 * pW, locY);
+            if (((pc.dexterity - 10) / 2) > 0)
+            {
+                gv.DrawText(" (+" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            else
+            {
+                gv.DrawText(" (" + ((pc.dexterity - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+
+            gv.DrawText("HP: " + pc.hp + "/" + pc.hpMax, tabX2, locY2 += spacing);
+            //CON             
+            gv.DrawText("CON:", locX + pW, locY += (spacing));
+            gv.DrawText(pc.baseCon.ToString(), locX + 3 * pW * 2, locY);
+            if (pc.constitution - pc.baseCon >= 0)
+            {
+                gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+            }
+            else
+            {
+                gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+            }
+            racial = pc.constitution - pc.baseCon;
+            if (racial < 0)
+            {
+                racial *= -1;
+            }
+            gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+            gv.DrawText(" = ", locX + 11 * pW, locY);
+            gv.DrawText(pc.constitution.ToString(), locX + 13 * pW, locY);
+            if (((pc.constitution - 10) / 2) > 0)
+            {
+                gv.DrawText(" (+" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            else
+            {
+                gv.DrawText(" (" + ((pc.constitution - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            gv.DrawText("SP: " + pc.sp + "/" + pc.spMax, tabX2, locY2 += spacing);
+            //INT             
+            gv.DrawText("INT:", locX + pW, locY += (spacing));
+            gv.DrawText(pc.baseInt.ToString(), locX + 3 * pW * 2, locY);
+            if (pc.intelligence - pc.baseInt >= 0)
+            {
+                gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+            }
+            else
+            {
+                gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+            }
+            racial = pc.intelligence - pc.baseInt;
+            if (racial < 0)
+            {
+                racial *= -1;
+            }
+            gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+            gv.DrawText(" = ", locX + 11 * pW, locY);
+            gv.DrawText(pc.intelligence.ToString(), locX + 13 * pW, locY);
+            if (((pc.intelligence - 10) / 2) > 0)
+            {
+                gv.DrawText(" (+" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            else
+            {
+                gv.DrawText(" (" + ((pc.intelligence - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            gv.DrawText("FORT: " + pc.fortitude + ", Acid: " + pc.damageTypeResistanceTotalAcid + "%" + ", Cold: " + pc.damageTypeResistanceTotalCold + "%" + ", Normal: " + pc.damageTypeResistanceTotalNormal + "%", tabX2, locY2 += spacing);
+            gv.DrawText("REF:   " + pc.reflex + ", Electricity: " + pc.damageTypeResistanceTotalElectricity + "%" + ", Fire: " + pc.damageTypeResistanceTotalFire + "%", tabX2, locY2 += spacing);
+            gv.DrawText("WILL: " + pc.will + ", Magic: " + pc.damageTypeResistanceTotalMagic + "%" + ", Poison: " + pc.damageTypeResistanceTotalPoison + "%", tabX2, locY2 += spacing);
+
+
+            if (gv.mod.playerList[gv.mod.selectedPartyLeader].guildName != "none")
+            {
+                gv.DrawText(gv.mod.playerList[gv.mod.selectedPartyLeader].guildName, 3 * gv.squareSize + (pW * 1) + gv.oXshift, locY2 += (spacing * 2));
+            }
+
+            if (gv.mod.playerList[gv.mod.selectedPartyLeader].guildRankName != "none")
+            {
+                gv.DrawText(gv.mod.playerList[gv.mod.selectedPartyLeader].guildRankName, tabX2, locY2);
+            }
+
+
+            /*
+             public string guildIdentifier = "none";//e.g. "Guild:"
+        public string guildName = "none";// e.g. "West Corinth Trading Company"
+        public string guildRankIdentifier = "none";//e.g. "Rank:"
+        public string guildRankName = "none";// e.g. "Initiate(Rank 1)"
+        public int guildRank = 0;
+        */
+
+            //WIS             
+            gv.DrawText("WIS:", locX + pW, locY += (spacing));
+            gv.DrawText(pc.baseWis.ToString(), locX + 3 * pW * 2, locY);
+            if (pc.wisdom - pc.baseWis >= 0)
+            {
+                gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+            }
+            else
+            {
+                gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+            }
+            racial = pc.wisdom - pc.baseWis;
+            if (racial < 0)
+            {
+                racial *= -1;
+            }
+            gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+            gv.DrawText(" = ", locX + 11 * pW, locY);
+            gv.DrawText(pc.wisdom.ToString(), locX + 13 * pW, locY);
+            if (((pc.wisdom - 10) / 2) > 0)
+            {
+                gv.DrawText(" (+" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            else
+            {
+                gv.DrawText(" (" + ((pc.wisdom - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+
+            //CHA             
+            gv.DrawText("CHA:", locX + pW, locY += (spacing));
+            gv.DrawText(pc.baseCha.ToString(), locX + 3 * pW * 2, locY);
+            if (pc.charisma - pc.baseCha >= 0)
+            {
+                gv.DrawText(" + ", locX + 4 * pW * 2, locY);
+            }
+            else
+            {
+                gv.DrawText(" - ", locX + 4 * pW * 2, locY);
+            }
+            racial = pc.charisma - pc.baseCha;
+            if (racial < 0)
+            {
+                racial *= -1;
+            }
+            gv.DrawText(racial.ToString(), locX + 5 * pW * 2, locY);
+            gv.DrawText(" = ", locX + 11 * pW, locY);
+            gv.DrawText(pc.charisma.ToString(), locX + 13 * pW, locY);
+            if (((pc.charisma - 10) / 2) > 0)
+            {
+                gv.DrawText(" (+" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            else
+            {
+                gv.DrawText(" (" + ((pc.charisma - 10) / 2) + ")", locX + 15 * pW, locY);
+            }
+            if (gv.mod.useLuck)
+            {
+                if (((pc.luck - 10) / 2) > 0)
+                {
+                    gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+                }
+                else
+                {
+                    gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, locX + pW, locY += spacing);
+
+                }
+            }
+
+            /*
             gv.DrawText("STR:  " + pc.baseStr + " + " + (pc.strength - pc.baseStr) + " = " + pc.strength + " (" + ((pc.strength - 10) / 2) + ")", tabX, locY += leftStartY);
             gv.DrawText("AC: " + actext, tabX2, locY);
             //gv.DrawText("BAB: " + pc.baseAttBonus + ", Melee to hit/damage: " + (pc.baseAttBonus + ((pc.strength - 10) / 2)) + "/" + ((pc.strength - 10) / 2) + ", Ranged to hit: " + (pc.baseAttBonus + ((pc.dexterity - 10) / 2)), tabX2, locY += spacing);
@@ -463,6 +724,7 @@ namespace IBx
             {
                 gv.DrawText("LCK:  " + pc.baseLuck + " + " + (pc.luck - pc.baseLuck) + " = " + pc.luck, tabX, locY += spacing);
             }
+            */
 
             //DRAW LEVEL UP BUTTON
             if (gv.mod.playerList[gv.cc.partyScreenPcIndex].IsReadyToAdvanceLevel())
@@ -502,7 +764,19 @@ namespace IBx
             btnBody.Img2 = gv.mod.getItemByResRefForInfo(pc.BodyRefs.resref).itemImage;
             btnFeet.Img2 = gv.mod.getItemByResRefForInfo(pc.FeetRefs.resref).itemImage;
             btnRing2.Img2 = gv.mod.getItemByResRefForInfo(pc.Ring2Refs.resref).itemImage;
-            btnAmmo.Img2 = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).itemImage;
+            ItemRefs itr2 = gv.mod.getItemRefsInInventoryByResRef(pc.AmmoRefs.resref);
+
+            if (itr2 != null)
+            {
+                if (itr2.quantity > 0)
+                {
+                    btnAmmo.Img2 = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).itemImage;
+                }
+                else
+                {
+                    pc.AmmoRefs.resref = null;
+                }
+            }
 
             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             /*
@@ -533,7 +807,7 @@ namespace IBx
             //bockauf
             //Ammo
             ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc.AmmoRefs.resref);
-          
+
             if (itr != null)
             {
                 //Item itQ = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref);
@@ -640,7 +914,7 @@ namespace IBx
             }
 
             //Head
-            itr =  pc.HeadRefs;
+            itr = pc.HeadRefs;
             if (itr != null)
             {
                 Item itQ = gv.mod.getItemByResRefForInfo(pc.HeadRefs.resref);
@@ -979,6 +1253,14 @@ namespace IBx
             btnFeet.Draw();
             btnRing2.Draw();
             btnAmmo.Draw();
+            if (gv.mod.allowIntraPartyConvos)
+            {
+                btnChat.Draw();
+            }
+            if (gv.mod.playerList.Count > 1)
+            {
+                btnOrder.Draw();
+            }
             btnSpells.Draw();
             btnTraits.Draw();
             btnEffects.Draw();
@@ -987,7 +1269,7 @@ namespace IBx
             {
                 btnPartyRoster.Draw();
             }
-            
+
             //DRAW DESCRIPTION BOX
             Item it = new Item();
             if (gv.cc.partyItemSlotIndex == 0) { it = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref); }
@@ -1100,14 +1382,14 @@ namespace IBx
 
                 //else
                 //{
-                    if (gv.sf.hasTrait(pc, "preciseshot2"))
-                    {
-                        modifier += 2;
-                    }
-                    else if (gv.sf.hasTrait(pc, "preciseshot"))
-                    {
-                        modifier++;
-                    }
+                if (gv.sf.hasTrait(pc, "preciseshot2"))
+                {
+                    modifier += 2;
+                }
+                else if (gv.sf.hasTrait(pc, "preciseshot"))
+                {
+                    modifier++;
+                }
                 //}
                 Item it2 = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref);
                 if (it2 != null)
@@ -1116,7 +1398,7 @@ namespace IBx
                 }
             }
 
-            attackMod = modifier + pc.baseAttBonus + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).attackBonus;
+            attackMod = modifier + pc.baseAttBonus + gv.sf.CalcAttackBonusesNoAmmo(pc);
 
             //3. Calculate damage with current weapon (numberOfDiceRolled, typeOfDieRolled, dammodifier)  
             int numberOfDiceRolled = 0;
@@ -1185,7 +1467,7 @@ namespace IBx
             {
                 textToSpan2 += "Attack range: " + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).attackRange + "<BR>";
             }
-            textToSpan2 += "Attack bonus: " + attackMod + "<BR>";
+            textToSpan2 += "Attack bonus: " + (attackMod + gv.mod.poorVisionModifier).ToString() + "<BR>";
             if (numberOfDiceRolled > 0)
             {
                 textToSpan2 += "Damage: " + numberOfDiceRolled + "d" + typeOfDieRolled + "+" + dammodifier + "<BR>";
@@ -1225,7 +1507,7 @@ namespace IBx
             tb.tbHeight = height;
             tb.logLinesList.Clear();
             tb.AddHtmlTextToLog(text);
-            tb.onDrawLogBox();                       
+            tb.onDrawLogBox();
         }
         public void onTouchParty(int eX, int eY, MouseEventType.EventType eventType, bool inCombat)
         {
@@ -1237,6 +1519,8 @@ namespace IBx
                 btnInfo.glowOn = false;
                 btnReturn.glowOn = false;
                 btnSpells.glowOn = false;
+                btnChat.glowOn = false;
+                btnOrder.glowOn = false;
                 btnTraits.glowOn = false;
                 btnEffects.glowOn = false;
                 btnOthers.glowOn = false;
@@ -1276,6 +1560,14 @@ namespace IBx
                         {
                             btnSpells.glowOn = true;
                         }
+                        else if (btnChat.getImpact(x, y))
+                        {
+                            btnChat.glowOn = true;
+                        }
+                        else if (btnOrder.getImpact(x, y))
+                        {
+                            btnOrder.glowOn = true;
+                        }
                         else if (btnTraits.getImpact(x, y))
                         {
                             btnTraits.glowOn = true;
@@ -1300,6 +1592,8 @@ namespace IBx
                         btnInfo.glowOn = false;
                         btnReturn.glowOn = false;
                         btnSpells.glowOn = false;
+                        btnChat.glowOn = false;
+                        btnOrder.glowOn = false;
                         btnTraits.glowOn = false;
                         btnEffects.glowOn = false;
                         btnOthers.glowOn = false;
@@ -1322,6 +1616,42 @@ namespace IBx
                                 gv.screenType = "tokenSelector";
                                 gv.screenTokenSelector.resetTokenSelector("party", pc);
                             }
+                        }
+                        else if (btnChat.getImpact(x, y))
+                        {
+                            if (!inCombat)
+                            {
+                                gv.cc.doConversationBasedOnTag("chat");
+                            }
+                        }
+                        else if (btnOrder.getImpact(x, y))
+                        {
+                            if (!inCombat)
+                            {
+                                gv.cc.doConversationBasedOnTag("order");
+                            }
+                            /*
+                            if (gv.mod.playerList.Count > 5)
+                            {
+                                gv.cc.doConversationBasedOnTag("order6");
+                            }
+                            else if (gv.mod.playerList.Count > 4)
+                            {
+                                gv.cc.doConversationBasedOnTag("order5");
+                            }
+                            else if (gv.mod.playerList.Count > 3)
+                            {
+                                gv.cc.doConversationBasedOnTag("order4");
+                            }
+                            else if (gv.mod.playerList.Count > 2)
+                            {
+                                gv.cc.doConversationBasedOnTag("order3");
+                            }
+                            else if (gv.mod.playerList.Count > 1)
+                            {
+                                gv.cc.doConversationBasedOnTag("order2");
+                            }
+                            */
                         }
                         else if (btnSpells.getImpact(x, y))
                         {
@@ -1391,8 +1721,8 @@ namespace IBx
                         {
                             //if (inCombat)
                             //{
-                                //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
-                                //return;
+                            //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
+                            //return;
                             //}
                             if (gv.cc.partyItemSlotIndex == 1)
                             {
@@ -1417,8 +1747,8 @@ namespace IBx
                         {
                             //if (inCombat)
                             //{
-                                //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
-                                //return;
+                            //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
+                            //return;
                             //}
                             if (gv.cc.partyItemSlotIndex == 2)
                             {
@@ -1438,8 +1768,8 @@ namespace IBx
                         {
                             //if (inCombat)
                             //{
-                                //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
-                                //return;
+                            //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
+                            //return;
                             //}
                             if (gv.cc.partyItemSlotIndex == 4)
                             {
@@ -1451,8 +1781,8 @@ namespace IBx
                         {
                             //if (inCombat)
                             //{
-                                //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
-                                //return;
+                            //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
+                            //return;
                             //}
                             if (gv.cc.partyItemSlotIndex == 5)
                             {
@@ -1464,8 +1794,8 @@ namespace IBx
                         {
                             //if (inCombat)
                             //{
-                                //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
-                                //return;
+                            //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
+                            //return;
                             //}
                             if (gv.cc.partyItemSlotIndex == 6)
                             {
@@ -1477,8 +1807,8 @@ namespace IBx
                         {
                             //if (inCombat)
                             //{
-                                //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
-                                //return;
+                            //gv.sf.MessageBoxHtml("Can't equip/unequip this item in combat.");
+                            //return;
                             //}
                             if (gv.cc.partyItemSlotIndex == 7)
                             {
@@ -1567,18 +1897,29 @@ namespace IBx
                         }
                         if (!inCombat)
                         {
-                            for (int j = 0; j < gv.mod.playerList.Count; j++)
+                            if (!gv.mod.showPartyToken)
                             {
-                                if (btnPartyIndex[j].getImpact(x, y))
+                                for (int j = 0; j < gv.mod.playerList.Count; j++)
                                 {
-                                    gv.mod.selectedPartyLeader = j;
-                                    gv.cc.addLogText("lime", gv.mod.playerList[j].name + " is Party Leader");
-                                    if (gv.cc.partyScreenPcIndex == j)
+                                    if (btnPartyIndex[j].getImpact(x, y))
                                     {
-                                        doInterPartyConvo(); //not used in The Raventhal
+                                        gv.mod.selectedPartyLeader = j;
+                                        gv.screenMainMap.updateTraitsPanel();
+                                        gv.cc.addLogText("lime", gv.mod.playerList[gv.mod.selectedPartyLeader].name + " is Party Leader");
+                                        /*
+                                        if (gv.cc.partyScreenPcIndex == gv.mod.selectedPartyLeader)
+                                        {
+                                            doInterPartyConvo(); //not used in The Raventhal
+                                        }
+                                        */
+                                        //basics
+                                        if (gv.mod.allowIntraPartyConvos && gv.cc.partyScreenPcIndex == gv.mod.selectedPartyLeader)
+                                        {
+                                            gv.cc.doConversationBasedOnTag("chat");
+                                        }
+                                        gv.cc.partyScreenPcIndex = j;
+                                        resetTokenAndPortrait();
                                     }
-                                    gv.cc.partyScreenPcIndex = j;
-                                    resetTokenAndPortrait();
                                 }
                             }
                         }
@@ -1589,10 +1930,12 @@ namespace IBx
         }
         public void tokenLoad(Player p)
         {
+            //p.token = gv.cc.LoadBitmap(p.tokenFilename);
             btnToken.Img2 = p.tokenFilename;
         }
         public void portraitLoad(Player p)
         {
+            //p.portrait = gv.cc.LoadBitmap(p.portraitFilename);
             btnPortrait.Img = p.portraitFilename;
         }
         public String isUseableBy(Item it)
@@ -1613,16 +1956,26 @@ namespace IBx
         }
         public void doInterPartyConvo()
         {
-            if (gv.cc.partyScreenPcIndex == 0)
+            /*
+            if (gv.mod.allowIntraPartyConvos)
             {
-                return;
+                if (gv.cc.partyScreenPcIndex == 0)
+                {
+                    return;
+                }
+                if (gv.cc.partyScreenPcIndex >= gv.mod.playerList.Count)
+                {
+                    return;
+                }
+                Player pc = gv.mod.playerList[gv.cc.partyScreenPcIndex];
+                gv.cc.doConversationBasedOnTag(pc.name);
             }
-            if (gv.cc.partyScreenPcIndex >= gv.mod.playerList.Count)
+            else
             {
-                return;
+                gv.sf.MessageBox("This adventure has no special dialogue between party members.");
             }
-            Player pc = gv.mod.playerList[gv.cc.partyScreenPcIndex];
-            gv.cc.doConversationBasedOnTag(pc.name);
+            */
+            gv.cc.doConversationBasedOnTag("intraPartyDialogue");
         }
 
         public bool canNotBeUnequipped()
@@ -1763,7 +2116,7 @@ namespace IBx
                     }
                 }
 
-                if ((it.requiredLevel <= pc.classLevel) &&(gv.cc.checkRequirmentsMet(pc, it)))
+                if ((it.requiredLevel <= pc.classLevel) && (gv.cc.checkRequirmentsMet(pc, it)))
                 {
                     if (gv.cc.partyItemSlotIndex == 0)
                     {
@@ -1863,9 +2216,12 @@ namespace IBx
 
             string selected = await gv.ListViewPage(actionList, "Level Up Action");
             int selectedIndex = gv.GetSelectedIndex(selected, actionList);
-
             //using (ItemListSelector itSel = new ItemListSelector(gv, actionList, "Level Up Action"))
             //{
+                //itSel.IceBlinkButtonClose.Enabled = true;
+                //itSel.IceBlinkButtonClose.Visible = true;
+                //itSel.setupAll(gv);
+                //var ret = itSel.ShowDialog();
                 if (selectedIndex == 0) // selected to Cancel
                 {
                     //do nothing
@@ -1932,7 +2288,7 @@ namespace IBx
                                     }
                                 }
 
-                                
+
                                 //must add replacement code (for spells, too)
                                 //********************************************
                                 #region replacement code traits
@@ -2239,7 +2595,7 @@ namespace IBx
                             {
                                 spellGained += sa.name + ", ";
                                 pc.knownSpellsTags.Add(sa.tag);
-                                
+
                                 #region replacement code spells
                                 //get the spell gained
                                 Spell sp = new Spell();
@@ -2248,7 +2604,7 @@ namespace IBx
                                 {
                                     pc.replacedTraitsOrSpellsByTag.Add(sp.spellToReplaceByTag);
                                 }
-                                
+
                                 //adding trait to replace mechanism: known traits
                                 for (int i = pc.knownSpellsTags.Count - 1; i >= 0; i--)
                                 {
@@ -2306,7 +2662,7 @@ namespace IBx
                                         }
                                     }
                                 }
-                                
+
                                 //}
                                 /*
                                 if (!ta.associatedSpellTag.Equals("none"))
