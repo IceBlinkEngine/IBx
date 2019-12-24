@@ -114,7 +114,11 @@ namespace IBx
         {
             Player toReturn = null;
             // deserialize JSON directly from a file
-            string json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\characters\\" + filename);
+            string json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\characters\\" + filename + ".json");
+            if (filename.EndsWith(".json"))
+            {
+                json = gv.LoadStringFromUserFolder("\\saves\\" + gv.mod.moduleName + "\\characters\\" + filename);
+            }
             using (StringReader sr = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -921,7 +925,7 @@ namespace IBx
 
                         else if (btnReturn.getImpact(x, y))
                         {
-                            gv.PlaySound("btn_click");
+                            //gv.PlaySound("btn_click");
                             if (gv.mod.playerList.Count > 0 && gv.mod.playerList.Count >= gv.mod.numberOfPlayerMadePcsRequired && gv.mod.playerList.Count <= gv.mod.numberOfPlayerMadePcsAllowed)
                             {
                                 gv.mod.PlayerLocationX = gv.mod.startingPlayerPositionX;

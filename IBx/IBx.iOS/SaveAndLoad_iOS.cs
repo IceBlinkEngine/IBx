@@ -55,6 +55,12 @@ namespace IBx.iOS
             Directory.CreateDirectory(directoryname);
             directoryname = Path.Combine(documents, "saves");
             Directory.CreateDirectory(directoryname);
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            /* for testing
+            foreach (var res in assembly.GetManifestResourceNames())
+            {
+                System.Diagnostics.Debug.WriteLine(res);
+            }*/
         }
 
         public void SaveText(string fullPath, string text)
@@ -455,6 +461,38 @@ namespace IBx.iOS
             }
             if (stream == null)
             {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.portraits." + filename);
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.portraits." + filename + ".png");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.portraits." + filename + ".PNG");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.portraits." + filename + ".jpg");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.pctokens." + filename);
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.pctokens." + filename + ".png");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.pctokens." + filename + ".PNG");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.pctokens." + filename + ".jpg");
+            }
+            if (stream == null)
+            {
                 stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.graphics.ui_missingtexture.png");
             }
             SKManagedStream skStream = new SKManagedStream(stream);
@@ -558,7 +596,7 @@ namespace IBx.iOS
                 if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(extension)))
                 {
                     string[] split = res.Split('.');
-                    list.Add(split[split.Length - 2]);
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
                 }
             }
 
@@ -567,7 +605,7 @@ namespace IBx.iOS
                 if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
                 {
                     string[] split = res.Split('.');
-                    list.Add(split[split.Length - 2]);
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
                 }
             }
             return list;

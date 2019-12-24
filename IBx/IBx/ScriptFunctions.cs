@@ -13465,7 +13465,13 @@ namespace IBx
         {
             try
             {
-                Player newPc = gv.cc.LoadPlayer(filename + ".json"); //ex: filename = "ezzbel.json"
+                string filename2 = filename;
+                if (!filename.EndsWith(".json"))
+                {
+                    filename2 = filename + ".json";
+                }
+                Player newPc = gv.cc.LoadPlayer(filename2); //ex: filename2 = "ezzbel.json"
+                
                 //newPc.token = gv.cc.LoadBitmap(newPc.tokenFilename);
                 //newPc.portrait = gv.cc.LoadBitmap(newPc.portraitFilename);
                 newPc.playerClass = mod.getPlayerClass(newPc.classTag);

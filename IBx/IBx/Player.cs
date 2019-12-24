@@ -602,22 +602,25 @@ namespace IBx
                         {
                             //check to see if needs prereq and if you have it
                             Trait tr = mod.getTraitByTag(ta.tag);
-                            if (!tr.prerequisiteTrait.Equals("none"))
+                            if (tr != null)
                             {
-                                //requires prereq so check if you have it
-                                if (this.knownTraitsTags.Contains(tr.prerequisiteTrait) || this.learningTraitsTags.Contains(tr.prerequisiteTrait))
+                                if (!tr.prerequisiteTrait.Equals("none"))
+                                {
+                                    //requires prereq so check if you have it
+                                    if (this.knownTraitsTags.Contains(tr.prerequisiteTrait) || this.learningTraitsTags.Contains(tr.prerequisiteTrait))
+                                    {
+                                        if (checkAttributeRequirementsOfTrait(this, tr))
+                                        {
+                                            traitTagsList.Add(ta.tag);
+                                        }
+                                    }
+                                }
+                                else //does not require prereq so add to list
                                 {
                                     if (checkAttributeRequirementsOfTrait(this, tr))
                                     {
                                         traitTagsList.Add(ta.tag);
                                     }
-                                }
-                            }
-                            else //does not require prereq so add to list
-                            {
-                                if (checkAttributeRequirementsOfTrait(this, tr))
-                                {
-                                    traitTagsList.Add(ta.tag);
                                 }
                             }
                         }

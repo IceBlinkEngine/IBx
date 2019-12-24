@@ -43,7 +43,7 @@ namespace IBx
             playerTokenList.Clear();
             try
             {
-                List<string> files = gv.GetAllFilesWithExtensionFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\pctokens", ".png");
+                List<string> files = gv.GetAllFilesWithExtensionFromBothFolders("\\modules\\" + gv.mod.moduleName + "\\pctokens", "\\modules\\" + gv.mod.moduleName + "\\pctokens", ".png");
                 //Load from gv.module folder first
                 //string[] files;
                 //if (Directory.Exists(gv.mainDirectory + "\\modules\\" + gv.mod.moduleName + "\\pctokens"))

@@ -228,7 +228,7 @@ namespace IBx
             if (!filename.Contains(".json"))
             {
                 // deserialize JSON directly from a file
-                string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename + ".json");
+                string json = gv.LoadStringFromEitherFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename + ".json", "\\modules\\" + gv.mod.moduleName + "\\data\\" + filename + ".json");
                 using (StringReader sr = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -239,7 +239,7 @@ namespace IBx
             else
             {
                 // deserialize JSON directly from a file
-                string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename);
+                string json = gv.LoadStringFromEitherFolder("\\modules\\" + gv.mod.moduleName + "\\data\\" + filename, "\\modules\\" + gv.mod.moduleName + "\\data\\" + filename);
                 using (StringReader sr = new StringReader(json))
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -250,7 +250,7 @@ namespace IBx
         }
         public void LoadCurrentConvo(string filename)
         {
-            string json = gv.LoadStringFromUserFolder("\\modules\\" + gv.mod.moduleName + "\\dialog\\" + filename + ".json");
+            string json = gv.LoadStringFromEitherFolder("\\modules\\" + gv.mod.moduleName + "\\dialog\\" + filename + ".json", "\\modules\\" + gv.mod.moduleName + "\\dialog\\" + filename + ".json");
             using (StringReader sr = new StringReader(json))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -1069,14 +1069,16 @@ namespace IBx
                 JsonSerializer serializer = new JsonSerializer();
                 toReturn = (Module)serializer.Deserialize(sr, typeof(Module));
             }
-
-            foreach (Area a in toReturn.moduleAreasObjects)
+            if (toReturn != null)
             {
-                foreach (Prop p in a.Props)
+                foreach (Area a in toReturn.moduleAreasObjects)
                 {
-                    if (p.MoverType == "daily")
+                    foreach (Prop p in a.Props)
                     {
-                        int gkg = 1;
+                        if (p.MoverType == "daily")
+                        {
+                            int gkg = 1;
+                        }
                     }
                 }
             }

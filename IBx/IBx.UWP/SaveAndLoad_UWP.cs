@@ -141,8 +141,20 @@ namespace IBx.UWP
             }
             else
             {
-                StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
                 string modFolder = Path.GetFileNameWithoutExtension(modFilename);
+                //try asset area            
+                Assembly assembly = GetType().GetTypeInfo().Assembly;
+                Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.modules." + modFolder + "." + modFilename);
+                if (stream != null)
+                {
+                    using (var reader = new System.IO.StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+
+                StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                //string modFolder = Path.GetFileNameWithoutExtension(modFilename);
                 
                 //try from personal folder first
                 //var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);

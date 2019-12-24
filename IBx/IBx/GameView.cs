@@ -1083,16 +1083,31 @@ namespace IBx
             cc.longShadowCorner = cc.LoadBitmap("longShadowCorner");
             cc.shortShadow = cc.LoadBitmap("shortShadow");
             cc.shortShadowCorner = cc.LoadBitmap("shortShadowCorner");
+            cc.longShadowCornerHalf = cc.LoadBitmap("longShadowCornerHalf");
+            cc.longShadowCornerHalfMirror = cc.LoadBitmap("longShadowCornerHalfMirror");
             cc.shortShadowCorner2 = cc.LoadBitmap("shortShadowCorner2");
             cc.smallStairNEMirror = cc.LoadBitmap("smallStairNEMirror");
             cc.smallStairNENormal = cc.LoadBitmap("smallStairNENormal");
             cc.corner3 = cc.LoadBitmap("corner3");
             cc.entranceLightNorth2 = cc.LoadBitmap("entranceLightNorth2");
 
+            cc.tooHigh = cc.LoadBitmap("tooHigh");
+            cc.tooDeep = cc.LoadBitmap("tooDeep");
+
             cc.btnIni = cc.LoadBitmap("btn_ini");
             cc.btnIniGlow = cc.LoadBitmap("btn_ini_glow");
             cc.walkPass = cc.LoadBitmap("walk_pass");
             cc.walkBlocked = cc.LoadBitmap("walk_block");
+            //gehörtdiewelt
+            cc.encounter_indicator = cc.LoadBitmap("encounter_indicator");
+            cc.mandatory_conversation_indicator = cc.LoadBitmap("mandatory_conversation_indicator");
+            cc.optional_conversation_indicator = cc.LoadBitmap("optional_conversation_indicator");
+            cc.challengeHidden = cc.LoadBitmap("challengeHidden");
+            cc.challengeSkull = cc.LoadBitmap("challengeSkull");
+            cc.isChasingSymbol = cc.LoadBitmap("chasing");
+            cc.swiftSymbol = cc.LoadBitmap("swift");
+            cc.slowSymbol = cc.LoadBitmap("slow");
+
             cc.losBlocked = cc.LoadBitmap("los_block");
             cc.black_tile = cc.LoadBitmap("black_tile");
             cc.black_tile_NE = cc.LoadBitmap("black_tile_NE");
@@ -1195,6 +1210,7 @@ namespace IBx
 		    cc.LoadEffects();
 		    cc.LoadSpells();
 		    cc.LoadTraits();
+            cc.LoadFactions();
             cc.LoadWeathers();
             cc.LoadWeatherEffects();
 		    cc.LoadCreatures();
@@ -1247,16 +1263,22 @@ namespace IBx
 		    initializeSounds();
 		
 		    cc.LoadTestParty();
-		
-		    //load all the message box helps/tutorials
-		    cc.stringBeginnersGuide = cc.loadTextToString("MessageBeginnersGuide.txt");
-		    cc.stringPlayersGuide = cc.loadTextToString("MessagePlayersGuide.txt");
-		    cc.stringPcCreation = cc.loadTextToString("MessagePcCreation.txt");
-		    cc.stringMessageCombat = cc.loadTextToString("MessageCombat.txt");
-		    cc.stringMessageInventory = cc.loadTextToString("MessageInventory.txt");
-		    cc.stringMessageParty = cc.loadTextToString("MessageParty.txt");
-		    cc.stringMessageMainMap = cc.loadTextToString("MessageMainMap.txt");
-	    }
+
+            //load all the message box helps/tutorials
+            cc.stringStrength = cc.loadTextToString("MessageStrengthExplanation.txt");
+            cc.stringDexterity = cc.loadTextToString("MessageDexterityExplanation.txt");
+            cc.stringConstitution = cc.loadTextToString("MessageConstitutionExplanation.txt");
+            cc.stringIntelligence = cc.loadTextToString("MessageIntelligenceExplanation.txt");
+            cc.stringWisdom = cc.loadTextToString("MessageWisdomExplanation.txt");
+            cc.stringCharisma = cc.loadTextToString("MessageCharismaExplanation.txt");
+            cc.stringBeginnersGuide = cc.loadTextToString("MessageBeginnersGuide.txt");
+            cc.stringPlayersGuide = cc.loadTextToString("MessagePlayersGuide.txt");
+            cc.stringPcCreation = cc.loadTextToString("MessagePcCreation.txt");
+            cc.stringMessageCombat = cc.loadTextToString("MessageCombat.txt");
+            cc.stringMessageInventory = cc.loadTextToString("MessageInventory.txt");
+            cc.stringMessageParty = cc.loadTextToString("MessageParty.txt");
+            cc.stringMessageMainMap = cc.loadTextToString("MessageMainMap.txt");
+        }
 
         private void ResetFont()
         {
@@ -1646,6 +1668,15 @@ namespace IBx
         {
             if (!stillProcessingGameLoop)
             {
+                squaresInHeight = screenHeight / squareSize;
+                squaresInWidth = screenWidth / squareSize;
+                double rawOffsetX = squaresInWidth / 2;
+                double rawOffsetY = squaresInHeight / 2;
+                double rawOffset = squaresInHeight / 2 - 1;
+                playerOffset = (int)Math.Ceiling(rawOffset);
+                playerOffsetX = (int)Math.Ceiling(rawOffsetX);
+
+                playerOffsetY = (int)Math.Ceiling(rawOffsetY);
                 stillProcessingGameLoop = true; //starting the game loop so do not allow another tick call to run until finished with this tick call.
                 long current = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
                 elapsed = (int)(current - previousTime); //calculate the total ms elapsed since the last time through the game loop
@@ -2677,7 +2708,7 @@ namespace IBx
         }
         public void PlaySound(string filenameNoExtension)
         {
-            DependencyService.Get<ISaveAndLoad>().PlaySound(this, filenameNoExtension);
+            //TODO DependencyService.Get<ISaveAndLoad>().PlaySound(this, filenameNoExtension);
         }
         public void CreateAreaMusicPlayer()
         {
