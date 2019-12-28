@@ -72,7 +72,8 @@ namespace IBx
                     if (modinfo != null)
                     {
                         moduleList.Add(modinfo);
-                        titleList.Add(gv.cc.GetFromBitmapList("title"));
+                        titleList.Add(gv.cc.LoadBitmap("title", modinfo));
+                        //titleList.Add(gv.cc.GetFromBitmapList(modinfo.tit.titleImageName, modfile));
                     }
                 }
             }

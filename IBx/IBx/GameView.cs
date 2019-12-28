@@ -2292,6 +2292,7 @@ namespace IBx
             {
                 screenPartyRoster.redrawPartyRoster();
             }
+            mod.debugMode = true; //TODO turn off, only for testing
             if (mod.debugMode)
             {
                 int txtH = (int)drawFontRegHeight;
@@ -2592,7 +2593,7 @@ namespace IBx
 
             var lblTitle = new Label { Text = "Text Entry", HorizontalOptions = LayoutOptions.Center, FontAttributes = FontAttributes.Bold };
             var lblMessage = new Label { Text = headerText };
-            var txtInput = new Editor { Text = existingTextInputValue };
+            var txtInput = new Editor { Text = existingTextInputValue, BackgroundColor = Color.White, TextColor = Color.Black };
             //txtInput.HorizontalOptions = LayoutOptions.FillAndExpand;
             txtInput.VerticalOptions = LayoutOptions.FillAndExpand;
 

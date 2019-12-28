@@ -388,6 +388,20 @@ namespace IBx
 
         public void MessageBoxHtml(string message)
         {
+            message = message.Replace("<br>", "");
+            message = message.Replace("<BR>", "");
+            message = message.Replace("<b>", "");
+            message = message.Replace("<i>", "");
+            message = message.Replace("<u>", "");
+            message = message.Replace("<big>", "");
+            message = message.Replace("<small>", "");
+            message = message.Replace("</br>", "");
+            message = message.Replace("</BR>", "");
+            message = message.Replace("</b>", "");
+            message = message.Replace("</i>", "");
+            message = message.Replace("</u>", "");
+            message = message.Replace("</big>", "");
+            message = message.Replace("</small>", "");
             gv.cp.DisplayAlert("Message", message, "OK");
             //<b> Bold
             //<i> Italics

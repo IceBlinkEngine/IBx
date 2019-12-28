@@ -55,8 +55,10 @@ namespace IBx.iOS
             Directory.CreateDirectory(directoryname);
             directoryname = Path.Combine(documents, "saves");
             Directory.CreateDirectory(directoryname);
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            directoryname = Path.Combine(documents, "user");
+            Directory.CreateDirectory(directoryname);
             /* for testing
+            Assembly assembly = GetType().GetTypeInfo().Assembly;            
             foreach (var res in assembly.GetManifestResourceNames())
             {
                 System.Diagnostics.Debug.WriteLine(res);
@@ -126,16 +128,6 @@ namespace IBx.iOS
         }
         public string LoadStringFromAssetFolder(string fullPath)
         {
-            /*string text = "";
-            //check in Assests folder last
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets" + ConvertFullPath(fullPath, "."));
-            using (var reader = new System.IO.StreamReader(stream))
-            {
-                text = reader.ReadToEnd();
-            }
-            return text;*/
-
             string text = "";
             //string filename = Path.GetFileName("C:" + fullPath);
             int pos = fullPath.LastIndexOf("\\") + 1;
@@ -195,26 +187,6 @@ namespace IBx.iOS
                 }
             }
             return text;
-
-            /*
-            string text = "";
-            //check in module folder first
-            /*StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-            string convertedFullPath = storageFolder.Path + ConvertFullPath(userFolderpath, "\\");
-            if (File.Exists(convertedFullPath))
-            {
-                text = File.ReadAllText(convertedFullPath);
-                return text;
-            }*/
-            //check in Assests folder last
-            /*Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets." + ConvertFullPath(assetFolderpath, "."));
-            using (var reader = new System.IO.StreamReader(stream))
-            {
-                text = reader.ReadToEnd();
-            }
-            return text;
-            */
         }
         public string[] LoadStringLinesFromEitherFolder(string assetFolderpath, string userFolderpath)
         {
@@ -222,26 +194,7 @@ namespace IBx.iOS
             List<string> linesArray = new List<string>();
             linesArray.Add("");            
             lines = linesArray.ToArray();
-            //check in module folder first
-            /*Java.IO.File sdCard = Android.OS.Environment.ExternalStorageDirectory;
-            string filePath = sdCard.AbsolutePath + "/IBx" + ConvertFullPath(userFolderpath, "/");
-            if (File.Exists(filePath))
-            {
-                return File.ReadAllLines(filePath);
-            }
-            //check in Assests folder last
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets" + ConvertFullPath(assetFolderpath, "."));
-            using (var reader = new System.IO.StreamReader(stream))
-            {
-                List<string> linesArray = new List<string>();
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    linesArray.Add(line);
-                }
-                lines = linesArray.ToArray();
-            }*/
+            
             return lines;
         }
 
@@ -522,14 +475,7 @@ namespace IBx.iOS
             List<string> list = new List<string>();
 
             //FROM ASSETS
-            Assembly assembly = GetType().GetTypeInfo().Assembly;
-
-            //DEBUGGING RESOURCE PATH
-            //foreach (var res in assembly.GetManifestResourceNames())
-            //{
-            //    int x3 = 0;
-            //}
-
+            Assembly assembly = GetType().GetTypeInfo().Assembly;                        
             foreach (var res in assembly.GetManifestResourceNames())
             {
                 if ((res.Contains(ConvertFullPath(folderpath, "."))) && (res.EndsWith(extension)))
@@ -556,7 +502,6 @@ namespace IBx.iOS
         {
             List<string> list = new List<string>();
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-
             foreach (var res in assembly.GetManifestResourceNames())
             {
                 if ((res.Contains(ConvertFullPath(folderpath, "."))) && (res.EndsWith(extension)))
@@ -599,7 +544,7 @@ namespace IBx.iOS
                     list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
                 }
             }
-
+            //from main asset folder
             foreach (var res in assembly.GetManifestResourceNames())
             {
                 if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
