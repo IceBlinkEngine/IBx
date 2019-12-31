@@ -1636,6 +1636,14 @@ namespace IBx
         {
             animationTimerOn = true;
             animationStartTime = gameTimerStopwatch.ElapsedMilliseconds; //get the current total amount of ms since the game launched
+            if (delay < 1)
+            {
+                delay = 1;
+            }
+            if (mod.useCombatSmoothMovement)
+            {
+                delay = 1;
+            }
             animationDelayTime = delay;
             /*if (type.Equals("doAnimation"))
             {
@@ -2263,7 +2271,7 @@ namespace IBx
             }
             else if (screenType.Equals("combat"))
             {
-                screenCombat.redrawCombat();
+                screenCombat.redrawCombat(elapsed);
             }
             else if (screenType.Equals("combatCast"))
             {

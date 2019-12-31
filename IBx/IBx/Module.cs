@@ -102,7 +102,7 @@ namespace IBx
         //public float hurdle = 10f;
 
         public int breathAnimationFrequency = 10;
-        public int idleAnimationFrequency = 10;
+        public int idleAnimationFrequency = 5;
 
 
 

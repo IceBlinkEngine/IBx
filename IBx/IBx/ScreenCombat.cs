@@ -105,6 +105,11 @@ namespace IBx
         public List<int> moverOrdersOfNormalLivingCreatures = new List<int>();
         public List<int> moverOrdersOfNormalFallenCreatures = new List<int>();
 
+        //public List<int> moverOrdersOfWideLivingCreatures = new List<int>();
+        //public List<int> moverOrdersOfWideFallenCreatures = new List<int>();
+        //public List<int> moverOrdersOfTallLivingCreatures = new List<int>();
+        //public List<int> moverOrdersOfTallFallenCreatures = new List<int>();
+
         //COMBAT STUFF
         public bool adjustCamToRangedCreature = false;
         public bool isPlayerTurn = true;
@@ -812,6 +817,10 @@ namespace IBx
 
             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
             {
+                if (gv.mod.useCombatSmoothMovement)
+                {
+                    crt.inactiveTimer = gv.sf.RandInt(200);
+                }
                 int decider = gv.sf.RandInt(2);
                 if (decider == 1)
                 {
@@ -7243,7 +7252,12 @@ namespace IBx
             {
                 animationsOn = true;
             }
+            //if (!gv.mod.useCombatSmoothMovement)
+            //{
             gv.screenCombat.blockAnimationBridge = false;
+            //}
+            crt.glideAdderX = 0;
+            crt.glideAdderY = 0;
             //gv.cc.addLogText("<font color='silver'>" + "Right before calling truncontroller" + "</font><BR>");
             turnController();
         }
@@ -8708,7 +8722,12 @@ namespace IBx
                                         //p.currentWalkingSpeed = elapsed / 30f * ((float)gv.squareSize / ((float)gv.mod.realTimeTimerLengthInMilliSeconds * 0.03f)) * (float)p.pixelMoveSpeed * 0.9f * p.propMovingHalfSpeedMulti;
 
                                         crt.walkAnimationDelayCounter += elapsed / 30f * ((float)gv.squareSize / 50f);
-                                        if (crt.walkAnimationDelayCounter >= 20f)
+                                        float walkThreshold = 20f;
+                                        if ((crt.glideAdderX != 0 || crt.glideAdderY != 0))
+                                        {
+                                            walkThreshold = 10f;
+                                        }
+                                        if (crt.walkAnimationDelayCounter >= walkThreshold)
                                         {
                                             //osgosg
                                             if (!crt.showWalkingFrame)
@@ -8749,12 +8768,12 @@ namespace IBx
                                             if (!crt.showIdlingFrame)
                                             {
                                                 crt.showIdlingFrame = true;
-                                                crt.hurdle = 2f + (float)gv.sf.RandInt(300) / 100f;
+                                                crt.hurdle = (2f + (float)gv.sf.RandInt(300) / 100f) / 1.5f;
                                             }
                                             else
                                             {
                                                 crt.showIdlingFrame = false;
-                                                crt.hurdle = 25f + (float)gv.sf.RandInt(2250) / 100f;
+                                                crt.hurdle = (25f + (float)gv.sf.RandInt(2250) / 100f);
                                             }
                                             crt.idleAnimationDelayCounter = 0;
                                             //gv.mod.hurdle = 3f + (float)gv.sf.RandInt(700) / 100f;
@@ -8890,7 +8909,7 @@ namespace IBx
                 //
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
                 //bewlo was working
-                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && (attackAnimationFrameCounter >= maxUsableCounterValue))
+                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds*1.5f) && (attackAnimationFrameCounter >= maxUsableCounterValue))
                 //if ((attackAnimationTimeElapsed >= 2*attackAnimationLengthInMilliseconds))
 
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
@@ -9125,7 +9144,7 @@ namespace IBx
                 //hurgh1000
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
                 //below worked
-                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
+                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds*1.5f))
                 //if ((attackAnimationTimeElapsed >= 0))
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
                 {
@@ -9580,7 +9599,7 @@ namespace IBx
         }
 
         #region Combat Draw
-        public void redrawCombat()
+        public void redrawCombat(float elapsed)
         {
             drawCombatMap();
             drawProps();
@@ -9592,7 +9611,7 @@ namespace IBx
             }
             else
             {
-                drawMovingCombatCreatures();
+                drawMovingCombatCreatures(elapsed);
             }
             drawSprites();
             drawHeightShadows();
@@ -10004,26 +10023,27 @@ namespace IBx
                     Player crt = (Player)m.PcOrCreature;
                     if (crt.hp <= 0)
                     {
-                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                        {
-                            moverOrdersOfLargeFallenCreatures.Add(crt.moveOrder);
-                        }
-                        else
-                        {
-                            moverOrdersOfNormalFallenCreatures.Add(crt.moveOrder);
-                        }
+                        //if (crt.token.PixelSize.Width > 100)
+                        //{
+                        //moverOrdersOfLargeFallenCreatures.Add(crt.moveOrder);
+                        //}
+                        //else
+                        //{
+                        moverOrdersOfNormalFallenCreatures.Add(crt.moveOrder);
+                        //}
                     }
                     else
                     {
                         moverOrdersOfAllLivingCreatures.Add(crt.moveOrder);
-                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                        {
-                            moverOrdersOfLargeLivingCreatures.Add(crt.moveOrder);
-                        }
-                        else
-                        {
-                            moverOrdersOfNormalLivingCreatures.Add(crt.moveOrder);
-                        }
+                        //if (crt.token.PixelSize.Width > 100)
+                        //if (crt.creatureSize == 4 || crt.creatureSize == 2)
+                        //{
+                        //moverOrdersOfLargeLivingCreatures.Add(crt.moveOrder);
+                        //}
+                        //else
+                        //{
+                        moverOrdersOfNormalLivingCreatures.Add(crt.moveOrder);
+                        //}
                     }
                 }
                 else
@@ -10031,7 +10051,7 @@ namespace IBx
                     Creature crt = (Creature)m.PcOrCreature;
                     if (crt.hp <= 0)
                     {
-                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                        if (crt.creatureSize == 4 || crt.creatureSize == 2)
                         {
                             moverOrdersOfLargeFallenCreatures.Add(crt.moveOrder);
                         }
@@ -10043,7 +10063,8 @@ namespace IBx
                     else
                     {
                         moverOrdersOfAllLivingCreatures.Add(crt.moveOrder);
-                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                        //if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                        if (crt.creatureSize == 4 || crt.creatureSize == 2)
                         {
                             moverOrdersOfLargeLivingCreatures.Add(crt.moveOrder);
                         }
@@ -10063,6 +10084,8 @@ namespace IBx
 
             buttonsNeededOverall = (moverOrdersOfLargeLivingCreatures.Count) * 2;
             buttonsNeededOverall += moverOrdersOfNormalLivingCreatures.Count;
+            //buttonsNeededOverall += moverOrdersOfTallLivingCreatures.Count;
+            //buttonsNeededOverall += (moverOrdersOfWideLivingCreatures.Count) * 2;
 
             //determine number of inibars needed
             int numberOfIniBarsNeeded = 1;
@@ -10446,17 +10469,87 @@ namespace IBx
                             if (crt.hp > 0)
                             {
                                 IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
+                                bool isNormal = false;
+                                bool isWide = false;
+                                bool isTall = false;
+                                bool isLarge = false;
+
+                                //IbRect src = new IbRect(0, 0, ply.token.PixelSize.Width, ply.token.PixelSize.Width);
+                                //2-frame
+                                //normal
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 200)
+                                {
+                                    src = new IbRect(0, 0, 100, 100);
+                                    isNormal = true;
+                                }
+                                //wide
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 200)
+                                {
+                                    src = new IbRect(0, 0, 200, 100);
+                                    isWide = true;
+                                }
+                                //tall
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 400)
+                                {
+                                    src = new IbRect(0, 0, 100, 200);
+                                    isTall = true;
+                                }
+                                //large
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 400)
+                                {
+                                    src = new IbRect(0, 0, 200, 200);
+                                    isLarge = true;
+                                }
+
+                                //5-frame
+                                //normal
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 500)
+                                {
+                                    src = new IbRect(0, 0, 100, 100);
+                                    isNormal = true;
+                                }
+                                //wide
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 500)
+                                {
+                                    src = new IbRect(0, 0, 200, 100);
+                                    isWide = true;
+                                }
+                                //tall
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 1000)
+                                {
+                                    src = new IbRect(0, 0, 100, 200);
+                                    isTall = true;
+                                }
+                                //large
+                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height == 1000)
+                                {
+                                    src = new IbRect(0, 0, 200, 200);
+                                    isLarge = true;
+                                }
+
                                 int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2 * gv.pS;
                                 int startBarY = 0 * gv.squareSize + 2 * gv.pS;
                                 int targetSizeX = gv.squareSize / 2;
                                 int targetSizeY = gv.squareSize / 2;
                                 int marchingLineHeight = gv.squareSize / 2;
-                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                if (isLarge || isWide)
+                                {
+                                    targetSizeX = gv.squareSize;
+                                    //targetSizeY = gv.squareSize;
+                                    //marchingLineHeight = 0;
+                                }
+                                if (isLarge || isTall)
+                                {
+                                    //targetSizeX = gv.squareSize;
+                                    targetSizeY = gv.squareSize;
+                                    marchingLineHeight = 0;
+                                }
+                                /*if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
                                 {
                                     targetSizeX = gv.squareSize;
                                     targetSizeY = gv.squareSize;
                                     marchingLineHeight = 0;
-                                }
+                                }*/
                                 IbRect dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
                                 if (crt.moveOrder + 1 == currentMoveOrderIndex)
                                 {
@@ -10465,7 +10558,27 @@ namespace IBx
 
                                 gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, false);
                                 int mo = crt.moveOrder + 1;
-                                if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width <= 100)
+                                targetSizeX = gv.squareSize / 2;
+                                targetSizeY = gv.squareSize / 2;
+                                marchingLineHeight = gv.squareSize / 2;
+                                dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
+                                if (isTall || isNormal)
+                                {
+                                    creatureSpacesUsed++;
+                                    //drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), Color.White);
+                                    //drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), Color.Red);
+                                }
+                                else
+                                {
+                                    creatureSpacesUsed++;
+                                    creatureSpacesUsed++;
+                                    //drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), Color.White);
+                                    //drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, crt.hp.ToString(), Color.Red);
+                                }
+                                drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
+                                drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, crt.hp.ToString(), "red");
+
+                                /*if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width <= 100)
                                 {
                                     creatureSpacesUsed++;
                                     drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
@@ -10477,23 +10590,83 @@ namespace IBx
                                     creatureSpacesUsed++;
                                     drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
                                     drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, crt.hp.ToString(), "red");
-                                }
+                                }*/
                             }
                         }
                         else
                         {
+                            //determien which kind of token is used to get the correct frame
+                            //only for old two-framers an dfull fledged-five-framers
+
+                            bool isNormal = false;
+                            bool isWide = false;
+                            bool isTall = false;
+                            bool isLarge = false;
+
                             IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ply.tokenFilename).Width, gv.cc.GetFromBitmapList(ply.tokenFilename).Width);
+
+                            //2-frame
+                            //normal
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 200)
+                            {
+                                src = new IbRect(0, 0, 100, 100);
+                                isNormal = true;
+                            }
+                            //wide
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 200)
+                            {
+                                src = new IbRect(0, 0, 200, 100);
+                                isWide = true;
+                            }
+                            //tall
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 400)
+                            {
+                                src = new IbRect(0, 0, 100, 200);
+                                isTall = true;
+                            }
+                            //large
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 400)
+                            {
+                                src = new IbRect(0, 0, 200, 200);
+                                isLarge = true;
+                            }
+
+                            //5-frame
+                            //normal
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 500)
+                            {
+                                src = new IbRect(0, 0, 100, 100);
+                                isNormal = true;
+                            }
+                            //wide
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 500)
+                            {
+                                src = new IbRect(0, 0, 200, 100);
+                                isWide = true;
+                            }
+                            //tall
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 100 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 1000)
+                            {
+                                src = new IbRect(0, 0, 100, 200);
+                                isTall = true;
+                            }
+                            //large
+                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width == 200 && gv.cc.GetFromBitmapList(ply.tokenFilename).Height == 1000)
+                            {
+                                src = new IbRect(0, 0, 200, 200);
+                                isLarge = true;
+                            }
                             int startBarX = (0 * gv.squareSize) + gv.oXshift + mapStartLocXinPixels + 2 * gv.pS;
                             int startBarY = 0 * gv.squareSize + 2 * gv.pS;
                             int targetSizeX = gv.squareSize / 2;
                             int targetSizeY = gv.squareSize / 2;
                             int marchingLineHeight = gv.squareSize / 2;
-                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width > 100)
+                            /*if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width > 100)
                             {
                                 targetSizeX = gv.squareSize;
                                 targetSizeY = gv.squareSize;
                                 marchingLineHeight = 0;
-                            }
+                            }*/
                             IbRect dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
                             if (ply.moveOrder + 1 == currentMoveOrderIndex)
                             {
@@ -10502,19 +10675,19 @@ namespace IBx
 
                             gv.DrawBitmap(gv.cc.GetFromBitmapList(ply.tokenFilename), src, dst, false);
                             int mo = ply.moveOrder + 1;
-                            if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width <= 100)
-                            {
+                            //if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width <= 100)
+                            //{
                                 creatureSpacesUsed++;
                                 drawMiniText(dst.Left, dst.Top + 1 * gv.pS, mo.ToString(), "white");
                                 drawMiniText(dst.Left + gv.pS, dst.Top - 5 * gv.pS, ply.hp.ToString(), "lime");
-                            }
-                            else
-                            {
-                                creatureSpacesUsed++;
-                                creatureSpacesUsed++;
-                                drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
-                                drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, ply.hp.ToString(), "lime");
-                            }
+                            //}
+                            //else
+                            //{
+                            //    creatureSpacesUsed++;
+                            //    creatureSpacesUsed++;
+                            //    drawMiniText(dst.Left, dst.Top + gv.squareSize / 2 + 1 * gv.pS, mo.ToString(), "white");
+                            //    drawMiniText(dst.Left + 3 * gv.pS, dst.Top - 3 * gv.pS, ply.hp.ToString(), "lime");
+                            //}
                         }
 
                     }
@@ -12109,7 +12282,7 @@ namespace IBx
                 }
             }
         }
-        public void drawMovingCombatCreatures()
+        public void drawMovingCombatCreatures(float elapsed)
         {
             //the creature gilde adders x aor y not equalling zero migth be good indictaors for displaying the walk animation (alternate frames)
             //crt.glideAdderX and  crt.glideAdderY
@@ -12182,8 +12355,8 @@ namespace IBx
                 }
             }
 
-            float glideSpeed = 3f * (100f / gv.mod.combatAnimationSpeed) * (1f + gv.mod.currentEncounter.encounterCreatureList.Count * 0.125f);
-
+            //float glideSpeed = 0.4f * 3f * (100f / gv.mod.combatAnimationSpeed) * (1f + gv.mod.currentEncounter.encounterCreatureList.Count * 0.125f);
+            float glideSpeed = 4.75f * (100f / gv.mod.combatAnimationSpeed) * elapsed / 30f;
             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
             {
                 if ((!IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY)) || (!gv.mod.useCombatSmoothMovement))
@@ -12347,21 +12520,24 @@ namespace IBx
                 int decider = 0;
                 int moveChance = 80;
 
-                decider = gv.sf.RandInt(90);
+                int normalizedDecider = (int)(25f / (elapsed / 30f));
+                decider = gv.sf.RandInt(normalizedDecider);
+
                 if ((decider == 1) && (crt.inactiveTimer == 0))
                 {
-                    crt.inactiveTimer += gv.sf.RandInt(2);
+                    //crt.inactiveTimer += gv.sf.RandInt(2);
+                    crt.inactiveTimer += elapsed / 30f;
                 }
 
                 if (crt.inactiveTimer != 0)
                 {
-                    crt.inactiveTimer += gv.sf.RandInt(2);
+                    crt.inactiveTimer += elapsed / 30f;
                 }
 
                 //increasing threshold to give room to breathing and idle
                 //projectmover
                 //was 100, trying 700, looks like a good middleground
-                if (crt.inactiveTimer > 700)
+                if (crt.inactiveTimer > 450)
                 {
                     crt.inactiveTimer = 0;
                 }
@@ -14568,7 +14744,7 @@ namespace IBx
             }
             if (animationsOn || stepAnimationsOn)
             {
-                if (attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds)
+                if (attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds*1.5f)
                 {
                     foreach (AnimationSequence seq in animationSeqStack)
                     {
