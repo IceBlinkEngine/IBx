@@ -11786,14 +11786,49 @@ namespace IBx
         }
         public void drawMovingCombatCreatures()
         {
-            //foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
-            //{
+            //the creature gilde adders x aor y not equalling zero migth be good indictaors for displaying the walk animation (alternate frames)
+            //crt.glideAdderX and  crt.glideAdderY
+            //crt.inactiveTimer = 0 indicates a wiggling movement going on
 
-            //}
+            //Creatures
+            //update(int elapsed) handles the animations
 
+            //miantain two frame sprite support through all of this
 
-            //if ((crt == gv.mod.currentEncounter.encounterCreatureList[creatureIndex])
-            //fats mode not used right now
+            //check these conditions in update(int elapsed) of ScreenCombat  
+            //breathing/idle: only animate creatures 1) whose turn it currently NOT is and 2) with hp > 0
+            //walking: only animate cretaures with 1) hp > 0 and 2a) whose crt.glideAdderX/crt.glideAdderY are not 0 or 2b) whose crt.inactiveTimwe equals 0
+            //I think inactiveTimer needs to be longer as otherwise not enough room is left for idle and breathe animations
+            //assign and unassign(!) crt.show... values accordingly (only one can be true anytime, likely no use for the normal and attack one, as there are systems for those already)
+            //might use frameNumber, like main map does, too (a bit redundant)
+
+            //use drawMovingCombatCreatures crt.show... values in drawMovingCombatCreatures()
+            //crt.show.. values determine which frame/part of the sprite to use as src here
+            //factor in creature size dimensiosn for picking the correct part of the sprite
+            //mainmap is using prp.currentFrameNumber, truned into framePosition, for picking correct part, maybe copy that fro crt and combat
+
+            //PC
+            //to do: plan
+
+            //MapScrolling
+            //to do: plan
+
+            //turned inot frameposition
+            //doPropAnimations used to determine the prp.currentFrameNumber there
+            //setting prp.showWalkingFrame(2), prp.showIdlingFrame(3), prp.showBreathingFrame(4)
+            //normal woulsd 0 then and attack 1
+
+            //mirror tehse setting for cretaure, add prp.showAttckFrame(1)
+
+            //all states exclude each other
+            //idle has only a chnce to kick in if no other stae is currently active and should be ended by the others
+
+            //extra considertaion needed because of the differnt creature sizes possible in combat (tall, wide, large)
+            //make sure tw always support the old two-frame-sprites (nomral, attack)
+
+            //will need to do some breathing and idle pc animations, too (walkign will not work like as pc are not gliding in combat)
+
+            //fast mode not used right now
             if ((gv.mod.fastMode) && (!isPlayerTurn))
             {
                 framesInFastForwardCounter++;
@@ -14081,8 +14116,9 @@ namespace IBx
             else if (keyData == Keys.I)
             {
                 gv.mod.mainMapMovementRelevantKeyPressed = false;
-                if ((isPlayerTurn) && (!gv.mod.playerList[currentPlayerIndex].isTemporaryAllyForThisEncounterOnly) && !gv.mod.currentEncounter.noItemUseModifier)
+                if ((isPlayerTurn) && !gv.mod.currentEncounter.noItemUseModifier)
                 {
+                    //(!gv.mod.playerList[currentPlayerIndex].isTemporaryAllyForThisEncounterOnly)
                     gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
                     gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
                     gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
@@ -14178,588 +14214,597 @@ namespace IBx
                             }
                         }
                         */
-                        /*
-                        //add to end of move order  
-                        MoveOrder newMO = new MoveOrder();
-                        newMO.PcOrCreature = gv.mod.playerList[currentPlayerIndex];
-                        newMO.rank = highestMoveOrderFound + 1;
-                        gv.screenCombat.moveOrderList.Add(newMO);
-                        for (int i = gv.screenCombat.moveOrderList.Count - 2; i >= 0; i--)
-                        {
-                            if (gv.screenCombat.moveOrderList[i].PcOrCreature == newMO.PcOrCreature)
-                            {
-                                gv.screenCombat.moveOrderList.RemoveAt(i);
-                            }
-                        }
-
-                        //increment the number of initial move order objects
-                        //note: check how ini bar system will interact with creatures added while battle is running  
-                        gv.screenCombat.initialMoveOrderListSize++;
-
-                        recalculateCreaturesShownInInitiativeBar();
-
-                        endPcTurn(false);
-                    }
-                    else
-                    {
-                        gv.cc.addLogText("red", "Delaying not possible for this character this turn.");
-                    }
+            /*
+            //add to end of move order  
+            MoveOrder newMO = new MoveOrder();
+            newMO.PcOrCreature = gv.mod.playerList[currentPlayerIndex];
+            newMO.rank = highestMoveOrderFound + 1;
+            gv.screenCombat.moveOrderList.Add(newMO);
+            for (int i = gv.screenCombat.moveOrderList.Count - 2; i >= 0; i--)
+            {
+                if (gv.screenCombat.moveOrderList[i].PcOrCreature == newMO.PcOrCreature)
+                {
+                    gv.screenCombat.moveOrderList.RemoveAt(i);
                 }
             }
-            else if (keyData == Keys.U)
+
+            //increment the number of initial move order objects
+            //note: check how ini bar system will interact with creatures added while battle is running  
+            gv.screenCombat.initialMoveOrderListSize++;
+
+            recalculateCreaturesShownInInitiativeBar();
+
+            endPcTurn(false);
+        }
+        else
+        {
+            gv.cc.addLogText("red", "Delaying not possible for this character this turn.");
+        }
+    }
+}
+else if (keyData == Keys.U)
+{
+    gv.mod.mainMapMovementRelevantKeyPressed = false;
+    if (isPlayerTurn && !gv.mod.currentEncounter.noTraitUseModifier)
+    {
+        gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+        continueTurn = false;
+        gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+        gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+        gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+        gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+        gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+        Player pc = gv.mod.playerList[currentPlayerIndex];
+        if (pc.knownInCombatUsableTraitsTags.Count > 0)
+        {
+            currentCombatMode = "traitUseSelector";
+            gv.screenType = "combatTraitUse";
+            gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+            spellSelectorIndex = 0;
+            setTargetHighlightStartLocation(pc);
+        }
+        else
+        {
+            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+else if (keyData == Keys.X)
+{
+    gv.mod.mainMapMovementRelevantKeyPressed = false;
+    foreach (IB2Panel pnl in combatUiLayout.panelList)
+    {
+        //hides left
+        if (pnl.hidingXIncrement < 0)
+        {
+            if (pnl.currentLocX < pnl.shownLocX)
+            {
+                pnl.showing = true;
+            }
+            else
+            {
+                pnl.hiding = true;
+            }
+        }
+        //hides right
+        else if (pnl.hidingXIncrement > 0)
+        {
+            if (pnl.currentLocX > pnl.shownLocX)
+            {
+                pnl.showing = true;
+            }
+            else
+            {
+                pnl.hiding = true;
+            }
+        }
+        //hides down
+        else if (pnl.hidingYIncrement > 0)
+        {
+            if (pnl.currentLocY > pnl.shownLocY)
+            {
+                if ((pnl.tag.Equals("arrowPanel")) && (!showArrows)) //don't show arrows
+                {
+                    continue;
+                }
+                pnl.showing = true;
+            }
+            else
+            {
+                pnl.hiding = true;
+            }
+        }
+        //hides up
+        else if (pnl.hidingYIncrement < 0)
+        {
+            if (pnl.currentLocY < pnl.shownLocY)
+            {
+                pnl.showing = true;
+            }
+            else
+            {
+                pnl.hiding = true;
+            }
+        }
+    }
+}
+
+#region Move Map
+if (keyData == Keys.Up && !showMoveKeys)
+{
+    if (gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.Y > -gv.playerOffsetY)
+        {
+            UpperLeftSquare.Y--;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.Y > 0)
+        {
+            UpperLeftSquare.Y--;
+        }
+        return;
+    }
+}
+else if (keyData == Keys.Left && !showMoveKeys)
+{
+    if (gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.X > -gv.playerOffsetX)
+        {
+            UpperLeftSquare.X--;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.X > 0)
+        {
+            UpperLeftSquare.X--;
+        }
+        return;
+    }
+}
+else if (keyData == Keys.Down && !showMoveKeys)
+{
+    if (gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
+        {
+            UpperLeftSquare.Y++;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - gv.playerOffsetY - 1)
+        {
+            UpperLeftSquare.Y++;
+        }
+        return;
+    }
+}
+else if (keyData == Keys.Right && !showMoveKeys)
+{
+    if (gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
+        {
+            UpperLeftSquare.X++;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - gv.playerOffsetX - 1)
+        {
+            UpperLeftSquare.X++;
+        }
+        return;
+    }
+}
+
+if (keyData == Keys.W && showMoveKeys)
+{
+    if (!gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.Y > -gv.playerOffsetY)
+        {
+            UpperLeftSquare.Y--;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.Y > 0)
+        {
+            UpperLeftSquare.Y--;
+        }
+        return;
+    }
+}
+else if (keyData == Keys.A && showMoveKeys)
+{
+    if (!gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.X > -gv.playerOffsetX)
+        {
+            UpperLeftSquare.X--;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.X > 0)
+        {
+            UpperLeftSquare.X--;
+        }
+        return;
+    }
+}
+else if (keyData == Keys.S && showMoveKeys)
+{
+    if (!gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
+        {
+            UpperLeftSquare.Y++;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - gv.playerOffsetY - 1)
+        {
+            UpperLeftSquare.Y++;
+        }
+        return;
+    }
+}
+else if (keyData == Keys.D && showMoveKeys)
+{
+    if (!gv.screenMainMap.showMoveKeys)
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = true;
+    }
+    else
+    {
+        gv.mod.mainMapMovementRelevantKeyPressed = false;
+    }
+    if (gv.mod.useManualCombatCam)
+    {
+        if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
+        {
+            UpperLeftSquare.X++;
+        }
+        return;
+    }
+    else
+    {
+        if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - gv.playerOffsetX - 1)
+        {
+            UpperLeftSquare.X++;
+        }
+        return;
+    }
+}
+#endregion
+#region Move PC gv.mode
+if (currentCombatMode.Equals("move"))
+{
+    Player pc = gv.mod.playerList[currentPlayerIndex];
+    if ((keyData == Keys.NumPad7) || (keyData == Keys.Q && !showMoveKeys))
+    {
+        continueTurn = false;
+        MoveUpLeft(pc);
+    }
+    else if ((keyData == Keys.NumPad8) || (keyData == Keys.Up && showMoveKeys) || (keyData == Keys.W && !showMoveKeys))
+    {
+
+        if (keyData == Keys.NumPad8)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
+
+        if (keyData == Keys.Up)
+        {
+            if (gv.screenMainMap.showMoveKeys)
+            {
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
+            }
+            else
             {
                 gv.mod.mainMapMovementRelevantKeyPressed = false;
-                if (isPlayerTurn && !gv.mod.currentEncounter.noTraitUseModifier)
-                {
-                    gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
-                    continueTurn = false;
-                    gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                    gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                    gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                    gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                    gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                    Player pc = gv.mod.playerList[currentPlayerIndex];
-                    if (pc.knownInCombatUsableTraitsTags.Count > 0)
-                    {
-                        currentCombatMode = "traitUseSelector";
-                        gv.screenType = "combatTraitUse";
-                        gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                        spellSelectorIndex = 0;
-                        setTargetHighlightStartLocation(pc);
-                    }
-                    else
-                    {
-                        //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                    }
-                }
             }
-            else if (keyData == Keys.X)
+        }
+
+        if (keyData == Keys.W)
+        {
+            if (!gv.screenMainMap.showMoveKeys)
+            {
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
+            }
+            else
             {
                 gv.mod.mainMapMovementRelevantKeyPressed = false;
-                foreach (IB2Panel pnl in combatUiLayout.panelList)
-                {
-                    //hides left
-                    if (pnl.hidingXIncrement < 0)
-                    {
-                        if (pnl.currentLocX < pnl.shownLocX)
-                        {
-                            pnl.showing = true;
-                        }
-                        else
-                        {
-                            pnl.hiding = true;
-                        }
-                    }
-                    //hides right
-                    else if (pnl.hidingXIncrement > 0)
-                    {
-                        if (pnl.currentLocX > pnl.shownLocX)
-                        {
-                            pnl.showing = true;
-                        }
-                        else
-                        {
-                            pnl.hiding = true;
-                        }
-                    }
-                    //hides down
-                    else if (pnl.hidingYIncrement > 0)
-                    {
-                        if (pnl.currentLocY > pnl.shownLocY)
-                        {
-                            if ((pnl.tag.Equals("arrowPanel")) && (!showArrows)) //don't show arrows
-                            {
-                                continue;
-                            }
-                            pnl.showing = true;
-                        }
-                        else
-                        {
-                            pnl.hiding = true;
-                        }
-                    }
-                    //hides up
-                    else if (pnl.hidingYIncrement < 0)
-                    {
-                        if (pnl.currentLocY < pnl.shownLocY)
-                        {
-                            pnl.showing = true;
-                        }
-                        else
-                        {
-                            pnl.hiding = true;
-                        }
-                    }
-                }
             }
+        }
 
-            #region Move Map
-            if (keyData == Keys.Up && !showMoveKeys)
+        continueTurn = false;
+        MoveUp(pc);
+    }
+    else if ((keyData == Keys.NumPad9) || (keyData == Keys.E && !showMoveKeys))
+    {
+        continueTurn = false;
+        MoveUpRight(pc);
+    }
+    else if ((keyData == Keys.NumPad4) || (keyData == Keys.Left && showMoveKeys) || (keyData == Keys.A && !showMoveKeys))
+    {
+        if (keyData == Keys.NumPad4)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
+
+        if (keyData == Keys.Left)
+        {
+            if (gv.screenMainMap.showMoveKeys)
             {
-                if (gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.Y > -gv.playerOffsetY)
-                    {
-                        UpperLeftSquare.Y--;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.Y > 0)
-                    {
-                        UpperLeftSquare.Y--;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
             }
-            else if (keyData == Keys.Left && !showMoveKeys)
+            else
             {
-                if (gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.X > -gv.playerOffsetX)
-                    {
-                        UpperLeftSquare.X--;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.X > 0)
-                    {
-                        UpperLeftSquare.X--;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
             }
-            else if (keyData == Keys.Down && !showMoveKeys)
+        }
+
+        if (keyData == Keys.A)
+        {
+            if (!gv.screenMainMap.showMoveKeys)
             {
-                if (gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
-                    {
-                        UpperLeftSquare.Y++;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - gv.playerOffsetY - 1)
-                    {
-                        UpperLeftSquare.Y++;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
             }
-            else if (keyData == Keys.Right && !showMoveKeys)
+            else
             {
-                if (gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
-                    {
-                        UpperLeftSquare.X++;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - gv.playerOffsetX - 1)
-                    {
-                        UpperLeftSquare.X++;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
             }
+        }
+        continueTurn = false;
+        MoveLeft(pc);
+    }
+    else if (keyData == Keys.NumPad5)
+    {
+        CenterScreenOnPC();
+    }
+    else if ((keyData == Keys.NumPad6) || (keyData == Keys.Right && showMoveKeys) || (keyData == Keys.D && !showMoveKeys))
+    {
+        if (keyData == Keys.NumPad6)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
 
-            if (keyData == Keys.W && showMoveKeys)
+        if (keyData == Keys.Right)
+        {
+            if (gv.screenMainMap.showMoveKeys)
             {
-                if (!gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.Y > -gv.playerOffsetY)
-                    {
-                        UpperLeftSquare.Y--;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.Y > 0)
-                    {
-                        UpperLeftSquare.Y--;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
             }
-            else if (keyData == Keys.A && showMoveKeys)
+            else
             {
-                if (!gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.X > -gv.playerOffsetX)
-                    {
-                        UpperLeftSquare.X--;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.X > 0)
-                    {
-                        UpperLeftSquare.X--;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
             }
-            else if (keyData == Keys.S && showMoveKeys)
+        }
+
+        if (keyData == Keys.D)
+        {
+            if (!gv.screenMainMap.showMoveKeys)
             {
-                if (!gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
-                    {
-                        UpperLeftSquare.Y++;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - gv.playerOffsetY - 1)
-                    {
-                        UpperLeftSquare.Y++;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
             }
-            else if (keyData == Keys.D && showMoveKeys)
+            else
             {
-                if (!gv.screenMainMap.showMoveKeys)
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = true;
-                }
-                else
-                {
-                    gv.mod.mainMapMovementRelevantKeyPressed = false;
-                }
-                if (gv.mod.useManualCombatCam)
-                {
-                    if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
-                    {
-                        UpperLeftSquare.X++;
-                    }
-                    return;
-                }
-                else
-                {
-                    if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - gv.playerOffsetX - 1)
-                    {
-                        UpperLeftSquare.X++;
-                    }
-                    return;
-                }
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
             }
-            #endregion
-            #region Move PC gv.mode
-            if (currentCombatMode.Equals("move"))
+        }
+        continueTurn = false;
+        MoveRight(pc);
+    }
+    else if ((keyData == Keys.NumPad1) || (keyData == Keys.Y && !showMoveKeys) || (keyData == Keys.Z && !showMoveKeys))
+    {
+        continueTurn = false;
+        MoveDownLeft(pc);
+    }
+    else if ((keyData == Keys.NumPad2) || (keyData == Keys.Down && showMoveKeys) || (keyData == Keys.S && !showMoveKeys))
+    {
+        if (keyData == Keys.NumPad2)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
+
+        if (keyData == Keys.Down)
+        {
+            if (gv.screenMainMap.showMoveKeys)
             {
-                Player pc = gv.mod.playerList[currentPlayerIndex];
-                if ((keyData == Keys.NumPad7) || (keyData == Keys.Q && !showMoveKeys))
-                {
-                    continueTurn = false;
-                    MoveUpLeft(pc);
-                }
-                else if ((keyData == Keys.NumPad8) || (keyData == Keys.Up && showMoveKeys) || (keyData == Keys.W && !showMoveKeys))
-                {
-
-                    if (keyData == Keys.NumPad8)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
-
-                    if (keyData == Keys.Up)
-                    {
-                        if (gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-
-                    if (keyData == Keys.W)
-                    {
-                        if (!gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-
-                    continueTurn = false;
-                    MoveUp(pc);
-                }
-                else if ((keyData == Keys.NumPad9) || (keyData == Keys.E && !showMoveKeys))
-                {
-                    continueTurn = false;
-                    MoveUpRight(pc);
-                }
-                else if ((keyData == Keys.NumPad4) || (keyData == Keys.Left && showMoveKeys) || (keyData == Keys.A && !showMoveKeys))
-                {
-                    if (keyData == Keys.NumPad4)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
-
-                    if (keyData == Keys.Left)
-                    {
-                        if (gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-
-                    if (keyData == Keys.A)
-                    {
-                        if (!gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-                    continueTurn = false;
-                    MoveLeft(pc);
-                }
-                else if (keyData == Keys.NumPad5)
-                {
-                    CenterScreenOnPC();
-                }
-                else if ((keyData == Keys.NumPad6) || (keyData == Keys.Right && showMoveKeys) || (keyData == Keys.D && !showMoveKeys))
-                {
-                    if (keyData == Keys.NumPad6)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
-
-                    if (keyData == Keys.Right)
-                    {
-                        if (gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-
-                    if (keyData == Keys.D)
-                    {
-                        if (!gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-                    continueTurn = false;
-                    MoveRight(pc);
-                }
-                else if ((keyData == Keys.NumPad1) || (keyData == Keys.Y && !showMoveKeys) || (keyData == Keys.Z && !showMoveKeys))
-                {
-                    continueTurn = false;
-                    MoveDownLeft(pc);
-                }
-                else if ((keyData == Keys.NumPad2) || (keyData == Keys.Down && showMoveKeys) || (keyData == Keys.S && !showMoveKeys))
-                {
-                    if (keyData == Keys.NumPad2)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
-
-                    if (keyData == Keys.Down)
-                    {
-                        if (gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-
-                    if (keyData == Keys.S)
-                    {
-                        if (!gv.screenMainMap.showMoveKeys)
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = true;
-                        }
-                        else
-                        {
-                            gv.mod.mainMapMovementRelevantKeyPressed = false;
-                        }
-                    }
-                    continueTurn = false;
-                    MoveDown(pc);
-                }
-                else if ((keyData == Keys.NumPad3) || (keyData == Keys.C && !showMoveKeys))
-                {
-                    continueTurn = false;
-                    MoveDownRight(pc);
-                }
-                return;
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
             }
-            #endregion
-            #region Move Targeting gv.mode
-            if (currentCombatMode.Equals("attack"))
+            else
             {
-                Player pc = gv.mod.playerList[currentPlayerIndex];
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
+            }
+        }
+
+        if (keyData == Keys.S)
+        {
+            if (!gv.screenMainMap.showMoveKeys)
+            {
+                gv.mod.mainMapMovementRelevantKeyPressed = true;
+            }
+            else
+            {
+                gv.mod.mainMapMovementRelevantKeyPressed = false;
+            }
+        }
+        continueTurn = false;
+        MoveDown(pc);
+    }
+    else if ((keyData == Keys.NumPad3) || (keyData == Keys.C && !showMoveKeys))
+    {
+        continueTurn = false;
+        MoveDownRight(pc);
+    }
+    return;
+}
+#endregion
+#region Move Targeting gv.mode
+if (currentCombatMode.Equals("attack"))
+{
+    Player pc = gv.mod.playerList[currentPlayerIndex];
+    if (keyData == Keys.NumPad5)
+    {
+        continueTurn = false;
+        TargetAttackPressed(pc);
+        return;
+    }
+}
+if (currentCombatMode.Equals("cast"))
+{
+    Player pc = gv.mod.playerList[currentPlayerIndex];
                 if (keyData == Keys.NumPad5)
                 {
                     continueTurn = false;
-                    TargetAttackPressed(pc);
+                    if (gv.mod.isCastFromUsedItem)
+                    {
+                        gv.mod.isCastFromUsedItem = false;
+                        Item it = gv.mod.getItemByTag(gv.mod.tagOfItemUsedForCast);
+                        TargetCastPressed(pc, it);
+                    }
+                    else
+                    {
+                        TargetCastPressed(pc);
+                    }
                     return;
                 }
-            }
-            if (currentCombatMode.Equals("cast"))
-            {
-                Player pc = gv.mod.playerList[currentPlayerIndex];
-                if (keyData == Keys.NumPad5)
-                {
-                    continueTurn = false;
-                    TargetCastPressed(pc);
-                    return;
-                }
-            }
-            if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-            {
-                if (keyData == Keys.NumPad7)
-                {
-                    continueTurn = false;
-                    MoveTargetHighlight(7);
-                }
-                else if (keyData == Keys.NumPad8)
-                {
-                    if (keyData == Keys.NumPad8)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
+}
+if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+{
+    if (keyData == Keys.NumPad7)
+    {
+        continueTurn = false;
+        MoveTargetHighlight(7);
+    }
+    else if (keyData == Keys.NumPad8)
+    {
+        if (keyData == Keys.NumPad8)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
 
-                    continueTurn = false;
-                    MoveTargetHighlight(8);
-                }
-                else if (keyData == Keys.NumPad9)
-                {
-                    continueTurn = false;
-                    MoveTargetHighlight(9);
-                }
-                else if (keyData == Keys.NumPad4)
-                {
-                    if (keyData == Keys.NumPad4)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
+        continueTurn = false;
+        MoveTargetHighlight(8);
+    }
+    else if (keyData == Keys.NumPad9)
+    {
+        continueTurn = false;
+        MoveTargetHighlight(9);
+    }
+    else if (keyData == Keys.NumPad4)
+    {
+        if (keyData == Keys.NumPad4)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
 
-                    continueTurn = false;
-                    MoveTargetHighlight(4);
-                }
-                else if (keyData == Keys.NumPad6)
-                {
-                    continueTurn = false;
-                    MoveTargetHighlight(6);
-                }
-                else if (keyData == Keys.NumPad1)
-                {
-                    continueTurn = false;
-                    MoveTargetHighlight(1);
-                }
-                else if (keyData == Keys.NumPad2)
-                {
-                    if (keyData == Keys.NumPad2)
-                    {
-                        gv.mod.mainMapMovementRelevantKeyPressed = true;
-                    }
+        continueTurn = false;
+        MoveTargetHighlight(4);
+    }
+    else if (keyData == Keys.NumPad6)
+    {
+        continueTurn = false;
+        MoveTargetHighlight(6);
+    }
+    else if (keyData == Keys.NumPad1)
+    {
+        continueTurn = false;
+        MoveTargetHighlight(1);
+    }
+    else if (keyData == Keys.NumPad2)
+    {
+        if (keyData == Keys.NumPad2)
+        {
+            gv.mod.mainMapMovementRelevantKeyPressed = true;
+        }
 
 
-                    continueTurn = false;
-                    MoveTargetHighlight(2);
-                }
-                else if (keyData == Keys.NumPad3)
-                {
-                    continueTurn = false;
-                    MoveTargetHighlight(3);
-                }
-                return;
-            }
-            #endregion
-            */
+        continueTurn = false;
+        MoveTargetHighlight(2);
+    }
+    else if (keyData == Keys.NumPad3)
+    {
+        continueTurn = false;
+        MoveTargetHighlight(3);
+    }
+    return;
+}
+#endregion
+*/
         }
         #endregion
 
@@ -16120,7 +16165,16 @@ namespace IBx
                                 else if (currentCombatMode.Equals("cast"))
                                 {
                                     continueTurn = false;
-                                    TargetCastPressed(pc);
+                                    if (gv.mod.isCastFromUsedItem)
+                                    {
+                                        gv.mod.isCastFromUsedItem = false;
+                                        Item it = gv.mod.getItemByTag(gv.mod.tagOfItemUsedForCast);
+                                        TargetCastPressed(pc, it);
+                                    }
+                                    else
+                                    {
+                                        TargetCastPressed(pc);
+                                    }
                                 }
                             }
                             targetHighlightCenterLocation.Y = gridy;
@@ -18882,7 +18936,16 @@ namespace IBx
                             else if (currentCombatMode.Equals("cast"))
                             {
                                 continueTurn = false;
-                                TargetCastPressed(pc);
+                                if (gv.mod.isCastFromUsedItem)
+                                {
+                                    gv.mod.isCastFromUsedItem = false;
+                                    Item it = gv.mod.getItemByTag(gv.mod.tagOfItemUsedForCast);
+                                    TargetCastPressed(pc, it);
+                                }
+                                else
+                                {
+                                    TargetCastPressed(pc);
+                                }
                             }
                         }
                     }

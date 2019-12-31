@@ -1240,6 +1240,12 @@ namespace IBx
                                             doItemInventoryCastSpellCombat(gv.screenCombat.currentPlayerIndex);
                                             gv.screenCombat.currentCombatMode = "cast";
                                             gv.screenType = "combat";
+                                            if (gv.cc.currentSelectedSpell.usesTurnToActivate)
+                                            {
+                                                //gv.screenCombat.endPcTurn(false);
+                                                gv.screenCombat.continueTurn = false;
+                                                gv.screenCombat.dontEndTurn = false;
+                                            }
                                             //gv.cc.currentSelectedSpell = gv.mod.getSpellByTag(it.onUseItemCastSpellTag);
                                             //if (gv.cc.currentSelectedSpell.usesTurnToActivate)
                                             //{
@@ -1361,6 +1367,12 @@ namespace IBx
                                                         doItemInventoryCastSpellCombat(gv.screenCombat.currentPlayerIndex);
                                                         gv.screenCombat.currentCombatMode = "cast";
                                                         gv.screenType = "combat";
+                                                        if (gv.cc.currentSelectedSpell.usesTurnToActivate)
+                                                        {
+                                                            //gv.screenCombat.endPcTurn(false);
+                                                            gv.screenCombat.continueTurn = false;
+                                                            gv.screenCombat.dontEndTurn = false;
+                                                        }
                                                         //gv.cc.currentSelectedSpell = gv.mod.getSpellByTag(it.onUseItemCastSpellTag);
                                                         //if (gv.cc.currentSelectedSpell.usesTurnToActivate)
                                                         //{
@@ -1691,6 +1703,7 @@ namespace IBx
             {
                 ItemRefs itRef = GetCurrentlySelectedItemRefs();
                 Item it = gv.mod.getItemByResRefForInfo(itRef.resref);
+                gv.mod.tagOfItemUsedForCast = it.tag;
                 if (itRef.quantity != 0)
                 {
                     gv.mod.indexOfPCtoLastUseItem = pcIndex;
@@ -1721,6 +1734,7 @@ namespace IBx
             if (gv.screenType == "combatInventory")
             {
                 inCombat = true;
+                gv.mod.isCastFromUsedItem = true;
             }
             resetInventory(inCombat);
         }
@@ -1730,6 +1744,7 @@ namespace IBx
             {
                 ItemRefs itRef = GetCurrentlySelectedItemRefs();
                 Item it = gv.mod.getItemByResRefForInfo(itRef.resref);
+                gv.mod.tagOfItemUsedForCast = it.tag;
                 if (itRef.quantity != 0)
                 {
                     Spell sp = gv.mod.getSpellByTag(it.onUseItemCastSpellTag);
@@ -1760,6 +1775,7 @@ namespace IBx
             if (gv.screenType == "combatInventory")
             {
                 inCombat = true;
+                gv.mod.isCastFromUsedItem = true;
             }
             resetInventory(inCombat);
         }

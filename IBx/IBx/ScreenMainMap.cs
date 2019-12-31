@@ -2185,6 +2185,8 @@ namespace IBx
                             }
                         }
                     }
+                    //p.maxNumberOfFrames 1 or lower
+                    //mover prop animation using the framehseet (ie autoanimation)
                     //5-frames sprite sheet
                     else if (p.isMover)
                     {

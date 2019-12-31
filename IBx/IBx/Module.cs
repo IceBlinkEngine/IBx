@@ -11,6 +11,9 @@ namespace IBx
 {
     public class Module
     {
+        public bool isCastFromUsedItem = false;
+        public string tagOfItemUsedForCast = "none";
+
         public bool playLightningSound = false;
         public bool mainMapMovementRelevantKeyPressed = false;
         public bool justLeftCombat = false;
