@@ -1651,6 +1651,7 @@ namespace IBx
         }
         private void AnimationTimer_Tick()
         {
+            //screenCombat.blockAnimationBridge = false;
             if ((!screenCombat.blockAnimationBridge) || (!mod.useCombatSmoothMovement))
             {
                 animationTimerOn = false;

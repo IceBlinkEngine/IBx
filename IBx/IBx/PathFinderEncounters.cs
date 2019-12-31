@@ -411,7 +411,61 @@ namespace IBx
                     {
                         if (grid[p.combatLocX, p.combatLocY] != 4)
                         {
+                            //grid[cr.combatLocX, cr.combatLocY] = 1;
+                            //block all squares that are made up by all creatures cr (and squares based on their size)  
+                            //also if crt is large, block squares around cr as needed                      
+                            //int crSize = cr.creatureSize; //1=normal, 2=wide, 3=tall, 4=large  
+                            int crtSize = crt.creatureSize; //1=normal, 2=wide, 3=tall, 4=large  
+
                             grid[p.combatLocX, p.combatLocY] = 1;
+
+                            / crt wide
+                            if (crtSize == 2)
+                            {
+                                if (p.combatLocX > 0)
+                                {
+                                    if (grid[p.combatLocX - 1, p.combatLocY] != 4)
+                                    {
+                                        grid[p.combatLocX - 1, p.combatLocY] = 1;
+                                    }
+                                }
+                            }
+                            //crt tall  
+                            if (crtSize == 3)
+                            {
+                                if (p.combatLocY > 0)
+                                {
+                                    if (grid[p.combatLocX, p.combatLocY - 1] != 4)
+                                    {
+                                        grid[p.combatLocX, p.combatLocY - 1] = 1;
+                                    }
+                                }
+                            }
+                            //crt large  
+                            if (crtSize == 4)
+                            {
+                                if (p.combatLocX > 0)
+                                {
+                                    if (grid[p.combatLocX - 1, p.combatLocY] != 4)
+                                    {
+                                        grid[p.combatLocX - 1, p.combatLocY] = 1;
+                                    }
+                                }
+                                if (p.combatLocY > 0)
+                                {
+                                    if (grid[p.combatLocX, p.combatLocY - 1] != 4)
+                                    {
+                                        grid[p.combatLocX, p.combatLocY - 1] = 1;
+                                    }
+                                }
+                                if ((p.combatLocX > 0) && (p.combatLocY > 0))
+                                {
+                                    if (grid[p.combatLocX - 1, p.combatLocY - 1] != 4)
+                                    {
+                                        grid[p.combatLocX - 1, p.combatLocY - 1] = 1;
+                                    }
+                                }
+                            }
                         }
                         /*int crt3Size = gv.cc.getCreatureSize(crt.cr_tokenFilename); //1=normal, 2=wide, 3=tall, 4=large  
     212 +                    //crt wide  

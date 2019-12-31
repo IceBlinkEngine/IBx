@@ -2002,6 +2002,16 @@ namespace IBx
                 }
                 turnController();
             }
+            else
+            {
+                int ghhg = 0;
+            }
+            /*
+             else if ((animationSeqStack.Count > 0)  && (!continueTurn) && !gv.mod.currentEncounter.isOver && !allDone)
+             {
+                 turnController();
+             }
+             */
 
             //else
             //{
@@ -4822,6 +4832,10 @@ namespace IBx
             gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnStartCombatTurnIBScript, gv.mod.currentEncounter.OnStartCombatTurnIBScriptParms);
 
             creatureMoves = 0;
+            if (crt.creatureSize == 3)
+            {
+                int g = 0;
+            }
             doCreatureNextAction();
         }
         public void doCreatureNextAction()
@@ -4961,6 +4975,9 @@ namespace IBx
                     if (crt.cr_effectsList[i].tag == eTag)
                     {
                         crt.cr_effectsList.RemoveAt(i);
+                        //logmessage
+                        //tatsächlichliebe
+                        gv.cc.addLogText("<yl>" + crt.cr_name + " lost effect due to moving" + "</yl><BR>");
                     }
                 }
             }
@@ -4969,6 +4986,10 @@ namespace IBx
             //update stats
             crt.tagsOfEffectsToRemoveOnMove.Clear();
 
+            if (crt.creatureSize == 3)
+            {
+                int ghgj = 0;
+            }
             if (creatureMoves + 0.5f < crt.getMoveDistance())
             {
                 /*
@@ -7123,8 +7144,10 @@ namespace IBx
                 }
             }
             */
+            crt.maxTurnTimeCounter = 0;
             crt.targetPcTag = "none";
             updateStatsAllCreatures();
+            //gv.cc.addLogText("<font color='silver'>" + "Updated stats" + "</font><BR>");
             creatureMoves = 0;
             currentMoves = 0;
             //store current hp of cretaure, use it at start of creature next turn to see whether damage occured in the meantime
@@ -7215,6 +7238,13 @@ namespace IBx
             {
                 return;
             }
+            //animationSeqStack.Clear();
+            if (animationSeqStack.Count > 0)
+            {
+                animationsOn = true;
+            }
+            gv.screenCombat.blockAnimationBridge = false;
+            //gv.cc.addLogText("<font color='silver'>" + "Right before calling truncontroller" + "</font><BR>");
             turnController();
         }
 
@@ -8359,6 +8389,11 @@ namespace IBx
                         //check to see what type of event
                         if (trig.Event1Type.Equals("script"))
                         {
+
+                            if (trig.Event1Parm1 == "spell_doubleStrike")
+                            {
+                                int g = 0;
+                            }
                             //gv.cc.doScriptBasedOnFilename(trig.Event1FilenameOrTag, trig.Event1Parm1, trig.Event1Parm2, trig.Event1Parm3, trig.Event1Parm4);
                             if ((isPlayerTurn) && (trig.canBeTriggeredByPc)) //only do if PC can trigger  
                             {
@@ -8595,12 +8630,269 @@ namespace IBx
             #endregion
 
             #region COMBAT ANIMATION SPRITES
+            //projectmover
+            //the creature gilde adders x aor y not equalling zero migth be good indictaors for displaying the walk animation (alternate frames)
+            //crt.glideAdderX and  crt.glideAdderY
+            //crt.inactiveTimer = 0 indicates a wiggling movement going on
+
+            //Creatures
+            //update(int elapsed) handles the animations
+
+            //miantain two frame sprite support through all of this
+
+            //check these conditions in update(int elapsed) of ScreenCombat  
+            //breathing/idle: only animate creatures 1) whose turn it currently NOT is and 2) with hp > 0
+            //walking: only animate cretaures with 1) hp > 0 and 2a) whose crt.glideAdderX/crt.glideAdderY are not 0 or 2b) whose crt.inactiveTimwe equals 0
+            //I think inactiveTimer needs to be longer as otherwise not enough room is left for idle and breathe animations
+            //assign and unassign(!) crt.show... values accordingly (only one can be true anytime, likely no use for the normal and attack one, as there are systems for those already)
+            //might use frameNumber, like main map does, too (a bit redundant)
+
+            //use drawMovingCombatCreatures crt.show... values in drawMovingCombatCreatures()
+            //crt.show.. values determine which frame/part of the sprite to use as src here
+            //factor in creature size dimensiosn for picking the correct part of the sprite
+            //mainmap is using prp.currentFrameNumber, truned into framePosition, for picking correct part, maybe copy that fro crt and combat
+
+            //PC
+            //to do: plan
+
+            //MapScrolling
+            //to do: plan
+
+            //turned inot frameposition
+            //doPropAnimations used to determine the prp.currentFrameNumber there
+            //setting prp.showWalkingFrame(2), prp.showIdlingFrame(3), prp.showBreathingFrame(4)
+            //normal woulsd 0 then and attack 1
+
+            //mirror tehse setting for cretaure, add prp.showAttckFrame(1)
+
+            //lets add code for idling, breathing and walking
+            //walking overides breathign and idling
+            //idlign (more rare) overwrites breathing)
+
+            foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                //check walking first
+                //all animation require hp > 0
+                if (crt.hp > 0)
+                {
+                    //cretaure shoudl NOT be contained in lists for attack or dying animations
+                    if (!creatureToAnimate.Contains(crt))
+                    {
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                        //if (crt.token != null)
+                        //{
+                            //if (!crt.token.IsDisposed)
+                            //{
+
+                                int heightMultiplierDueToSize = 1;
+                                if (crt.creatureSize == 3 || crt.creatureSize == 4)
+                                {
+                                    heightMultiplierDueToSize = 2;
+                                }
+                                //wolfmountain, look at draw player code
+                                //if (p.currentWalkingSpeed != 0)
+                                //{
+                                if ((crt.glideAdderX != 0 || crt.glideAdderY != 0) || (crt.inactiveTimer == 0))
+                                {
+
+                                    //crt.showWalkingFrame = true;
+                                    //}
+                                    crt.showIdlingFrame = false;
+                                    //p.idleAnimationDelayCounter = 0;
+                                    crt.showBreathingFrame = false;
+                                    //p.breathAnimationDelayCounter = 0;
+
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 300)
+                                    {
+                                        //use value form prop.currentWalkingSpeed
+                                        //p.currentWalkingSpeed = elapsed / 30f * ((float)gv.squareSize / ((float)gv.mod.realTimeTimerLengthInMilliSeconds * 0.03f)) * (float)p.pixelMoveSpeed * 0.9f * p.propMovingHalfSpeedMulti;
+
+                                        crt.walkAnimationDelayCounter += elapsed / 30f * ((float)gv.squareSize / 50f);
+                                        if (crt.walkAnimationDelayCounter >= 20f)
+                                        {
+                                            //osgosg
+                                            if (!crt.showWalkingFrame)
+                                            {
+                                                crt.showWalkingFrame = true;
+                                            }
+                                            else
+                                            {
+                                                crt.showWalkingFrame = false;
+                                            }
+                                            crt.walkAnimationDelayCounter = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        crt.showWalkingFrame = false;
+                                    }
+                                }
+                                //not walking, maybe idling or breathing?
+                                else
+                                {
+                                    //reset counters
+                                    crt.walkAnimationDelayCounter = 0;
+                                    //show default sprite when not scrolling in any case
+                                    crt.showWalkingFrame = false;
+
+                                    //add idling code
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 400)
+                                    {
+                                        //TODO:
+                                        //add idle frequency property in
+                                        //randomize idlign a bit for different pc
+                                        crt.idleAnimationDelayCounter += (1f * elapsed / 30f * gv.mod.idleAnimationFrequency / 100f);
+                                        //gv.mod.hurdle = 3f + (float)gv.sf.RandInt(700) / 100f;
+                                        if (crt.idleAnimationDelayCounter >= crt.hurdle)
+                                        {
+                                            //osgosg
+                                            if (!crt.showIdlingFrame)
+                                            {
+                                                crt.showIdlingFrame = true;
+                                                crt.hurdle = 2f + (float)gv.sf.RandInt(300) / 100f;
+                                            }
+                                            else
+                                            {
+                                                crt.showIdlingFrame = false;
+                                                crt.hurdle = 25f + (float)gv.sf.RandInt(2250) / 100f;
+                                            }
+                                            crt.idleAnimationDelayCounter = 0;
+                                            //gv.mod.hurdle = 3f + (float)gv.sf.RandInt(700) / 100f;
+                                        }
+                                        //breathing code, hurdle for idle not reached
+                                        else
+                                        {
+                                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 500)
+                                            {
+                                                crt.breathAnimationDelayCounter += (1f * elapsed / 30f * gv.mod.breathAnimationFrequency / 100f);
+                                                if (crt.breathAnimationDelayCounter >= (4.0f + (float)gv.sf.RandInt(250) / 100f))
+                                                {
+                                                    //osgosg
+                                                    if (!crt.showBreathingFrame)
+                                                    {
+                                                        crt.showBreathingFrame = true;
+                                                        //gv.mod.hurdle = 2f + (float)gv.sf.RandInt(300) / 100f;
+                                                    }
+                                                    else
+                                                    {
+                                                        crt.showBreathingFrame = false;
+                                                        //gv.mod.hurdle = 10f + (float)gv.sf.RandInt(1500) / 100f;
+                                                    }
+                                                    crt.breathAnimationDelayCounter = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                crt.showBreathingFrame = false;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        crt.showIdlingFrame = false;
+                                    }
+                                }
+
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                //walking
+                                if (crt.showWalkingFrame)
+                                {
+                                    //just set teh correct p.framenumber here
+                                    //0 is default, 1 is attack, 2 is walk, 3 is idle, 4 is breathe
+                                    crt.currentFrameNumber = 2;
+
+                                    //src = new IbRect(0, 2 * gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width);
+
+                                    //src = new IbRect(0, gv.mod.selectedPartyLeader].token.PixelSize.Width * attackAnimationFrameCounter, pc.token.PixelSize.Width, pc.token.PixelSize.Width);
+                                }
+                                //idling
+                                else if (crt.showIdlingFrame)
+                                {
+                                    crt.currentFrameNumber = 3;
+                                    //src = new IbRect(0, 3 * gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width);
+
+                                }
+                                //breathing
+                                else if (crt.showBreathingFrame)
+                                {
+                                    crt.currentFrameNumber = 4;
+                                    //src = new IbRect(0, 4 * gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width);
+
+                                }
+                                //default
+                                else
+                                {
+                                    crt.currentFrameNumber = 0;
+                                    //src = new IbRect(0, 0, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width, gv.mod.playerList[gv.mod.selectedPartyLeader].token.PixelSize.Width);
+
+                                }
+                            //}
+                        //}
+
+                        //no animation
+                        //else
+                        //{
+                        //    crt.currentFrameNumber = 0;
+                            //likely no code needed here
+                        //}
+
+
+
+                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+
+                        //check walking first
+                        //2a) whose crt.glideAdderX / crt.glideAdderY are not 0 or 2b) whose crt.inactiveTimwe equals 0
+
+                    }
+                }
+            }
+            /*
+            if (!isPlayerTurn)
+            {
+                Creature crt2 = new Creature();
+                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt2 = c;
+                        break;
+                    }
+                }
+                crt2.maxTurnTimeCounter += elapsed;
+
+                if (crt2.maxTurnTimeCounter > 8000)
+                {
+                    animationState = AnimationState.None;
+                    animationSeqStack.Clear();
+                    endCreatureTurn(crt2);
+                }
+            }
+            */
+            /*
+            foreach (AnimationSequence seq in animationSeqStack)
+            {
+                if (seq.AnimationSeq.Count > 0)
+                {
+                    animationsOn = true;
+                    stepAnimationsOn = false;
+                    break;
+                }
+            }
+            */
+
+            //stepAnimationsOn = false;
+            // measure time opf each cretaure smove and after threshold end in any way
             if (animationsOn && !stepAnimationsOn)
+            //if (animationsOn)
+            //if (animationSeqStack.Count > 0)
             {
                 attackAnimationTimeElapsed += elapsed;
-                //hurgh1000
+                //
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
+                //bewlo was working
                 if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && (attackAnimationFrameCounter >= maxUsableCounterValue))
+                //if ((attackAnimationTimeElapsed >= 2*attackAnimationLengthInMilliseconds))
+
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
                 {
                     //time is up, reset attack animations to null
@@ -8678,146 +8970,148 @@ namespace IBx
                         }
                     }
                     //if all animation sequences are done, end this turn
-                    if (animationSeqStack.Count == 0)
-                    {
-                        animationsOn = false;
-                        deathAnimationLocations.Clear();
-                        blockCreatureDrawLocations.Clear();
+                }
+                if (animationSeqStack.Count == 0)
+                {
+                    animationsOn = false;
+                    deathAnimationLocations.Clear();
+                    blockCreatureDrawLocations.Clear();
 
-                        //remove any dead creatures                        
-                        for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
+                    //remove any dead creatures                        
+                    for (int x = gv.mod.currentEncounter.encounterCreatureList.Count - 1; x >= 0; x--)
+                    {
+                        if (gv.mod.currentEncounter.encounterCreatureList[x].hp <= 0)
                         {
-                            if (gv.mod.currentEncounter.encounterCreatureList[x].hp <= 0)
+                            try
                             {
-                                try
+                                //do OnDeath IBScript
+                                gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
+                                //project repeatable
+                                int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - x;
+                                if (deadIdx < idx)
                                 {
-                                    //do OnDeath IBScript
-                                    gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScript, gv.mod.currentEncounter.encounterCreatureList[x].onDeathIBScriptParms);
-                                    //project repeatable
-                                    int deadIdx = (gv.mod.currentEncounter.encounterCreatureList.Count - 1) - x;
-                                    if (deadIdx < idx)
+                                    idx--;
+                                    if (idx < 0)
                                     {
-                                        idx--;
-                                        if (idx < 0)
-                                        {
-                                            idx = 0;
-                                        }
-                                    }
-                                    if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[x].cr_tag)
-                                    {
-                                        gv.mod.currentEncounter.assassinationConditionMet = true;
-                                    }
-                                    gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
-                                    if (!gv.mod.currentEncounter.isRepeatable)
-                                    {
-                                        //gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
+                                        idx = 0;
                                     }
                                 }
-                                catch (Exception ex)
+                                if (gv.mod.currentEncounter.assassinationVictory && gv.mod.currentEncounter.assassinationTargetTag == gv.mod.currentEncounter.encounterCreatureList[x].cr_tag)
                                 {
-                                    gv.errorLog(ex.ToString());
+                                    gv.mod.currentEncounter.assassinationConditionMet = true;
+                                }
+                                gv.mod.currentEncounter.encounterCreatureList.RemoveAt(x);
+                                if (!gv.mod.currentEncounter.isRepeatable)
+                                {
+                                    //gv.mod.currentEncounter.encounterCreatureRefsList.RemoveAt(x);
                                 }
                             }
+                            catch (Exception ex)
+                            {
+                                gv.errorLog(ex.ToString());
+                            }
                         }
+                    }
+                    foreach (Player p in gv.mod.playerList)
+                    {
+                        if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
+                        {
+                            if (p.hp <= 0)
+                            {
+                                gv.mod.currentEncounter.protectionConditionMet = true;
+                            }
+                        }
+                    }
+                    if (isPlayerTurn)
+                    {
+                        checkEndEncounter();
+                        gv.touchEnabled = true;
+                        animationState = AnimationState.None;
+                        //endPcTurn(true);
+                        //update all player stats in case their was a recently added spell or trait effect that would change them  
                         foreach (Player p in gv.mod.playerList)
                         {
-                            if (gv.mod.currentEncounter.protectionDefeat && gv.mod.currentEncounter.protectionTargetName == p.name)
-                            {
-                                if (p.hp <= 0)
-                                {
-                                    gv.mod.currentEncounter.protectionConditionMet = true;
-                                }
-                            }
+                            gv.sf.UpdateStats(p);
                         }
-                        if (isPlayerTurn)
-                        {
-                            checkEndEncounter();
-                            gv.touchEnabled = true;
-                            animationState = AnimationState.None;
-                            //endPcTurn(true);
-                            //update all player stats in case their was a recently added spell or trait effect that would change them  
-                            foreach (Player p in gv.mod.playerList)
-                            {
-                                gv.sf.UpdateStats(p);
-                            }
 
-                            if (gv.mod.playerList[currentPlayerIndex].hp <= 0 || gv.mod.playerList[currentPlayerIndex].isHeld())
+                        if (gv.mod.playerList[currentPlayerIndex].hp <= 0 || gv.mod.playerList[currentPlayerIndex].isHeld())
+                        {
+                            endPcTurn(true);
+                        }
+
+                        if (dontEndTurn && currentCombatMode != "move")
+                        {
+                            //don't end turn just yet..probably called from a trait that is meant to be used right away like Power Attack or Set Trap  
+                            dontEndTurn = false;
+                            if (currentCombatMode != "cast")
+                            {
+                                currentCombatMode = "move";
+                            }
+                            /*
+                                //update all player stats in case their was a recently added spell or trait effect that would change them  
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    gv.sf.UpdateStats(p);
+                                }
+                                */
+                        }
+                        else
+                        {
+
+                            if (currentCombatMode != "move")
                             {
                                 endPcTurn(true);
                             }
 
-                            if (dontEndTurn && currentCombatMode != "move")
-                            {
-                                //don't end turn just yet..probably called from a trait that is meant to be used right away like Power Attack or Set Trap  
-                                dontEndTurn = false;
-                                if (currentCombatMode != "cast")
-                                {
-                                    currentCombatMode = "move";
-                                }
-                                /*
-                                    //update all player stats in case their was a recently added spell or trait effect that would change them  
-                                    foreach (Player p in gv.mod.playerList)
-                                    {
-                                        gv.sf.UpdateStats(p);
-                                    }
-                                    */
-                            }
-                            else
-                            {
-
-                                if (currentCombatMode != "move")
-                                {
-                                    endPcTurn(true);
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            animationState = AnimationState.None;
-
-                            //if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
-                            //{
-                            //idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
-                            //}
-                            //if (dontEndCreatureTurn && gv.mod.currentEncounter.encounterCreatureList[idx].hp > 0 && !gv.mod.currentEncounter.encounterCreatureList[idx].isHeld())
-                            //{
-                            //dontEndCreatureTurn = false;
-                            //animationsOn = false;
-                            //}
-                            //else
-                            //{
-                            /*
-                            for (int i = gv.mod.currentEncounter.encounterCreatureList.Count-1; i >= 0; i--)
-                            {
-                                if (gv.mod.currentEncounter.encounterCreatureList[i].moveOrder == currentMoveOrderIndex)
-                                {
-                                    endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[i]);
-                                }
-                            }
-                            */
-                            /*
-                            if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
-                            {
-                                idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
-                            }
-                            endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[idx]);
-                            */
-                            Creature crt = new Creature();
-                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
-                            {
-                                if (c.moveOrder == currentMoveOrderIndex - 1)
-                                {
-                                    crt = c;
-                                    break;
-                                }
-                            }
-                            endCreatureTurn(crt);
-
-                            //}
                         }
                     }
+                    else
+                    {
+                        animationState = AnimationState.None;
+
+                        //if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
+                        //{
+                        //idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
+                        //}
+                        //if (dontEndCreatureTurn && gv.mod.currentEncounter.encounterCreatureList[idx].hp > 0 && !gv.mod.currentEncounter.encounterCreatureList[idx].isHeld())
+                        //{
+                        //dontEndCreatureTurn = false;
+                        //animationsOn = false;
+                        //}
+                        //else
+                        //{
+                        /*
+                        for (int i = gv.mod.currentEncounter.encounterCreatureList.Count-1; i >= 0; i--)
+                        {
+                            if (gv.mod.currentEncounter.encounterCreatureList[i].moveOrder == currentMoveOrderIndex)
+                            {
+                                endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[i]);
+                            }
+                        }
+                        */
+                        /*
+                        if (idx >= gv.mod.currentEncounter.encounterCreatureList.Count)
+                        {
+                            idx = gv.mod.currentEncounter.encounterCreatureList.Count - 1;
+                        }
+                        endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[idx]);
+                        */
+                        Creature crt = new Creature();
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                            {
+                                crt = c;
+                                break;
+                            }
+                        }
+                        endCreatureTurn(crt);
+
+                        //}
+                    }
                 }
+                //below removed in order to tackle all situations of not remaning anims, not only attack situaions
+                //}
                 if ((gv.mod.useManualCombatCam) && (animationSeqStack.Count == 0))
                 {
                     gv.touchEnabled = true;
@@ -8830,7 +9124,9 @@ namespace IBx
                 attackAnimationTimeElapsed += elapsed;
                 //hurgh1000
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
+                //below worked
                 if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
+                //if ((attackAnimationTimeElapsed >= 0))
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
                 {
                     //time is up, reset attack animations to null
@@ -8908,6 +9204,7 @@ namespace IBx
                         }
                     }
                     //if all animation sequences are done, end this turn
+                    //below worked
                     if (animationSeqStack.Count == 0)
                     {
                         stepAnimationsOn = false;
@@ -9027,10 +9324,12 @@ namespace IBx
                                 }
                             }
 
+                            //belowworked
                             if (cr.hp <= 0 || cr.isHeld())
                             {
                                 endCreatureTurn(cr);
                             }
+                            //belowworked
                             else
                             {
                                 //remove any dead creatures                        
@@ -9135,6 +9434,32 @@ namespace IBx
                 }
             }//animationsonend
 
+
+            //firsttry
+            /*
+            if (!animationsOn && !stepAnimationsOn)
+            {
+                if (!isPlayerTurn)
+                {
+                    animationState = AnimationState.None;
+
+                    Creature crt = new Creature();
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            crt = c;
+                            break;
+                        }
+                    }
+                    
+                    if ((crt.moveDistance - creatureMoves) < 1)
+                    {
+                        endCreatureTurn(crt);
+                    }
+                }
+            }
+            */
             //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             #endregion
 
@@ -12033,7 +12358,10 @@ namespace IBx
                     crt.inactiveTimer += gv.sf.RandInt(2);
                 }
 
-                if (crt.inactiveTimer > 100)
+                //increasing threshold to give room to breathing and idle
+                //projectmover
+                //was 100, trying 700, looks like a good middleground
+                if (crt.inactiveTimer > 700)
                 {
                     crt.inactiveTimer = 0;
                 }
@@ -12103,11 +12431,14 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            if (coord.Y - 1 >= 0)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12121,12 +12452,15 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                    if (coord.Y - 1 >= 0)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12147,11 +12481,14 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if (coord.X == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                if (coord.Y - 1 >= 0)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if (coord.X == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12184,17 +12521,23 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            if (coord.Y - 1 >= 0)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            if (coord.Y - 1 >= 0 && coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y - 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12208,19 +12551,25 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                    if (coord.Y - 1 >= 0)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
-                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                    if (coord.Y - 1 >= 0 && coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y - 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12241,18 +12590,24 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if (coord.X == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                if (coord.Y - 1 >= 0)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if (coord.X == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
 
-                                                if ((coord.X + 1) == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                if (coord.Y - 1 >= 0 && coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y - 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12287,11 +12642,14 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                            if (coord.X - 1 >= 0)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12305,12 +12663,15 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    if (coord.X - 1 >= 0)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12331,11 +12692,14 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if ((coord.X - 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                if (coord.X - 1 >= 0)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X - 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12369,18 +12733,23 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                            if (coord.X - 1 >= 0)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
-
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                            if (coord.X - 1 >= 0 && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X - 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12394,19 +12763,26 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    if (coord.X - 1 >= 0)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
-                                    if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+
+                                    if (coord.X - 1 >= 0 && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X - 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12427,17 +12803,24 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if ((coord.X - 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                if (coord.X - 1 >= 0)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X - 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
-                                                if ((coord.X - 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+
+                                                if (coord.X - 1 >= 0 && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X - 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12473,11 +12856,14 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12491,12 +12877,15 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12517,11 +12906,14 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12553,11 +12945,14 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 2) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12571,12 +12966,15 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 2) == p.combatLocY)
+                                    if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12597,11 +12995,14 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if (coord.X == coordOther.X && (coord.Y + 2) == coordOther.Y)
+                                                if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12635,18 +13036,24 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
 
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12660,20 +13067,26 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
 
-                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12694,18 +13107,24 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
 
-                                                if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12738,17 +13157,24 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 2) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                            if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + coord.X].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 2) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceY = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceY = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12762,19 +13188,26 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 2) == p.combatLocY)
+                                    if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && coord.X == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
-                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 2) == p.combatLocY)
+
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceY = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceY = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12795,17 +13228,24 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if (coord.X == coordOther.X && (coord.Y + 2) == coordOther.Y)
+                                                if (coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if (coord.X == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
-                                                if ((coord.X + 1) == coordOther.X && (coord.Y + 2) == coordOther.Y)
+
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceY = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceY = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12839,11 +13279,14 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12857,12 +13300,15 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12883,11 +13329,14 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -12920,11 +13369,14 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 2)].Walkable)
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -12938,12 +13390,15 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && (coord.X + 2) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -12964,11 +13419,14 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if ((coord.X + 2) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -13002,18 +13460,23 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
-
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -13027,20 +13490,26 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
 
-                                    if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -13061,18 +13530,24 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
 
-                                                if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -13105,17 +13580,24 @@ namespace IBx
                         bool lookForOthers = true;
                         foreach (Coordinate coord in crt.tokenCoveredSquares)
                         {
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 2)].Walkable)
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
-                            if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 2)].Walkable)
+
+                            if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                             {
-                                crt.roamDistanceX = 0;
-                                lookForOthers = false;
-                                break;
+                                if (!gv.mod.currentEncounter.encounterTiles[(coord.Y + 1) * gv.mod.currentEncounter.MapSizeX + (coord.X + 1)].Walkable)
+                                {
+                                    crt.roamDistanceX = 0;
+                                    lookForOthers = false;
+                                    break;
+                                }
                             }
                         }
 
@@ -13129,19 +13611,26 @@ namespace IBx
                             {
                                 foreach (Player p in gv.mod.playerList)
                                 {
-                                    if (p.hp > 0 && (coord.X + 2) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
-                                    if (p.hp > 0 && (coord.X + 2) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+
+                                    if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                     {
-                                        crt.roamDistanceX = 0;
-                                        lookForCreatures = false;
-                                        foundPlayer = true;
-                                        break;
+                                        if (p.hp > 0 && (coord.X + 1) == p.combatLocX && (coord.Y + 1) == p.combatLocY)
+                                        {
+                                            crt.roamDistanceX = 0;
+                                            lookForCreatures = false;
+                                            foundPlayer = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (foundPlayer)
@@ -13162,17 +13651,24 @@ namespace IBx
                                         {
                                             foreach (Coordinate coordOther in cOther.tokenCoveredSquares)
                                             {
-                                                if ((coord.X + 2) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
-                                                if ((coord.X + 2) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+
+                                                if (coord.X + 1 < gv.mod.currentEncounter.MapSizeX && coord.Y + 1 < gv.mod.currentEncounter.MapSizeY)
                                                 {
-                                                    crt.roamDistanceX = 0;
-                                                    breakAllNested = true;
-                                                    break;
+                                                    if ((coord.X + 1) == coordOther.X && (coord.Y + 1) == coordOther.Y)
+                                                    {
+                                                        crt.roamDistanceX = 0;
+                                                        breakAllNested = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -13204,10 +13700,15 @@ namespace IBx
                 int height = gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height;
                 //1=normal, 2=wide, 3=tall, 4=large  
                 int crtSize = crt.creatureSize;
-                IbRectF src = new IbRectF(0, 0, width, height / 2);
+                //IbRectF src = new IbRectF(0, 0, width, height / 2);
+                IbRectF src = new IbRectF(0, 0, width, 100);
+                if (crtSize == 3 || crtSize == 4)
+                {
+                    src = new IbRectF(0, 0, width, 200);
+                }
 
                 //if ((creatureToAnimate != null) && (creatureToAnimate == crt))
-                if ((creatureToAnimate.Count > 0) && (creatureToAnimate.Contains(crt)))
+                /*if ((creatureToAnimate.Count > 0) && (creatureToAnimate.Contains(crt)))
                 {
                     //blockAnimationBridge = true;
                     attackAnimationDelayCounter++;
@@ -13228,6 +13729,80 @@ namespace IBx
                     }
                     src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
                     //src = new IbRect(0, height / 2, width, height / 2);
+                }*/
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                //if ((creatureToAnimate != null) && (creatureToAnimate == crt))
+                if ((creatureToAnimate.Count > 0) && (creatureToAnimate.Contains(crt)))
+                {
+                    //blockAnimationBridge = true;
+                    //narr
+                    attackAnimationDelayCounter++;
+                    //if (attackAnimationDelayCounter >= (int)(crt.token.PixelSize.Height / 100f - 1))
+                    if (attackAnimationDelayCounter >= 1)
+                    {
+                        attackAnimationFrameCounter++;
+                        attackAnimationDelayCounter = 0;
+                    }
+                    int maxUsableCounterValue = 1;
+                    if ((crtSize == 3) || (crtSize == 4))
+                    {
+                        maxUsableCounterValue = 1;
+                    }
+                    if (attackAnimationFrameCounter > 1)
+                    {
+                        attackAnimationFrameCounter = 1;
+                        blockAnimationBridge = false;
+                    }
+
+                    if (crt.creatureSize == 1)
+                    {
+                        src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
+                    }
+                    else if (crt.creatureSize == 2)
+                    {
+                        src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width / 2 * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width / 2);
+                    }
+                    else if (crt.creatureSize == 3)
+                    {
+                        src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * 2 * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * 2);
+                    }
+                    else if (crt.creatureSize == 4)
+                    {
+                        src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
+                    }
+
+                    //src = new IbRect(0, height / 2, width, height / 2);
+                }
+                //use different parts of the source file here for walking, idling, breathing
+                else
+                {
+                    //IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, p.propFrameHeight);
+                    //walking
+                    if (crt.currentFrameNumber == 2 || crt.currentFrameNumber == 3 || crt.currentFrameNumber == 4)
+                    {
+                        //normal
+                        if (crt.creatureSize == 1)
+                        {
+                            src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * crt.currentFrameNumber, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
+                        }
+                        //wide
+                        else if (crt.creatureSize == 2)
+                        {
+                            src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width / 2 * crt.currentFrameNumber, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width / 2);
+                        }
+                        //tall
+                        else if (crt.creatureSize == 3)
+                        {
+                            src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * 2 * crt.currentFrameNumber, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * 2);
+                        }
+                        //large
+                        else if (crt.creatureSize == 4)
+                        {
+                            src = new IbRectF(0, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width * crt.currentFrameNumber, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width, gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width);
+                        }
+                    }
+
                 }
 
                 //normal
