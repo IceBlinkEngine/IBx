@@ -12262,9 +12262,9 @@ namespace IBx
             {
                 //Uses the Screen Pixel Locations
                 int endX = getPixelLocX(targetHighlightCenterLocation.X) + (gv.squareSize / 2);
-                int endY = getPixelLocY(targetHighlightCenterLocation.Y) + (gv.squareSize / 2) + gv.oYshift;
+                int endY = getPixelLocY(targetHighlightCenterLocation.Y) + (gv.squareSize / 2);
                 int startX = getPixelLocX(p.combatLocX) + (gv.squareSize / 2);
-                int startY = getPixelLocY(p.combatLocY) + (gv.squareSize / 2) + gv.oYshift;
+                int startY = getPixelLocY(p.combatLocY) + (gv.squareSize / 2);
                 //Uses the Map Pixel Locations
                 int endX2 = targetHighlightCenterLocation.X * gv.squareSize + (gv.squareSize / 2);
                 int endY2 = targetHighlightCenterLocation.Y * gv.squareSize + (gv.squareSize / 2);
@@ -16600,7 +16600,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     //recalculateCreaturesShownInInitiativeBar();
 
                     int gridx = (int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
-                    int gridy = (int)(eY - (gv.squareSize / 2)) / gv.squareSize;
+                    int gridy = (int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize;
 
                     #region FloatyText
                     gv.cc.floatyText = "";
@@ -16890,9 +16890,9 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                     #region TOUCH ON MAP AREA
                     gridx = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
-                    gridy = ((int)(eY - (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
+                    gridy = ((int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
                     int tappedSqrX = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize);
-                    int tappedSqrY = ((int)(eY - (gv.squareSize / 2)) / gv.squareSize);
+                    int tappedSqrY = ((int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize);
 
                     if (IsInVisibleCombatWindow(gridx, gridy))
                     {

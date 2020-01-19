@@ -42500,6 +42500,7 @@ namespace IBx
                         if (tgl == null) { return; }
                         tgl.toggleOn = !tgl.toggleOn;
                         showClock = !showClock;
+                        //gv.mod.useScrollingSystem = !gv.mod.useScrollingSystem;
                     }
                     if (rtn.Equals("tglSound"))
                     {
@@ -43944,10 +43945,10 @@ namespace IBx
                         }
                         gv.mod.doNotStartScrolling = false;
                     }
-
+                    
                     else if (rtn.Equals(""))
                     {
-
+                    /*
                         bool isLeftSlice = false;
                         bool isRightSlice = false;
                         bool isTopSlice = false;
@@ -44046,17 +44047,17 @@ namespace IBx
                         {
                             rawValue = (int)(xDistanceFromCenter);
                         }
-                        /*
-                        if (rawValue <= 0.75f*gv.squareSize)
-                        {
-                            moveSpeed = 0.4f;
-                        }
-                        if (rawValue >= 2.25 * gv.squareSize)
-                        {
-                            moveSpeed = 1.75f;
-                        }
-                        gv.mod.scrollModeSpeed = 0.5f * moveSpeed;
-                        */
+                        
+                        //if (rawValue <= 0.75f*gv.squareSize)
+                        //{
+                        //    moveSpeed = 0.4f;
+                        //}
+                        //if (rawValue >= 2.25 * gv.squareSize)
+                        //{
+                        //    moveSpeed = 1.75f;
+                        //}
+                        //gv.mod.scrollModeSpeed = 0.5f * moveSpeed;
+                        
                         float disQ = (rawValue * 0.4f) / gv.squareSize;
                         if (disQ > 1.4f)
                         {
@@ -44419,8 +44420,9 @@ namespace IBx
                         }
 
                         //teatomorrow
+                        */
                     }
-
+                    
                     //lübbke3
                     break;
             }
@@ -45343,915 +45345,24 @@ public void onKeyDown(KeyEventArgs e)
         public void onKeyUp()
         {
             /*
+            //bring up save dialog
             if ((moveDelay()) && (finishedMove))
             {
-                //if (keyData == Keys.None)
-                //{
-                //int hgh = 0;
-                //}
-
-                /*
-                if (keyData == Keys.D4 | keyData == Keys.NumPad4)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "left";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goWest();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveLeft(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "left";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goWest();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveLeft(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-                /*if (keyData == Keys.ShiftKey)
+                if (keyData == Keys.ShiftKey)
                 {
                     //krah krah
                     //gv.mod.interfaceFadeCounter = 0;
                 }
-                /*
-                else if (keyData == Keys.Left && showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
 
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "left";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goWest();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveLeft(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "left";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goWest();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveLeft(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                        
-                    }
-                }
-                */
-                /*else if (keyData == Keys.M)
+                else if (keyData == Keys.M)
                 {
                     if (gv.mod.allowSave)
                     {
                         gv.cc.doSavesDialog();
                     }
                 }
-                /*
-                else if (keyData == Keys.D && !showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "right";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-
-                                bool isTransition = gv.cc.goEast();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveRight(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "right";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-
-                                bool isTransition = gv.cc.goEast();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveRight(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.A && !showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "left";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goWest();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveLeft(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "left";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goWest();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveLeft(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                      
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.D6 | keyData == Keys.NumPad6)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "right";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goEast();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveRight(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "right";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goEast();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveRight(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.Right && showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "right";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goEast();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveRight(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ( (gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) || (keyData.ToString() != gv.mod.lastPressedKey))
-                            //else 
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "right";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goEast();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveRight(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.D8 | keyData == Keys.NumPad8)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "up";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goNorth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveUp(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "up";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goNorth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveUp(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
-                /*
-                else if (keyData == Keys.Up && showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "up";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goNorth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                    //if (gv.screenType == "main")
-                                    //{
-                                    moveUp(true);
-                                    //}
-                                    //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) || (keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "up";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goNorth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                    //if (gv.screenType == "main")
-                                    //{
-                                    moveUp(true);
-                                    //}
-                                    //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-
-                    }
-                }
-                */
-                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                /*
-                else if (keyData == Keys.W && !showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-                    
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "up";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goNorth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveUp(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "up";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goNorth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveUp(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.D2 | keyData == Keys.NumPad2)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "down";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goSouth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveDown(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "down";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goSouth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveDown(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.Down && showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "down";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goSouth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveDown(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "down";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goSouth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveDown(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                        
-                    }
-                }
-                */
-                /*
-                else if (keyData == Keys.S && !showMoveKeys)
-                {
-                    gv.mod.doTriggerInspiteOfScrolling = false;
-                    bool blockMoveBecausOfCurrentScrolling = false;
-
-                    if (gv.mod.useScrollingSystem)
-                    {
-                        if (gv.mod.scrollingTimer != 100 && gv.mod.scrollingTimer != 0)
-                        {
-                            blockMoveBecausOfCurrentScrolling = true;
-                        }
-                    }
-
-                    blockMoveBecausOfCurrentScrolling = false;
-
-                    if (!blockMoveBecausOfCurrentScrolling)
-                    {
-                        if (gv.mod.useScrollingSystem)
-                        {
-                            //single press
-                            if (!gv.mod.isScrollingNow)
-                            {
-                                gv.mod.isScrollingNow = true;
-                                //gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingTimer = 100;
-                                gv.mod.scrollingDirection = "down";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goSouth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveDown(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                            //continued press
-                            //else if (moveDelay2())
-                            else if ((gv.mod.scrollingTimer <= gv.mod.lastScrollStep || gv.mod.scrollingTimer >= 100) ||(keyData.ToString() != gv.mod.lastPressedKey))
-                            {
-                                gv.mod.isScrollingNow = true;
-                                gv.mod.scrollingTimer = 100 + gv.mod.scrollingOverhang2;
-                                gv.mod.scrollingOverhang2 = 0;
-                                gv.mod.scrollingDirection = "down";
-                                gv.mod.doTriggerInspiteOfScrolling = true;
-                                bool isTransition = gv.cc.goSouth();
-                                if (!isTransition)
-                                {
-                                    gv.mod.breakActiveSearch = false;
-                                    //gv.mod.wasJustCalled = false;
-                                    //if (!gv.mod.wasJustCalled)
-                                    //{
-                                        //if (gv.screenType == "main")
-                                        //{
-                                            moveDown(true);
-                                        //}
-                                        //gv.mod.wasJustCalled = true;
-                                    //}
-                                }
-                            }
-                        }
-
-                       
-                    }
-                }
-                */
-            /*}
-
+            }
+            //switch party leader scroll downor move right
             if (keyData == Keys.E)
             {
                 gv.mod.showIdlingFrame = false;
@@ -46305,7 +45416,7 @@ public void onKeyDown(KeyEventArgs e)
                     updateTraitsPanel();
                 }
             }
-
+            //switch party leader scroll down or move right
             if (keyData == Keys.Right && !showMoveKeys)
             {
                 gv.mod.showIdlingFrame = false;
@@ -46356,7 +45467,7 @@ public void onKeyDown(KeyEventArgs e)
                     updateTraitsPanel();
                 }
             }
-
+            //switch party leader scroll down or move right
             if (keyData == Keys.D && showMoveKeys)
             {
                 gv.mod.showIdlingFrame = false;
@@ -46407,7 +45518,7 @@ public void onKeyDown(KeyEventArgs e)
                     updateTraitsPanel();
                 }
             }
-
+            //change party leader scroll up or move left
             if (keyData == Keys.Q)
             {
                 gv.mod.showIdlingFrame = false;
@@ -46460,7 +45571,7 @@ public void onKeyDown(KeyEventArgs e)
                     updateTraitsPanel();
                 }
             }
-
+            //change party leader scroll up or move left
             if (keyData == Keys.Left && !showMoveKeys)
             {
                 gv.mod.showIdlingFrame = false;
@@ -46511,7 +45622,7 @@ public void onKeyDown(KeyEventArgs e)
                     updateTraitsPanel();
                 }
             }
-
+            //change party leader scroll up or move left
             if (keyData == Keys.A && showMoveKeys)
             {
                 gv.mod.showIdlingFrame = false;
@@ -47606,7 +46717,7 @@ public void onKeyDown(KeyEventArgs e)
                 }
             }
 
-
+            //hide and show interface
             else if (keyData == Keys.X)
             {
 
@@ -47624,22 +46735,8 @@ public void onKeyDown(KeyEventArgs e)
                     {
                         if (pnl.tag != "arrowPanel")
                         {
-                            /*
-                            //hides left
-                            if (pnl.hidingXIncrement < 0)
-                            {
-                                if (pnl.currentLocX < pnl.shownLocX)
-                                {
-                                    pnl.showing = true;
-                                }
-                                else
-                                {
-                                    pnl.hiding = true;
-                                }
-                            }
-                            */
                             //hides right
-                            /*if (pnl.hidingXIncrement > 0)
+                            if (pnl.hidingXIncrement > 0)
                             {
                                 if (pnl.currentLocX > pnl.shownLocX)
                                 {
@@ -47696,22 +46793,7 @@ public void onKeyDown(KeyEventArgs e)
                     {
                         if (pnl.tag != "arrowPanel")
                         {
-                            /*
-                            //hides left
-                            if (pnl.hidingXIncrement < 0)
-                            {
-                                if (pnl.currentLocX < pnl.shownLocX)
-                                {
-                                    pnl.showing = true;
-                                }
-                                else
-                                {
-                                    pnl.hiding = true;
-                                }
-                            }
-                            */
-                            //hides right
-                            /*if (pnl.hidingXIncrement > 0)
+                            if (pnl.hidingXIncrement > 0)
                             {
                                 if (pnl.currentLocX > pnl.shownLocX)
                                 {

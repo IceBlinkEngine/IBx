@@ -622,6 +622,9 @@ namespace IBx.Droid
         public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
         {
             List<string> list = new List<string>();
+            string uppercase = extension.ToUpper();
+            string lowercase = extension.ToLower();
+
             //search in external folder
             string root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (AllowReadWriteExternal())
@@ -639,7 +642,26 @@ namespace IBx.Droid
                     if (f.Name.EndsWith(extension))
                     {
                         string[] split = f.Name.Split('.');
-                        list.Add(split[split.Length - 2]);
+                        if (!list.Contains(split[split.Length - 2] + "." + split[split.Length - 1]))
+                        {
+                            list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                        }
+                    }
+                    else if (f.Name.EndsWith(uppercase))
+                    {
+                        string[] split = f.Name.Split('.');
+                        if (!list.Contains(split[split.Length - 2] + "." + split[split.Length - 1]))
+                        {
+                            list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                        }
+                    }
+                    else if (f.Name.EndsWith(lowercase))
+                    {
+                        string[] split = f.Name.Split('.');
+                        if (!list.Contains(split[split.Length - 2] + "." + split[split.Length - 1]))
+                        {
+                            list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                        }
                     }
                 }
             }
@@ -652,11 +674,31 @@ namespace IBx.Droid
                     string[] split = res.Split('.');
                     list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
                 }
+                else if ((res.Contains("IBx.Droid.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(uppercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains("IBx.Droid.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(lowercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
             }
             //from main asset folder
             foreach (var res in assembly.GetManifestResourceNames())
             {
                 if ((res.Contains("IBx.Droid.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                if ((res.Contains("IBx.Droid.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(uppercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                if ((res.Contains("IBx.Droid.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(lowercase)))
                 {
                     string[] split = res.Split('.');
                     list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);

@@ -13,6 +13,7 @@ namespace IBx
 {
     public class GameView
     {
+        string IBversion = "1.182.002";
         public ContentPage cp;
         public SKCanvas canvas;
         public bool textFormatSet = false;
@@ -2309,10 +2310,10 @@ namespace IBx
                 {
                     for (int y = -2; y <= 2; y++)
                     {
-                        DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")", x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
+                        DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
                     }
                 }
-                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")", 5, screenHeight - txtH - 5 - oYshift, "white");
+                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 5, screenHeight - txtH - 5 - oYshift, "white");
             }
 
             //EndDraw(); //uncomment this for DIRECT2D ADDITIONS

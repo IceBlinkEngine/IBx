@@ -287,6 +287,11 @@ namespace IBx.iOS
                 SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
                 if (bm != null) { return bm; }
             }
+            else if (File.Exists(filePath + ".PNG"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".PNG").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
             else if (File.Exists(filePath + ".jpg"))
             {
                 SKBitmap bm = UIImage.FromFile(filePath + ".jpg").ToSKBitmap();
@@ -302,6 +307,11 @@ namespace IBx.iOS
             else if (File.Exists(filePath + ".png"))
             {
                 SKBitmap bm = UIImage.FromFile(filePath + ".png").ToSKBitmap();
+                if (bm != null) { return bm; }
+            }
+            else if (File.Exists(filePath + ".PNG"))
+            {
+                SKBitmap bm = UIImage.FromFile(filePath + ".PNG").ToSKBitmap();
                 if (bm != null) { return bm; }
             }
             else if (File.Exists(filePath + ".jpg"))
@@ -515,15 +525,36 @@ namespace IBx.iOS
         public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
         {
             List<string> list = new List<string>();
+            string uppercase = extension.ToUpper();
+            string lowercase = extension.ToLower();
 
             //FROM USER FOLDER
             var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (Directory.Exists(documents + ConvertFullPath(userFolderpath, "/")))
             {
-                string[] files = Directory.GetFiles(documents + ConvertFullPath(userFolderpath, "/"), "*" + extension, SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(documents + ConvertFullPath(userFolderpath, "/"), "*" + uppercase, SearchOption.AllDirectories);
                 foreach (string file in files)
                 {
-                    list.Add(Path.GetFileNameWithoutExtension(file));
+                    if (!list.Contains(Path.GetFileName(file)))
+                    {
+                        list.Add(Path.GetFileName(file));
+                    }
+                }
+                files = Directory.GetFiles(documents + ConvertFullPath(userFolderpath, "/"), "*" + lowercase, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    if (!list.Contains(Path.GetFileName(file)))
+                    {
+                        list.Add(Path.GetFileName(file));
+                    }
+                }
+                files = Directory.GetFiles(documents + ConvertFullPath(userFolderpath, "/"), "*" + extension, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    if (!list.Contains(Path.GetFileName(file)))
+                    {
+                        list.Add(Path.GetFileName(file));
+                    }
                 }
             }
 
@@ -538,7 +569,17 @@ namespace IBx.iOS
             //module folder in app 
             foreach (var res in assembly.GetManifestResourceNames())
             {
-                if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(extension)))
+                if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(uppercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(lowercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(userFolderpath, "."))) && (res.EndsWith(extension)))
                 {
                     string[] split = res.Split('.');
                     list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
@@ -547,7 +588,17 @@ namespace IBx.iOS
             //from main asset folder
             foreach (var res in assembly.GetManifestResourceNames())
             {
-                if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
+                if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(uppercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(lowercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
                 {
                     string[] split = res.Split('.');
                     list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);

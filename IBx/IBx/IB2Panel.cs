@@ -45,9 +45,14 @@ namespace IBx
         public void setupIB2Panel(GameView g)
         {
             gv = g;
+            /*if (this.tag.StartsWith("arrow"))
+            {
+                shownLocY = 910;
+                hiddenLocY = 1080;
+            }*/
             currentLocX = shownLocX;
             currentLocY = shownLocY;
-
+            
             //try to do aspect ratio adjustemnets here
             //to do
             //default is 16:9 (=1,77777777...)
@@ -61,6 +66,12 @@ namespace IBx
             yAdjustmentFactor = (1920f / 1080f) / currentAspectRatio;
 
             currentLocY = (int)(currentLocY * yAdjustmentFactor);
+            shownLocY = (int)(shownLocY * yAdjustmentFactor);
+            hiddenLocY = (int)(hiddenLocY * yAdjustmentFactor);
+
+
+
+            //shownLocY = (int)(shownLocY * yAdjustmentFactor);
 
             foreach (IB2Button btn in buttonList)
             {
@@ -151,7 +162,7 @@ namespace IBx
                     dst = new IbRect((int)(currentLocX * gv.screenDensity), (int)(currentLocY * gv.screenDensity), (int)(Width * gv.screenDensity), (int)(Height * gv.screenDensity));
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(backgroundImageFilename), src, dst, 0, false, 0.75f);
                 }
-
+                
 
             }
             //IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(backgroundImageFilename).PixelSize.Width, gv.cc.GetFromBitmapList(backgroundImageFilename).PixelSize.Height);
@@ -221,6 +232,8 @@ namespace IBx
                     log.onDrawLogBox(this);
                 }
             }
+
+            gv.DrawText("(" + this.currentLocX * gv.screenDensity + "," + this.currentLocY * gv.screenDensity + ")", currentLocX * gv.screenDensity, currentLocY * gv.screenDensity);
         }
 
         public void DrawLogBackground()

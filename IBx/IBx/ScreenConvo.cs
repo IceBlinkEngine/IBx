@@ -65,7 +65,7 @@ namespace IBx
                 btnNew.Glow = "btn_small_glow";
                 btnNew.Text = (y + 1).ToString();
                 btnNew.X = gv.screenWidth - 3 * gv.squareSize;
-                btnNew.Y = y * gv.squareSize;
+                btnNew.Y = y * gv.squareSize + (y * 3 * pH);
                 btnNew.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnNew.Width = (int)(gv.ibbwidthR * gv.screenDensity);
 

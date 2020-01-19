@@ -419,7 +419,7 @@ namespace IBx
 
                             grid[p.combatLocX, p.combatLocY] = 1;
 
-                            / crt wide
+                            // crt wide
                             if (crtSize == 2)
                             {
                                 if (p.combatLocX > 0)

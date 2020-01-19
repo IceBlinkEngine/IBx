@@ -300,6 +300,38 @@ namespace IBx.UWP
                 }
                 if (stream == null)
                 {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.portraits." + filename);
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.portraits." + filename + ".png");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.portraits." + filename + ".PNG");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.portraits." + filename + ".jpg");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.pctokens." + filename);
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.pctokens." + filename + ".png");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.pctokens." + filename + ".PNG");
+                }
+                if (stream == null)
+                {
+                    stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.pctokens." + filename + ".jpg");
+                }
+                if (stream == null)
+                {
                     stream = assembly.GetManifestResourceStream("IBx.UWP.Assets.graphics.ui_missingtexture.png");
                 }
                 SKManagedStream skStream = new SKManagedStream(stream);
@@ -341,18 +373,54 @@ namespace IBx.UWP
         public List<string> GetAllFilesWithExtensionFromBothFolders(string assetFolderpath, string userFolderpath, string extension)
         {
             List<string> list = new List<string>();
+            string uppercase = extension.ToUpper();
+            string lowercase = extension.ToLower();
+
             StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-            string[] files = Directory.GetFiles(storageFolder.Path + ConvertFullPath(userFolderpath, "\\"), "*" + extension, SearchOption.AllDirectories);
-            foreach (string file in files)
+            if (Directory.Exists(storageFolder.Path + ConvertFullPath(userFolderpath, "\\")))
             {
-                list.Add(Path.GetFileName(file));
+                string[] files = Directory.GetFiles(storageFolder.Path + ConvertFullPath(userFolderpath, "\\"), "*" + extension, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    if (!list.Contains(Path.GetFileName(file)))
+                    {
+                        list.Add(Path.GetFileName(file));
+                    }
+                }
+                files = Directory.GetFiles(storageFolder.Path + ConvertFullPath(userFolderpath, "\\"), "*" + uppercase, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    if (!list.Contains(Path.GetFileName(file)))
+                    {
+                        list.Add(Path.GetFileName(file));
+                    }
+                }
+                files = Directory.GetFiles(storageFolder.Path + ConvertFullPath(userFolderpath, "\\"), "*" + lowercase, SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    if (!list.Contains(Path.GetFileName(file)))
+                    {
+                        list.Add(Path.GetFileName(file));
+                    }
+                }
             }
             Assembly assembly = GetType().GetTypeInfo().Assembly;
             foreach (var res in assembly.GetManifestResourceNames())
             {
                 if ((res.Contains(ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(extension)))
                 {
-                    list.Add(res);
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains(ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(uppercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
+                }
+                else if ((res.Contains(ConvertFullPath(assetFolderpath, "."))) && (res.EndsWith(lowercase)))
+                {
+                    string[] split = res.Split('.');
+                    list.Add(split[split.Length - 2] + "." + split[split.Length - 1]);
                 }
             }
             return list;

@@ -149,7 +149,7 @@ namespace IBx
             if ((moduleList.Count > 0) && (moduleIndex < moduleList.Count))
             {
 
-                string textToSpan = "<u>Module Description</u>" + "<br>";
+                string textToSpan = "<u>Module Description</u>" + "(v" + moduleList[moduleIndex].moduleVersion + ")" + "<br>";
                 //textToSpan += "<b><i><big>" + moduleList[moduleIndex].moduleLabelName + "</big></i></b><br>";
                 textToSpan += moduleList[moduleIndex].moduleDescription;
                 description.logLinesList.Clear();
