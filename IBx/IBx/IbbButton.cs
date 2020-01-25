@@ -134,13 +134,14 @@ namespace IBx
             float ulX = ((this.Width) - stringSize) / 2;
             float ulY = ((this.Height) - thisFontHeight) / 2;
 
-            for (int x = -2; x <= 2; x++)
+            /*for (int x = -2; x <= 2; x++)
             {
                 for (int y = -2; y <= 2; y++)
                 {
                     gv.DrawText(Text, this.X + ulX + x, this.Y + ulY + y , fontHeightInString, "black");
                 }
-            }
+            }*/
+            gv.DrawText(Text, this.X + ulX + 2, this.Y + ulY + 2, fontHeightInString, "black");
             if (!this.btnWithGold)
             {
                 gv.DrawText(Text, this.X + ulX, this.Y + ulY, fontHeightInString, "white");
@@ -157,13 +158,14 @@ namespace IBx
             ulX = (((this.Width) - stringSize) / 8) * 7;
             ulY = (((this.Height) - thisFontHeight) / 8) * 7;
 
-            for (int x = -2; x <= 2; x++)
+            /*for (int x = -2; x <= 2; x++)
             {
                 for (int y = -2; y <= 2; y++)
                 {
                     gv.DrawText(Quantity, this.X + ulX + x, this.Y + ulY + y, fontHeightInString, "black");
                 }
-            }
+            }*/
+            gv.DrawText(Quantity, this.X + ulX + 2, this.Y + ulY + 2, fontHeightInString, "black");
             if (!this.btnOfChargedItem)
             {
                 gv.DrawText(Quantity, this.X + ulX, this.Y + ulY, fontHeightInString, "white");

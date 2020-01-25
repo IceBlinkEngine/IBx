@@ -360,6 +360,7 @@ namespace IBx
         //MAIN SCREEN UPDATE
         public void Update(int elapsed)
         {
+            
             //to do: must be done for nearbys
             //flöti
             foreach (int i in gv.cc.getNearbyAreas())
@@ -1068,9 +1069,9 @@ namespace IBx
 
                 }
             }
-
+            
             mainUiLayout.Update(elapsed);
-
+            
             //handle RealTime Timer events if gv.module uses this system
             if (gv.mod.useRealTimeTimer && !gv.mod.currentArea.isOverviewMap)
             {
@@ -1362,25 +1363,7 @@ namespace IBx
                         positionmodifierY = (-3) * gv.squareSize;
                     }
 
-                    /*
-                    if (i == 8)
-                    {
-                        layerType = "fog1";
-                        decider = gv.sf.RandInt(50);
-                        speedMultiplier += 0.04f;
-                        positionmodifierX = (3) * gv.squareSize;
-                        positionmodifierY = (3) * gv.squareSize;
-                    }
-
-                    if (i == 9)
-                    {
-                        layerType = "fog2";
-                        decider = gv.sf.RandInt(50);
-                        speedMultiplier += 0.04f;
-                        positionmodifierX = (-5) * gv.squareSize;
-
-                    }
-                    */
+                    
 
                     gv.cc.createFog(layerType, speedMultiplier, positionmodifierX - 1.8f * gv.squareSize, positionmodifierY);
                 }
@@ -1598,6 +1581,7 @@ namespace IBx
 
             }
             #endregion
+            
         }
 
         public void doScrolling(float elapsed)
@@ -3877,7 +3861,7 @@ namespace IBx
                 {
                     drawMap();
                 }
-                drawWorldMap();//ressource heavy
+                drawWorldMap(); //######### RESOURCE HEAVY ###########
 
                 //CommonCode.addLogText("red", "Failed to setup Music Player...Audio will be disabled. Most likely due to not having Windows Media Player installed or having an incompatible version.");
 
@@ -4046,7 +4030,7 @@ namespace IBx
                 drawMainMapHotKeys();
             }
             //finalBlackenOffMapScreen();
-            drawUiLayout();//ressource heavy
+            drawUiLayout(); //######### RESOURCE HEAVY ###########
             //eva
             //drawMiniMap();
 
@@ -4522,7 +4506,7 @@ namespace IBx
 
         public void drawWorldMap()
         {
-
+            //gv.mod.useAllTileSystem = false;
 
             if (gv.mod.useAllTileSystem)
             {
@@ -35610,7 +35594,7 @@ namespace IBx
                                 float scalerY = 1;
                                 int brX = (int)(gv.squareSize * scalerX);
                                 int brY = (int)(gv.squareSize * scalerY);
-                                IbRect src = new IbRect(0, 0, 100, 100);
+                                IbRect src = new IbRect(0, 0, gv.cc.walkBlocked.Width, gv.cc.walkBlocked.Height);
                                 IbRect dst = new IbRect(tlX + gv.oXshift + mapStartLocXinPixels, tlY, brX, brY);
                                 if (tile.LoSBlocked)
                                 {

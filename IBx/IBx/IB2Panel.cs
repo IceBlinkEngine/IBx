@@ -233,7 +233,7 @@ namespace IBx
                 }
             }
 
-            gv.DrawText("(" + this.currentLocX * gv.screenDensity + "," + this.currentLocY * gv.screenDensity + ")", currentLocX * gv.screenDensity, currentLocY * gv.screenDensity);
+            //gv.DrawText("(" + this.currentLocX * gv.screenDensity + "," + this.currentLocY * gv.screenDensity + ")", currentLocX * gv.screenDensity, currentLocY * gv.screenDensity);
         }
 
         public void DrawLogBackground()

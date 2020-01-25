@@ -177,6 +177,11 @@ namespace IBx
         public int attackAnimationTimeElapsed = 0;
         public int attackAnimationLengthInMilliseconds = 250;
 
+        public IbbButton btnPanUp = null;
+        public IbbButton btnPanDown = null;
+        public IbbButton btnPanLeft = null;
+        public IbbButton btnPanRight = null;
+
         public ScreenCombat(Module m, GameView g)
         {
             //mod = m;
@@ -186,6 +191,54 @@ namespace IBx
             //CalculateUpperLeft();
             //setControlsStart();
             //setToggleButtonsStart();
+        }
+
+        public void setControlsStart()
+        {
+            int pW = (int)((float)gv.screenWidth / 100.0f);
+            int pH = (int)((float)gv.screenHeight / 100.0f);
+            int padW = gv.squareSize / 6;
+                        
+            if (btnPanUp == null)
+            {
+                btnPanUp = new IbbButton(gv, 1.0f);
+                btnPanUp.Img = "btn_pan_up";
+                btnPanUp.X = (gv.screenWidth / 2) - (gv.squareSize / 2);
+                btnPanUp.Y = (pH * 2);
+                btnPanUp.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnPanUp.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnPanUp.glowOn = false;
+            }
+            if (btnPanDown == null)
+            {
+                btnPanDown = new IbbButton(gv, 1.0f);
+                btnPanDown.Img = "btn_pan_down";
+                btnPanDown.X = (gv.screenWidth / 2) - (gv.squareSize / 2);
+                btnPanDown.Y = gv.screenHeight - gv.squareSize - (pH * 2);
+                btnPanDown.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnPanDown.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnPanDown.glowOn = false;
+            }
+            if (btnPanLeft == null)
+            {
+                btnPanLeft = new IbbButton(gv, 1.0f);
+                btnPanLeft.Img = "btn_pan_left";
+                btnPanLeft.X = (pH * 2);
+                btnPanLeft.Y = (gv.screenHeight / 2) - (gv.squareSize / 2);
+                btnPanLeft.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnPanLeft.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnPanLeft.glowOn = false;
+            }
+            if (btnPanRight == null)
+            {
+                btnPanRight = new IbbButton(gv, 1.0f);
+                btnPanRight.Img = "btn_pan_right";
+                btnPanRight.X = gv.screenWidth - (3 * gv.squareSize) - (pH * 2);
+                btnPanRight.Y = (gv.screenHeight / 2) - (gv.squareSize / 2);
+                btnPanRight.Height = (int)(gv.ibbheight * gv.screenDensity);
+                btnPanRight.Width = (int)(gv.ibbwidthR * gv.screenDensity);
+                btnPanRight.glowOn = false;
+            }
         }
 
         public void saveUILayout()
@@ -9601,6 +9654,12 @@ namespace IBx
         #region Combat Draw
         public void redrawCombat(float elapsed)
         {
+            //IF CONTROLS ARE NULL, CREATE THEM
+            if (btnPanUp == null)
+            {
+                setControlsStart();
+            }
+
             drawCombatMap();
             drawProps();
             drawEffectSquares();
@@ -9653,7 +9712,13 @@ namespace IBx
                     }
                 }
             }
+            
             drawUiLayout();
+            
+            btnPanUp.Draw();
+            btnPanDown.Draw();
+            btnPanLeft.Draw();
+            btnPanRight.Draw();
         }
 
         public void drawHeightShadows()
@@ -11695,7 +11760,7 @@ namespace IBx
                                 int brX = gv.squareSize;
                                 int brY = gv.squareSize;
 
-                                IbRect srcGrid = new IbRect(0, 0, gv.squareSizeInPixels, gv.squareSizeInPixels);
+                                IbRect srcGrid = new IbRect(0, 0, gv.cc.walkBlocked.Width, gv.cc.walkBlocked.Height);
                                 IbRect dstGrid = new IbRect(tlX, tlY, brX, brY);
                                 if (gv.mod.currentEncounter.encounterTiles[y * gv.mod.currentEncounter.MapSizeX + x].LoSBlocked)
                                 {
@@ -11915,7 +11980,7 @@ namespace IBx
                             int brX = gv.squareSize;
                             int brY = gv.squareSize;
 
-                            IbRect srcGrid = new IbRect(0, 0, gv.squareSizeInPixels, gv.squareSizeInPixels);
+                            IbRect srcGrid = new IbRect(0, 0, gv.cc.walkBlocked.Width, gv.cc.walkBlocked.Height);
                             IbRect dstGrid = new IbRect(tlX, tlY, brX, brY);
                             if (gv.mod.currentEncounter.encounterTiles[y * gv.mod.currentEncounter.MapSizeX + x].LoSBlocked)
                             {
@@ -16585,7 +16650,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         }*/
 
         public void onTouchCombat(int eX, int eY, MouseEventType.EventType eventType)
-        {
+        {            
             switch (eventType)
             {
                 case MouseEventType.EventType.MouseDown:
@@ -16701,212 +16766,3012 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                     Player pc = gv.mod.playerList[currentPlayerIndex];
 
-                    //NEW SYSTEM
-                    string rtn = combatUiLayout.getImpact(x, y);
-                    //gv.cc.addLogText("lime", "mouse down: " + rtn);
-
-                    #region Toggles
-                    if (rtn.Equals("tglHP"))
+                    if (btnPanUp.getImpact(x, y))
                     {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        tgl.toggleOn = !tgl.toggleOn;
-                        showHP = !showHP;
-                    }
-                    if (rtn.Equals("tglSP"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        tgl.toggleOn = !tgl.toggleOn;
-                        showSP = !showSP;
-                    }
-                    if (rtn.Equals("tglMoveKeys"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        tgl.toggleOn = !tgl.toggleOn;
-                        showMoveKeys = !showMoveKeys;
-                    }
-                    if (rtn.Equals("tglMoveOrder"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        tgl.toggleOn = !tgl.toggleOn;
-                        showMoveOrder = !showMoveOrder;
-                    }
-                    if (rtn.Equals("tglIniBar"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        tgl.toggleOn = !tgl.toggleOn;
-                        showIniBar = !showIniBar;
-                    }
-                    if (rtn.Equals("tglFastMode"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        tgl.toggleOn = !tgl.toggleOn;
-                        if (gv.mod.fastMode)
+                        if (UpperLeftSquare.Y > -gv.playerOffsetY)
                         {
-                            Creature crt = new Creature();
-                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            UpperLeftSquare.Y--;
+                        }
+                    }
+                    else if (btnPanDown.getImpact(x, y))
+                    {
+                        if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
+                        {
+                            UpperLeftSquare.Y++;
+                        }
+                    }
+                    else if (btnPanLeft.getImpact(x, y))
+                    {
+                        if (UpperLeftSquare.X > -gv.playerOffsetX)
+                        {
+                            UpperLeftSquare.X--;
+                        }
+                    }
+                    else if (btnPanRight.getImpact(x, y))
+                    {
+                        if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
+                        {
+                            UpperLeftSquare.X++;
+                        }
+                    }
+                    else
+                    {
+                        //NEW SYSTEM
+                        string rtn = combatUiLayout.getImpact(x, y);
+
+                        #region Toggles
+                        if (rtn.Equals("tglHP"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            tgl.toggleOn = !tgl.toggleOn;
+                            showHP = !showHP;
+                        }
+                        if (rtn.Equals("tglSP"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            tgl.toggleOn = !tgl.toggleOn;
+                            showSP = !showSP;
+                        }
+                        if (rtn.Equals("tglMoveKeys"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            tgl.toggleOn = !tgl.toggleOn;
+                            showMoveKeys = !showMoveKeys;
+                        }
+                        if (rtn.Equals("tglMoveOrder"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            tgl.toggleOn = !tgl.toggleOn;
+                            showMoveOrder = !showMoveOrder;
+                        }
+                        if (rtn.Equals("tglIniBar"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            tgl.toggleOn = !tgl.toggleOn;
+                            showIniBar = !showIniBar;
+                        }
+                        if (rtn.Equals("tglFastMode"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            tgl.toggleOn = !tgl.toggleOn;
+                            if (gv.mod.fastMode)
                             {
-                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                Creature crt = new Creature();
+                                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                                 {
-                                    crt = c;
-                                    break;
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        crt = c;
+                                        break;
+                                    }
+                                }
+                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                            }
+                            gv.mod.fastMode = !gv.mod.fastMode;
+                        }
+
+                        if (rtn.Equals("tglSpeed"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+
+                            if (gv.mod.combatAnimationSpeed == 100)
+                            {
+                                gv.mod.combatAnimationSpeed = 50;
+                                tgl.ImgOffFilename = "tgl_speedNEW_2";
+                                gv.cc.addLogText("lime", "move speed: 2x");
+                            }
+                            else if (gv.mod.combatAnimationSpeed == 50)
+                            {
+                                gv.mod.combatAnimationSpeed = 25;
+                                tgl.ImgOffFilename = "tgl_speedNEW_4";
+                                gv.cc.addLogText("lime", "move speed: 4x");
+                            }
+                            else if (gv.mod.combatAnimationSpeed == 25)
+                            {
+                                gv.mod.combatAnimationSpeed = 10;
+                                tgl.ImgOffFilename = "tgl_speedNEW_10";
+                                gv.cc.addLogText("lime", "move speed: 10x");
+                            }
+                            else if (gv.mod.combatAnimationSpeed == 10)
+                            {
+                                gv.mod.combatAnimationSpeed = 100;
+                                tgl.ImgOffFilename = "tgl_speedNEW_1";
+                                gv.cc.addLogText("lime", "move speed: 1x");
+                            }
+                        }
+                        if (rtn.Equals("tglAttackSpeed"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+
+                            if (gv.mod.attackAnimationSpeed == 100)
+                            {
+                                gv.mod.attackAnimationSpeed = 50;
+                                tgl.ImgOffFilename = "tgl_attackSpeed_2";
+                                gv.cc.addLogText("lime", "attack and cast speed: 2x");
+                            }
+                            else if (gv.mod.attackAnimationSpeed == 50)
+                            {
+                                gv.mod.attackAnimationSpeed = 25;
+                                tgl.ImgOffFilename = "tgl_attackSpeed_4";
+                                gv.cc.addLogText("lime", "attack and cast speed: 4x");
+                            }
+                            else if (gv.mod.attackAnimationSpeed == 25)
+                            {
+                                gv.mod.attackAnimationSpeed = 10;
+                                tgl.ImgOffFilename = "tgl_attackSpeed_10";
+                                gv.cc.addLogText("lime", "attack and cast speed: 10x");
+                            }
+                            else if (gv.mod.attackAnimationSpeed == 10)
+                            {
+                                gv.mod.attackAnimationSpeed = 100;
+                                tgl.ImgOffFilename = "tgl_attackSpeed_1";
+                                gv.cc.addLogText("lime", "attack and cast speed: 1x");
+                            }
+                        }
+                        if (rtn.Equals("tglSound"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            if (tgl.toggleOn)
+                            {
+                                tgl.toggleOn = false;
+                                gv.mod.playMusic = false;
+                                //TODO gv.screenCombat.tglSoundFx.toggleOn = false;
+                                gv.stopCombatMusic();
+                                gv.cc.addLogText("lime", "Music Off");
+                            }
+                            else
+                            {
+                                tgl.toggleOn = true;
+                                gv.mod.playMusic = true;
+                                //TODO gv.screenCombat.tglSoundFx.toggleOn = true;
+                                gv.startCombatMusic();
+                                gv.cc.addLogText("lime", "Music On");
+                            }
+                        }
+                        if (rtn.Equals("tglSoundFx"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            if (tgl.toggleOn)
+                            {
+                                tgl.toggleOn = false;
+                                gv.mod.playSoundFx = false;
+                                gv.cc.addLogText("lime", "SoundFX Off");
+                            }
+                            else
+                            {
+                                tgl.toggleOn = true;
+                                gv.mod.playSoundFx = true;
+                                gv.cc.addLogText("lime", "SoundFX On");
+                            }
+                        }
+                        if (rtn.Equals("tglGrid"))
+                        {
+                            IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                            if (tgl == null) { return; }
+                            if (tgl.toggleOn)
+                            {
+                                tgl.toggleOn = false;
+                                gv.mod.com_showGrid = false;
+                            }
+                            else
+                            {
+                                tgl.toggleOn = true;
+                                gv.mod.com_showGrid = true;
+                            }
+                        }
+                        if (rtn.Equals("tglHelp"))
+                        {
+                            tutorialMessageCombat(true);
+                        }
+                        if ((rtn.Equals("tglKill")) && (gv.mod.debugMode))
+                        {
+                            gv.mod.currentEncounter.encounterCreatureList.Clear();
+                            //gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
+                            checkEndEncounter();
+                        }
+                        #endregion
+
+                        #region TOUCH ON MAP AREA
+                        gridx = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
+                        gridy = ((int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
+                        int tappedSqrX = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize);
+                        int tappedSqrY = ((int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize);
+
+                        if (IsInVisibleCombatWindow(gridx, gridy))
+                        {
+                            gv.cc.floatyText = "";
+                            gv.cc.floatyText2 = "";
+                            gv.cc.floatyText3 = "";
+                            gv.cc.floatyText4 = "";
+                            gv.cc.floatyText0 = "";
+                            gv.cc.floatyTextA = "";
+                            gv.cc.floatyTextB = "";
+                            if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                            {
+                                //Check for second tap so TARGET
+                                if ((gridx == targetHighlightCenterLocation.X) && (gridy == targetHighlightCenterLocation.Y))
+                                {
+                                    if (currentCombatMode.Equals("attack"))
+                                    {
+                                        continueTurn = false;
+                                        TargetAttackPressed(pc);
+                                    }
+                                    else if (currentCombatMode.Equals("cast"))
+                                    {
+                                        continueTurn = false;
+                                        if (gv.mod.isCastFromUsedItem)
+                                        {
+                                            gv.mod.isCastFromUsedItem = false;
+                                            Item it = gv.mod.getItemByTag(gv.mod.tagOfItemUsedForCast);
+                                            TargetCastPressed(pc, it);
+                                        }
+                                        else
+                                        {
+                                            TargetCastPressed(pc);
+                                        }
+                                    }
+                                }
+                                targetHighlightCenterLocation.Y = gridy;
+                                targetHighlightCenterLocation.X = gridx;
+                            }
+                        }
+                        #endregion
+
+                        #region BUTTONS
+                        if ((rtn.Equals("ctrlUpArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY - 1)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveUp(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlUpArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(8);
+                                    }
                                 }
                             }
-                            UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                            UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
                         }
-                        gv.mod.fastMode = !gv.mod.fastMode;
-                    }
+                        else if ((rtn.Equals("ctrlDownArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY + 1)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveDown(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlDownArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(2);
+                                    }
+                                }
+                            }
+                        }
+                        else if ((rtn.Equals("ctrlLeftArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX - 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveLeft(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlLeftArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(4);
+                                    }
+                                }
+                            }
+                        }
+                        else if ((rtn.Equals("ctrlRightArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX + 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveRight(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlRightArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(6);
+                                    }
+                                }
+                            }
+                        }
+                        else if ((rtn.Equals("ctrlUpRightArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX + 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY - 1)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveUpRight(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlUpRightArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(9);
+                                    }
+                                }
+                            }
+                        }
+                        else if ((rtn.Equals("ctrlDownRightArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX + 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY + 1)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveDownRight(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlDownRightArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(3);
+                                    }
+                                }
+                            }
+                        }
+                        else if ((rtn.Equals("ctrlUpLeftArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX - 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY - 1)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveUpLeft(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlUpLeftArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(7);
+                                    }
+                                }
+                            }
+                        }
+                        else if ((rtn.Equals("ctrlDownLeftArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX - 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY + 1)))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    continueTurn = false;
+                                    MoveDownLeft(pc);
+                                }
+                                else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                                {
+                                    if (rtn.Equals("ctrlDownLeftArrow")) //if clicked on square, don't move the highlight...only move for arrow button
+                                    {
+                                        continueTurn = false;
+                                        MoveTargetHighlight(1);
+                                    }
+                                }
+                            }
+                        }
+                        else if (rtn.Equals("btnSwitchWeapon"))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                continueTurn = false;
+                                if (currentPlayerIndex > gv.mod.playerList.Count - 1)
+                                {
+                                    return;
+                                }
+                                gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                gv.cc.partyScreenPcIndex = currentPlayerIndex;
+                                gv.screenParty.resetPartyScreen();
+                                gv.screenType = "combatParty";
+                            }
+                        }
+                        else if (rtn.Equals("btnMove"))
+                        {
 
-                    if (rtn.Equals("tglSpeed"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
+                            if (canMove)
+                            {
+                                if (currentCombatMode.Equals("move"))
+                                {
+                                    currentCombatMode = "info";
+                                }
+                                else
+                                {
+                                    if (isPlayerTurn)
+                                    {
+                                        gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                        gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                        gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                        gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                        gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                        currentCombatMode = "move";
+                                    }
+                                }
+                                gv.screenType = "combat";
+                            }
+                        }
+                        else if (rtn.Equals("btnInventory"))
+                        {
+                            if (isPlayerTurn && !gv.mod.currentEncounter.noItemUseModifier)
+                            {
+                                gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                //gv.screenInventory.resetInventory(true);
+                                gv.screenType = "combatInventory";
+                                gv.screenInventory.resetInventory(true);
+                            }
+                        }
 
-                        if (gv.mod.combatAnimationSpeed == 100)
+                        else if (rtn.Equals("btnIni1"))
                         {
-                            gv.mod.combatAnimationSpeed = 50;
-                            tgl.ImgOffFilename = "tgl_speedNEW_2";
-                            gv.cc.addLogText("lime", "move speed: 2x");
-                        }
-                        else if (gv.mod.combatAnimationSpeed == 50)
-                        {
-                            gv.mod.combatAnimationSpeed = 25;
-                            tgl.ImgOffFilename = "tgl_speedNEW_4";
-                            gv.cc.addLogText("lime", "move speed: 4x");
-                        }
-                        else if (gv.mod.combatAnimationSpeed == 25)
-                        {
-                            gv.mod.combatAnimationSpeed = 10;
-                            tgl.ImgOffFilename = "tgl_speedNEW_10";
-                            gv.cc.addLogText("lime", "move speed: 10x");
-                        }
-                        else if (gv.mod.combatAnimationSpeed == 10)
-                        {
-                            gv.mod.combatAnimationSpeed = 100;
-                            tgl.ImgOffFilename = "tgl_speedNEW_1";
-                            gv.cc.addLogText("lime", "move speed: 1x");
-                        }
-                    }
-                    if (rtn.Equals("tglAttackSpeed"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
+                            int buttonThreshold = 1 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
 
-                        if (gv.mod.attackAnimationSpeed == 100)
-                        {
-                            gv.mod.attackAnimationSpeed = 50;
-                            tgl.ImgOffFilename = "tgl_attackSpeed_2";
-                            gv.cc.addLogText("lime", "attack and cast speed: 2x");
-                        }
-                        else if (gv.mod.attackAnimationSpeed == 50)
-                        {
-                            gv.mod.attackAnimationSpeed = 25;
-                            tgl.ImgOffFilename = "tgl_attackSpeed_4";
-                            gv.cc.addLogText("lime", "attack and cast speed: 4x");
-                        }
-                        else if (gv.mod.attackAnimationSpeed == 25)
-                        {
-                            gv.mod.attackAnimationSpeed = 10;
-                            tgl.ImgOffFilename = "tgl_attackSpeed_10";
-                            gv.cc.addLogText("lime", "attack and cast speed: 10x");
-                        }
-                        else if (gv.mod.attackAnimationSpeed == 10)
-                        {
-                            gv.mod.attackAnimationSpeed = 100;
-                            tgl.ImgOffFilename = "tgl_attackSpeed_1";
-                            gv.cc.addLogText("lime", "attack and cast speed: 1x");
-                        }
-                    }
-                    if (rtn.Equals("tglSound"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        if (tgl.toggleOn)
-                        {
-                            tgl.toggleOn = false;
-                            gv.mod.playMusic = false;
-                            //TODO gv.screenCombat.tglSoundFx.toggleOn = false;
-                            gv.stopCombatMusic();
-                            gv.cc.addLogText("lime", "Music Off");
-                        }
-                        else
-                        {
-                            tgl.toggleOn = true;
-                            gv.mod.playMusic = true;
-                            //TODO gv.screenCombat.tglSoundFx.toggleOn = true;
-                            gv.startCombatMusic();
-                            gv.cc.addLogText("lime", "Music On");
-                        }
-                    }
-                    if (rtn.Equals("tglSoundFx"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        if (tgl.toggleOn)
-                        {
-                            tgl.toggleOn = false;
-                            gv.mod.playSoundFx = false;
-                            gv.cc.addLogText("lime", "SoundFX Off");
-                        }
-                        else
-                        {
-                            tgl.toggleOn = true;
-                            gv.mod.playSoundFx = true;
-                            gv.cc.addLogText("lime", "SoundFX On");
-                        }
-                    }
-                    if (rtn.Equals("tglGrid"))
-                    {
-                        IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
-                        if (tgl == null) { return; }
-                        if (tgl.toggleOn)
-                        {
-                            tgl.toggleOn = false;
-                            gv.mod.com_showGrid = false;
-                        }
-                        else
-                        {
-                            tgl.toggleOn = true;
-                            gv.mod.com_showGrid = true;
-                        }
-                    }
-                    if (rtn.Equals("tglHelp"))
-                    {
-                        tutorialMessageCombat(true);
-                    }
-                    if ((rtn.Equals("tglKill")) && (gv.mod.debugMode))
-                    {
-                        gv.mod.currentEncounter.encounterCreatureList.Clear();
-                        //gv.mod.currentEncounter.encounterCreatureRefsList.Clear();
-                        checkEndEncounter();
-                    }
-                    #endregion
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
 
-                    #region TOUCH ON MAP AREA
-                    gridx = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize) + UpperLeftSquare.X;
-                    gridy = ((int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize) + UpperLeftSquare.Y;
-                    int tappedSqrX = ((int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize);
-                    int tappedSqrY = ((int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize);
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
 
-                    if (IsInVisibleCombatWindow(gridx, gridy))
-                    {
-                        gv.cc.floatyText = "";
-                        gv.cc.floatyText2 = "";
-                        gv.cc.floatyText3 = "";
-                        gv.cc.floatyText4 = "";
-                        gv.cc.floatyText0 = "";
-                        gv.cc.floatyTextA = "";
-                        gv.cc.floatyTextB = "";
-                        if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
+                        else if (rtn.Equals("btnIni2"))
                         {
-                            //Check for second tap so TARGET
-                            if ((gridx == targetHighlightCenterLocation.X) && (gridy == targetHighlightCenterLocation.Y))
+                            int buttonThreshold = 2 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+                        else if (rtn.Equals("btnIni3"))
+                        {
+                            int buttonThreshold = 3 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+                        else if (rtn.Equals("btnIni4"))
+                        {
+                            int buttonThreshold = 4 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+                        else if (rtn.Equals("btnIni5"))
+                        {
+                            int buttonThreshold = 5 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+                        else if (rtn.Equals("btnIni6"))
+                        {
+                            int buttonThreshold = 6 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+                        else if (rtn.Equals("btnIni7"))
+                        {
+                            int buttonThreshold = 7 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni8"))
+                        {
+                            int buttonThreshold = 8 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni9"))
+                        {
+                            int buttonThreshold = 9 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni10"))
+                        {
+                            int buttonThreshold = 10 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni11"))
+                        {
+                            int buttonThreshold = 11 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni12"))
+                        {
+                            int buttonThreshold = 12 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni13"))
+                        {
+                            int buttonThreshold = 13 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni14"))
+                        {
+                            int buttonThreshold = 14 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni15"))
+                        {
+                            int buttonThreshold = 15 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni16"))
+                        {
+                            int buttonThreshold = 16 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni17"))
+                        {
+                            int buttonThreshold = 17 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni18"))
+                        {
+                            int buttonThreshold = 18 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni19"))
+                        {
+                            int buttonThreshold = 19 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni20"))
+                        {
+                            int buttonThreshold = 20 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni21"))
+                        {
+                            int buttonThreshold = 21 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni22"))
+                        {
+                            int buttonThreshold = 22 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni23"))
+                        {
+                            int buttonThreshold = 23 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni24"))
+                        {
+                            int buttonThreshold = 24 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni25"))
+                        {
+                            int buttonThreshold = 25 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni26"))
+                        {
+                            int buttonThreshold = 26 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni27"))
+                        {
+                            int buttonThreshold = 27 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni28"))
+                        {
+                            int buttonThreshold = 28 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni29"))
+                        {
+                            int buttonThreshold = 29 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni30"))
+                        {
+                            int buttonThreshold = 30 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni31"))
+                        {
+                            int buttonThreshold = 31 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni32"))
+                        {
+                            int buttonThreshold = 32 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni33"))
+                        {
+                            int buttonThreshold = 33 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni34"))
+                        {
+                            int buttonThreshold = 34 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni35"))
+                        {
+                            int buttonThreshold = 35 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+
+                        else if (rtn.Equals("btnIni36"))
+                        {
+                            int buttonThreshold = 36 - gv.mod.creatureCounterSubstractor;
+                            int buttonCounter = 0;
+                            int index1 = 0;
+
+                            for (int i = 0; i < moveOrderList.Count; i++)
+                            {
+                                if (moveOrderList[i].PcOrCreature is Player)
+                                {
+                                    Player crt = (Player)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (moveOrderList[i].PcOrCreature is Creature)
+                                {
+                                    Creature crt = (Creature)moveOrderList[i].PcOrCreature;
+                                    if (crt.hp > 0)
+                                    {
+                                        buttonCounter++;
+                                        if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
+                                        {
+                                            buttonCounter++;
+                                        }
+                                        if (buttonCounter >= buttonThreshold)
+                                        {
+                                            index1 = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            MoveOrder m = moveOrderList[index1];
+                            if (m.PcOrCreature is Player)
+                            {
+                                Player crt = (Player)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                            if (m.PcOrCreature is Creature)
+                            {
+                                Creature crt = (Creature)m.PcOrCreature;
+                                if (crt.hp > 0)
+                                {
+                                    UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                                    UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
+                                }
+                            }
+                        }
+
+                        else if (rtn.Equals("btnAttack"))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                if (currentCombatMode.Equals("attack"))
+                                {
+                                    currentCombatMode = "info";
+                                }
+                                else
+                                {
+                                    gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                                    gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                    gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                    gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                    gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                    gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                    currentCombatMode = "attack";
+                                }
+                                gv.screenType = "combat";
+                                setTargetHighlightStartLocation(pc);
+                            }
+                        }
+                        else if (rtn.Equals("btnCast"))
+                        {
+                            if (isPlayerTurn && !gv.mod.currentEncounter.noSpellCastModifier)
+                            {
+                                gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                                continueTurn = false;
+                                gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                if (pc.knownSpellsTags.Count > 0)
+                                {
+                                    currentCombatMode = "castSelector";
+                                    gv.screenType = "combatCast";
+                                    gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+                                    spellSelectorIndex = 0;
+                                    setTargetHighlightStartLocation(pc);
+                                }
+                            }
+                            else
+                            {
+                                //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else if (rtn.Equals("btnTraitUse"))
+                        {
+                            if (isPlayerTurn && !gv.mod.currentEncounter.noTraitUseModifier)
+                            {
+                                gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                                continueTurn = false;
+                                gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                //potential reason
+                                if (pc.knownInCombatUsableTraitsTags.Count > 0)
+                                {
+                                    currentCombatMode = "traitUseSelector";
+                                    gv.screenType = "combatTraitUse";
+                                    gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
+                                    spellSelectorIndex = 0;
+                                    setTargetHighlightStartLocation(pc);
+                                }
+                            }
+                            else
+                            {
+                                //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else if (rtn.Equals("btnSkipTurn"))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                continueTurn = false;
+                                gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
+                                gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
+                                gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
+                                gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
+                                gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
+                                gv.screenType = "combat";
+                                endPcTurn(false);
+                            }
+                        }
+                        else if (rtn.Equals("btnDelay"))
+                        {
+                            if (isPlayerTurn)
+                            {
+                                int highestMoveOrderFound = 0;
+
+                                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                {
+                                    if (c.moveOrder > highestMoveOrderFound)
+                                    {
+                                        highestMoveOrderFound = c.moveOrder;
+                                    }
+                                }
+
+                                foreach (Player p in gv.mod.playerList)
+                                {
+                                    if (p.moveOrder > highestMoveOrderFound)
+                                    {
+                                        highestMoveOrderFound = p.moveOrder;
+                                    }
+                                }
+
+                                if (highestMoveOrderFound != gv.mod.playerList[currentPlayerIndex].moveOrder && !gv.mod.playerList[currentPlayerIndex].hasDelayedAlready)
+                                {
+                                    gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
+                                    gv.mod.playerList[currentPlayerIndex].moveOrder = highestMoveOrderFound + 1;
+                                    /*
+                                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (c.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder)
+                                        {
+                                            gv.mod.playerList[currentPlayerIndex].moveOrder++;
+                                        }
+                                    }
+                                    foreach (Player p in gv.mod.playerList)
+                                    {
+                                        if (p.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder && p != gv.mod.playerList[currentPlayerIndex])
+                                        {
+                                            gv.mod.playerList[currentPlayerIndex].moveOrder++;
+                                        }
+                                    }
+                                    */
+
+                                    //add to end of move order  
+                                    MoveOrder newMO = new MoveOrder();
+                                    newMO.PcOrCreature = gv.mod.playerList[currentPlayerIndex];
+                                    newMO.rank = highestMoveOrderFound + 1;
+                                    gv.screenCombat.moveOrderList.Add(newMO);
+                                    for (int i = gv.screenCombat.moveOrderList.Count - 2; i >= 0; i--)
+                                    {
+                                        if (gv.screenCombat.moveOrderList[i].PcOrCreature == newMO.PcOrCreature)
+                                        {
+                                            gv.screenCombat.moveOrderList.RemoveAt(i);
+                                        }
+                                    }
+
+                                    //increment the number of initial move order objects
+                                    //note: check how ini bar system will interact with creatures added while battle is running  
+                                    gv.screenCombat.initialMoveOrderListSize++;
+
+                                    recalculateCreaturesShownInInitiativeBar();
+
+                                    endPcTurn(false);
+                                }
+                                else
+                                {
+                                    gv.cc.addLogText("red", "Delaying not possible for this character this turn.");
+                                }
+                            }
+                        }
+                        else if (rtn.Equals("btnExit"))
+                        {
+                            //TODO gv.Close();
+                        }
+                        else if (rtn.Equals("btnSelect"))
+                        {
+                            if (isPlayerTurn)
                             {
                                 if (currentCombatMode.Equals("attack"))
                                 {
@@ -16928,2799 +19793,30 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                     }
                                 }
                             }
-                            targetHighlightCenterLocation.Y = gridy;
-                            targetHighlightCenterLocation.X = gridx;
                         }
+                        else if (rtn.Equals("btnToggleArrows"))
+                        {
+                            foreach (IB2Panel pnl in combatUiLayout.panelList)
+                            {
+                                if (pnl.tag.Equals("arrowPanel"))
+                                {
+                                    //hides down
+                                    showArrows = !showArrows;
+                                    if (pnl.currentLocY > pnl.shownLocY)
+                                    {
+                                        pnl.showing = true;
+                                    }
+                                    else
+                                    {
+                                        pnl.hiding = true;
+                                    }
+                                }
+                            }
+                        }                        
+                        #endregion
                     }
-                    #endregion
-
-                    #region BUTTONS
-                    if ((rtn.Equals("ctrlUpArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY - 1)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveUp(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlUpArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(8);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlDownArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY + 1)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveDown(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlDownArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(2);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlLeftArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX - 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveLeft(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlLeftArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(4);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlRightArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX + 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveRight(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlRightArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(6);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlUpRightArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX + 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY - 1)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveUpRight(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlUpRightArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(9);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlDownRightArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX + 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY + 1)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveDownRight(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlDownRightArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(3);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlUpLeftArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX - 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY - 1)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveUpLeft(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlUpLeftArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(7);
-                                }
-                            }
-                        }
-                    }
-                    else if ((rtn.Equals("ctrlDownLeftArrow")) || ((tappedSqrX + UpperLeftSquare.X == pc.combatLocX - 1) && (tappedSqrY + UpperLeftSquare.Y == pc.combatLocY + 1)))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                continueTurn = false;
-                                MoveDownLeft(pc);
-                            }
-                            else if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
-                            {
-                                if (rtn.Equals("ctrlDownLeftArrow")) //if clicked on square, don't move the highlight...only move for arrow button
-                                {
-                                    continueTurn = false;
-                                    MoveTargetHighlight(1);
-                                }
-                            }
-                        }
-                    }
-                    else if (rtn.Equals("btnSwitchWeapon"))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            continueTurn = false;
-                            if (currentPlayerIndex > gv.mod.playerList.Count - 1)
-                            {
-                                return;
-                            }
-                            gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                            gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                            gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                            gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                            gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                            gv.cc.partyScreenPcIndex = currentPlayerIndex;
-                            gv.screenParty.resetPartyScreen();
-                            gv.screenType = "combatParty";
-                        }
-                    }
-                    else if (rtn.Equals("btnMove"))
-                    {
-
-                        if (canMove)
-                        {
-                            if (currentCombatMode.Equals("move"))
-                            {
-                                currentCombatMode = "info";
-                            }
-                            else
-                            {
-                                if (isPlayerTurn)
-                                {
-                                    gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                                    gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                                    gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                                    gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                                    gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                                    currentCombatMode = "move";
-                                }
-                            }
-                            gv.screenType = "combat";
-                        }
-                    }
-                    else if (rtn.Equals("btnInventory"))
-                    {
-                        if (isPlayerTurn && !gv.mod.currentEncounter.noItemUseModifier)
-                        {
-                            gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                            gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                            gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                            gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                            gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                            //gv.screenInventory.resetInventory(true);
-                            gv.screenType = "combatInventory";
-                            gv.screenInventory.resetInventory(true);
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni1"))
-                    {
-                        int buttonThreshold = 1 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni2"))
-                    {
-                        int buttonThreshold = 2 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni3"))
-                    {
-                        int buttonThreshold = 3 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni4"))
-                    {
-                        int buttonThreshold = 4 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni5"))
-                    {
-                        int buttonThreshold = 5 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni6"))
-                    {
-                        int buttonThreshold = 6 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnIni7"))
-                    {
-                        int buttonThreshold = 7 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni8"))
-                    {
-                        int buttonThreshold = 8 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni9"))
-                    {
-                        int buttonThreshold = 9 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni10"))
-                    {
-                        int buttonThreshold = 10 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni11"))
-                    {
-                        int buttonThreshold = 11 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni12"))
-                    {
-                        int buttonThreshold = 12 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni13"))
-                    {
-                        int buttonThreshold = 13 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni14"))
-                    {
-                        int buttonThreshold = 14 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni15"))
-                    {
-                        int buttonThreshold = 15 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni16"))
-                    {
-                        int buttonThreshold = 16 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni17"))
-                    {
-                        int buttonThreshold = 17 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni18"))
-                    {
-                        int buttonThreshold = 18 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni19"))
-                    {
-                        int buttonThreshold = 19 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni20"))
-                    {
-                        int buttonThreshold = 20 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni21"))
-                    {
-                        int buttonThreshold = 21 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni22"))
-                    {
-                        int buttonThreshold = 22 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni23"))
-                    {
-                        int buttonThreshold = 23 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni24"))
-                    {
-                        int buttonThreshold = 24 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni25"))
-                    {
-                        int buttonThreshold = 25 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni26"))
-                    {
-                        int buttonThreshold = 26 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni27"))
-                    {
-                        int buttonThreshold = 27 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni28"))
-                    {
-                        int buttonThreshold = 28 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni29"))
-                    {
-                        int buttonThreshold = 29 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni30"))
-                    {
-                        int buttonThreshold = 30 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni31"))
-                    {
-                        int buttonThreshold = 31 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni32"))
-                    {
-                        int buttonThreshold = 32 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni33"))
-                    {
-                        int buttonThreshold = 33 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni34"))
-                    {
-                        int buttonThreshold = 34 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni35"))
-                    {
-                        int buttonThreshold = 35 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-
-                    else if (rtn.Equals("btnIni36"))
-                    {
-                        int buttonThreshold = 36 - gv.mod.creatureCounterSubstractor;
-                        int buttonCounter = 0;
-                        int index1 = 0;
-
-                        for (int i = 0; i < moveOrderList.Count; i++)
-                        {
-                            if (moveOrderList[i].PcOrCreature is Player)
-                            {
-                                Player crt = (Player)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (moveOrderList[i].PcOrCreature is Creature)
-                            {
-                                Creature crt = (Creature)moveOrderList[i].PcOrCreature;
-                                if (crt.hp > 0)
-                                {
-                                    buttonCounter++;
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Width > 100)
-                                    {
-                                        buttonCounter++;
-                                    }
-                                    if (buttonCounter >= buttonThreshold)
-                                    {
-                                        index1 = i;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        MoveOrder m = moveOrderList[index1];
-                        if (m.PcOrCreature is Player)
-                        {
-                            Player crt = (Player)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                        if (m.PcOrCreature is Creature)
-                        {
-                            Creature crt = (Creature)m.PcOrCreature;
-                            if (crt.hp > 0)
-                            {
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
-                                UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
-                            }
-                        }
-                    }
-
-                    else if (rtn.Equals("btnAttack"))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("attack"))
-                            {
-                                currentCombatMode = "info";
-                            }
-                            else
-                            {
-                                gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
-                                gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                                gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                                gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                                gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                                gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                                currentCombatMode = "attack";
-                            }
-                            gv.screenType = "combat";
-                            setTargetHighlightStartLocation(pc);
-                        }
-                    }
-                    else if (rtn.Equals("btnCast"))
-                    {
-                        if (isPlayerTurn && !gv.mod.currentEncounter.noSpellCastModifier)
-                        {
-                            gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
-                            continueTurn = false;
-                            gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                            gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                            gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                            gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                            gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                            if (pc.knownSpellsTags.Count > 0)
-                            {
-                                currentCombatMode = "castSelector";
-                                gv.screenType = "combatCast";
-                                gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                                spellSelectorIndex = 0;
-                                setTargetHighlightStartLocation(pc);
-                            }
-                        }
-                        else
-                        {
-                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (rtn.Equals("btnTraitUse"))
-                    {
-                        if (isPlayerTurn && !gv.mod.currentEncounter.noTraitUseModifier)
-                        {
-                            gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
-                            continueTurn = false;
-                            gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                            gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                            gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                            gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                            gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                            //potential reason
-                            if (pc.knownInCombatUsableTraitsTags.Count > 0)
-                            {
-                                currentCombatMode = "traitUseSelector";
-                                gv.screenType = "combatTraitUse";
-                                gv.screenCastSelector.castingPlayerIndex = currentPlayerIndex;
-                                spellSelectorIndex = 0;
-                                setTargetHighlightStartLocation(pc);
-                            }
-                        }
-                        else
-                        {
-                            //TODO Toast.makeText(gv.gameContext, "PC has no Spells", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else if (rtn.Equals("btnSkipTurn"))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            continueTurn = false;
-                            gv.mod.playerList[currentPlayerIndex].thisCastIsFreeOfCost = false;
-                            gv.mod.playerList[currentPlayerIndex].isPreparingSpell = false;
-                            gv.mod.playerList[currentPlayerIndex].doCastActionInXFullTurns = 0;
-                            gv.mod.playerList[currentPlayerIndex].tagOfSpellToBeCastAfterCastTimeIsDone = "none";
-                            gv.mod.playerList[currentPlayerIndex].thisCasterCanBeInterrupted = true;
-                            gv.screenType = "combat";
-                            endPcTurn(false);
-                        }
-                    }
-                    else if (rtn.Equals("btnDelay"))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            int highestMoveOrderFound = 0;
-
-                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
-                            {
-                                if (c.moveOrder > highestMoveOrderFound)
-                                {
-                                    highestMoveOrderFound = c.moveOrder;
-                                }
-                            }
-
-                            foreach (Player p in gv.mod.playerList)
-                            {
-                                if (p.moveOrder > highestMoveOrderFound)
-                                {
-                                    highestMoveOrderFound = p.moveOrder;
-                                }
-                            }
-
-                            if (highestMoveOrderFound != gv.mod.playerList[currentPlayerIndex].moveOrder && !gv.mod.playerList[currentPlayerIndex].hasDelayedAlready)
-                            {
-                                gv.mod.playerList[currentPlayerIndex].hasDelayedAlready = true;
-                                gv.mod.playerList[currentPlayerIndex].moveOrder = highestMoveOrderFound + 1;
-                                /*
-                                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
-                                {
-                                    if (c.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder)
-                                    {
-                                        gv.mod.playerList[currentPlayerIndex].moveOrder++;
-                                    }
-                                }
-                                foreach (Player p in gv.mod.playerList)
-                                {
-                                    if (p.moveOrder == gv.mod.playerList[currentPlayerIndex].moveOrder && p != gv.mod.playerList[currentPlayerIndex])
-                                    {
-                                        gv.mod.playerList[currentPlayerIndex].moveOrder++;
-                                    }
-                                }
-                                */
-
-                                //add to end of move order  
-                                MoveOrder newMO = new MoveOrder();
-                                newMO.PcOrCreature = gv.mod.playerList[currentPlayerIndex];
-                                newMO.rank = highestMoveOrderFound + 1;
-                                gv.screenCombat.moveOrderList.Add(newMO);
-                                for (int i = gv.screenCombat.moveOrderList.Count - 2; i >= 0; i--)
-                                {
-                                    if (gv.screenCombat.moveOrderList[i].PcOrCreature == newMO.PcOrCreature)
-                                    {
-                                        gv.screenCombat.moveOrderList.RemoveAt(i);
-                                    }
-                                }
-
-                                //increment the number of initial move order objects
-                                //note: check how ini bar system will interact with creatures added while battle is running  
-                                gv.screenCombat.initialMoveOrderListSize++;
-
-                                recalculateCreaturesShownInInitiativeBar();
-
-                                endPcTurn(false);
-                            }
-                            else
-                            {
-                                gv.cc.addLogText("red", "Delaying not possible for this character this turn.");
-                            }
-                        }
-                    }
-                    else if (rtn.Equals("btnExit"))
-                    {
-                        //TODO gv.Close();
-                    }
-                    else if (rtn.Equals("btnSelect"))
-                    {
-                        if (isPlayerTurn)
-                        {
-                            if (currentCombatMode.Equals("attack"))
-                            {
-                                continueTurn = false;
-                                TargetAttackPressed(pc);
-                            }
-                            else if (currentCombatMode.Equals("cast"))
-                            {
-                                continueTurn = false;
-                                if (gv.mod.isCastFromUsedItem)
-                                {
-                                    gv.mod.isCastFromUsedItem = false;
-                                    Item it = gv.mod.getItemByTag(gv.mod.tagOfItemUsedForCast);
-                                    TargetCastPressed(pc, it);
-                                }
-                                else
-                                {
-                                    TargetCastPressed(pc);
-                                }
-                            }
-                        }
-                    }
-                    else if (rtn.Equals("btnToggleArrows"))
-                    {
-                        foreach (IB2Panel pnl in combatUiLayout.panelList)
-                        {
-                            if (pnl.tag.Equals("arrowPanel"))
-                            {
-                                //hides down
-                                showArrows = !showArrows;
-                                if (pnl.currentLocY > pnl.shownLocY)
-                                {
-                                    pnl.showing = true;
-                                }
-                                else
-                                {
-                                    pnl.hiding = true;
-                                }
-                            }
-                        }
-                    }
+                    
                     break;
-                    #endregion
             }
         }
 

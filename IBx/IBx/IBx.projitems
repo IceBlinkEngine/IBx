@@ -1501,6 +1501,10 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\pctokens\tkn_hero.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\ui\btn_pan_down.png" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\ui\btn_pan_left.png" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\ui\btn_pan_right.png" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\ui\btn_pan_up.png" />
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\data\Brin1.json" />
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\data\Dorian1.json" />
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\data\kangath.json" />

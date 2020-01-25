@@ -1312,7 +1312,7 @@ namespace IBx
                                 }
                             //}
                             string pcselected = await gv.ListViewPage(pcNames, "Selected PC to Use Item");
-                            int pcselectedIndex = gv.GetSelectedIndex(pcselected, actionList);
+                            int pcselectedIndex = gv.GetSelectedIndex(pcselected, pcNames);
                             //using (ItemListSelector itSel2 = new ItemListSelector(gv, pcNames, "Selected PC to Use Item"))
                             //{
                             //itSel2.IceBlinkButtonClose.Enabled = true;

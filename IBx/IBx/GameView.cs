@@ -13,7 +13,7 @@ namespace IBx
 {
     public class GameView
     {
-        string IBversion = "1.182.002";
+        public string IBversion = "1.182.006";
         public ContentPage cp;
         public SKCanvas canvas;
         public bool textFormatSet = false;
@@ -52,7 +52,7 @@ namespace IBx
         public SKPaint textPaint = new SKPaint();
         public SKRect textBounds = new SKRect();
                 
-        public string versionNum = "v1.00";
+        //public string versionNum = "v1.00";
         public string fixedModule = "";
         public float drawFontRegHeight;
         public float drawFontLargeHeight;
@@ -1311,9 +1311,9 @@ namespace IBx
                 }
             }*/
             
-            drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.5);
-            drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.333);
-            drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.25);
+            drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.4);
+            drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.3);
+            drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.2);
             drawFontRegWidth = 10.0f;
         }
 
@@ -1755,13 +1755,14 @@ namespace IBx
         //our new method for everything outlined
         public void DrawTextOutlined(string text, float x, float y, string style, string size, string color, bool isUnderlined)
         {
-            for (int xx = -2; xx <= 2; xx++)
+            /*for (int xx = -2; xx <= 2; xx++)
             {
                 for (int yy = -2; yy <= 2; yy++)
                 {
                     DrawText(text, x + xx, y + yy, size, "black", style, 255, isUnderlined);
                 }
-            }
+            }*/
+            DrawText(text, x + 2, y + 2, size, "black", style, 255, isUnderlined);
             DrawText(text, x, y, size, color, style, 255, isUnderlined);
         }
 
@@ -2306,14 +2307,15 @@ namespace IBx
             if (mod.debugMode)
             {
                 int txtH = (int)drawFontRegHeight;
-                for (int x = -2; x <= 2; x++)
+                /*for (int x = -2; x <= 2; x++)
                 {
                     for (int y = -2; y <= 2; y++)
                     {
                         DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
                     }
-                }
-                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 5, screenHeight - txtH - 5 - oYshift, "white");
+                }*/
+                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 2 + 5, screenHeight - txtH - 5 + 2 - oYshift, "black");
+                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 5, screenHeight - txtH - 5 - oYshift, "white");                
             }
 
             //EndDraw(); //uncomment this for DIRECT2D ADDITIONS
