@@ -13507,7 +13507,7 @@ namespace IBx
                         GiveItem(newPc.AmmoRefs.resref, 1);
                     }
                     //gv.TrackerSendEventOnePlayerInfo(newPc,"PartyAddCompanion:" + newPc.name);
-                    gv.cc.addLogText("<font color='lime'>" + newPc.name + " joins the party</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + newPc.name + " <font color='white'>joins the party</font><BR><BR>");
                 }
                 else
                 {
@@ -19460,7 +19460,7 @@ namespace IBx
                     }
                     //Do floaty text damage
                     //gv.screenCombat.floatyTextOn = true;
-                    gv.cc.addFloatyText(new Coordinate(crt.combatLocX, crt.combatLocY), damageTotal + "");
+                    gv.cc.addFloatyText(new Coordinate(crt.combatLocX, crt.combatLocY), damageTotal + "", "orange");
                     #endregion
                 }
                 if ((ef.doHeal))
@@ -19677,7 +19677,7 @@ namespace IBx
                     }
                     //Do floaty text damage
                     //gv.screenCombat.floatyTextOn = true;
-                    gv.cc.addFloatyText(new Coordinate(pc.combatLocX, pc.combatLocY), damageTotal + "");
+                    gv.cc.addFloatyText(new Coordinate(pc.combatLocX, pc.combatLocY), damageTotal + "", "orange");
                     #endregion
                 }
                 if ((ef.doHeal) && !gv.mod.currentEncounter.noHealingAllowed)
@@ -20701,6 +20701,7 @@ namespace IBx
         {
             //europa4
             AoeTargetsList.Clear();
+            gv.screenCombat.refreshCreatureCoveredSquares();
 
             int startX2 = 0;
             int startY2 = 0;
@@ -20766,6 +20767,8 @@ namespace IBx
                         //if in range of radius of x and radius of y
                         //if ((crt.combatLocX == coor.X) && (crt.combatLocY == coor.Y))
                         //if any part of creature is in range of radius of x and radius of y  
+                        //nasenbluten
+                        //gv.screenCombat.refreshCreatureCoveredSquares();
                         foreach (Coordinate crtCoor in crt.tokenCoveredSquares)
                         {
                             //player casts on creature
@@ -24089,7 +24092,7 @@ namespace IBx
                                 }
                                 else
                                 {
-                                    gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
+                                    //gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
                                 }
                                 pc.charStatus = "Dead";
                             }
@@ -25224,7 +25227,7 @@ namespace IBx
                         {
                             gv.screenCombat.deathAnimationLocations.Add(new Coordinate(pc.combatLocX, pc.combatLocY));
                         }
-                        gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
+                        //gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
                         pc.charStatus = "Dead";
                     }
                     //Do floaty text damage
@@ -25360,7 +25363,7 @@ namespace IBx
                         }
                         if (gv.screenType == "combat")
                         {
-                            gv.cc.addLogText("<font color='red'>" + target.name + " is unconscious!" + "</font><BR>");
+                            //gv.cc.addLogText("<font color='red'>" + target.name + " is unconscious!" + "</font><BR>");
                         }
                         target.charStatus = "Dead";
                     }

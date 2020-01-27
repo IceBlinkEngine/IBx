@@ -177,10 +177,17 @@ namespace IBx
         public int attackAnimationTimeElapsed = 0;
         public int attackAnimationLengthInMilliseconds = 250;
 
-        public IbbButton btnPanUp = null;
-        public IbbButton btnPanDown = null;
-        public IbbButton btnPanLeft = null;
-        public IbbButton btnPanRight = null;
+        //public IbbButton btnPanUp = null;
+        //public IbbButton btnPanDown = null;
+        //public IbbButton btnPanLeft = null;
+        //public IbbButton btnPanRight = null;
+        public bool touchIsDown = false;
+        public int moveDeltaX = 0;
+        public int moveDeltaY = 0;
+        public int touchMoveDeltaX = 0;
+        public int touchMoveDeltaY = 0;
+        public int lastTouchMoveLocationX = 0;
+        public int lastTouchMoveLocationY = 0;
 
         public ScreenCombat(Module m, GameView g)
         {
@@ -195,7 +202,7 @@ namespace IBx
 
         public void setControlsStart()
         {
-            int pW = (int)((float)gv.screenWidth / 100.0f);
+            /*int pW = (int)((float)gv.screenWidth / 100.0f);
             int pH = (int)((float)gv.screenHeight / 100.0f);
             int padW = gv.squareSize / 6;
                         
@@ -238,7 +245,7 @@ namespace IBx
                 btnPanRight.Height = (int)(gv.ibbheight * gv.screenDensity);
                 btnPanRight.Width = (int)(gv.ibbwidthR * gv.screenDensity);
                 btnPanRight.glowOn = false;
-            }
+            }*/
         }
 
         public void saveUILayout()
@@ -393,12 +400,24 @@ namespace IBx
                 creatureToAnimate.Clear();
                 playerToAnimate = null;
                 Creature crt = new Creature();
+                int highestLivingCrtMoveOrderfound = 0;
                 foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                 {
-                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    if (currentMoveOrderIndex == 0)
                     {
-                        crt = c;
-                        break;
+                        if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                        {
+                            highestLivingCrtMoveOrderfound = c.moveOrder;
+                            crt = c;
+                        }
+                    }
+                    else
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            crt = c;
+                            break;
+                        }
                     }
                 }
                 //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -427,6 +446,7 @@ namespace IBx
 
         public void doCombatSetup()
         {
+            gv.cc.addLogText("<font color='yellow'>" + "Encounter setup" + "</font><BR><BR>");
             //surprise round system
             creaturesHaveUpperHand = false;
             partyHasUpperHand = false;
@@ -560,7 +580,7 @@ namespace IBx
                     if (gv.sf.ThisProp.isStealthed)
                     {
                         creaturesHaveUpperHand = true;
-                        gv.cc.addLogText("<font color='red'>" + "Ambush! The enemy has caught the party flat-footed. Free first round for the enemy." + "</font><BR>");
+                        gv.cc.addLogText("<font color='white'>" + "Ambush - party is flat-footed" + "</font><BR><BR>");
                     }
                     else if ((advantageCreatures && advantageParty) || (!advantageCreatures && !advantageParty))
                     {
@@ -569,12 +589,12 @@ namespace IBx
                     else if (advantageCreatures && !advantageParty)
                     {
                         creaturesHaveUpperHand = true;
-                        gv.cc.addLogText("<font color='red'>" + "The enemy has caught the party flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the enemy." + "</font><BR>");
+                        gv.cc.addLogText("<font color='white'>" + "Party is flat-footed" + "</font><BR><BR>");
                     }
                     else if (!advantageCreatures && advantageParty)
                     {
                         partyHasUpperHand = true;
-                        gv.cc.addLogText("<font color='blue'>" + "The party has caught the enemy flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the party." + "</font><BR>");
+                        gv.cc.addLogText("<font color='white'>" + "Enemy is flat-footed" + "</font><BR><BR>");
                     }
                 }
                 //not called from prop
@@ -587,12 +607,12 @@ namespace IBx
                     else if (advantageCreatures && !advantageParty)
                     {
                         creaturesHaveUpperHand = true;
-                        gv.cc.addLogText("<font color='red'>" + "The enemy has caught the party flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the enemy." + "</font><BR>");
+                        gv.cc.addLogText("<font color='white'>" + "Party is flat-footed" + "</font><BR><BR>");
                     }
                     else if (!advantageCreatures && advantageParty)
                     {
                         partyHasUpperHand = true;
-                        gv.cc.addLogText("<font color='blue'>" + "The party has caught the enemy flat-footed (based on rolls in " + gv.mod.tagOfStealthMainTrait + " and " + gv.mod.tagOfSpotEnemyTrait + ")! Free first round for the party." + "</font><BR>");
+                        gv.cc.addLogText("<font color='white'>" + "Enemy is flat-footed" + "</font><BR><BR>");
                     }
                 }
             }
@@ -695,11 +715,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank1;
                                                     if (f.accumulatedBuffStrengthRank1 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank1.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank1.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank1 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank1.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank1.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     //birthday
                                                     //let's limit the faction buff effect a bit for starters
@@ -714,11 +734,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank2;
                                                     if (f.accumulatedBuffStrengthRank2 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank2.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank2.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank2 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank2.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank2.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 3)
@@ -730,11 +750,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank3;
                                                     if (f.accumulatedBuffStrengthRank3 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank3.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank3.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank3 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank3.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank3.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 4)
@@ -746,11 +766,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank4;
                                                     if (f.accumulatedBuffStrengthRank4 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank4.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank4.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank4 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank4.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank4.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 5)
@@ -762,11 +782,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank5;
                                                     if (f.accumulatedBuffStrengthRank5 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank5.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank5.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank5 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank5.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank5.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 6)
@@ -778,11 +798,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank6;
                                                     if (f.accumulatedBuffStrengthRank6 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank6.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank6.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank6 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank6.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank6.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 7)
@@ -794,11 +814,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank7;
                                                     if (f.accumulatedBuffStrengthRank7 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank7.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank7.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank7 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank7.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank7.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 8)
@@ -810,11 +830,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank8;
                                                     if (f.accumulatedBuffStrengthRank8 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank8.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank8.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank8 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank8.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank8.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 9)
@@ -826,11 +846,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank9;
                                                     if (f.accumulatedBuffStrengthRank9 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank9.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank9.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank9 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank9.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank9.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
                                                 if (f.rank == 10)
@@ -842,11 +862,11 @@ namespace IBx
                                                     copy.reflex += f.accumulatedBuffStrengthRank10;
                                                     if (f.accumulatedBuffStrengthRank10 > 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a +" + f.accumulatedBuffStrengthRank10.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color ='white'> belongs to " + f.name + " , +" + f.accumulatedBuffStrengthRank10.ToString() + " buff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                     else if (f.accumulatedBuffStrengthRank10 < 0)
                                                     {
-                                                        gv.cc.addLogText("<font color='blue'>" + copy.cr_name + " belongs to " + f.name + " and gets a -" + f.accumulatedBuffStrengthRank10.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR>");
+                                                        gv.cc.addLogText("<font color='red'>" + copy.cr_name + "<font color='white'> belongs to " + f.name + ", -" + f.accumulatedBuffStrengthRank10.ToString() + " debuff to AC, Hitroll and Saves" + "</font><BR><BR>");
                                                     }
                                                 }
 
@@ -925,7 +945,7 @@ namespace IBx
                 if (gv.mod.nightFightModifier != 0)
                 {
                     gv.mod.poorVisionModifier = gv.mod.nightFightModifier;
-                    gv.cc.addLogText("<font color='yellow'>Night debuff of " + gv.mod.nightFightModifier.ToString() + " applied on party." + "<BR></font>");
+                    gv.cc.addLogText("<font color='white'>Low light debuff of " + gv.mod.nightFightModifier.ToString() + " applied on party." + "<BR><BR></font>");
                     for (int index = 0; index < gv.mod.playerList.Count; index++)
                     {
                         gv.sf.UpdateStats(gv.mod.playerList[index]);
@@ -951,7 +971,7 @@ namespace IBx
                 if (gv.mod.darkFightModifier != 0)
                 {
                     gv.mod.poorVisionModifier = gv.mod.darkFightModifier;
-                    gv.cc.addLogText("<font color='yellow'>Darkness debuff of " + gv.mod.darkFightModifier.ToString() + " applied on party" + ".<BR></font>");
+                    gv.cc.addLogText("<font color='white'>Darkness debuff of " + gv.mod.darkFightModifier.ToString() + " applied on party" + ".<BR><BR></font>");
                     for (int index = 0; index < gv.mod.playerList.Count; index++)
                     {
                         gv.sf.UpdateStats(gv.mod.playerList[index]);
@@ -1352,7 +1372,7 @@ namespace IBx
                     gv.cc.addLogText("<font color='yellow'>" + "Win this battle by defeating all enemies." + "<BR></font>");
                 }
                 */
-                gv.cc.addLogText("<font color='yellow'>" + battleStartMessage + "<BR></font>");
+                gv.cc.addLogText("<font color='white'>" + battleStartMessage + "<BR></font>");
             }
 
             //IBScript Setup Combat Hook (run only once)
@@ -1371,21 +1391,21 @@ namespace IBx
             }
             else if (partyHasUpperHand)
             {
-                gv.cc.addFloatyText(new Coordinate(0, 0), "Enemy is caught flat-footed, Round " + roundCounter, "green");
-                gv.cc.addLogText("<font color='lime'>" + "Round " + roundCounter + "</font><BR>");
+                gv.cc.addFloatyText(new Coordinate(0, 0), "Enemy is caught flat-footed, Round " + roundCounter, "yellow");
+                gv.cc.addLogText("<font color='yellow'>" + "Round " + roundCounter + "</font><BR>");
             }
             else if (creaturesHaveUpperHand)
             {
-                gv.cc.addFloatyText(new Coordinate(0, 0), "Party is caught flat-footed, Round " + roundCounter, "red");
-                gv.cc.addLogText("<font color='red'>" + "Round " + roundCounter + "</font><BR>");
+                gv.cc.addFloatyText(new Coordinate(0, 0), "Party is caught flat-footed, Round " + roundCounter, "yellow");
+                gv.cc.addLogText("<font color='yellow'>" + "Round " + roundCounter + "</font><BR>");
             }
             if (gv.mod.currentEncounter.standGroundVictory)
             {
-                gv.cc.addLogText("<font color='lime'>" + "Survive " + gv.mod.currentEncounter.standGroundInternalTimer + " more round(s).</font><BR>");
+                gv.cc.addLogText("<font color='white'>" + "Survive " + gv.mod.currentEncounter.standGroundInternalTimer + " more round(s).</font><BR>");
             }
             if (gv.mod.currentEncounter.timeLimitDefeat)
             {
-                gv.cc.addLogText("<font color='red'>" + "You have to win within " + gv.mod.currentEncounter.timeLimitInternalTimer + " round(s) or this battle is lost.</font><BR>");
+                gv.cc.addLogText("<font color='white'>" + "You have to win within " + gv.mod.currentEncounter.timeLimitInternalTimer + " round(s) or this battle is lost.</font><BR>");
             }
             floatyTextEnlargerOn = true;
             //floatyTextOn = true;
@@ -1493,6 +1513,8 @@ namespace IBx
         public void turnController()
         {
             if ((animationSeqStack.Count == 0) && (!continueTurn) && !gv.mod.currentEncounter.isOver && !allDone)
+            //if ((!continueTurn) && !gv.mod.currentEncounter.isOver && !allDone)
+            //if (animationSeqStack.Count == 0)
             {
                 //zulaufen
 
@@ -1583,20 +1605,23 @@ namespace IBx
                     if (pc.moveOrder == currentMoveOrderIndex)
                     {
                         //tiereimpark
+                        //nastybug
+                        gv.screenCombat.animationSeqStack.Clear();
                         checkEndEncounter();
                         if (!allDone)
                         {
                             //deathAnimationLocations.Clear();
                             //write the pc's name to log whsoe turn it is
-                            if (pc.hp > 0)
-                            {
-                                gv.cc.addLogText("<font color='blue'>It's the turn of " + pc.name + ". </font><BR>");
-                            }
+                            //if (pc.hp > 0)
+                            //{
+                            //gv.cc.addLogText("<font color='blue'>Turn of " + pc.name + ". </font><BR>");
+                            gv.cc.addLogText("Turn of " + "<font color='lime'>" + pc.name + "</font><BR>");
+                            //}
 
                             if ((pc.hp <= 0) && (pc.hp > -20) && !pc.hasDelayedAlready)
                             {
                                 pc.hp -= 1;
-                                gv.cc.addLogText("<font color='red'>" + pc.name + " bleeds 1 HP, dead at -20 HP!" + "</font><BR>");
+                                gv.cc.addLogText("Unconscious and bleeding, <font color='red'> -1 <font color='white'>HP</font><BR>");
                                 pc.charStatus = "Dead";
                                 if (pc.hp <= -20)
                                 {
@@ -1764,7 +1789,13 @@ namespace IBx
                             currentMoveOrderIndex++;
                             tagsOfTriggersAndPropTriggersCalledThisTurn.Clear();
                             triggerIndexCombat = 0;
-                            CalculateUpperLeft();
+
+                            //flackern
+                            if (pc.hp > 0)
+                            {
+                                //CalculateUpperLeft();
+                            }
+
                             if (!pc.hasDelayedAlready)
                             {
                                 doPropTriggers();
@@ -1782,7 +1813,7 @@ namespace IBx
                             bool partySkipDueToSurprise = false;
                             if (roundCounter <= 2 && creaturesHaveUpperHand)
                             {
-                                gv.cc.addLogText("<font color='red'>" + pc.name + " skips this turn (flat-footed)." + "</font><BR>");
+                                gv.cc.addLogText("Flat-footed" + "<BR>");
                                 partySkipDueToSurprise = true;
                             }
                             if (roundCounter > 2)
@@ -1790,7 +1821,7 @@ namespace IBx
                                 partySkipDueToSurprise = false;
                             }
                             //partySkipDueToSurprise = true;
-                            if ((pc.isHeld()) || (pc.isDead()) || partySkipDueToSurprise)
+                            if ((pc.isDead()) || partySkipDueToSurprise)
                             {
                                 pc.thisCastIsFreeOfCost = false;
                                 pc.isPreparingSpell = false;
@@ -1923,11 +1954,11 @@ namespace IBx
 
                                             if (saveChk >= DC)
                                             {
-                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " makes will save(" + saveChkRoll + "+" + saveChkAdder + " >= " + DC + ") and " + pc.playerClass.labelForCastAction + " still despite damage during last turn." + "</font><BR>");
+                                                gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>makes will save(" + saveChkRoll + "+" + saveChkAdder + " >= " + DC + ") and " + pc.playerClass.labelForCastAction + " still despite damage during last turn." + "</font><BR>");
                                             }
                                             else
                                             {
-                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " fails will save(" + saveChkRoll + "+" + saveChkAdder + " <= " + DC + ") - " + pc.playerClass.spellLabelSingular + " cancelled due to damage during last turn." + "</font><BR>");
+                                                gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>fails will save(" + saveChkRoll + "+" + saveChkAdder + " <= " + DC + ") - " + pc.playerClass.spellLabelSingular + " cancelled due to damage during last turn." + "</font><BR>");
 
                                                 //reset all relevant values to default
                                                 pc.isPreparingSpell = false;
@@ -1950,7 +1981,7 @@ namespace IBx
                                         pc.doCastActionInXFullTurns--;
 
                                         //log
-                                        gv.cc.addLogText("<font color='yellow'>" + pc.name + " prepares a " + pc.playerClass.spellLabelSingular + " that takes still " + pc.doCastActionInXFullTurns + " full turn(s)..." + " </font><BR>");
+                                        gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> prepares a " + pc.playerClass.spellLabelSingular + " that takes still " + pc.doCastActionInXFullTurns + " full turn(s)..." + " </font><BR>");
 
                                         //end turn
                                         endPcTurn(true);
@@ -1990,6 +2021,7 @@ namespace IBx
                     if (crt.moveOrder == currentMoveOrderIndex)
                     {
                         //tiereimpark
+                        gv.screenCombat.animationSeqStack.Clear();
                         checkEndEncounter();
                         spriteList.Clear();
                         if (!floatyTextEnlargerOn)
@@ -2000,7 +2032,7 @@ namespace IBx
                         coordinatesOfPcTheCreatureMovesTowards.Y = -1;
                         storedPathOfCurrentCreature.Clear();
                         //deathAnimationLocations.Clear();
-                        gv.cc.addLogText("<font color='blue'>It's the turn of " + crt.cr_name + ". </font><BR>");
+                        gv.cc.addLogText("Turn of " + "<font color='red'>" + crt.cr_name + "</font> <BR>");
                         //switching to a system where effects last from turn they are applied to start of the target creature's next turn (multiplied with duration of effect)
                         applyEffectsFromSquare(crt.combatLocX, crt.combatLocY);
                         applyEffectsCombat(crt, false);
@@ -2021,7 +2053,8 @@ namespace IBx
                         currentMoveOrderIndex++;
                         tagsOfTriggersAndPropTriggersCalledThisTurn.Clear();
                         triggerIndexCombat = 0;
-                        CalculateUpperLeft();
+                        CalculateUpperLeftCreature(crt);
+                        //CalculateUpperLeft();
                         doPropTriggers();
                         //tiereimpark
                         checkEndEncounter();
@@ -2032,7 +2065,7 @@ namespace IBx
                         bool skipDueToSurprise = false;
                         if (roundCounter <= 2 && partyHasUpperHand)
                         {
-                            gv.cc.addLogText("<font color='blue'>" + crt.cr_name + " skips this turn (flat-footed)." + "</font><BR>");
+                            gv.cc.addLogText("Flat-footed" + "<BR>");
                             skipDueToSurprise = true;
                         }
                         if (roundCounter > 2)
@@ -2044,6 +2077,7 @@ namespace IBx
                         {
                             //upperLeftInFastForwardX = -100;
                             //upperLeftInFastForwardY = -100;
+                            blockAnimationBridge = false;
                             doCreatureTurn();
                         }
                         else
@@ -2064,6 +2098,7 @@ namespace IBx
                 }
                 turnController();
             }
+
             else
             {
                 int ghhg = 0;
@@ -3268,7 +3303,7 @@ namespace IBx
                                             if (s.Value.Equals(ls))
                                             {
                                                 skip = true;
-                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " is immune to " + ef.name + "</font><BR>");
+                                                gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>is immune to " + ef.name + "</font><BR>");
                                                 break;
                                             }
                                         }
@@ -3339,7 +3374,7 @@ namespace IBx
                                             //}
                                             //else
                                             //{
-                                            gv.cc.addLogText("<font color='yellow'>" + pc.name + " makes successful " + ef.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + " and avoids " + ef.name + " </font><BR>");
+                                            gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> makes successful " + ef.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + " and avoids " + ef.name + " </font><BR>");
                                             //}
                                         }
                                         else//failed save roll or no roll allowed
@@ -3353,7 +3388,7 @@ namespace IBx
                                                 //}
                                                 //else
                                                 //{
-                                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " failed " + ef.saveCheckType + " saving roll for " + ef.name + "(" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
+                                                gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> failed " + ef.saveCheckType + " saving roll for " + ef.name + "(" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
                                                 //}
                                                 //gv.cc.addLogText("<font color='yellow'>" + pc.name + " failed " + thisSpellEffect.saveCheckType + " saving roll against " + thisSpellEffect.name + "</font><BR>");
                                                 //gv.cc.addLogText("<font color='yellow'>" + "(" + saveChkRoll.ToString() + "+" + saveChkAdder.ToString() + "<" + DC.ToString() + ")" + "</font><BR>");
@@ -3760,7 +3795,7 @@ namespace IBx
                         {
                             pc.charStatus = "Alive";
                         }
-                        gv.cc.addLogText("<font color='lime'>" + pc.name + " gains 1 HPs (BattleRegen Trait)" + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> gains 1 HPs (BattleRegen Trait)" + "</font><BR>");
                     }
                 }
             }
@@ -3781,7 +3816,7 @@ namespace IBx
                             pc.charStatus = "Alive";
                             pc.hp = pc.hpMax / 10;
                             //do damage to all
-                            gv.cc.addLogText("<font color='lime'>" + pc.name + " jumps back up (Hard to Kill trait).</font><br>");
+                            gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> jumps back up (Hard to Kill trait).</font><br>");
                             if (gv.mod.debugMode)
                             {
                                 gv.cc.addLogText("<font color='yellow'>" + "roll = " + roll + " (" + roll + " > 50)</font><BR>");
@@ -3789,7 +3824,7 @@ namespace IBx
                         }
                         else
                         {
-                            gv.cc.addLogText("<font color='lime'>" + pc.name + " stays down (Hard to Kill trait).</font><br>");
+                            gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> stays down (Hard to Kill trait).</font><br>");
                             if (gv.mod.debugMode)
                             {
                                 gv.cc.addLogText("<font color='yellow'>" + "roll = " + roll + " (" + roll + " < 51)</font><BR>");
@@ -3908,7 +3943,7 @@ namespace IBx
             }
             if (increment > 0)
             {
-                gv.cc.addLogText("<font color='lime'>" + pc.name + " regens " + increment + "sp</font><br>");
+                gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'> regens <font color='lime'>" + increment + "<font color='white'> sp</font><br>");
             }
 
         }
@@ -3922,7 +3957,7 @@ namespace IBx
             }
             if (increment > 0)
             {
-                gv.cc.addLogText("<font color='lime'>" + pc.name + " regens " + increment + "hp</font><br>");
+                gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>regens <font color='lime'>" + increment + " <font color='white'>hp</font><br>");
             }
         }
 
@@ -4163,7 +4198,7 @@ namespace IBx
                     {
                         if (pc.effectsList[i].endEffectWhenCarrierTakesDamage)
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + pc.name + "took damage and is freed from" + pc.effectsList[i].name + "</font><BR>");
+                            gv.cc.addLogText("<font color='lime'>" + pc.name + "<font color='white'>took damage and is freed from" + pc.effectsList[i].name + "</font><BR>");
                             pc.effectsList.Remove(pc.effectsList[i]);
                         }
                     }
@@ -4205,12 +4240,12 @@ namespace IBx
 
                         if (saveChk >= DC)
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + "The " + pc.effectsList[i].name + " effect on " + pc.name + " has been shrugged off." + " </font><BR>");
+                            gv.cc.addLogText("<font color='whitw'>" + "The " + pc.effectsList[i].name + " effect on <font color='lime'>" + pc.name + " <font color='white'>has been shrugged off." + " </font><BR>");
                             pc.effectsList.RemoveAt(i);
                         }
                         else
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + pc.name + " fails to shrug off " + pc.effectsList[i].name + "." + " </font><BR>");
+                            gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>fails to shrug off " + pc.effectsList[i].name + "." + " </font><BR>");
                         }
                     }
                 }
@@ -4230,7 +4265,7 @@ namespace IBx
                             {
                                 if (!pc.effectsList[i].isPermanent)
                                 {
-                                    gv.cc.addLogText("<font color='yellow'>" + "The " + pc.effectsList[i].name + " effect on " + pc.name + " has just ended." + " </font><BR>");
+                                    gv.cc.addLogText("<font color='white'>" + "The " + pc.effectsList[i].name + " effect on <font color='lime'>" + pc.name + " <font color='white'>has just ended." + " </font><BR>");
                                     pc.effectsList.RemoveAt(i);
                                 }
                             }
@@ -4241,7 +4276,7 @@ namespace IBx
                             {
                                 if (!pc.effectsList[i].isPermanent)
                                 {
-                                    gv.cc.addLogText("<font color='yellow'>" + "The " + pc.effectsList[i].name + " effect on " + pc.name + " has just ended." + " </font><BR>");
+                                    gv.cc.addLogText("<font color='white'>" + "The " + pc.effectsList[i].name + " effect on <font color='lime'>" + pc.name + " <font color='white'>has just ended." + " </font><BR>");
                                     pc.effectsList.RemoveAt(i);
                                 }
                             }
@@ -4391,7 +4426,7 @@ namespace IBx
                         if (pc.hp > -20)
                         {
                             pc.hp -= gv.mod.currentEncounter.hpDamageEachRound;
-                            gv.cc.addLogText("<font color='red'>" + pc.name + " lost " + gv.mod.currentEncounter.hpDamageEachRound + " hp.</font><BR>");
+                            gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>lost <font color='red'>" + gv.mod.currentEncounter.hpDamageEachRound + " <font color='white'>hp.</font><BR>");
                         }
                     }
 
@@ -4400,7 +4435,7 @@ namespace IBx
                         if (pc.sp > 0)
                         {
                             pc.sp -= gv.mod.currentEncounter.spDamageEachRound;
-                            gv.cc.addLogText("<font color='red'>" + pc.name + " lost " + gv.mod.currentEncounter.spDamageEachRound + " sp.</font><BR>");
+                            gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>lost <font color='red'>" + gv.mod.currentEncounter.spDamageEachRound + " <font color='white'>sp.</font><BR>");
                             if (pc.sp < 0)
                             {
                                 pc.sp = 0;
@@ -4625,26 +4660,32 @@ namespace IBx
                 crt.hp = crt.hp - damage;
                 if (paidHpCost)
                 {
-                    gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> is damaged for " + itChk.hpCostPerAttack + "HP by attacking." + "</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + "</font><font color='white'> is damaged for " + itChk.hpCostPerAttack + "HP by attacking." + "</font><BR>");
                 }
                 if (paidSpCost)
                 {
-                    gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> is drained for " + itChk.spCostPerAttack + " SP by attacking." + "</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + "</font><font color='white'> is drained for " + itChk.spCostPerAttack + " SP by attacking." + "</font><BR>");
                 }
                 if (attackPenaltyForCostNotPaid)
                 {
-                    gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> could not pay cost for attack, -10 to hit." + "</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + "</font><font color='white'> could not pay cost for attack, -10 to hit." + "</font><BR>");
                 }
 
-                gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> attacks </font><font color='silver'>" + crt.cr_name + "</font>");
-                gv.cc.addLogText("<font color='white'> and HITS (</font><font color='lime'>" + damage + "</font><font color='white'> damage)</font><BR>");
+                gv.cc.addLogText("Attacks <font color='red'>" + crt.cr_name + "</font>");
                 if (!automaticallyHits)
                 {
-                    gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " >= " + defense + "</font><BR>");
+                    if (attackMod >= 0)
+                    {
+                        gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " >= " + defense + ", hit for <font color='red'>" + damage + "<font color='white'>hp</font>");
+                    }
+                    else
+                    {
+                        gv.cc.addLogText("<font color='white'>" + attackRoll + " " + attackMod + " >= " + defense + ", hit for <font color='red'>" + damage + "<font color='white'>hp</font>");
+                    }
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='white'>" + "(Automatic hit)" + "</font><BR>");
+                    gv.cc.addLogText("<font color='white'>" + "Automatic hit for <font color='red'>" + damage + "<font color='white'>hp</font><BR> ");
                 }
 
                 Item it = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref);
@@ -4686,7 +4727,7 @@ namespace IBx
                         deathAnimationLocations.Add(new Coordinate(coor.X, coor.Y));
                         //gv.screenCombat.blockCreatureDrawLocations.Add();
                     }
-                    gv.cc.addLogText("<font color='lime'>You killed the " + crt.cr_name + "</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>has been killed</font><BR>");
                     return 2; //killed
                 }
                 else
@@ -4703,19 +4744,25 @@ namespace IBx
                 }
                 if (paidHpCost)
                 {
-                    gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> is damaged for " + itChk.hpCostPerAttack + "HP by attacking." + "</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + "</font><font color='white'> is damaged for " + itChk.hpCostPerAttack + "HP by attacking." + "</font><BR>");
                 }
                 if (paidSpCost)
                 {
-                    gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> is drained for " + itChk.spCostPerAttack + " SP by attacking." + "</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + "</font><font color='white'> is drained for " + itChk.spCostPerAttack + " SP by attacking." + "</font><BR>");
                 }
                 if (attackPenaltyForCostNotPaid)
                 {
-                    gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> could not pay cost for attack, -10 to hit." + "</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + "</font><font color='white'> could not pay cost for attack, -10 to hit." + "</font><BR>");
                 }
-                gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font><font color='white'> attacks </font><font color='gray'>" + crt.cr_name + "</font>");
-                gv.cc.addLogText("<font color='white'> and MISSES</font><BR>");
-                gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " < " + defense + "</font><BR>");
+                gv.cc.addLogText("Attacks <font color='red'>" + crt.cr_name + "</font>");
+                if (attackMod >= 0)
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " < " + defense + ", miss</font><BR>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " " + attackMod + " < " + defense + ", miss</font><BR>");
+                }
                 return 0; //missed
             }
         }
@@ -4799,7 +4846,7 @@ namespace IBx
                 //if (!continueTurn)
                 //{
                 deathAnimationLocations.Clear();
-
+                gv.cc.addLogText("<font color='blue'> </font><BR>");
                 turnController();
                 //}
                 //else
@@ -4853,12 +4900,12 @@ namespace IBx
             if (roll + attMod + skillMod >= DC)
             {
                 pc.steathModeOn = true;
-                gv.cc.addLogText("<font color='lime'> stealth ON: " + roll + "+" + attMod + "+" + skillMod + ">=" + DC + "</font><BR>");
+                gv.cc.addLogText("Stealthed: " + roll + "+" + attMod + "+" + skillMod + ">=" + DC + "<BR>");
             }
             else
             {
                 pc.steathModeOn = false;
-                gv.cc.addLogText("<font color='lime'> stealth OFF: " + roll + "+" + attMod + "+" + skillMod + " < " + DC + "</font><BR>");
+                gv.cc.addLogText("<Unstealthed: " + roll + "+" + attMod + "+" + skillMod + " < " + DC + "<BR>");
             }
         }
         public void doPlayerCombatFacing(Player pc, int tarX, int tarY)
@@ -4879,12 +4926,24 @@ namespace IBx
         {
             canMove = true;
             Creature crt = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
             foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
             {
-                if (c.moveOrder == currentMoveOrderIndex - 1)
+                if (currentMoveOrderIndex == 0)
                 {
-                    crt = c;
-                    break;
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        crt = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt = c;
+                        break;
+                    }
                 }
             }
             //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -4903,12 +4962,24 @@ namespace IBx
         public void doCreatureNextAction()
         {
             Creature crt = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
             foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
             {
-                if (c.moveOrder == currentMoveOrderIndex - 1)
+                if (currentMoveOrderIndex == 0)
                 {
-                    crt = c;
-                    break;
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        crt = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt = c;
+                        break;
+                    }
                 }
             }
             //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -4952,12 +5023,24 @@ namespace IBx
         public void doCreatureTurnAfterDelay()
         {
             Creature crt = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
             foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
             {
-                if (c.moveOrder == currentMoveOrderIndex - 1)
+                if (currentMoveOrderIndex == 0)
                 {
-                    crt = c;
-                    break;
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        crt = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt = c;
+                        break;
+                    }
                 }
             }
             //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -5020,12 +5103,24 @@ namespace IBx
         public void CreatureMoves()
         {
             Creature crt = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
             foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
             {
-                if (c.moveOrder == currentMoveOrderIndex - 1)
+                if (currentMoveOrderIndex == 0)
                 {
-                    crt = c;
-                    break;
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        crt = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        crt = c;
+                        break;
+                    }
                 }
             }
             //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -6218,9 +6313,182 @@ namespace IBx
                 CreatureMoves();
             }
         }
+        
+        //leavethretaned overload
+        public void CreatureDoesAttack(Creature crt, bool allowAnimationActivation, Player pc, int futurePosX, int futurePosY)
+        {
+            if (pc != null)
+            {
+                //Player pc = (Player)gv.sf.CombatTarget;
+                //Uses Map Pixel Locations
+                int startX = pc.combatLocX * gv.squareSize + (gv.squareSize / 2);
+                int startY = pc.combatLocY * gv.squareSize + (gv.squareSize / 2);
+                int endX = crt.combatLocX * gv.squareSize + (gv.squareSize / 2);
+                int endY = crt.combatLocY * gv.squareSize + (gv.squareSize / 2);
+                // determine if ranged or melee
+                if ((crt.cr_category.Equals("Ranged"))
+                        && (CalcDistance(crt, crt.combatLocX, crt.combatLocY, pc.combatLocX, pc.combatLocY) <= crt.cr_attRange)
+                        && (isVisibleLineOfSight(new Coordinate(startX, startY), new Coordinate(endX, endY))))
+                {
+                    //play attack sound for ranged
+                    gv.PlaySound(crt.cr_attackSound);
+                    if ((pc.combatLocX < crt.combatLocX) && (!crt.combatFacingLeft)) //attack left
+                    {
+                        crt.combatFacingLeft = true;
+                    }
+                    else if ((pc.combatLocX > crt.combatLocX) && (crt.combatFacingLeft)) //attack right
+                    {
+                        crt.combatFacingLeft = false;
+                    }
+                    //CHANGE FACING BASED ON ATTACK
+                    doCreatureCombatFacing(crt, pc.combatLocX, pc.combatLocY);
 
+                    if (crt.hp > 0)
+                    {
 
-        //AoO overload
+                        //bali1
+                        if (gv.mod.useManualCombatCam)
+                        {
+                            adjustCamToRangedCreature = true;
+                            //CenterScreenOnPC();
+                            //CalculateUpperLeftCreature(crt);
+                            adjustCamToRangedCreature = false;
+
+                            if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                            {
+                                //ATTACKI
+                                gv.touchEnabled = false;
+                            }
+                        }
+
+                        creatureToAnimate.Add(crt);
+                        playerToAnimate = null;
+                        creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
+                        //set attack animation and do a delay
+                        attackAnimationTimeElapsed = 0;
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f) );
+                        attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+
+                        //add projectile animation
+                        startX = getPixelLocX(crt.combatLocX);
+                        startY = getPixelLocY(crt.combatLocY);
+                        endX = getPixelLocX(pc.combatLocX);
+                        endY = getPixelLocY(pc.combatLocY);
+                        string filename = crt.cr_projSpriteFilename;
+                        AnimationSequence newSeq = new AnimationSequence();
+                        animationSeqStack.Add(newSeq);
+                        AnimationStackGroup newGroup = new AnimationStackGroup();
+                        newSeq.AnimationSeq.Add(newGroup);
+                        launchProjectile(filename, startX, startY, endX, endY, newGroup);
+                        //add ending projectile animation  
+                        //onthewater
+                        doStandardCreatureAttack(crt, pc, futurePosX, futurePosY);
+                        //add hit or miss animation
+                        //add floaty text
+                        //add death animations
+                        newGroup = new AnimationStackGroup();
+                        animationSeqStack[0].AnimationSeq.Add(newGroup);
+                        foreach (Coordinate coor in deathAnimationLocations)
+                        {
+                            if (!IsInVisibleCombatWindow(coor.X, coor.Y))
+                            {
+                                continue;
+                            }
+                            addDeathAnimation(newGroup, new Coordinate(getPixelLocX(coor.X), getPixelLocY(coor.Y)));
+                        }
+                        if (!allowAnimationActivation)
+                        {
+                            //AoO situation
+                            isPlayerTurn = true;
+                        }
+                        animationsOn = true;
+                    }
+                    else
+                    {
+                        //skip this guys turn
+                    }
+                }
+                else if ((crt.cr_category.Equals("Melee"))
+                        && (CalcDistance(crt, crt.combatLocX, crt.combatLocY, pc.combatLocX, pc.combatLocY) <= crt.cr_attRange))
+                {
+                    if ((pc.combatLocX < crt.combatLocX) && (!crt.combatFacingLeft)) //attack left
+                    {
+                        crt.combatFacingLeft = true;
+                    }
+                    else if ((pc.combatLocX > crt.combatLocX) && (crt.combatFacingLeft)) //attack right
+                    {
+                        crt.combatFacingLeft = false;
+                    }
+                    //CHANGE FACING BASED ON ATTACK
+                    doCreatureCombatFacing(crt, pc.combatLocX, pc.combatLocY);
+                    if (crt.hp > 0)
+                    {
+
+                        if (gv.mod.useManualCombatCam)
+                        {
+                            //adjustCamToRangedCreature = true;
+                            //CenterScreenOnPC();
+                            //CalculateUpperLeftCreature(crt);
+                            //adjustCamToRangedCreature = false;
+
+                            if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                            {
+                                //ATTACKI
+                                gv.touchEnabled = false;
+                            }
+                        }
+
+                        creatureToAnimate.Add(crt);
+                        playerToAnimate = null;
+
+                        attackAnimationTimeElapsed = 0;
+                        attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
+
+                        //do melee attack stuff and animations  
+                        AnimationSequence newSeq = new AnimationSequence();
+                        animationSeqStack.Add(newSeq);
+                        doStandardCreatureAttack(crt, pc, futurePosX, futurePosY);
+                        //add hit or miss animation
+                        //add floaty text
+                        //add death animations
+                        AnimationStackGroup newGroup = new AnimationStackGroup();
+                        animationSeqStack[0].AnimationSeq.Add(newGroup);
+                        foreach (Coordinate coor in deathAnimationLocations)
+                        {
+                            if (!IsInVisibleCombatWindow(coor.X, coor.Y))
+                            {
+                                continue;
+                            }
+                            addDeathAnimation(newGroup, new Coordinate(getPixelLocX(coor.X), getPixelLocY(coor.Y)));
+                        }
+
+                        if (!allowAnimationActivation)
+                        {
+                            //AoO situation
+                            isPlayerTurn = true;
+                        }
+                        animationsOn = true;
+                    }
+                    else
+                    {
+                        //skip this guys turn
+                    }
+                }
+                else //not in range for attack so MOVE
+                {
+                    CreatureMoves();
+                }
+            }
+            else //no target so move instead
+            {
+                CreatureMoves();
+            }
+        }
+
+        //AoO overload (for non-moving situarions, like casting)
         public void CreatureDoesAttack(Creature crt, bool allowAnimationActivation, Player pc)
         {
             if (pc != null)
@@ -7206,10 +7474,11 @@ namespace IBx
                 }
             }
             */
+            gv.cc.addLogText("<font color='blue'> </font><BR>");
             crt.maxTurnTimeCounter = 0;
             crt.targetPcTag = "none";
             updateStatsAllCreatures();
-            //gv.cc.addLogText("<font color='silver'>" + "Updated stats" + "</font><BR>");
+            //gv.cc.addLogText("<font color='red'>" + "Updated stats" + "</font><BR>");
             creatureMoves = 0;
             currentMoves = 0;
             //store current hp of cretaure, use it at start of creature next turn to see whether damage occured in the meantime
@@ -7313,6 +7582,110 @@ namespace IBx
             crt.glideAdderY = 0;
             //gv.cc.addLogText("<font color='silver'>" + "Right before calling truncontroller" + "</font><BR>");
             turnController();
+        }
+
+        public void doStandardCreatureAttack(Creature crt, Player pc, int futureX, int futureY)
+        {
+            //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            //Player pc = (Player)gv.sf.CombatTarget;
+
+            upperLeftInFastForwardX = pc.combatLocX - gv.playerOffsetX;
+            upperLeftInFastForwardY = pc.combatLocY - gv.playerOffsetY;
+
+            bool hit = false;
+            for (int i = 0; i < crt.getNumberOfAttacks(); i++)
+            {
+                //this reduces the to hit bonus for each further creature attack by an additional -5
+                //creatureMultAttackPenalty = 5 * i;            
+                bool hitreturn = doActualCreatureAttack(pc, crt, i, futureX, futureY);
+                if (hitreturn) { hit = true; }
+                if (pc.hp <= 0)
+                {
+                    break; //do not try and attack same PC that was just killed
+                }
+            }
+
+            //play attack sound for melee
+            if (!crt.cr_category.Equals("Ranged"))
+            {
+                gv.PlaySound(crt.cr_attackSound);
+            }
+
+            if (hit)
+            {
+                //hitAnimationLocation = new Coordinate(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY));
+                //reversecodeneeded
+                if (pc.hp > 0)
+                {
+                    hitAnimationLocation = new Coordinate(getPixelLocX(futureX), getPixelLocY(futureY));
+                }
+
+                else
+                {
+                    spriteList.Clear();
+                    /*
+                    int passX = pc.combatLocX;
+                    int passY = pc.combatLocY;
+
+                    if (pc.combatLocX > futureX)
+                    {
+                        passX = pc.combatLocX - 1;
+                    }
+                    else if (pc.combatLocX < futureX)
+                    {
+                        passX = pc.combatLocX + 1;
+                    }
+
+                    if (pc.combatLocY > futureY)
+                    {
+                        passY = pc.combatLocY - 1;
+                    }
+                    else if (pc.combatLocY < futureY)
+                    {
+                        passY = pc.combatLocY + 1;
+                    }
+                    hitAnimationLocation = new Coordinate(getPixelLocX(passX), getPixelLocY(passY));
+                    */
+                }
+
+                //new system
+                //AnimationStackGroup newGroup = new AnimationStackGroup();
+                //animationSeqStack[0].AnimationSeq.Add(newGroup);
+                //addHitAnimation(newGroup);
+                //attackAnimationTimeElapsed = 100000;
+                //if (gv.mod.AoOHitSymbolHasBeenDrawn == false)
+                //{
+
+                if (pc.hp > 0)
+                {
+                    int ttl = 8 * gv.mod.attackAnimationSpeed;
+                    Sprite spr = new Sprite(gv, "hit_symbol", hitAnimationLocation.X, hitAnimationLocation.Y, 0, 0, 0, 0, 1.0f, ttl, false, ttl / 4);
+                    int testX = UpperLeftSquare.X;
+                    int testY = UpperLeftSquare.Y;
+                    spriteList.Add(spr);
+                }
+
+                //gv.mod.AoOHitSymbolHasBeenDrawn = true;
+                //}
+            }
+            else
+            {
+                //hitAnimationLocation = new Coordinate(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY));
+                hitAnimationLocation = new Coordinate(getPixelLocX(futureX), getPixelLocY(futureY));
+                //new system
+                //AnimationStackGroup newGroup = new AnimationStackGroup();
+                //animationSeqStack[0].AnimationSeq.Add(newGroup);
+                //addMissAnimation(newGroup);
+                //attackAnimationTimeElapsed = 100000;
+                //if (gv.mod.numberOfAoOAttackers > 1)
+                //{
+                int ttl = 8 * gv.mod.attackAnimationSpeed;
+                Sprite spr = new Sprite(gv, "miss_symbol", hitAnimationLocation.X, hitAnimationLocation.Y, 0, 0, 0, 0, 1.0f, ttl, false, ttl / 4);
+                int testX = UpperLeftSquare.X;
+                int testY = UpperLeftSquare.Y;
+                spriteList.Add(spr);
+                //}
+            }
         }
 
         public void doStandardCreatureAttack(Creature crt, Player pc)
@@ -7430,13 +7803,18 @@ namespace IBx
             if ((attack >= defense) || (attackRoll == 20))
             {
                 pc.hp = pc.hp - damage;
-                gv.cc.addLogText("<font color='silver'>" + crt.cr_name + "</font>" +
-                        "<font color='white'>" + " attacks " + "</font>" +
-                        "<font color='aqua'>" + pc.name + "</font><BR>");
-                gv.cc.addLogText("<font color='white'>" + " and HITS (" + "</font>" +
-                        "<font color='red'>" + damage + "</font>" +
-                        "<font color='white'>" + " damage)" + "</font><BR>");
-                gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " >= " + defense + "</font><BR>");
+                gv.cc.addLogText("Attacks " +
+                        "<font color='lime'>" + pc.name + "</font><BR>");
+                if (attackMod >= 0)
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " >= " + defense + ", hit for <font color='red'>" + damage + "</font>" +
+                            "<font color='white'>" + "hp" + "</font>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " " + attackMod + " >= " + defense + ", hit for <font color='red'>" + damage + "</font>" +
+                            "<font color='white'>" + "hp" + "</font>");
+                }
 
                 doOnHitScriptBasedOnFilename(crt.onScoringHit, crt, pc);
                 if (!crt.onScoringHitCastSpellTag.Equals("none"))
@@ -7451,7 +7829,7 @@ namespace IBx
 
                 if (pc.hp <= 0)
                 {
-                    gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
+                    //gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
                     pc.charStatus = "Dead";
                 }
                 if (pc.hp <= -20)
@@ -7462,11 +7840,103 @@ namespace IBx
             }
             else
             {
-                gv.cc.addLogText("<font color='silver'>" + crt.cr_name + "</font>" +
-                        "<font color='white'>" + " attacks " + "</font>" +
-                        "<font color='aqua'>" + pc.name + "</font><BR>");
-                gv.cc.addLogText("<font color='white'>" + " and MISSES" + "</font><BR>");
-                gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " < " + defense + "</font><BR>");
+                gv.cc.addLogText("Attacks " +
+                        "<font color='lime'>" + pc.name + "</font><BR>");
+                if (attackMod >= 0)
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " < " + defense + ", miss</font><BR>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " " + attackMod + " < " + defense + ", miss</font><BR>");
+                }
+                return false;
+            }
+        }
+
+        //overload for AoO
+        public bool doActualCreatureAttack(Player pc, Creature crt, int attackNumber, int futureX, int futureY)
+        {
+            int attackRoll = gv.sf.RandInt(20);
+            int attackMod = CalcCreatureAttackModifier(crt, pc);
+            int defense = CalcPcDefense(pc, crt);
+            int damage = CalcCreatureDamageToPc(pc, crt);
+            int attack = attackRoll + attackMod;
+
+            if ((attack >= defense) || (attackRoll == 20))
+            {
+                pc.hp = pc.hp - damage;
+                gv.cc.addLogText("Attacks " +
+                        "<font color='lime'>" + pc.name + "</font><BR>");
+                if (attackMod >= 0)
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " >= " + defense + ", hit for <font color='red'>" + damage + "</font>" +
+                            "<font color='white'>" + "hp</font>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " " + attackMod + " >= " + defense + ", hit for <font color='red'>" + damage + "</font>" +
+                            "<font color='white'>" + "hp</font>");
+                }
+
+                doOnHitScriptBasedOnFilename(crt.onScoringHit, crt, pc);
+                if (!crt.onScoringHitCastSpellTag.Equals("none"))
+                {
+                    doCreatureOnHitCastSpell(crt, pc);
+                }
+
+                //Draw floaty text showing damage above PC
+                int txtH = (int)gv.drawFontRegHeight;
+                int shiftUp = 0 - (attackNumber * txtH);
+
+
+                int passX = pc.combatLocX;
+                int passY = pc.combatLocY;
+
+                if (pc.combatLocX > futureX)
+                {
+                    passX = pc.combatLocX + 1;
+                }
+                else if (pc.combatLocX < futureX)
+                {
+                    passX = pc.combatLocX - 1;
+                }
+
+                if (pc.combatLocY > futureY)
+                {
+                    passY = pc.combatLocY + 1;
+                }
+                else if (pc.combatLocY < futureY)
+                {
+                    passY = pc.combatLocY - 1;
+                }
+                //passX
+                gv.cc.addFloatyText(new Coordinate(passX, passY), damage + "", shiftUp);
+                //gv.cc.addFloatyText(new Coordinate(pc.combatLocX, pc.combatLocY), damage + "", shiftUp);
+
+                if (pc.hp <= 0)
+                {
+                    //gv.cc.addLogText("<font color='red'>" + pc.name + " is unconscious!" + "</font><BR>");
+                    pc.charStatus = "Dead";
+                }
+                if (pc.hp <= -20)
+                {
+                    // deathAnimationLocations.Add(new Coordinate(pc.combatLocX, pc.combatLocY));
+                }
+                return true;
+            }
+            else
+            {
+                gv.cc.addLogText("Attacks " +
+                        "<font color='lime'>" + pc.name + "</font><BR>");
+                if (attackMod >= 0)
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " + " + attackMod + " < " + defense + ", miss</font><BR>");
+                }
+                else
+                {
+                    gv.cc.addLogText("<font color='white'>" + attackRoll + " " + attackMod + " < " + defense + ", miss</font><BR>");
+                }
                 return false;
             }
         }
@@ -7501,7 +7971,7 @@ namespace IBx
                                         + " fireDam = " + fireDam + "</font>" +
                                         "<BR>");
                         }
-                        gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font>" +
+                        gv.cc.addLogText("<font color='lime'>" + pc.name + "</font>" +
                                 "<font color='white'>" + " is burned for " + "</font>" +
                                 "<font color='red'>" + fireDam + "</font>" +
                                 "<font color='white'>" + " hit point(s)" + "</font>" +
@@ -7543,7 +8013,7 @@ namespace IBx
                                     + " acidDam = " + acidDam + "</font>" +
                                     "<BR>");
                         }
-                        gv.cc.addLogText("<font color='aqua'>" + pc.name + "</font>" +
+                        gv.cc.addLogText("<font color='lime'>" + pc.name + "</font>" +
                                 "<font color='white'>" + " is burned for " + "</font>" +
                                 "<font color='lime'>" + acidDam + "</font>" +
                                 "<font color='white'>" + " hit point(s)" + "</font>" +
@@ -7578,7 +8048,7 @@ namespace IBx
                                         + " fireDam = " + fireDam + "</font>" +
                                         "<BR>");
                         }
-                        gv.cc.addLogText("<font color='aqua'>" + crt.cr_name + "</font>" +
+                        gv.cc.addLogText("<font color='lime'>" + crt.cr_name + "</font>" +
                                 "<font color='white'>" + " is burned for " + "</font>" +
                                 "<font color='red'>" + fireDam + "</font>" +
                                 "<font color='white'>" + " hit point(s)" + "</font>" +
@@ -7597,7 +8067,7 @@ namespace IBx
                                         + " fireDam = " + fireDam + "</font>" +
                                         "<BR>");
                         }
-                        gv.cc.addLogText("<font color='aqua'>" + crt.cr_name + "</font>" +
+                        gv.cc.addLogText("<font color='lime'>" + crt.cr_name + "</font>" +
                                 "<font color='white'>" + " is burned for " + "</font>" +
                                 "<font color='red'>" + fireDam + "</font>" +
                                 "<font color='white'>" + " hit point(s)" + "</font>" +
@@ -7616,7 +8086,7 @@ namespace IBx
                                         + " fireDam = " + fireDam + "</font>" +
                                         "<BR>");
                         }
-                        gv.cc.addLogText("<font color='aqua'>" + crt.cr_name + "</font>" +
+                        gv.cc.addLogText("<font color='lime'>" + crt.cr_name + "</font>" +
                                 "<font color='white'>" + " is burned for " + "</font>" +
                                 "<font color='red'>" + fireDam + "</font>" +
                                 "<font color='white'>" + " hit point(s)" + "</font>" +
@@ -8224,12 +8694,24 @@ namespace IBx
             else
             {
                 Creature crt = new Creature();
+                int highestLivingCrtMoveOrderfound = 0;
                 foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                 {
-                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    if (currentMoveOrderIndex == 0)
                     {
-                        crt = c;
-                        break;
+                        if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                        {
+                            highestLivingCrtMoveOrderfound = c.moveOrder;
+                            crt = c;
+                        }
+                    }
+                    else
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            crt = c;
+                            break;
+                        }
                     }
                 }
                 //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -8294,12 +8776,24 @@ namespace IBx
                 {
                     //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
                     Creature crt = new Creature();
+                    int highestLivingCrtMoveOrderfound = 0;
                     foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                     {
-                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        if (currentMoveOrderIndex == 0)
                         {
-                            crt = c;
-                            break;
+                            if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                            {
+                                highestLivingCrtMoveOrderfound = c.moveOrder;
+                                crt = c;
+                            }
+                        }
+                        else
+                        {
+                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                            {
+                                crt = c;
+                                break;
+                            }
                         }
                     }
                     prp = gv.mod.currentEncounter.getPropByLocation(crt.combatLocX, crt.combatLocY);
@@ -8413,12 +8907,24 @@ namespace IBx
                 else
                 {
                     Creature crt = new Creature();
+                    int highestLivingCrtMoveOrderfound = 0;
                     foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                     {
-                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        if (currentMoveOrderIndex == 0)
                         {
-                            crt = c;
-                            break;
+                            if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                            {
+                                highestLivingCrtMoveOrderfound = c.moveOrder;
+                                crt = c;
+                            }
+                        }
+                        else
+                        {
+                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                            {
+                                crt = c;
+                                break;
+                            }
                         }
                     }
                     //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -9169,12 +9675,24 @@ namespace IBx
                         endCreatureTurn(gv.mod.currentEncounter.encounterCreatureList[idx]);
                         */
                         Creature crt = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
                         foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                         {
-                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                            if (currentMoveOrderIndex == 0)
                             {
-                                crt = c;
-                                break;
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    crt = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    crt = c;
+                                    break;
+                                }
                             }
                         }
                         endCreatureTurn(crt);
@@ -9387,12 +9905,24 @@ namespace IBx
                         {
                             //alarmknopf
                             Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
                             foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                             {
-                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                if (currentMoveOrderIndex == 0)
                                 {
-                                    cr = c;
-                                    break;
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
                                 }
                             }
 
@@ -9500,7 +10030,7 @@ namespace IBx
                         }
                     }
                 }
-                if ((gv.mod.useManualCombatCam) && (animationSeqStack.Count == 0))
+                if ((gv.mod.useManualCombatCam) && (animationSeqStack.Count == 0) && (spriteList.Count == 0))
                 {
                     gv.touchEnabled = true;
                 }
@@ -9655,10 +10185,10 @@ namespace IBx
         public void redrawCombat(float elapsed)
         {
             //IF CONTROLS ARE NULL, CREATE THEM
-            if (btnPanUp == null)
+            /*if (btnPanUp == null)
             {
                 setControlsStart();
-            }
+            }*/
 
             drawCombatMap();
             drawProps();
@@ -9715,10 +10245,10 @@ namespace IBx
             
             drawUiLayout();
             
-            btnPanUp.Draw();
-            btnPanDown.Draw();
-            btnPanLeft.Draw();
-            btnPanRight.Draw();
+            //btnPanUp.Draw();
+            //btnPanDown.Draw();
+            //btnPanLeft.Draw();
+            //btnPanRight.Draw();
         }
 
         public void drawHeightShadows()
@@ -12188,8 +12718,9 @@ namespace IBx
                         IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
                         gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft, false);
                         src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
-                        if (!animationsOn)
-                        {
+                        //always show effects
+                        //if (!animationsOn)
+                        //{
                             foreach (Effect ef in pc.effectsList)
                             {
                                 if ((!ef.isPermanent) && (ef.spriteFilename != "none") && (ef.spriteFilename != ""))
@@ -12200,7 +12731,7 @@ namespace IBx
                                     //gv.cc.DisposeOfBitmap(ref fx);
                                 }
                             }
-                        }
+                        //}
                         if ((pc.isDead()) || (pc.isUnconcious()))
                         {
                             src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Width);
@@ -12263,8 +12794,9 @@ namespace IBx
                         IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
                         gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft);
                         src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
-                        if (!animationsOn)
-                        {
+                        //show effects always
+                        //if (!animationsOn)
+                        //{
                             foreach (Effect ef in pc.effectsList)
                             {
                                 if ((!ef.isPermanent) && (ef.spriteFilename != "none") && (ef.spriteFilename != ""))
@@ -12275,7 +12807,7 @@ namespace IBx
                                     //gv.cc.DisposeOfBitmap(ref fx);
                                 }
                             }
-                        }
+                        //}
                         if ((pc.isDead()) || (pc.isUnconcious()))
                         {
                             src = new IbRect(0, 0, gv.cc.pc_dead.Width, gv.cc.pc_dead.Width);
@@ -14177,7 +14709,9 @@ namespace IBx
                 //end
                 */
 
-                if (!animationsOn && drawCreature)
+                //if (!animationsOn && drawCreature)
+                //always show efects
+                if (drawCreature)
                 {
                     foreach (Effect ef in crt.cr_effectsList)
                     {
@@ -14219,12 +14753,24 @@ namespace IBx
                     //if (creatureIndex < gv.mod.currentEncounter.encounterCreatureList.Count)
                     //{
                     Creature cr = new Creature();
+                    int highestLivingCrtMoveOrderfound = 0;
                     foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
                     {
-                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        if (currentMoveOrderIndex == 0)
                         {
-                            cr = c;
-                            break;
+                            if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                            {
+                                highestLivingCrtMoveOrderfound = c.moveOrder;
+                                cr = c;
+                            }
+                        }
+                        else
+                        {
+                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                            {
+                                cr = c;
+                                break;
+                            }
                         }
                     }
                     //Creature cr = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
@@ -14678,8 +15224,9 @@ namespace IBx
             if (floatyTextOn)
             {
                 int txtH = (int)gv.drawFontRegHeight;
-
-                foreach (FloatyText ft in gv.cc.floatyTextList)
+                int rightShift = 0;
+                //foreach (FloatyText ft in gv.cc.floatyTextList)
+                for (int i = 0; i < gv.cc.floatyTextList.Count; i++)
                 {
                     /*
                     for (int x = -1; x <= 1; x++)
@@ -14697,15 +15244,15 @@ namespace IBx
                     }
                     */
                     string colr = "yellow";
-                    if (ft.color.Equals("yellow"))
+                    if (gv.cc.floatyTextList[i].color.Equals("yellow"))
                     {
                         colr = "yellow";
                     }
-                    else if (ft.color.Equals("blue"))
+                    else if (gv.cc.floatyTextList[i].color.Equals("blue"))
                     {
                         colr = "blue";
                     }
-                    else if (ft.color.Equals("green"))
+                    else if (gv.cc.floatyTextList[i].color.Equals("green"))
                     {
                         colr = "lime";
                     }
@@ -14713,11 +15260,46 @@ namespace IBx
                     {
                         colr = "red";
                     }
-                    if (!ft.value.Contains("Round"))
+                    if (i < gv.cc.floatyTextList.Count - 1)
                     {
-                        gv.DrawTextOutlined(ft.value, ft.location.X - (UpperLeftSquare.X * gv.squareSize) + mapStartLocXinPixels, ft.location.Y - (UpperLeftSquare.Y * gv.squareSize), 1.0f, colr);
+                        if (gv.cc.floatyTextList[i].z == gv.cc.floatyTextList[i + 1].z)
+                        {
+                            /*
+                            string text = gv.cc.floatyTextList[i].value.ToString();
+                            if (!text.Contains(" /"))
+                            {
+                                text += " /";
+                                gv.cc.floatyTextList[i].value = text;
+                            }
+                            */
+                        }
+                    }
+
+                    if (!gv.cc.floatyTextList[i].value.Contains("Round"))
+                    {
+                        gv.DrawTextOutlined(gv.cc.floatyTextList[i].value, gv.cc.floatyTextList[i].location.X - (UpperLeftSquare.X * gv.squareSize) + mapStartLocXinPixels + rightShift, gv.cc.floatyTextList[i].location.Y - (UpperLeftSquare.Y * gv.squareSize), 1.0f, colr);
+                    }
+
+                    if (i < gv.cc.floatyTextList.Count - 1)
+                    {
+                        //if (gv.cc.floatyTextList[i].location.X < gv.cc.floatyTextList[i + 1].location.X - 15)
+                        {
+                            rightShift += (gv.squareSize / 3);
+                        }
+                    }
+                    if (rightShift > 2f * gv.squareSize)
+                    {
+                        rightShift = 0;
+                    }
+                    if (i < gv.cc.floatyTextList.Count - 1)
+                    {
+                        if (gv.cc.floatyTextList[i + 1].location.X - (gv.squareSize / 2) > gv.cc.floatyTextList[i].location.X)
+                        {
+                            rightShift = 0;
+                        }
                     }
                 }
+                rightShift = 0;
             }
             if (floatyTextEnlargerOn)
             {
@@ -16649,14 +17231,78 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             }
         }*/
 
+        
+        
+        private bool isTouchWithinMapArea(int eX, int eY)
+        {
+            return true;
+            /*if ((eX > (int)((tbXloc)))
+                    && (eX < (int)(tbWidth) + (int)((tbXloc)))
+                    && (eY > (int)((tbYloc)))
+                    && (eY < (int)(tbHeight) + (int)((tbYloc))))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }*/
+        }
+
         public void onTouchCombat(int eX, int eY, MouseEventType.EventType eventType)
         {            
             switch (eventType)
             {
-                case MouseEventType.EventType.MouseDown:
                 case MouseEventType.EventType.MouseMove:
+
+                    if (touchIsDown)
+                    {
+                        if (isTouchWithinMapArea(eX, eY))
+                        {
+                            touchMoveDeltaY = lastTouchMoveLocationY - eY;
+                            touchMoveDeltaX = lastTouchMoveLocationX - eX;
+                            if (touchMoveDeltaX > gv.squareSize)
+                            {
+                                PanRight();
+                                touchMoveDeltaX = 0;
+                                lastTouchMoveLocationX = eX;
+                            }
+                            else if (touchMoveDeltaX < -1 * gv.squareSize)
+                            {
+                                PanLeft();
+                                touchMoveDeltaX = 0;
+                                lastTouchMoveLocationX = eX;
+                            }
+                            if (touchMoveDeltaY > gv.squareSize)
+                            {
+                                PanDown();
+                                touchMoveDeltaY = 0;
+                                lastTouchMoveLocationY = eY;
+                            }
+                            else if (touchMoveDeltaY < -1 * gv.squareSize)
+                            {
+                                PanUp();
+                                touchMoveDeltaY = 0;
+                                lastTouchMoveLocationY = eY;
+                            }
+                        }
+                    }
+
+                    break;
+
+                case MouseEventType.EventType.MouseDown:
+                
                     int x = (int)eX;
                     int y = (int)eY;
+
+                    if (isTouchWithinMapArea(eX, eY))
+                    {
+                        touchIsDown = true;
+                        lastTouchMoveLocationX = eX;
+                        touchMoveDeltaX = 0;
+                        lastTouchMoveLocationY = eY;
+                        touchMoveDeltaY = 0;
+                    }
 
                     //NEW SYSTEM
                     combatUiLayout.setHover(x, y);
@@ -16764,38 +17410,30 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     x = (int)eX;
                     y = (int)eY;
 
+                    touchIsDown = false;
+                    touchMoveDeltaX = 0;
+                    touchMoveDeltaY = 0;
+
                     Player pc = gv.mod.playerList[currentPlayerIndex];
 
-                    if (btnPanUp.getImpact(x, y))
+                    /*if (btnPanUp.getImpact(x, y))
                     {
-                        if (UpperLeftSquare.Y > -gv.playerOffsetY)
-                        {
-                            UpperLeftSquare.Y--;
-                        }
+                        PanUp();
                     }
                     else if (btnPanDown.getImpact(x, y))
                     {
-                        if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
-                        {
-                            UpperLeftSquare.Y++;
-                        }
+                        PanDown();
                     }
                     else if (btnPanLeft.getImpact(x, y))
                     {
-                        if (UpperLeftSquare.X > -gv.playerOffsetX)
-                        {
-                            UpperLeftSquare.X--;
-                        }
+                        PanLeft();
                     }
                     else if (btnPanRight.getImpact(x, y))
                     {
-                        if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
-                        {
-                            UpperLeftSquare.X++;
-                        }
+                        PanRight();
                     }
                     else
-                    {
+                    {*/
                         //NEW SYSTEM
                         string rtn = combatUiLayout.getImpact(x, y);
 
@@ -16842,8 +17480,19 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             tgl.toggleOn = !tgl.toggleOn;
                             if (gv.mod.fastMode)
                             {
-                                Creature crt = new Creature();
-                                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            Creature crt = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        crt = c;
+                                    }
+                                }
+                                else
                                 {
                                     if (c.moveOrder == currentMoveOrderIndex - 1)
                                     {
@@ -16851,7 +17500,8 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         break;
                                     }
                                 }
-                                UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
+                            }
+                            UpperLeftSquare.X = crt.combatLocX - gv.playerOffsetX;
                                 UpperLeftSquare.Y = crt.combatLocY - gv.playerOffsetY;
                             }
                             gv.mod.fastMode = !gv.mod.fastMode;
@@ -17255,7 +17905,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17320,7 +17970,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17385,7 +18035,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17450,7 +18100,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17515,7 +18165,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17580,7 +18230,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17645,7 +18295,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17711,7 +18361,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17777,7 +18427,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17843,7 +18493,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17909,7 +18559,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -17975,7 +18625,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18041,7 +18691,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18107,7 +18757,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18173,7 +18823,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18239,7 +18889,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18305,7 +18955,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18371,7 +19021,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18437,7 +19087,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18503,7 +19153,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18569,7 +19219,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18635,7 +19285,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18701,7 +19351,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18767,7 +19417,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18833,7 +19483,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18899,7 +19549,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -18965,7 +19615,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19031,7 +19681,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19097,7 +19747,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19163,7 +19813,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19229,7 +19879,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19295,7 +19945,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19361,7 +20011,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19427,7 +20077,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19493,7 +20143,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19559,7 +20209,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                         buttonCounter++;
                                         if (gv.cc.GetFromBitmapList(crt.tokenFilename).Width > 100)
                                         {
-                                            buttonCounter++;
+                                            //buttonCounter++;
                                         }
                                         if (buttonCounter >= buttonThreshold)
                                         {
@@ -19814,9 +20464,38 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             }
                         }                        
                         #endregion
-                    }
+                    //}
                     
                     break;
+            }
+        }
+
+        public void PanUp()
+        {
+            if (UpperLeftSquare.Y > -gv.playerOffsetY)
+            {
+                UpperLeftSquare.Y--;
+            }
+        }
+        public void PanDown()
+        {
+            if (UpperLeftSquare.Y < gv.mod.currentEncounter.MapSizeY - gv.playerOffsetY - 1)
+            {
+                UpperLeftSquare.Y++;
+            }
+        }
+        public void PanLeft()
+        {
+            if (UpperLeftSquare.X > -gv.playerOffsetX)
+            {
+                UpperLeftSquare.X--;
+            }
+        }
+        public void PanRight()
+        {
+            if (UpperLeftSquare.X < gv.mod.currentEncounter.MapSizeX - gv.playerOffsetX - 1)
+            {
+                UpperLeftSquare.X++;
             }
         }
 
@@ -20625,44 +21304,57 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         //Helper Methods
         public void CalculateUpperLeft()
         {
-
-            //if (animationSeqStack.Count == 0)
-            //{
-            if (gv.mod.useManualCombatCam)
+            Player pc2 = gv.mod.playerList[currentPlayerIndex];
+            if (pc2.hp > 0)
             {
-                FormerUpperLeftSquare.X = UpperLeftSquare.X;
-                FormerUpperLeftSquare.Y = UpperLeftSquare.Y;
-                CenterScreenOnPC();
-            }
-            else
-            {
-                Player pc = gv.mod.playerList[currentPlayerIndex];
-                int minX = pc.combatLocX - gv.playerOffsetX;
-                if (minX < 0) { minX = 0; }
-                int minY = pc.combatLocY - gv.playerOffsetY;
-                if (minY < 0) { minY = 0; }
-
-                if ((pc.combatLocX <= (UpperLeftSquare.X + 7)) && (pc.combatLocX >= UpperLeftSquare.X + 2) && (pc.combatLocY <= (UpperLeftSquare.Y + 7)) && (pc.combatLocY >= UpperLeftSquare.Y + 2))
+                //if (animationSeqStack.Count == 0)
+                //{
+                if (gv.mod.useManualCombatCam)
                 {
-                    return;
+                    FormerUpperLeftSquare.X = UpperLeftSquare.X;
+                    FormerUpperLeftSquare.Y = UpperLeftSquare.Y;
+                    CenterScreenOnPC();
                 }
+
                 else
                 {
-                    UpperLeftSquare.X = minX;
-                    UpperLeftSquare.Y = minY;
-                    int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
-                    int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                    deltaX = 0;
-                    deltaY = 0;
-                    foreach (Sprite spr in spriteList)
+                    Player pc = gv.mod.playerList[currentPlayerIndex];
+                    int minX = pc.combatLocX - gv.playerOffsetX;
+                    if (minX < 0) { minX = 0; }
+                    int minY = pc.combatLocY - gv.playerOffsetY;
+                    if (minY < 0) { minY = 0; }
+
+                    if ((pc.combatLocX <= (UpperLeftSquare.X + 7)) && (pc.combatLocX >= UpperLeftSquare.X + 2) && (pc.combatLocY <= (UpperLeftSquare.Y + 7)) && (pc.combatLocY >= UpperLeftSquare.Y + 2))
                     {
-                        spr.position.X = spr.position.X + (deltaX * gv.squareSize);
-                        spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                        return;
+                    }
+                    else
+                    {
+                        UpperLeftSquare.X = minX;
+                        UpperLeftSquare.Y = minY;
+                        int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
+                        int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
+                        deltaX = 0;
+                        deltaY = 0;
+                        foreach (Sprite spr in spriteList)
+                        {
+                            spr.position.X = spr.position.X + (deltaX * gv.squareSize);
+                            spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                        }
+                        foreach (AnimationSequence aS in animationSeqStack)
+                        {
+                            for (int i = 0; i < aS.AnimationSeq.Count; i++)
+                            {
+                                for (int j = 0; j < aS.AnimationSeq[i].SpriteGroup.Count; j++)
+                                {
+                                    aS.AnimationSeq[i].SpriteGroup[j].position.X = aS.AnimationSeq[i].SpriteGroup[j].position.X + (deltaX * gv.squareSize);
+                                    aS.AnimationSeq[i].SpriteGroup[j].position.Y = aS.AnimationSeq[i].SpriteGroup[j].position.Y + (deltaY * gv.squareSize);
+                                }
+                            }
+                        }
                     }
                 }
             }
-            //}
-
         }
 
         public void CalculateUpperLeftCreature(Creature crt)
@@ -20673,6 +21365,18 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             //if (animationSeqStack.Count == 0)
             //{
             //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
+            //Player pc = gv.mod.playerList[currentPlayerIndex];
+
+            if (crt.combatLocX == 0 && crt.combatLocY == 0)
+            {
+                int hgjh = 0;
+            }
+
+            if (crt.cr_tag == "newTag")
+            {
+                return;
+            }
+            
             int minX = crt.combatLocX - gv.playerOffsetX;
             if (!gv.mod.useManualCombatCam)
             {
@@ -20702,7 +21406,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             }
             if (((crt.combatLocX + 2 + oversizeMargin) <= (UpperLeftSquare.X + (gv.playerOffsetX * 2))) && ((crt.combatLocX - 2 - oversizeMargin) >= (UpperLeftSquare.X)) && ((crt.combatLocY + 2 + oversizeMargin) <= (UpperLeftSquare.Y + (gv.playerOffsetY * 2))) && ((crt.combatLocY - 2 - oversizeMargin) >= (UpperLeftSquare.Y)))
             {
-                return;
+                //return;
             }
 
             else
@@ -20715,6 +21419,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     {
                         relevantRange = crt.cr_attRange;
                     }
+                    relevantRange = 100;
                     //Melee or AoO situation
                     foreach (Player p in gv.mod.playerList)
                     {
@@ -20724,14 +21429,24 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             UpperLeftSquare.Y = minY;
                             int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
                             int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                            deltaX = 0;
-                            deltaY = 0;
+                            //deltaX = 0;
+                            //deltaY = 0;
                             foreach (Sprite spr in spriteList)
                             {
                                 spr.position.X = spr.position.X + (deltaX * gv.squareSize);
                                 spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
                             }
-
+                            foreach (AnimationSequence aS in animationSeqStack)
+                            {
+                                for (int i = 0; i < aS.AnimationSeq.Count; i++)
+                                {
+                                    for (int j = 0; j < aS.AnimationSeq[i].SpriteGroup.Count; j++)
+                                    {
+                                        aS.AnimationSeq[i].SpriteGroup[j].position.X = aS.AnimationSeq[i].SpriteGroup[j].position.X - (deltaX * gv.squareSize);
+                                        aS.AnimationSeq[i].SpriteGroup[j].position.Y = aS.AnimationSeq[i].SpriteGroup[j].position.Y - (deltaY * gv.squareSize);
+                                    }
+                                }
+                            }
                             break;
                         }
 
@@ -20743,12 +21458,23 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             UpperLeftSquare.Y = minY;
                             int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
                             int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                            deltaX = 0;
-                            deltaY = 0;
+                            //deltaX = 0;
+                            //deltaY = 0;
                             foreach (Sprite spr in spriteList)
                             {
                                 spr.position.X = spr.position.X + (deltaX * gv.squareSize);
                                 spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                            }
+                            foreach (AnimationSequence aS in animationSeqStack)
+                            {
+                                for (int i = 0; i < aS.AnimationSeq.Count; i++)
+                                {
+                                    for (int j = 0; j < aS.AnimationSeq[i].SpriteGroup.Count; j++)
+                                    {
+                                        aS.AnimationSeq[i].SpriteGroup[j].position.X = aS.AnimationSeq[i].SpriteGroup[j].position.X - (deltaX * gv.squareSize);
+                                        aS.AnimationSeq[i].SpriteGroup[j].position.Y = aS.AnimationSeq[i].SpriteGroup[j].position.Y - (deltaY * gv.squareSize);
+                                    }
+                                }
                             }
                             break;
                             //cut out fo bugfixing
@@ -20786,12 +21512,23 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     UpperLeftSquare.Y = minY;
                     int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
                     int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                    deltaX = 0;
-                    deltaY = 0;
+                    //deltaX = 0;
+                    //deltaY = 0;
                     foreach (Sprite spr in spriteList)
                     {
                         spr.position.X = spr.position.X + (deltaX * gv.squareSize);
                         spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                    }
+                    foreach (AnimationSequence aS in animationSeqStack)
+                    {
+                        for (int i = 0; i < aS.AnimationSeq.Count; i++)
+                        {
+                            for (int j = 0; j < aS.AnimationSeq[i].SpriteGroup.Count; j++)
+                            {
+                                aS.AnimationSeq[i].SpriteGroup[j].position.X = aS.AnimationSeq[i].SpriteGroup[j].position.X - (deltaX * gv.squareSize);
+                                aS.AnimationSeq[i].SpriteGroup[j].position.Y = aS.AnimationSeq[i].SpriteGroup[j].position.Y - (deltaY * gv.squareSize);
+                            }
+                        }
                     }
                 }
             }
@@ -20799,11 +21536,19 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         }
         public void CenterScreenOnPC()
         {
+
+
             if (currentPlayerIndex < gv.mod.playerList.Count && currentPlayerIndex > -1)
             {
                 if (gv.mod.playerList[currentPlayerIndex] != null)
                 {
                     Player pc = gv.mod.playerList[currentPlayerIndex];
+
+                    if (pc.combatLocX == 0 && pc.combatLocY == 0)
+                    {
+                        int hgjh = 0;
+                    }
+
                     int minX = pc.combatLocX - gv.playerOffsetX;
                     if (!gv.mod.useManualCombatCam)
                     {
@@ -20829,12 +21574,24 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     //TODO: transform sprite position here, based on delta between current and older upper left, also for creatue
                     int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
                     int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                    deltaX = 0;
-                    deltaY = 0;
+                    //deltaX = 0;
+                    //deltaY = 0;
                     foreach (Sprite spr in spriteList)
                     {
                         spr.position.X = spr.position.X + (deltaX * gv.squareSize);
                         spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                    }
+
+                    foreach (AnimationSequence aS in animationSeqStack)
+                    {
+                        for (int i = 0; i < aS.AnimationSeq.Count; i++)
+                        {
+                            for (int j = 0; j < aS.AnimationSeq[i].SpriteGroup.Count; j++)
+                            {
+                                aS.AnimationSeq[i].SpriteGroup[j].position.X = aS.AnimationSeq[i].SpriteGroup[j].position.X - (deltaX * gv.squareSize);
+                                aS.AnimationSeq[i].SpriteGroup[j].position.Y = aS.AnimationSeq[i].SpriteGroup[j].position.Y - (deltaY * gv.squareSize);
+                            }
+                        }
                     }
                 }
             }
@@ -20844,6 +21601,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         {
             if (pc != null)
             {
+
+                if (pc.combatLocX == 0 && pc.combatLocY == 0)
+                {
+                    int hgjh = 0;
+                }
                 //Player pc = gv.mod.playerList[currentPlayerIndex];
                 int minX = pc.combatLocX - gv.playerOffsetX;
                 if (!gv.mod.useManualCombatCam)
@@ -20870,12 +21632,23 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 //TODO: transform sprite position here, based on delta between current and older upper left, also for creatue
                 int deltaX = UpperLeftSquare.X - FormerUpperLeftSquare.X;
                 int deltaY = UpperLeftSquare.Y - FormerUpperLeftSquare.Y;
-                deltaX = 0;
-                deltaY = 0;
+                //deltaX = 0;
+                //deltaY = 0;
                 foreach (Sprite spr in spriteList)
                 {
                     spr.position.X = spr.position.X + (deltaX * gv.squareSize);
                     spr.position.Y = spr.position.Y + (deltaY * gv.squareSize);
+                }
+                foreach (AnimationSequence aS in animationSeqStack)
+                {
+                    for (int i = 0; i < aS.AnimationSeq.Count; i++)
+                    {
+                        for (int j = 0; j < aS.AnimationSeq[i].SpriteGroup.Count; j++)
+                        {
+                            aS.AnimationSeq[i].SpriteGroup[j].position.X = aS.AnimationSeq[i].SpriteGroup[j].position.X - (deltaX * gv.squareSize);
+                            aS.AnimationSeq[i].SpriteGroup[j].position.Y = aS.AnimationSeq[i].SpriteGroup[j].position.Y - (deltaY * gv.squareSize);
+                        }
+                    }
                 }
             }
         }
@@ -21515,6 +22288,26 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         }
         public void LeaveThreatenedCheck(Player pc, int futurePlayerLocationX, int futurePlayerLocationY)
         {
+            int passX = pc.combatLocX;
+            int passY = pc.combatLocY;
+
+            if (pc.combatLocX > futurePlayerLocationX)
+            {
+                passX = pc.combatLocX + 1;
+            }
+            else if (pc.combatLocX < futurePlayerLocationX)
+            {
+                passX = pc.combatLocX - 1;
+            }
+
+            if (pc.combatLocY > futurePlayerLocationY)
+            {
+                passY = pc.combatLocY + 1;
+            }
+            else if (pc.combatLocY < futurePlayerLocationY)
+            {
+                passY = pc.combatLocY - 1;
+            }
 
             foreach (string eTag in pc.tagsOfEffectsToRemoveOnMove)
             {
@@ -21560,8 +22353,13 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         }
                         else
                         {
-                            gv.cc.addLogText("<font color='blue'>Attack of Opportunity by: " + crt.cr_name + "</font><BR>");
-                            CreatureDoesAttack(crt, false, pc);
+                            //gv.mod.numberOfAoOAttackers++;
+                            gv.touchEnabled = false;
+                            gv.cc.addLogText("<font color='white'>Attack of Opportunity by: <font color='white'>" + crt.cr_name + "</font><BR>");
+
+                            CreatureDoesAttack(crt, false, pc, passX, passY);
+
+
                             //doActualCreatureAttack(pc, crt, 1);
                             if (pc.hp <= 0)
                             {
@@ -21613,7 +22411,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     situationalModifier += gv.mod.attackFromBehindToHitModifier;
                     if (gv.mod.attackFromBehindToHitModifier > 0)
                     {
-                        gv.cc.addLogText("<font color='lime'> Attack from behind: +" + gv.mod.attackFromBehindToHitModifier.ToString() + " to hit." + "</font><BR>");
+                        gv.cc.addLogText("<font color='white'> Attack from behind: +" + gv.mod.attackFromBehindToHitModifier.ToString() + " to hit." + "</font><BR>");
                     }
                 }
                 //attacks on truely held creatures get +4 bonus to hit
@@ -21621,7 +22419,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 {
                     modifier += 4;
                     situationalModifier += 4;
-                    gv.cc.addLogText("<font color='yellow'>" + pc.name + " attacks held creature: +4 att</font><BR>");
+                    gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>attacks held creature: +4 att</font><BR>");
                 }
             }
             else //ranged weapon used
@@ -21915,13 +22713,13 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 {
                     modifier += gv.mod.attackFromBehindToHitModifier;
                     situationalModifier += gv.mod.attackFromBehindToHitModifier;
-                    gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " attacks from behind: +" + gv.mod.attackFromBehindToHitModifier + " att</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>attacks from behind: +" + gv.mod.attackFromBehindToHitModifier + " att</font><BR>");
                 }
                 if (pc.isHeld())
                 {
                     modifier += 4;
                     situationalModifier += 4;
-                    gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " attacks held player character: +4 att</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>attacks held player character: +4 att</font><BR>");
                 }
                 if (situationalModifier != 0)
                 {

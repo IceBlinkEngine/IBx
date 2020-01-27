@@ -43672,7 +43672,7 @@ namespace IBx
                         }
                         if (!gv.mod.doNotStartScrolling)
                         {
-                            gv.aTimer = true;
+                            gv.aTimer = false;
                             gv.mod.scrollModeSpeed = 0.5f;
                         }
                         gv.mod.doNotStartScrolling = false;

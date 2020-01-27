@@ -10929,6 +10929,7 @@ namespace IBx
                                             {
                                                 gv.mod.moduleAreasObjects[h].Props[i].isCurrentlyChasing = false;
                                                 gv.mod.moduleAreasObjects[h].Props[i].ReturningToPost = true;
+                                                gv.mod.moduleAreasObjects[h].Props[i].ChaserStartChasingTime = 0;
                                                 if (!gv.mod.moduleAreasObjects[h].Props[i].isStealthed)
                                                 {
                                                     bool tooMuchHeightDifference = false;
@@ -12181,6 +12182,7 @@ namespace IBx
                                     {
                                         gv.mod.currentArea.Props[i].isCurrentlyChasing = false;
                                         gv.mod.currentArea.Props[i].ReturningToPost = true;
+                                        gv.mod.currentArea.Props[i].ChaserStartChasingTime = 0;
                                         if (!gv.mod.currentArea.Props[i].isStealthed)
                                         {
                                             bool tooMuchHeightDifference = false;
