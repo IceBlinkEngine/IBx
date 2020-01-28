@@ -13622,7 +13622,7 @@ namespace IBx
                                 }
                   */
 
-                gv.cc.addLogText("<font color='lime'>" + newPc.name + " joins the party</font><BR>");
+                gv.cc.addLogText("<font color='lime'>" + newPc.name + " <font color='white'>joins the party</font><BR><BR>");
 
                 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 /*
@@ -19517,22 +19517,26 @@ namespace IBx
                         //burning man
                         if (ef.combatLocX == 0 && ef.combatLocY == 0)
                         {
-                            if ((int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) >= 0)
+                            if ((int)((ef.durationInUnits / gv.mod.TimePerRound)) >= 0)
                             {
-                                gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " has effect: " + ef.name + ", (" + (int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) + " round(s) remain)</font><BR>");
-                                if ((int)(ef.durationInUnits / gv.mod.TimePerRound) <= 1)
+                                //effektmacher
+                                if ((int)((ef.durationInUnits / gv.mod.TimePerRound)) > 0)
                                 {
-                                    gv.cc.addLogText("<font color='yellow'>" + "This effect is removed on start of next turn of " + crt.cr_name + "</font><BR>");
+                                    gv.cc.addLogText("<font color='white'>" + "Effect: " + ef.name + ", " + (int)((ef.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                }
+                                if ((int)(ef.durationInUnits / gv.mod.TimePerRound) == 0)
+                                {
+                                    gv.cc.addLogText("<font color='white'>" + ef.name + ": last round, is removed on start of next turn of <font color='red'>" + crt.cr_name + "</font><BR>");
                                 }
                             }
                             else
                             {
-                                gv.cc.addLogText("<font color='yellow'>" + ef.name + " is removed on start of next turn of " + crt.cr_name + "</font><BR>");
+                                gv.cc.addLogText("<font color='white'>" + ef.name + " has been removed</font><BR>");
                             }
                         }
                         else
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " has effect: " + ef.name + "</font><BR>");
+                            gv.cc.addLogText("<font color='white'>" + "Effect: " + ef.name + "</font><BR>");
                         }
                         /*
                         if ((int)(ef.durationInUnits / gv.mod.TimePerRound) <= 1)
@@ -19745,22 +19749,27 @@ namespace IBx
                     {
                         if (ef.combatLocX == 0 && ef.combatLocY == 0)
                         {
-                            if ((int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) >= 0)
+
+                            if ((int)((ef.durationInUnits / gv.mod.TimePerRound)) >= 0)
                             {
-                                gv.cc.addLogText("<font color='yellow'>" + pc.name + " has effect: " + ef.name + ", (" + (int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) + " round(s) remain)</font><BR>");
-                                if ((int)(ef.durationInUnits / gv.mod.TimePerRound) <= 1)
+                                //effektmacher
+                                if ((int)((ef.durationInUnits / gv.mod.TimePerRound)) > 0)
                                 {
-                                    gv.cc.addLogText("<font color='yellow'>" + "This effect is removed on start of next turn of " + pc.name + "</font><BR>");
+                                    gv.cc.addLogText("<font color='white'>" + "Effect: " + ef.name + ", " + (int)((ef.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                }
+                                if ((int)(ef.durationInUnits / gv.mod.TimePerRound) == 0)
+                                {
+                                    gv.cc.addLogText("<font color='white'>" + ef.name + ": last round, is removed on start of next turn of <font color='lime'>" + pc.name + "</font><BR>");
                                 }
                             }
                             else
                             {
-                                gv.cc.addLogText("<font color='yellow'>" + ef.name + " is removed on start of next turn of " + pc.name + "</font><BR>");
+                                gv.cc.addLogText("<font color='white'>" + ef.name + " has been removed</font><BR>");
                             }
                         }
                         else
                         {
-                            gv.cc.addLogText("<font color='yellow'>" + pc.name + " has effect: " + ef.name + "</font><BR>");
+                            gv.cc.addLogText("<font color='white'>" + "Effect: " + ef.name + "</font><BR>");
                         }
                         //gv.cc.addLogText("<font color='yellow'>" + pc.name + " has effect: " + ef.name + ", (" + (int)((ef.durationInUnits / gv.mod.TimePerRound) - 1) + " turn(s) remain)</font><BR>");
 
@@ -21008,7 +21017,7 @@ namespace IBx
                                     if (s.Value.Equals(ls.Value))
                                     {
                                         skip = true;
-                                        gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " is immune to " + thisSpellEffect.name + "</font><BR>");
+                                        gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>is immune to " + thisSpellEffect.name + "</font><BR>");
                                         break;
                                     }
                                 }
@@ -21135,16 +21144,16 @@ namespace IBx
                                         //europa
                                         if (saveChk >= DC) //passed save check (do half or avoid all?)
                                         {
-                                            gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " makes successful " + thisSpellEffect.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + "</font><BR>");
+                                            gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>makes successful " + thisSpellEffect.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + ">=" + DC.ToString() + ")" + "</font><BR>");
                                             if (thisSpellEffect.saveOnlyHalvesDamage)
                                             {
                                                 damage = damage / 2;
-                                                gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " takes only half damage from " + thisSpellEffect.name + "</font><BR>");
+                                                gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>takes only half damage from " + thisSpellEffect.name + "</font><BR>");
                                             }
                                             else
                                             {
                                                 damage = 0;
-                                                gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " takes no damage from " + thisSpellEffect.name + "</font><BR>");
+                                                gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>takes no damage from " + thisSpellEffect.name + "</font><BR>");
                                             }
                                         }
                                         else //failed save check or no save check allowed
@@ -21152,38 +21161,38 @@ namespace IBx
                                             //failed save roll
                                             if (saveChkAdder > -99)
                                             {
-                                                gv.cc.addLogText("<font color='yellow'>" + crt.cr_name + " failed " + thisSpellEffect.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
+                                                gv.cc.addLogText("<font color='red'>" + crt.cr_name + " <font color='white'>failed " + thisSpellEffect.saveCheckType + " saving roll (" + saveChkRoll.ToString() + "+" + saveChkAdder + " < " + DC.ToString() + ")" + "</font><BR>");
                                             }
                                             else//no save roll allowed
                                             {
-                                                gv.cc.addLogText("<font color='yellow'>" + "No saving roll allowed" + "</font><BR>");
+                                                gv.cc.addLogText("<font color='white'>" + "No saving roll allowed" + "</font><BR>");
                                             }
                                         }
 
-                                        if (mod.debugMode) { gv.cc.addLogText("<font color='yellow'>" + saveChkRoll + " + " + saveChkAdder + " >= " + DC + "</font><BR>"); }
-                                        if (mod.debugMode) { gv.cc.addLogText("<font color='yellow'>" + "resist = " + resist + " damage = " + damage + "</font><BR>"); }
+                                        if (mod.debugMode) { gv.cc.addLogText("<font color='white'>" + saveChkRoll + " + " + saveChkAdder + " >= " + DC + "</font><BR>"); }
+                                        if (mod.debugMode) { gv.cc.addLogText("<font color='white'>" + "resist = " + resist + " damage = " + damage + "</font><BR>"); }
 
                                         int damageAndResist = (int)((float)damage * resist);
                                         damageTotal += damageAndResist;
                                         //resistance exists
                                         if (resist < 1)
                                         {
-                                            gv.cc.addLogText("<font color='aqua'>" + sourceName + "</font>" + "<font color='white'>" + " damages " + "</font>" + "<font color='silver'>"
-                                                            + crt.cr_name + "</font>" + "<font color='white'>" + "with " + thisSpellEffect.name + " (" + "</font>" + "<font color='lime'>"
+                                            gv.cc.addLogText("<font color='white'>" + sourceName + "</font>" + "<font color='white'>" + " damages " + "</font>" + "<font color='red'>"
+                                                            + crt.cr_name + "</font>" + "<font color='white'>" + "with " + thisSpellEffect.name + " (" + "</font>" + "<font color='white'>"
                                                             + damageAndResist + "</font>" + "<font color='white'>" + " damage)" + "(-" + ((1 - resist) * 100f) + "% resistance)" + "</font><BR>");
                                         }
                                         //vulnerability exists
                                         else if (resist > 1)
                                         {
-                                            gv.cc.addLogText("<font color='aqua'>" + sourceName + "</font>" + "<font color='white'>" + " damages " + "</font>" + "<font color='silver'>"
-                                                            + crt.cr_name + "</font>" + "<font color='white'>" + "with " + thisSpellEffect.name + " (" + "</font>" + "<font color='lime'>"
+                                            gv.cc.addLogText("<font color='white'>" + sourceName + "</font>" + "<font color='white'>" + " damages " + "</font>" + "<font color='red'>"
+                                                            + crt.cr_name + "</font>" + "<font color='white'>" + "with " + thisSpellEffect.name + " (" + "</font>" + "<font color='white'>"
                                                             + damageAndResist + "</font>" + "<font color='white'>" + " damage)" + "(+" + ((resist - 1) * 100f) + "% vulnerability)" + "</font><BR>");
                                         }
                                         //neither resistance nor vulnerability
                                         else
                                         {
-                                            gv.cc.addLogText("<font color='aqua'>" + sourceName + "</font>" + "<font color='white'>" + " damages " + "</font>" + "<font color='silver'>"
-                                                            + crt.cr_name + "</font>" + "<font color='white'>" + "with " + thisSpellEffect.name + " (" + "</font>" + "<font color='lime'>"
+                                            gv.cc.addLogText("<font color='white'>" + sourceName + "</font>" + "<font color='white'>" + " damages " + "</font>" + "<font color='red'>"
+                                                            + crt.cr_name + "</font>" + "<font color='white'>" + "with " + thisSpellEffect.name + " (" + "</font>" + "<font color='white'>"
                                                             + damageAndResist + "</font>" + "<font color='white'>" + " damage)" + "</font><BR>");
                                         }
                                     }
@@ -21204,7 +21213,7 @@ namespace IBx
                                             //brüssel
                                             gv.screenCombat.deathAnimationLocations.Add(new Coordinate(coor.X, coor.Y));
                                         }
-                                        gv.cc.addLogText("<font color='lime'>" + "You killed the " + crt.cr_name + "</font><BR>");
+                                        gv.cc.addLogText("<font color='white'>" + "You killed <font color='red'>" + crt.cr_name + "</font><BR>");
                                     }
                                     //Do floaty text damage
                                     //gv.screenCombat.floatyTextOn = true;
@@ -21346,8 +21355,73 @@ namespace IBx
                                         //gv.cc.addLogText("<font color='yellow'>" + "No save roll against longer lasting effect of " + thisSpellEffect.name + " allowed" + "</font><BR>");
                                         //}
                                         int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
-                                        gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                        //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        string stackState = "";
+
+                                        if (thisSpellEffect.isPermanent)
+                                        {
+                                            stackState = "(added as permanent effect)";
+                                        }
+                                        else
+                                        {
+                                            if (!crt.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                            {
+                                                stackState = "(added as first effect of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableEffect)
+                                            {
+                                                stackState = "(added on top existing effect(s) of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableDuration)
+                                            {
+                                                stackState = "(extended duration of existing effect of this type)";
+                                            }
+                                            else
+                                            {
+                                                stackState = "(replacing existing effect of this type)";
+                                            }
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //seaofthieves
+                                        if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                        {
+                                            if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                            {
+                                                if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                                {
+                                                    //effektmacher2
+                                                    if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                                    }
+                                                    if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='red'>" + crt.cr_name + "</font><BR>");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                        }
+                                        else if (stackState == "(extended duration of existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='red'>" + crt.cr_name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                        }
+                                        else if (stackState == "(replacing existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='red'>" + crt.cr_name + "</font><BR>");
+                                        }
                                         crt.AddEffectByObject(thisSpellEffect, classLevel);
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
                                     }
                                     #endregion
                                 }
@@ -21722,9 +21796,73 @@ namespace IBx
                                         }
                                         int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                         //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
-                                        pc.AddEffectByObject(thisSpellEffect, classLevel);
-                                        gv.cc.doEffectScript(pc, thisSpellEffect);
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        string stackState = "";
 
+                                        if (thisSpellEffect.isPermanent)
+                                        {
+                                            stackState = "(added as permanent effect)";
+                                        }
+                                        else
+                                        {
+                                            if (!pc.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                            {
+                                                stackState = "(added as first effect of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableEffect)
+                                            {
+                                                stackState = "(added on top existing effect(s) of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableDuration)
+                                            {
+                                                stackState = "(extended duration of existing effect of this type)";
+                                            }
+                                            else
+                                            {
+                                                stackState = "(replacing existing effect of this type)";
+                                            }
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //seaofthieves
+                                        if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                        {
+                                            if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                            {
+                                                if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                                {
+                                                    //effektmacher2
+                                                    if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                                    }
+                                                    if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='lime'>" + pc.name + "</font><BR>");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                        }
+                                        else if (stackState == "(extended duration of existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='lime'>" + pc.name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                        }
+                                        else if (stackState == "(replacing existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='lime'>" + pc.name + "</font><BR>");
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                        pc.AddEffectByObject(thisSpellEffect, classLevel);
+                                        UpdateStats(pc);
                                     }
                                     #endregion
                                 }
@@ -22250,6 +22388,69 @@ namespace IBx
                                         //}
                                         int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                         gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                        //crt.AddEffectByObject(thisSpellEffect, classLevel);
+                                        string stackState = "";
+
+                                        if (thisSpellEffect.isPermanent)
+                                        {
+                                            stackState = "(added as permanent effect)";
+                                        }
+                                        else
+                                        {
+                                            if (!crt.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                            {
+                                                stackState = "(added as first effect of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableEffect)
+                                            {
+                                                stackState = "(added on top existing effect(s) of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableDuration)
+                                            {
+                                                stackState = "(extended duration of existing effect of this type)";
+                                            }
+                                            else
+                                            {
+                                                stackState = "(replacing existing effect of this type)";
+                                            }
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //seaofthieves
+                                        if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                        {
+                                            if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                            {
+                                                if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                                {
+                                                    //effektmacher2
+                                                    if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                                    }
+                                                    if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='red'>" + crt.cr_name + "</font><BR>");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                        }
+                                        else if (stackState == "(extended duration of existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='red'>" + crt.cr_name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                        }
+                                        else if (stackState == "(replacing existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='red'>" + crt.cr_name + "</font><BR>");
+                                        }
                                         crt.AddEffectByObject(thisSpellEffect, classLevel);
                                     }
                                     #endregion
@@ -22611,8 +22812,74 @@ namespace IBx
                                         }
                                         int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                         //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        string stackState = "";
+
+                                        if (thisSpellEffect.isPermanent)
+                                        {
+                                            stackState = "(added as permanent effect)";
+                                        }
+                                        else
+                                        {
+                                            if (!pc.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                            {
+                                                stackState = "(added as first effect of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableEffect)
+                                            {
+                                                stackState = "(added on top existing effect(s) of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableDuration)
+                                            {
+                                                stackState = "(extended duration of existing effect of this type)";
+                                            }
+                                            else
+                                            {
+                                                stackState = "(replacing existing effect of this type)";
+                                            }
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //seaofthieves
+                                        if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                        {
+                                            if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                            {
+                                                if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                                {
+                                                    //effektmacher2
+                                                    if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                                    }
+                                                    if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='lime'>" + pc.name + "</font><BR>");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                        }
+                                        else if (stackState == "(extended duration of existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='lime'>" + pc.name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                        }
+                                        else if (stackState == "(replacing existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='lime'>" + pc.name + "</font><BR>");
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
                                         pc.AddEffectByObject(thisSpellEffect, classLevel);
-                                        gv.cc.doEffectScript(pc, thisSpellEffect);
+                                        //gv.cc.doEffectScript(pc, thisSpellEffect);
+                                        UpdateStats(pc);
 
                                     }
                                     #endregion
@@ -23048,7 +23315,72 @@ namespace IBx
                                         //}
                                         int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                         gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                        //UpdateStats(pc);
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        string stackState = "";
+
+                                        if (thisSpellEffect.isPermanent)
+                                        {
+                                            stackState = "(added as permanent effect)";
+                                        }
+                                        else
+                                        {
+                                            if (!crt.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                            {
+                                                stackState = "(added as first effect of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableEffect)
+                                            {
+                                                stackState = "(added on top existing effect(s) of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableDuration)
+                                            {
+                                                stackState = "(extended duration of existing effect of this type)";
+                                            }
+                                            else
+                                            {
+                                                stackState = "(replacing existing effect of this type)";
+                                            }
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //seaofthieves
+                                        if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                        {
+                                            if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                            {
+                                                if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                                {
+                                                    //effektmacher2
+                                                    if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                                    }
+                                                    if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='red'>" + crt.cr_name + "</font><BR>");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                        }
+                                        else if (stackState == "(extended duration of existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='red'>" + crt.cr_name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                        }
+                                        else if (stackState == "(replacing existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='red'>" + crt.cr_name + "</font><BR>");
+                                        }
                                         crt.AddEffectByObject(thisSpellEffect, classLevel);
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
                                     }
                                     #endregion
                                 }
@@ -23409,9 +23741,73 @@ namespace IBx
                                         }
                                         int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                         //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
-                                        pc.AddEffectByObject(thisSpellEffect, classLevel);
-                                        gv.cc.doEffectScript(pc, thisSpellEffect);
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        string stackState = "";
 
+                                        if (thisSpellEffect.isPermanent)
+                                        {
+                                            stackState = "(added as permanent effect)";
+                                        }
+                                        else
+                                        {
+                                            if (!pc.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                            {
+                                                stackState = "(added as first effect of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableEffect)
+                                            {
+                                                stackState = "(added on top existing effect(s) of this type)";
+                                            }
+                                            else if (thisSpellEffect.isStackableDuration)
+                                            {
+                                                stackState = "(extended duration of existing effect of this type)";
+                                            }
+                                            else
+                                            {
+                                                stackState = "(replacing existing effect of this type)";
+                                            }
+                                        }
+
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                        //seaofthieves
+                                        if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                        {
+                                            if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                            {
+                                                if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                                {
+                                                    //effektmacher2
+                                                    if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                                    }
+                                                    if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                                    {
+                                                        gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='lime'>" + pc.name + "</font><BR>");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                            }
+                                        }
+                                        else if (stackState == "(extended duration of existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='lime'>" + pc.name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                        }
+                                        else if (stackState == "(replacing existing effect of this type)")
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='lime'>" + pc.name + "</font><BR>");
+                                        }
+                                        pc.AddEffectByObject(thisSpellEffect, classLevel);
+                                        UpdateStats(pc);
+                                        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                        ///gv.cc.doEffectScript(pc, thisSpellEffect);
                                     }
                                     #endregion
                                 }
@@ -23863,8 +24259,73 @@ namespace IBx
                                 //gv.cc.addLogText("<font color='yellow'>" + "No save roll against longer lasting effect of " + thisSpellEffect.name + " allowed" + "</font><BR>");
                                 //}
                                 int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
-                                gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + crt.cr_name + " for " + numberOfRounds + " turn(s)</font><BR>");
+
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                string stackState = "";
+
+                                if (thisSpellEffect.isPermanent)
+                                {
+                                    stackState = "(added as permanent effect)";
+                                }
+                                else
+                                {
+                                    if (!crt.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                    {
+                                        stackState = "(added as first effect of this type)";
+                                    }
+                                    else if (thisSpellEffect.isStackableEffect)
+                                    {
+                                        stackState = "(added on top existing effect(s) of this type)";
+                                    }
+                                    else if (thisSpellEffect.isStackableDuration)
+                                    {
+                                        stackState = "(extended duration of existing effect of this type)";
+                                    }
+                                    else
+                                    {
+                                        stackState = "(replacing existing effect of this type)";
+                                    }
+                                }
+
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                //seaofthieves
+                                if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                {
+                                    if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                    {
+                                        if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                        {
+                                            //effektmacher2
+                                            if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                            }
+                                            if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='red'>" + crt.cr_name + "</font><BR>");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                    }
+                                }
+                                else if (stackState == "(extended duration of existing effect of this type)")
+                                {
+                                    gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='red'>" + crt.cr_name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                }
+                                else if (stackState == "(replacing existing effect of this type)")
+                                {
+                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='red'>" + crt.cr_name + "</font><BR>");
+                                }
                                 crt.AddEffectByObject(thisSpellEffect, classLevel);
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
                                 //gv.cc.doEffectScript(pc, thisSpellEffect);
                             }
                             #endregion
@@ -24219,8 +24680,73 @@ namespace IBx
                                 }
                                 //int numberOfRounds = thisSpellEffect.durationInUnits / gv.mod.TimePerRound;
                                 //gv.cc.addLogText("<font color='lime'>" + thisSpellEffect.name + " is applied on " + pc.name + " for " + numberOfRounds + " round(s)</font><BR>");
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                string stackState = "";
+
+                                if (thisSpellEffect.isPermanent)
+                                {
+                                    stackState = "(added as permanent effect)";
+                                }
+                                else
+                                {
+                                    if (!pc.IsInEffectList(thisSpellEffect.tag)) //Not in list so add to list
+                                    {
+                                        stackState = "(added as first effect of this type)";
+                                    }
+                                    else if (thisSpellEffect.isStackableEffect)
+                                    {
+                                        stackState = "(added on top existing effect(s) of this type)";
+                                    }
+                                    else if (thisSpellEffect.isStackableDuration)
+                                    {
+                                        stackState = "(extended duration of existing effect of this type)";
+                                    }
+                                    else
+                                    {
+                                        stackState = "(replacing existing effect of this type)";
+                                    }
+                                }
+
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                                //seaofthieves
+                                if (stackState == "(added as permanent effect)" || stackState == "(added as first effect of this type)" || stackState == "(added on top existing effect(s) of this type)")
+                                {
+                                    if (thisSpellEffect.combatLocX == 0 && thisSpellEffect.combatLocY == 0)
+                                    {
+                                        if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) >= 0)
+                                        {
+                                            //effektmacher2
+                                            if ((int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) > 0)
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + ", " + (int)((thisSpellEffect.durationInUnits / gv.mod.TimePerRound)) + " full round(s) and the rest of this one remain</font><BR>");
+                                            }
+                                            if ((int)(thisSpellEffect.durationInUnits / gv.mod.TimePerRound) == 0)
+                                            {
+                                                gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + ": last round, is removed on start of next turn of <font color='lime'>" + pc.name + "</font><BR>");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " has been removed</font><BR>");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        gv.cc.addLogText("<font color='white'>" + "Effect: " + thisSpellEffect.name + "</font><BR>");
+                                    }
+                                }
+                                else if (stackState == "(extended duration of existing effect of this type)")
+                                {
+                                    gv.cc.addLogText("<font color='white'>Existing " + thisSpellEffect.name + " on <font color='lime'>" + pc.name + " <font color='white'>extended by " + thisSpellEffect.durationInUnits + " rounds</font><BR>");
+                                }
+                                else if (stackState == "(replacing existing effect of this type)")
+                                {
+                                    gv.cc.addLogText("<font color='white'>" + thisSpellEffect.name + " replaces an existing effect of the same type on <font color='lime'>" + pc.name + "</font><BR>");
+                                }
                                 pc.AddEffectByObject(thisSpellEffect, classLevel);
-                                gv.cc.doEffectScript(pc, thisSpellEffect);
+                                UpdateStats(pc);
+                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                //gv.cc.doEffectScript(pc, thisSpellEffect);
                             }
                             #endregion
                         }
@@ -25484,7 +26010,7 @@ namespace IBx
                 Effect ef = mod.getEffectByTag("mageArmor").DeepCopy();
                 ef.durationInUnits = numberOfRounds * gv.mod.TimePerRound;
                 gv.cc.addLogText("<font color='lime'>" + "Mage Armor is applied on " + target.name + "<BR>");
-                gv.cc.addLogText("<font color='lime'>" + " for " + numberOfRounds + " round(s)" + "</font><BR>");
+                gv.cc.addLogText("<font color='lime'>" + " for " + numberOfRounds + " turn(s)" + "</font><BR>");
                 target.AddEffectByObject(ef, source.classLevel);
                 if (!source.thisCastIsFreeOfCost)
                 {
@@ -25505,7 +26031,7 @@ namespace IBx
                 Effect ef = mod.getEffectByTag("mageArmor").DeepCopy();
                 ef.durationInUnits = numberOfRounds * gv.mod.TimePerRound;
                 gv.cc.addLogText("<font color='lime'>" + "Mage Armor is applied on " + target.cr_name + "<BR>");
-                gv.cc.addLogText("<font color='lime'>" + " for " + numberOfRounds + " round(s)" + "</font><BR>");
+                gv.cc.addLogText("<font color='lime'>" + " for " + numberOfRounds + " turn(s)" + "</font><BR>");
                 target.AddEffectByObject(ef, source.cr_level);
                 source.sp -= SpellToCast.costSP;
                 if (source.sp < 0) { source.sp = 0; }
@@ -26282,7 +26808,7 @@ namespace IBx
                     Effect ef = mod.getEffectByTag("bless").DeepCopy();
                     ef.durationInUnits = numberOfRounds * gv.mod.TimePerRound;
                     gv.cc.addLogText("<font color='lime'>" + "Bless is applied on " + pc.name
-                            + " for " + numberOfRounds + " round(s)" + "</font>" +
+                            + " for " + numberOfRounds + " turn(s)" + "</font>" +
                             "<BR>");
                     pc.AddEffectByObject(ef, source.classLevel);
                 }
@@ -26307,7 +26833,7 @@ namespace IBx
                     Effect ef = mod.getEffectByTag("bless").DeepCopy();
                     ef.durationInUnits = numberOfRounds * gv.mod.TimePerRound;
                     gv.cc.addLogText("<font color='lime'>" + "Bless is applied on " + crt.cr_name
-                            + " for " + numberOfRounds + " round(s)" + "</font>" +
+                            + " for " + numberOfRounds + " turn(s)" + "</font>" +
                             "<BR>");
                     crt.AddEffectByObject(ef, source.cr_level);
                 }
