@@ -1663,14 +1663,14 @@ namespace IBx
             //gv.mod.scrollingTimer = gv.mod.scrollingTimer - (0.65f* 7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
             if (gv.mod.currentArea.isOverviewMap)
             {
-                gv.mod.lastScrollStep = (0.7f * 7.5f * multi * gv.mod.scrollingSpeed * 2.0f * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
-                gv.mod.scrollingTimer = gv.mod.scrollingTimer - (0.65f * 7.5f * multi * gv.mod.scrollingSpeed * 2.0f * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
+                gv.mod.lastScrollStep = (1.15f * 0.7f * 7.5f * multi * gv.mod.scrollingSpeed * 2.0f * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
+                gv.mod.scrollingTimer = gv.mod.scrollingTimer - (1.15f * 0.65f * 7.5f * multi * gv.mod.scrollingSpeed * 2.0f * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
 
             }
             else
             {
-                gv.mod.lastScrollStep = (0.7f * 7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
-                gv.mod.scrollingTimer = gv.mod.scrollingTimer - (0.65f * 7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
+                gv.mod.lastScrollStep = (1.15f * 0.7f * 7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
+                gv.mod.scrollingTimer = gv.mod.scrollingTimer - (1.15f * 0.65f * 7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier);
 
             }
             //gv.mod.distances.Add(gv.mod.scrollingTimer);
@@ -2186,8 +2186,8 @@ namespace IBx
 
                                 if (gv.cc.GetFromBitmapList(p.ImageFileName).Height >= 300)
                                 {
-                                    p.walkAnimationDelayCounter += p.currentWalkingSpeed;
-                                    if (p.walkAnimationDelayCounter >= 10f)
+                                p.walkAnimationDelayCounter += 0.7f * p.currentWalkingSpeed;
+                                if (p.walkAnimationDelayCounter >= 10f)
                                     {
                                         //osgosg
                                         if (!p.showWalkingFrame)
@@ -31800,8 +31800,8 @@ namespace IBx
                                                     multi = 1.5f;
                                                 }
                                                 //aegh
-                                                p.currentPixelPositionY += 0.7f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti * 0.7f;
-                                                p.currentWalkingSpeed = 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti;
+                                                p.currentPixelPositionY += 1.15f * 0.7f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti * 0.7f;
+                                                p.currentWalkingSpeed = 0.9f * 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti;
                                             }
                                             else
                                             {
@@ -31826,8 +31826,8 @@ namespace IBx
                                                 {
                                                     multi = 1.5f;
                                                 }
-                                                p.currentPixelPositionY -= 0.7f * 1f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti * 0.7f;
-                                                p.currentWalkingSpeed = 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti;
+                                                p.currentPixelPositionY -= 1.15f * 0.7f * 1f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti * 0.7f;
+                                                p.currentWalkingSpeed = 0.9f * 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * p.propMovingHalfSpeedMulti;
 
                                             }
                                             else
@@ -31857,8 +31857,8 @@ namespace IBx
                                                 {
                                                     multi = 1.5f;
                                                 }
-                                                p.currentPixelPositionX += 0.7f * 1f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
-                                                p.currentWalkingSpeed = 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
+                                                p.currentPixelPositionX += 1.15f * 0.7f * 1f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
+                                                p.currentWalkingSpeed = 0.9f * 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
                                             }
                                             else
                                             {
@@ -31886,8 +31886,8 @@ namespace IBx
                                                 {
                                                     multi = 1.5f;
                                                 }
-                                                p.currentPixelPositionX -= 0.7f * 1f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
-                                                p.currentWalkingSpeed = 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
+                                                p.currentPixelPositionX -= 1.15f * 0.7f * 1f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
+                                                p.currentWalkingSpeed = 0.9f * 0.3f * (7.5f * multi * gv.mod.scrollingSpeed * 1.0f * gv.mod.scrollModeSpeed * gv.mod.sprintModifier) * (float)p.pixelMoveSpeed * 0.7f * p.propMovingHalfSpeedMulti;
                                             }
                                             else
                                             {
@@ -34185,7 +34185,7 @@ namespace IBx
 
                                             if (gv.cc.GetFromBitmapList(p.tokenFilename).Height >= 300)
                                             {
-                                                gv.mod.walkAnimationDelayCounter0 += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                                                gv.mod.walkAnimationDelayCounter0 += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                                                 if (gv.mod.walkAnimationDelayCounter0 >= 5f)
                                                 {
                                                     //osgosg
@@ -34315,7 +34315,7 @@ namespace IBx
 
                                             if (gv.cc.GetFromBitmapList(p.tokenFilename).Height >= 300)
                                             {
-                                                gv.mod.walkAnimationDelayCounter1 += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                                                gv.mod.walkAnimationDelayCounter1 += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                                                 if (gv.mod.walkAnimationDelayCounter1 >= 5f)
                                                 {
                                                     //osgosg
@@ -34445,7 +34445,7 @@ namespace IBx
 
                                             if (gv.cc.GetFromBitmapList(p.tokenFilename).Height >= 300)
                                             {
-                                                gv.mod.walkAnimationDelayCounter2 += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                                                gv.mod.walkAnimationDelayCounter2 += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                                                 if (gv.mod.walkAnimationDelayCounter2 >= 5f)
                                                 {
                                                     //osgosg
@@ -34575,7 +34575,7 @@ namespace IBx
 
                                             if (gv.cc.GetFromBitmapList(p.tokenFilename).Height >= 300)
                                             {
-                                                gv.mod.walkAnimationDelayCounter3 += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                                                gv.mod.walkAnimationDelayCounter3 += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                                                 if (gv.mod.walkAnimationDelayCounter3 >= 5f)
                                                 {
                                                     //osgosg
@@ -34706,7 +34706,7 @@ namespace IBx
 
                                             if (gv.cc.GetFromBitmapList(p.tokenFilename).Height >= 300)
                                             {
-                                                gv.mod.walkAnimationDelayCounter4 += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                                                gv.mod.walkAnimationDelayCounter4 += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                                                 if (gv.mod.walkAnimationDelayCounter4 >= 5f)
                                                 {
                                                     //osgosg
@@ -34836,7 +34836,7 @@ namespace IBx
 
                                             if (gv.cc.GetFromBitmapList(p.tokenFilename).Height >= 300)
                                             {
-                                                gv.mod.walkAnimationDelayCounter5 += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                                                gv.mod.walkAnimationDelayCounter5 += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                                                 if (gv.mod.walkAnimationDelayCounter5 >= 5f)
                                                 {
                                                     //osgosg
@@ -35085,7 +35085,7 @@ namespace IBx
                         {
 
 
-                            gv.mod.walkAnimationDelayCounter += (0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
+                            gv.mod.walkAnimationDelayCounter += (0.7f * 0.9f * elapsed / 30f * ((gv.mod.scrollModeSpeed * sprintMod) / 0.5f));
                             if (gv.mod.walkAnimationDelayCounter >= 5f)
                             {
                                 //osgosg

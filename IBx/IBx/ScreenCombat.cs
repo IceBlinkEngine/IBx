@@ -6288,7 +6288,7 @@ namespace IBx
                         {
                             //adjustCamToRangedCreature = true;
                             //michael
-                            CenterScreenOnPC(pc);
+                            //CenterScreenOnPC(pc);
                             //CalculateUpperLeftCreature(crt);
                             //adjustCamToRangedCreature = false;
 
@@ -6558,7 +6558,7 @@ namespace IBx
                         if (gv.mod.useManualCombatCam)
                         {
                             adjustCamToRangedCreature = true;
-                            CenterScreenOnPC();
+                            //CenterScreenOnPC();
                             //CalculateUpperLeftCreature(crt);
                             adjustCamToRangedCreature = false;
 
@@ -6635,7 +6635,7 @@ namespace IBx
                         if (gv.mod.useManualCombatCam)
                         {
                             //adjustCamToRangedCreature = true;
-                            CenterScreenOnPC();
+                            //CenterScreenOnPC();
                             //CalculateUpperLeftCreature(crt);
                             //adjustCamToRangedCreature = false;
 
@@ -9318,7 +9318,7 @@ namespace IBx
                                         float walkThreshold = 20f;
                                         if ((crt.glideAdderX != 0 || crt.glideAdderY != 0))
                                         {
-                                            walkThreshold = 10f;
+                                            walkThreshold = 6f;
                                         }
                                         if (crt.walkAnimationDelayCounter >= walkThreshold)
                                         {
@@ -10215,6 +10215,190 @@ namespace IBx
             }
         }
 
+        public void scrollOnCreatureMove(float elapsed)
+        {
+            if (!isPlayerTurn)
+            {
+                //float glideSpeed = 4.75f * (100f / gv.mod.combatAnimationSpeed) * elapsed / 30f;
+                float glideSpeed = 7.5f * (100f / gv.mod.combatAnimationSpeed) * elapsed / 30f;
+                Creature cr = new Creature();
+                int highestLivingCrtMoveOrderfound = 0;
+                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    if (currentMoveOrderIndex == 0)
+                    {
+                        if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                        {
+                            highestLivingCrtMoveOrderfound = c.moveOrder;
+                            cr = c;
+                        }
+                    }
+                    else
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            cr = c;
+                            break;
+                        }
+                    }
+                }
+
+                if (gv.mod.useCombatSmoothMovement)
+                {
+                    if ((cr.combatLocX != cr.newCoor.X) || (cr.combatLocY != cr.newCoor.Y))
+                    {
+                        if ((cr.newCoor.X != -1) && (cr.newCoor.Y != -1))
+                        {
+                            //glide east
+                            if ((cr.combatLocX < cr.newCoor.X) && (cr.combatLocY == cr.newCoor.Y))
+                            {
+                                cr.glideAdderX += 0.5f * glideSpeed;
+                                if (getPixelLocX(cr.combatLocX) + cr.glideAdderX >= getPixelLocX(cr.newCoor.X))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide west
+                            if ((cr.combatLocX > cr.newCoor.X) && (cr.combatLocY == cr.newCoor.Y))
+                            {
+                                cr.glideAdderX -= 0.5f * glideSpeed;
+                                if (getPixelLocX(cr.combatLocX) + cr.glideAdderX <= getPixelLocX(cr.newCoor.X))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide north
+                            if ((cr.combatLocX == cr.newCoor.X) && (cr.combatLocY > cr.newCoor.Y))
+                            {
+                                cr.glideAdderY -= 0.5f * glideSpeed;
+                                if (getPixelLocY(cr.combatLocY) + cr.glideAdderY <= getPixelLocY(cr.newCoor.Y))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide south
+                            if ((cr.combatLocX == cr.newCoor.X) && (cr.combatLocY < cr.newCoor.Y))
+                            {
+                                cr.glideAdderY += 0.5f * glideSpeed;
+                                if (getPixelLocY(cr.combatLocY) + cr.glideAdderY >= getPixelLocY(cr.newCoor.Y))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide southeast
+                            if ((cr.combatLocX < cr.newCoor.X) && (cr.combatLocY < cr.newCoor.Y))
+                            {
+                                cr.glideAdderX += 0.5f * glideSpeed;
+                                cr.glideAdderY += 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(cr.combatLocX) + cr.glideAdderX >= getPixelLocX(cr.newCoor.X)) && (getPixelLocY(cr.combatLocY) + cr.glideAdderY >= getPixelLocY(cr.newCoor.Y)))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide southwest
+                            if ((cr.combatLocX > cr.newCoor.X) && (cr.combatLocY < cr.newCoor.Y))
+                            {
+                                cr.glideAdderX -= 0.5f * glideSpeed;
+                                cr.glideAdderY += 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(cr.combatLocX) + cr.glideAdderX <= getPixelLocX(cr.newCoor.X)) && (getPixelLocY(cr.combatLocY) + cr.glideAdderY >= getPixelLocY(cr.newCoor.Y)))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide northwest
+                            if ((cr.combatLocX > cr.newCoor.X) && (cr.combatLocY > cr.newCoor.Y))
+                            {
+                                cr.glideAdderX -= 0.5f * glideSpeed;
+                                cr.glideAdderY -= 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(cr.combatLocX) + cr.glideAdderX <= getPixelLocX(cr.newCoor.X)) && (getPixelLocY(cr.combatLocY) + cr.glideAdderY <= getPixelLocY(cr.newCoor.Y)))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                            //glide northeast
+                            if ((cr.combatLocX < cr.newCoor.X) && (cr.combatLocY > cr.newCoor.Y))
+                            {
+                                cr.glideAdderX += 0.5f * glideSpeed;
+                                cr.glideAdderY -= 0.5f * glideSpeed;
+
+                                if ((getPixelLocX(cr.combatLocX) + cr.glideAdderX >= getPixelLocX(cr.newCoor.X)) && (getPixelLocY(cr.combatLocY) + cr.glideAdderY <= getPixelLocY(cr.newCoor.Y)))
+                                {
+
+                                    cr.combatLocX = cr.newCoor.X;
+                                    cr.combatLocY = cr.newCoor.Y;
+                                    cr.glideAdderX = 0;
+                                    cr.glideAdderY = 0;
+
+                                    //CalculateUpperLeftCreature(cr);
+                                    blockAnimationBridge = false;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
         #region Combat Draw
         public void redrawCombat(float elapsed)
         {
@@ -10225,7 +10409,7 @@ namespace IBx
             }*/
 
             drawCombatMap();
-            drawProps();
+            drawProps(elapsed);
             drawEffectSquares();
             drawCombatPlayers();
             if (gv.mod.useCombatSmoothMovement == false)
@@ -10251,7 +10435,9 @@ namespace IBx
             drawFloatyText();
             drawHPText();
             drawSPText();
-            drawFloatyTextList();
+            drawFloatyTextList(elapsed);
+
+            scrollOnCreatureMove(elapsed);
 
             //draw hotkey text
             if (gv.showHotKeys)
@@ -10296,6 +10482,34 @@ namespace IBx
                     IbRectF src = new IbRectF(0, 0, gv.cc.GetFromBitmapList("longShadow").Width, gv.cc.GetFromBitmapList("longShadow").Height);
                     //SharpDX.RectangleF dst = new SharpDX.RectangleF(getPixelLocX(x), getPixelLocY(y) + (float)(gv.squareSize * 0.5f), (gv.squareSize), (gv.squareSize));
                     IbRectF dst = new IbRectF(getPixelLocX(x), getPixelLocY(y) + gv.oYshift, (gv.squareSize), (gv.squareSize));
+                    if (!isPlayerTurn)
+                    {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
+                        //tlX = (x - UpperLeftSquare.X) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                        //tlY = (y - UpperLeftSquare.Y) * gv.squareSize - (int)cr.glideAdderY;
+                        dst = new IbRectF(getPixelLocX(x) - cr.glideAdderX, getPixelLocY(y) + gv.oYshift - cr.glideAdderY, (gv.squareSize), (gv.squareSize));
+
+                    }
 
                     //gv.oYshift
                     if (tile.isInShortShadeN)
@@ -10561,9 +10775,29 @@ namespace IBx
             lineCounter++;
         }
 
-        public void drawProps()
+        public void drawProps(float elapsed)
         {
-
+            Creature cr = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (currentMoveOrderIndex == 0)
+                {
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        cr = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        cr = c;
+                        break;
+                    }
+                }
+            }
             //code for drawing conquer and hold locations
             if (gv.mod.currentEncounter.conquerVictory)
             {
@@ -10571,6 +10805,10 @@ namespace IBx
                 {
                     IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList("conquerLocation").Width, gv.cc.GetFromBitmapList("conquerLocation").Width);
                     IbRect dst = new IbRect(getPixelLocX(gv.mod.currentEncounter.conquerTarget1X), getPixelLocY(gv.mod.currentEncounter.conquerTarget1Y), gv.squareSize, gv.squareSize);
+                    if (!isPlayerTurn)
+                    {
+                        dst = new IbRect(getPixelLocX(gv.mod.currentEncounter.conquerTarget1X) - (int)cr.glideAdderX, getPixelLocY(gv.mod.currentEncounter.conquerTarget1Y) - (int)cr.glideAdderY, gv.squareSize, gv.squareSize);
+                    }
                     gv.DrawBitmap(gv.cc.GetFromBitmapList("conquerLocation"), src, dst);
                 }
             }
@@ -10581,24 +10819,275 @@ namespace IBx
                 {
                     IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList("holdLocation").Width, gv.cc.GetFromBitmapList("holdLocation").Width);
                     IbRect dst = new IbRect(getPixelLocX(gv.mod.currentEncounter.holdTarget1X), getPixelLocY(gv.mod.currentEncounter.holdTarget1Y), gv.squareSize, gv.squareSize);
+                    if (!isPlayerTurn)
+                    {
+                        dst = new IbRect(getPixelLocX(gv.mod.currentEncounter.holdTarget1X) - (int)cr.glideAdderX, getPixelLocY(gv.mod.currentEncounter.holdTarget1Y) - (int)cr.glideAdderY, gv.squareSize, gv.squareSize);
+                    }
                     gv.DrawBitmap(gv.cc.GetFromBitmapList("holdLocation"), src, dst);
                 }
             }
 
             foreach (Prop prp in gv.mod.currentEncounter.propsList)
             {
-                IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(prp.ImageFileName).Width, gv.cc.GetFromBitmapList(prp.ImageFileName).Width);
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                if (prp.maxNumberOfFrames > 1)
+                {
+                    if (prp.animationIsActive)
+                    {
+                        float fadeAmount = 0;
+                        if (prp.framesNeededForFullFadeInOut > 0)
+                        {
+                            fadeAmount = 1f / prp.framesNeededForFullFadeInOut;
+                            if (prp.totalFramesInWholeLoopCounter <= prp.framesNeededForFullFadeInOut)
+                            {
+                                prp.opacity = fadeAmount * prp.totalFramesInWholeLoopCounter;
+                                if (prp.opacity > 1)
+                                {
+                                    prp.opacity = 1;
+                                }
+                            }
+
+                            else if (prp.totalFramesInWholeLoopCounter >= ((prp.maxNumberOfFrames * prp.numberOfCyclesNeededForCompletion) - prp.framesNeededForFullFadeInOut))
+                            {
+                                int framesLeft = (prp.maxNumberOfFrames * prp.numberOfCyclesNeededForCompletion) - prp.totalFramesInWholeLoopCounter;
+                                prp.opacity = framesLeft * fadeAmount;
+                            }
+                            else
+                            {
+                                prp.opacity = 1;
+                            }
+                        }
+
+                        //prp.drawAnimatedProp = true;
+                        if ((prp.maxNumberOfFrames > 1) && (!prp.animationComplete))
+                        {
+                            //prp.animationDelayCounter += (300f / elapsed);
+                            prp.animationDelayCounter += (elapsed / 2f);
+
+                            if (prp.animationDelayCounter >= prp.updateTicksNeededTillNextFrame)
+                            {
+
+                                #region forwardDirection
+                                //if (!prp.inverseAnimationDirection)
+                                //{
+                                prp.currentFrameNumber++;
+                                prp.totalFramesInWholeLoopCounter++;
+                                prp.animationDelayCounter = 0;
+                                if (prp.currentFrameNumber > (prp.maxNumberOfFrames - 1))
+                                {
+                                    prp.currentFrameNumber = 0;
+
+                                    //enter new conditional for multiple cylces required before compleetion here
+                                    if (prp.numberOfCyclesNeededForCompletion <= 1)
+                                    {
+                                        if (prp.randomAnimationDirectionEachCall)
+                                        {
+                                            int decider = gv.sf.RandInt(0, 100);
+                                            if (decider >= 50)
+                                            {
+                                                prp.inverseAnimationDirection = true;
+                                            }
+                                            else
+                                            {
+                                                prp.inverseAnimationDirection = false;
+                                            }
+                                        }
+
+                                        prp.animationComplete = true;
+                                        prp.totalFramesInWholeLoopCounter = 0;
+                                        if (prp.hiddenWhenComplete)
+                                        {
+                                            prp.drawAnimatedProp = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        prp.cycleCounter++;
+                                        if (prp.cycleCounter == prp.numberOfCyclesNeededForCompletion)
+                                        {
+                                            if (prp.randomAnimationDirectionEachCall)
+                                            {
+                                                int decider = gv.sf.RandInt(0, 100);
+                                                if (decider >= 50)
+                                                {
+                                                    prp.inverseAnimationDirection = true;
+                                                }
+                                                else
+                                                {
+                                                    prp.inverseAnimationDirection = false;
+                                                }
+                                            }
+
+                                            prp.animationComplete = true;
+                                            prp.cycleCounter = 0;
+                                            prp.totalFramesInWholeLoopCounter = 0;
+                                            if (prp.hiddenWhenComplete)
+                                            {
+                                                prp.drawAnimatedProp = false;
+                                            }
+                                        }
+                                    }
+                                }
+                                //}
+                                #endregion
+                                /*
+                                #region backwardsDirection
+                                else
+                                {
+                                    prp.currentFrameNumber--;
+                                    prp.totalFramesInWholeLoopCounter--;
+                                    prp.animationDelayCounter = 0;
+                                    if (prp.currentFrameNumber > (prp.maxNumberOfFrames - 1))
+                                    {
+                                        prp.currentFrameNumber = 0;
+
+                                    //enter new conditional for multiple cylces required before compleetion here
+                                    if (prp.numberOfCyclesNeededForCompletion <= 1)
+                                    {
+                                        prp.animationComplete = true;
+                                        prp.totalFramesInWholeLoopCounter = 0;
+                                        if (prp.hiddenWhenComplete)
+                                        {
+                                            prp.drawAnimatedProp = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        prp.cycleCounter++;
+                                        if (prp.cycleCounter == prp.numberOfCyclesNeededForCompletion)
+                                        {
+                                            if (prp.randomAnimationDirectionEachCall)
+                                            {
+                                                int decider = gv.sf.RandInt(0, 100);
+                                                if (decider >= 50)
+                                                {
+                                                    prp.inverseAnimationDirection = true;
+                                                }
+                                                else
+                                                {
+                                                    prp.inverseAnimationDirection = false;
+                                                }
+                                            }
+
+                                            prp.animationComplete = true;
+                                            prp.cycleCounter = 0;
+                                            prp.totalFramesInWholeLoopCounter = 0;
+                                            if (prp.hiddenWhenComplete)
+                                            {
+                                                prp.drawAnimatedProp = false;
+                                            }
+                                        }
+                                    }
+                                }
+                            } 
+
+                                #endregion
+                                */
+                            }
+                        }
+
+                        if (prp.animationComplete)
+                        {
+                            if (prp.doOnce)
+                            {
+                                prp.animationIsActive = false;
+                            }
+
+                            if (prp.animationIsActive)
+                            {
+                                if (prp.chanceToTriggerAnimationCycle >= 100)
+                                {
+                                    prp.animationComplete = false;
+                                    prp.drawAnimatedProp = true;
+                                }
+                                else
+                                {
+                                    prp.normalizedTime += (1 / elapsed);
+                                    if (prp.normalizedTime >= 1)
+                                    {
+                                        prp.normalizedTime = 0;
+                                        float rollRandom = gv.sf.RandInt(100);
+                                        if (rollRandom <= prp.chanceToTriggerAnimationCycle)
+                                        {
+                                            prp.animationComplete = false;
+                                            prp.drawAnimatedProp = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //animation is not active
+                    else
+                    {
+                        if (prp.hiddenWhenNotActive)
+                        {
+                            prp.drawAnimatedProp = false;
+                        }
+                    }
+                }
+
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                int framePosition = prp.currentFrameNumber;
+                if (prp.inverseAnimationDirection)
+                {
+                    framePosition = (prp.maxNumberOfFrames - 1) - prp.currentFrameNumber;
+                }
+                //IbRect src = new IbRect(0, framePosition * p.propFrameHeight, gv.mod.loadedTileBitmaps[indexOfLoadedTile].PixelSize.Width, p.propFrameHeight);
+                //IbRect dst = new IbRect(x + gv.oXshift + mapStartLocXinPixels - dstXshift, y - dstYshift, dstW, dstH);
+
+
+                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+                //IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(prp.ImageFileName).PixelSize.Width, gv.cc.GetFromBitmapList(prp.ImageFileName).PixelSize.Width);
+                IbRect src = new IbRect(0, framePosition * prp.propFrameHeight, gv.cc.GetFromBitmapList(prp.ImageFileName).Width, gv.cc.GetFromBitmapList(prp.ImageFileName).Width);
                 IbRect dst = new IbRect(getPixelLocX(prp.LocationX), getPixelLocY(prp.LocationY), gv.squareSize, gv.squareSize);
+                if (!isPlayerTurn)
+                {
+                    dst = new IbRect(getPixelLocX(prp.LocationX) - (int)cr.glideAdderX, getPixelLocY(prp.LocationY) - (int)cr.glideAdderY, gv.squareSize, gv.squareSize);
+                }
                 gv.DrawBitmap(gv.cc.GetFromBitmapList(prp.ImageFileName), src, dst);
             }
         }
 
         public void drawEffectSquares()
         {
+
+            Creature cr = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (currentMoveOrderIndex == 0)
+                {
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        cr = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        cr = c;
+                        break;
+                    }
+                }
+            }
             foreach (Effect ef in gv.mod.currentEncounter.effectsList)
             {
                 IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(ef.squareIndicatorFilename).Width, gv.cc.GetFromBitmapList(ef.squareIndicatorFilename).Width);
                 IbRect dst = new IbRect(getPixelLocX(ef.combatLocX), getPixelLocY(ef.combatLocY), gv.squareSize, gv.squareSize);
+                if (!isPlayerTurn)
+                {
+                    dst = new IbRect(getPixelLocX(ef.combatLocX) - (int)cr.glideAdderX, getPixelLocY(ef.combatLocY) - (int)cr.glideAdderY, gv.squareSize, gv.squareSize);
+                }
                 gv.DrawBitmap(gv.cc.GetFromBitmapList(ef.squareIndicatorFilename), src, dst);
             }
         }
@@ -11932,6 +12421,31 @@ namespace IBx
                     IbRect src = new IbRect(0, 0, bmpWidth, bmpHeight);
                     //IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
                     IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
+                    if (!isPlayerTurn)
+                    {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
+                        dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels - (int)cr.glideAdderX, dstY - (int)cr.glideAdderY, dstWidth, dstHeight);
+                    }
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(mapBitmap), src, dst);
 
                     /*
@@ -11987,13 +12501,13 @@ namespace IBx
 
                 //else //using tiles
                 {
-                    int minX = UpperLeftSquare.X - 5;
+                    int minX = UpperLeftSquare.X - 5 - 2;
                     if (minX < 0) { minX = 0; }
-                    int minY = UpperLeftSquare.Y - 5;
+                    int minY = UpperLeftSquare.Y - 5 - 2;
                     if (minY < 0) { minY = 0; }
-                    int maxX = UpperLeftSquare.X + gv.playerOffsetX + gv.playerOffsetX + 1;
+                    int maxX = UpperLeftSquare.X + gv.playerOffsetX + gv.playerOffsetX + 1 + 2;
                     if (maxX > gv.mod.currentEncounter.MapSizeX) { maxX = gv.mod.currentEncounter.MapSizeX; }
-                    int maxY = UpperLeftSquare.Y + gv.playerOffsetY + gv.playerOffsetY + 1;
+                    int maxY = UpperLeftSquare.Y + gv.playerOffsetY + gv.playerOffsetY + 1 + 2;
                     if (maxY > gv.mod.currentEncounter.MapSizeY) { maxY = gv.mod.currentEncounter.MapSizeY; }
 
                     #region Draw Layer1
@@ -12043,6 +12557,34 @@ namespace IBx
                                         int shiftX = srcLyr.Left / gv.squareSizeInPixels;
                                         int tlX = ((x - UpperLeftSquare.X + shiftX) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                         int tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize;
+
+                                        if (!isPlayerTurn)
+                                        {
+                                            Creature cr = new Creature();
+                                            int highestLivingCrtMoveOrderfound = 0;
+                                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                            {
+                                                if (currentMoveOrderIndex == 0)
+                                                {
+                                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                                    {
+                                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                        cr = c;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                                    {
+                                                        cr = c;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                            tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                                        }
+                                        
                                         float scalerX = srcLyr.Width / 100;
                                         float scalerY = srcLyr.Height / 100;
                                         int brX = (int)(gv.squareSize * scalerX);
@@ -12067,6 +12609,34 @@ namespace IBx
                                         int shiftX = srcLyr.Left / gv.squareSizeInPixels;
                                         int tlX = ((x - UpperLeftSquare.X + shiftX) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                         int tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize;
+
+                                        if (!isPlayerTurn)
+                                        {
+                                            Creature cr = new Creature();
+                                            int highestLivingCrtMoveOrderfound = 0;
+                                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                            {
+                                                if (currentMoveOrderIndex == 0)
+                                                {
+                                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                                    {
+                                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                        cr = c;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                                    {
+                                                        cr = c;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                            tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                                        }
+
                                         float scalerX = srcLyr.Width / 100;
                                         float scalerY = srcLyr.Height / 100;
                                         int brX = (int)(gv.squareSize * scalerX);
@@ -12131,6 +12701,34 @@ namespace IBx
                                         int shiftX = srcLyr.Left / gv.squareSizeInPixels;
                                         int tlX = ((x - UpperLeftSquare.X + shiftX) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                         int tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize;
+
+                                        if (!isPlayerTurn)
+                                        {
+                                            Creature cr = new Creature();
+                                            int highestLivingCrtMoveOrderfound = 0;
+                                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                            {
+                                                if (currentMoveOrderIndex == 0)
+                                                {
+                                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                                    {
+                                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                        cr = c;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                                    {
+                                                        cr = c;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                            tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                                        }
+
                                         float scalerX = srcLyr.Width / 100;
                                         float scalerY = srcLyr.Height / 100;
                                         int brX = (int)(gv.squareSize * scalerX);
@@ -12156,6 +12754,34 @@ namespace IBx
                                         int shiftX = srcLyr.Left / gv.squareSizeInPixels;
                                         int tlX = ((x - UpperLeftSquare.X + shiftX) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                         int tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize;
+
+                                        if (!isPlayerTurn)
+                                        {
+                                            Creature cr = new Creature();
+                                            int highestLivingCrtMoveOrderfound = 0;
+                                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                            {
+                                                if (currentMoveOrderIndex == 0)
+                                                {
+                                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                                    {
+                                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                        cr = c;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                                    {
+                                                        cr = c;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                            tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                                        }
+
                                         float scalerX = srcLyr.Width / 100;
                                         float scalerY = srcLyr.Height / 100;
                                         int brX = (int)(gv.squareSize * scalerX);
@@ -12221,6 +12847,34 @@ namespace IBx
                                         int shiftX = srcLyr.Left / gv.squareSizeInPixels;
                                         int tlX = ((x - UpperLeftSquare.X + shiftX) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                         int tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize;
+
+                                        if (!isPlayerTurn)
+                                        {
+                                            Creature cr = new Creature();
+                                            int highestLivingCrtMoveOrderfound = 0;
+                                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                            {
+                                                if (currentMoveOrderIndex == 0)
+                                                {
+                                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                                    {
+                                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                        cr = c;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                                    {
+                                                        cr = c;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                            tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                                        }
+
                                         float scalerX = srcLyr.Width / 100;
                                         float scalerY = srcLyr.Height / 100;
                                         int brX = (int)(gv.squareSize * scalerX);
@@ -12246,6 +12900,34 @@ namespace IBx
                                         int shiftX = srcLyr.Left / gv.squareSizeInPixels;
                                         int tlX = ((x - UpperLeftSquare.X + shiftX) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                         int tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize;
+
+                                        if (!isPlayerTurn)
+                                        {
+                                            Creature cr = new Creature();
+                                            int highestLivingCrtMoveOrderfound = 0;
+                                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                            {
+                                                if (currentMoveOrderIndex == 0)
+                                                {
+                                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                                    {
+                                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                        cr = c;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                                    {
+                                                        cr = c;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                            tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                                        }
+
                                         float scalerX = srcLyr.Width / 100;
                                         float scalerY = srcLyr.Height / 100;
                                         int brX = (int)(gv.squareSize * scalerX);
@@ -12321,6 +13003,32 @@ namespace IBx
 
                                 int tlX = ((x - UpperLeftSquare.X) * gv.squareSize) + gv.oXshift + mapStartLocXinPixels;
                                 int tlY = (y - UpperLeftSquare.Y) * gv.squareSize;
+                                if (!isPlayerTurn)
+                                {
+                                    Creature cr = new Creature();
+                                    int highestLivingCrtMoveOrderfound = 0;
+                                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                                    {
+                                        if (currentMoveOrderIndex == 0)
+                                        {
+                                            if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                            {
+                                                highestLivingCrtMoveOrderfound = c.moveOrder;
+                                                cr = c;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                                            {
+                                                cr = c;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    tlX = (x - UpperLeftSquare.X) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                                    tlY = (y - UpperLeftSquare.Y) * gv.squareSize - (int)cr.glideAdderY;
+                                }
                                 int brX = gv.squareSize;
                                 int brY = gv.squareSize;
 
@@ -12389,6 +13097,32 @@ namespace IBx
 
                     IbRect src = new IbRect(0, 0, bmpWidth, bmpHeight);
                     IbRect dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels, dstY, dstWidth, dstHeight);
+                    if (!isPlayerTurn)
+                    {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
+                        dst = new IbRect(dstX + gv.oXshift + mapStartLocXinPixels - (int)cr.glideAdderX, dstY - (int)cr.glideAdderY, dstWidth, dstHeight);
+                    }
+
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(mapBitmap), src, dst);
 
                     //int sqrsizeW = mapBitmap.PixelSize.Width / gv.mod.currentEncounter.MapSizeX;
@@ -12605,6 +13339,33 @@ namespace IBx
                     {
                         int tlX = -offset * gv.squareSize;
                         int tlY = y * gv.squareSize;
+                        if (!isPlayerTurn)
+                        {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            tlX = -offset * gv.squareSize - (int)(cr.glideAdderX);
+                            tlY = y * gv.squareSize - (int)cr.glideAdderY;
+
+                        }
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
                         IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
@@ -12621,6 +13382,33 @@ namespace IBx
                     {
                         int tlX = -offset * gv.squareSize;
                         int tlY = y * gv.squareSize;
+                        if (!isPlayerTurn)
+                        {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            tlX = -offset * gv.squareSize - (int)(cr.glideAdderX);
+                            tlY = y * gv.squareSize - (int)cr.glideAdderY;
+
+                        }
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
                         IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
@@ -12643,6 +13431,33 @@ namespace IBx
                     {
                         int tlX = x * gv.squareSize;
                         int tlY = -offset * gv.squareSize;
+                        if (!isPlayerTurn)
+                        {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            tlX = x * gv.squareSize - (int)(cr.glideAdderX);
+                            tlY = -offset * gv.squareSize - (int)cr.glideAdderY;
+
+                        }
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
                         IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
@@ -12660,6 +13475,33 @@ namespace IBx
                     {
                         int tlX = x * gv.squareSize;
                         int tlY = -offset * gv.squareSize;
+                        if (!isPlayerTurn)
+                        {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            tlX = x * gv.squareSize - (int)(cr.glideAdderX);
+                            tlY = -offset * gv.squareSize - (int)cr.glideAdderY;
+
+                        }
                         int brX = gv.squareSize;
                         int brY = gv.squareSize;
                         IbRect src = new IbRect(0, 0, gv.cc.black_tile.Width, gv.cc.black_tile.Height);
@@ -12675,6 +13517,7 @@ namespace IBx
         //XXXX
         public IbRect getSourceIbRect(int xSqr, int ySqr, int UpperLeftXsqr, int UpperLeftYsqr, int tileWinPixels, int tileHinPixels)
         {
+            /*
             IbRect src = new IbRect(0, 0, tileWinPixels, tileHinPixels);
 
             int tileWsqrs = tileWinPixels / gv.squareSizeInPixels;
@@ -12706,7 +13549,14 @@ namespace IBx
             //if endY <=0 then it is off the map
             if (endY <= 0) { return null; }
 
-            return new IbRect(startX * gv.squareSizeInPixels, startY * gv.squareSizeInPixels, (endX - startX) * gv.squareSizeInPixels, (endY - startY) * gv.squareSizeInPixels);
+            //return new IbRect(startX * gv.squareSizeInPixels, startY * gv.squareSizeInPixels, (endX - startX) * gv.squareSizeInPixels, (endY - startY) * gv.squareSizeInPixels);
+            */
+            IbRect srcLyr = new IbRect();
+            srcLyr.Left = 0;
+            srcLyr.Top = 0;
+            srcLyr.Width = tileWinPixels;
+            srcLyr.Height = tileHinPixels;
+            return srcLyr;
         }
         public void drawCombatPlayers()
         {
@@ -12717,6 +13567,38 @@ namespace IBx
                 {
                     IbRect src = new IbRect(0, 0, gv.cc.turn_marker.Width, gv.cc.turn_marker.Width);
                     IbRect dst = new IbRect(getPixelLocX(p.combatLocX), getPixelLocY(p.combatLocY), gv.squareSize, gv.squareSize);
+                    if (!isPlayerTurn)
+                    {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
+                        //tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                        //tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                        //if (cr.moveOrder != crt.moveOrder)
+                        {
+                            dst.Left -= (int)(cr.glideAdderX);
+                            dst.Top -= (int)(cr.glideAdderY);
+                        }
+
+                    }
                     if (isPlayerTurn)
                     {
                         gv.DrawBitmap(gv.cc.turn_marker, src, dst);
@@ -12750,6 +13632,38 @@ namespace IBx
                             src = new IbRect(0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                         }
                         IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
+                        if (!isPlayerTurn)
+                        {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            //tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                            //tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                            //if (cr.moveOrder != crt.moveOrder)
+                            {
+                                dst.Left -= (int)(cr.glideAdderX);
+                                dst.Top -= (int)(cr.glideAdderY);
+                            }
+
+                        }
                         gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft, false);
                         src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                         //always show effects
@@ -12794,8 +13708,40 @@ namespace IBx
 
                         if (showMoveOrder)
                         {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
                             int mo = pc.moveOrder + 1;
-                            drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                            bool noCreatureOnTop = true;
+                            foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (crt.combatLocX == pc.combatLocX && crt.combatLocY == pc.combatLocY)
+                                {
+                                    noCreatureOnTop = false;
+                                }
+                            }
+                            if (noCreatureOnTop)
+                            {
+                                drawText(getPixelLocX(pc.combatLocX) - (int)cr.glideAdderX, getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight - (int)cr.glideAdderY, mo.ToString(), "white");
+                            }
                         }
                     }
                 }
@@ -12826,6 +13772,38 @@ namespace IBx
                             src = new IbRect(0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width * attackAnimationFrameCounter, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                         }
                         IbRect dst = new IbRect(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), gv.squareSize, gv.squareSize);
+                        if (!isPlayerTurn)
+                        {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            //tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                            //tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                            //if (cr.moveOrder != crt.moveOrder)
+                            {
+                                dst.Left -= (int)(cr.glideAdderX);
+                                dst.Top -= (int)(cr.glideAdderY);
+                            }
+
+                        }
                         gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft);
                         src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                         //show effects always
@@ -12870,8 +13848,41 @@ namespace IBx
 
                         if (showMoveOrder)
                         {
+                            Creature cr = new Creature();
+                            int highestLivingCrtMoveOrderfound = 0;
+                            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (currentMoveOrderIndex == 0)
+                                {
+                                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                    {
+                                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                                        cr = c;
+                                    }
+                                }
+                                else
+                                {
+                                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                                    {
+                                        cr = c;
+                                        break;
+                                    }
+                                }
+                            }
                             int mo = pc.moveOrder + 1;
-                            drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                            bool noCreatureOnTop = true;
+                            foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                            {
+                                if (crt.combatLocX == pc.combatLocX && crt.combatLocY == pc.combatLocY)
+                                {
+                                    noCreatureOnTop = false;
+                                }
+                            }
+
+                            if (noCreatureOnTop)
+                            {
+                                drawText(getPixelLocX(pc.combatLocX) - (int)cr.glideAdderX, getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight - (int)cr.glideAdderY, mo.ToString(), "white");
+                            }
                         }
                     }
                 }
@@ -14650,6 +15661,58 @@ namespace IBx
                 }
                 if (drawCreature)
                 {
+                    if (!isPlayerTurn)
+                    {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
+                        //tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                        //tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                        if (cr.moveOrder != crt.moveOrder)
+                        {
+                            dst.Left -= (int)(cr.glideAdderX);
+                            dst.Top -= (int)(cr.glideAdderY);
+                        }
+                        else
+                        {
+                            //dst.Left -= (int)(cr.glideAdderX);
+                            //dst.Top -= (int)(cr.glideAdderY);
+                            dst.Left = gv.screenWidth / 2 - gv.squareSize / 2;
+                            dst.Top = gv.screenHeight / 2 - gv.squareSize / 2;
+
+                            //CalculateUpperLeftCreature(cr); 
+                            //gv.cc.addLogText("white", "X-Add:" + cr. glideAdderX);
+                            //gv.cc.addLogText("white", "Y-Add:" + cr.glideAdderY);
+                            //gv.cc.addLogText("white", "X-Loc:" + cr.combatLocX);
+                            //gv.cc.addLogText("white", "Y-Loc:" + cr.combatLocY);
+                            //gv.cc.addLogText("white", "X-NewCo:" + cr.newCoor.X);
+                            //gv.cc.addLogText("white", "Y-NewCo:" + cr.newCoor.Y);
+                            //gv.cc.addLogText("white", "UpperX:" + UpperLeftSquare.X);
+                            //gv.cc.addLogText("white", "UpperY:" + UpperLeftSquare.Y);
+                            //gv.cc.addLogText("white", "UpperX:" + getPixelLocX(cr.combatLocX));
+                            //gv.cc.addLogText("white", "UpperY:" + getPixelLocX(cr.combatLocY));
+
+                        }
+
+                    }
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
                 }
                 else
@@ -14674,6 +15737,45 @@ namespace IBx
                     if (crtSize == 4)
                     {
                         dst = new IbRectF(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY), gv.squareSize * 2, gv.squareSize * 2);
+                    }
+                    if (!isPlayerTurn)
+                    {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
+                        //tlX = (x - UpperLeftSquare.X + shiftX) * gv.squareSize - (int)(cr.glideAdderX) + gv.oXshift + mapStartLocXinPixels;
+                        //tlY = (y - UpperLeftSquare.Y + shiftY) * gv.squareSize - (int)cr.glideAdderY;
+                        if (cr.moveOrder != crt.moveOrder)
+                        {
+                            dst.Left -= (int)(cr.glideAdderX);
+                            dst.Top -= (int)(cr.glideAdderY);
+                        }
+
+                        else
+                        {
+                            dst.Left -= (int)(cr.glideAdderX);
+                            dst.Top -= (int)(cr.glideAdderY);
+                        }
+
+
                     }
                     gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, !crt.combatFacingLeft);
                 }
@@ -14772,8 +15874,36 @@ namespace IBx
 
                     if (showMoveOrder)
                     {
+                        Creature cr = new Creature();
+                        int highestLivingCrtMoveOrderfound = 0;
+                        foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (currentMoveOrderIndex == 0)
+                            {
+                                if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                                {
+                                    highestLivingCrtMoveOrderfound = c.moveOrder;
+                                    cr = c;
+                                }
+                            }
+                            else
+                            {
+                                if (c.moveOrder == currentMoveOrderIndex - 1)
+                                {
+                                    cr = c;
+                                    break;
+                                }
+                            }
+                        }
                         int mo = crt.moveOrder + 1;
-                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY + (int)crt.glideAdderY, mo.ToString(), "white");
+                        if (cr == crt)
+                        {
+                            drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY, mo.ToString(), "white");
+                        }
+                        else
+                        {
+                            drawText(getPixelLocX(crt.combatLocX) - (int)(cr.glideAdderX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight - (int)(cr.glideAdderY) + (int)crt.roamDistanceY, mo.ToString(), "white");
+                        }
                     }
                 }
             }
@@ -14991,8 +16121,36 @@ namespace IBx
 
                 if (showMoveOrder)
                 {
+                    Creature cr = new Creature();
+                    int highestLivingCrtMoveOrderfound = 0;
+                    foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if (currentMoveOrderIndex == 0)
+                        {
+                            if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                            {
+                                highestLivingCrtMoveOrderfound = c.moveOrder;
+                                cr = c;
+                            }
+                        }
+                        else
+                        {
+                            if (c.moveOrder == currentMoveOrderIndex - 1)
+                            {
+                                cr = c;
+                                break;
+                            }
+                        }
+                    }
                     int mo = crt.moveOrder + 1;
-                    drawText(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                    if (cr == crt)
+                    {
+                        drawText(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight, mo.ToString(), "white");
+                    }
+                    else
+                    {
+                        drawText(getPixelLocX(crt.combatLocX) - (int)(cr.glideAdderX), getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight - (int)(cr.glideAdderY), mo.ToString(), "white");
+                    }
                 }
             }
         }
@@ -15180,62 +16338,165 @@ namespace IBx
                     break;
                 }
             }
+
             if (isPlayer)
             {
-                gv.DrawTextOutlined(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, 1.0f, "lime");
+                gv.DrawTextOutlined(gv.cc.floatyText0, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y, 0.5f, "lime");
             }
             else
             {
-                gv.DrawTextOutlined(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, 1.0f, "red");
+                gv.DrawTextOutlined(gv.cc.floatyText0, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y, 0.5f, "red");
             }
-            gv.DrawTextOutlined(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, 1.0f, "white");
-            gv.DrawTextOutlined(gv.cc.floatyText3, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 3, 1.0f, "white");
+            gv.DrawTextOutlined(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, 0.5f, "white");
+            if (isPlayer)
+            {
+                gv.DrawTextOutlined(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, 0.5f, "lime");
+            }
+            else
+            {
+                gv.DrawTextOutlined(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, 0.5f, "red");
+            }
+            gv.DrawTextOutlined(gv.cc.floatyText3, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 3, 0.5f, "yellow");
 
             //gv.cc.floatyTextLocInfo.X = gv.squareSize/2;
             //gv.cc.floatyTextLocInfo.Y = gv.squareSize*1;
             //gv.DrawTextOutlined(gv.cc.floatyTextActorInfoName, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + txtH, 1.0f, Color.White);
-            
-            //gv.DrawText(gv.cc.floatyText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH, "yellow");
-            //gv.DrawText(gv.cc.floatyText2, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 2, "yellow");
-            //gv.DrawText(gv.cc.floatyText3, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y + txtH * 3, "yellow");
+            if (isPlayerTurn)
+            {
+                if (gv.cc.floatyTextPropMouseOver != "")
+                {
+                    //gv.DrawTextOutlined(gv.cc.floatyTextPropMouseOver, gv.cc.floatyTextLocPropMouseOver.X, gv.cc.floatyTextLocPropMouseOver.Y, 0.5f, Color.White);
+                    IbRect rect = new IbRect();
+                    rect.Left = gv.cc.floatyTextLocPropMouseOver.X - (int)(0.75f * gv.squareSize);
+                    rect.Top = gv.cc.floatyTextLocPropMouseOver.Y;
+                    //   gv.cc.floatyTextLocPropMouseOver
+                    rect.Width = 3 * gv.squareSize;
+                    //gv.DrawTextCenterOutlined(gv.cc.floatyTextPropMouseOver, rect, FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 0.5f, Color.White);
+                    gv.DrawTextCenterOutlinedRect(gv.cc.floatyTextPropMouseOver, rect, 0.7f, "white");
+                }
+            }
         }
         public void drawHPText()
         {
             if ((showHP) && (!animationsOn))
             {
+
+                Creature cr = new Creature();
+                int highestLivingCrtMoveOrderfound = 0;
+                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    if (currentMoveOrderIndex == 0)
+                    {
+                        if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                        {
+                            highestLivingCrtMoveOrderfound = c.moveOrder;
+                            cr = c;
+                        }
+                    }
+                    else
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            cr = c;
+                            break;
+                        }
+                    }
+                }
+
                 foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
                 {
-                    if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                    if (crt == cr)
                     {
-                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY + (int)crt.glideAdderY, crt.hp + "/" + crt.hpMax, "red");
+                        if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                        {
+                            drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY, crt.hp + "/" + crt.hpMax, "red");
+                        }
+                    }
+                    else
+                    {
+                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX - (int)cr.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY - (int)(cr.glideAdderY), crt.hp + "/" + crt.hpMax, "red");
                     }
                 }
                 foreach (Player pc in gv.mod.playerList)
                 {
                     if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                     {
-                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY), pc.hp + "/" + pc.hpMax, "red");
+                        bool noCreatureOnTop = true;
+                        foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (crt.combatLocX == pc.combatLocX && crt.combatLocY == pc.combatLocY)
+                            {
+                                noCreatureOnTop = false;
+                            }
+                        }
+
+                        if (noCreatureOnTop)
+                        {
+                            drawText(getPixelLocX(pc.combatLocX) - (int)(cr.glideAdderX), getPixelLocY(pc.combatLocY) - (int)(cr.glideAdderY), pc.hp + "/" + pc.hpMax, "lime");
+                        }
                     }
                 }
             }
         }
         public void drawSPText()
         {
+            int txtH = (int)gv.drawFontRegHeight;
             if ((showSP) && (!animationsOn))
             {
-                int txtH = (int)gv.drawFontRegHeight;
+
+                Creature cr = new Creature();
+                int highestLivingCrtMoveOrderfound = 0;
+                foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    if (currentMoveOrderIndex == 0)
+                    {
+                        if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                        {
+                            highestLivingCrtMoveOrderfound = c.moveOrder;
+                            cr = c;
+                        }
+                    }
+                    else
+                    {
+                        if (c.moveOrder == currentMoveOrderIndex - 1)
+                        {
+                            cr = c;
+                            break;
+                        }
+                    }
+                }
+
                 foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
                 {
-                    if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                    if (crt == cr)
                     {
-                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX + (int)crt.glideAdderX, getPixelLocY(crt.combatLocY) + txtH + (int)crt.roamDistanceY + (int)crt.glideAdderY, crt.sp + "/" + crt.spMax, "yellow");
+                        if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                        {
+                            drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY + txtH, crt.sp + "/" + crt.spMax, "yellow");
+                        }
+                    }
+                    else
+                    {
+                        drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX - (int)cr.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY - (int)(cr.glideAdderY) + txtH, crt.sp + "/" + crt.spMax, "yellow");
                     }
                 }
                 foreach (Player pc in gv.mod.playerList)
                 {
                     if (IsInVisibleCombatWindow(pc.combatLocX, pc.combatLocY))
                     {
-                        drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) + txtH, pc.sp + "/" + pc.spMax, "yellow");
+                        bool noCreatureOnTop = true;
+                        foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            if (crt.combatLocX == pc.combatLocX && crt.combatLocY == pc.combatLocY)
+                            {
+                                noCreatureOnTop = false;
+                            }
+                        }
+
+                        if (noCreatureOnTop)
+                        {
+                            drawText(getPixelLocX(pc.combatLocX) - (int)(cr.glideAdderX), getPixelLocY(pc.combatLocY) - (int)(cr.glideAdderY) + txtH, pc.sp + "/" + pc.spMax, "yellow");
+                        }
                     }
                 }
             }
@@ -15276,7 +16537,7 @@ namespace IBx
             */
             gv.DrawTextOutlined(text, xLoc, yLoc + txtH, 0.5f, colr);
         }
-        public void drawFloatyTextList()
+        public void drawFloatyTextList(float elapsed)
         {
             //summe
             if (floatyTextOn)
@@ -15359,45 +16620,51 @@ namespace IBx
                 }
                 rightShift = 0;
             }
+            
+            int txtH2 = (int)gv.drawFontRegHeight;
+
             if (floatyTextEnlargerOn)
             {
                 int txtH = (int)gv.drawFontRegHeight;
 
                 foreach (FloatyText ft in gv.cc.floatyTextList)
                 {
-                    /*
-                    for (int x = -1; x <= 1; x++)
+                    if (floatyTextEnlargerOn && ft.value.Contains("Round"))
                     {
-                        for (int y = -1; y <= 1; y++)
+                        /*
+                        for (int x = -1; x <= 1; x++)
                         {
-                            if (ft.value.Contains("Round"))
+                            for (int y = -1; y <= 1; y++)
                             {
-                                gv.DrawText(ft.value, ft.location.X + mapStartLocXinPixels + x, ft.location.Y + y, 3.0f, Color.Black);
+                                if (ft.value.Contains("Round"))
+                                {
+                                    gv.DrawText(ft.value, ft.location.X + mapStartLocXinPixels + x, ft.location.Y + y, 3.0f, Color.Black);
+                                }
                             }
                         }
-                    }
-                    */
-                    string colr = ft.color;
-                    /*if (ft.color.Equals("yellow"))
-                    {
-                        colr = Color.Yellow;
-                    }
-                    else if (ft.color.Equals("blue"))
-                    {
-                        colr = Color.Blue;
-                    }
-                    else if (ft.color.Equals("green"))
-                    {
-                        colr = Color.Lime;
-                    }
-                    else
-                    {
-                        colr = Color.Red;
-                    }*/
-                    if (ft.value.Contains("Round"))
-                    {
-                        //summe 
-                        gv.DrawTextOutlined(ft.value, ft.location.X + mapStartLocXinPixels, ft.location.Y, 3.0f, colr);
+                        */
+                        string colr = ft.color;
+                        /*if (ft.color.Equals("yellow"))
+                        {
+                            colr = Color.Yellow;
+                        }
+                        else if (ft.color.Equals("blue"))
+                        {
+                            colr = Color.Blue;
+                        }
+                        else if (ft.color.Equals("green"))
+                        {
+                            colr = Color.Lime;
+                        }
+                        else
+                        {
+                            colr = Color.Red;
+                        }*/
+                        if (ft.value.Contains("Round"))
+                        {
+                            //summe 
+                            gv.DrawTextOutlined(ft.value, ft.location.X + mapStartLocXinPixels, ft.location.Y, 3.0f, colr);
+                        }
                     }
                 }
             }
@@ -15727,6 +16994,14 @@ else if (keyData == Keys.U)
 }
 else if (keyData == Keys.X)
 {
+if (gv.cc.drawInfoText)
+                {
+                    gv.cc.drawInfoText = false;
+                }
+                else
+                {
+                    gv.cc.drawInfoText = true;
+                }
     gv.mod.mainMapMovementRelevantKeyPressed = false;
     foreach (IB2Panel pnl in combatUiLayout.panelList)
     {
@@ -17443,105 +18718,203 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     int gridx = (int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
                     int gridy = (int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize;
 
-                    #region FloatyText
-                    gv.cc.floatyText = "";
-                    gv.cc.floatyText2 = "";
-                    gv.cc.floatyText3 = "";
-                    gv.cc.floatyText4 = "";
-                    gv.cc.floatyText0 = "";
-                    gv.cc.floatyTextA = "";
-                    gv.cc.floatyTextB = "";
-
-                    gv.cc.floatyTextActorInfoName = "";
-
-                    foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                    #region Floaty info on props
+                    gv.cc.floatyTextPropMouseOver = ""
+; foreach (Prop p in gv.mod.currentEncounter.propsList)
                     {
-                        //if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
-                        //1=normal, 2=wide, 3=tall, 4=large  
-                        int crtSize = crt.creatureSize;
-
-                        //normal  
-                        if (crtSize == 1)
+                        if ((p.LocationX == gridx + UpperLeftSquare.X) && (p.LocationY == gridy + UpperLeftSquare.Y))
                         {
-                            if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
+                            if (!p.MouseOverText.Equals("none") && (isPlayerTurn))
                             {
-                                gv.cc.floatyText = crt.cr_name;
-                                gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
-                                gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
-                                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
+                                gv.cc.floatyTextPropMouseOver = p.MouseOverText;
+                                float floatyPushUp = 0;
 
-                                gv.cc.floatyTextActorInfoName = crt.cr_name;
-                            }
-                        }
-
-                        //wide  
-                        else if (crtSize == 2)
-                        {
-                            if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)))
-                            {
-                                gv.cc.floatyText = crt.cr_name;
-                                gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
-                                gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
-                                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
-
-                                gv.cc.floatyTextActorInfoName = crt.cr_name;
-                            }
-                        }
-
-                        //tall  
-                        else if (crtSize == 3)
-                        {
-                            if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)))
-                            {
-                                gv.cc.floatyText = crt.cr_name;
-                                gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
-                                gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
-                                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
-
-                                gv.cc.floatyTextActorInfoName = crt.cr_name;
-                            }
-                        }
-
-                        //large  
-                        else if (crtSize == 4)
-                        {
-                            if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) ||
-                            ((crt.combatLocX == gridx + +UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)) ||
-                            ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)))
-                            {
-                                gv.cc.floatyText = crt.cr_name;
-                                gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
-                                gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
-                                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
-
-                                gv.cc.floatyTextActorInfoName = crt.cr_name;
+                                if (gv.cc.floatyTextPropMouseOver.Length <= 20)
+                                {
+                                    floatyPushUp = 0.0f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 35)
+                                {
+                                    floatyPushUp = 0.0f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 52)
+                                {
+                                    floatyPushUp = 0.12f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 70)
+                                {
+                                    floatyPushUp = 0.3f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 87)
+                                {
+                                    floatyPushUp = 0.7f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 105)
+                                {
+                                    floatyPushUp = 1.0f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 122)
+                                {
+                                    floatyPushUp = 1.35f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 140)
+                                {
+                                    floatyPushUp = 1.5f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 157)
+                                {
+                                    floatyPushUp = 1.62f;
+                                }
+                                else if (gv.cc.floatyTextPropMouseOver.Length <= 175)
+                                {
+                                    floatyPushUp = 1.75f;
+                                }
+                                else
+                                {
+                                    floatyPushUp = 2.0f;
+                                }
+                                gv.cc.floatyPushUp = floatyPushUp;
+                                //aggroman
+                                gv.cc.floatyTextLocPropMouseOver = new Coordinate(gridx * gv.squareSize, (gridy) * gv.squareSize - (int)(floatyPushUp * 2 * gv.squareSize));
+                                //gv.DrawTextOutlined(p.MouseOverText, gv.cc.floatyTextLoc.X, gv.cc.floatyTextLoc.Y, 1.0f, Color.White);
                             }
                         }
                     }
-                    foreach (Player pc1 in gv.mod.playerList)
+                    #endregion
+
+                    #region FloatyText Creatures and pc
+                    if (true) //e.Button != MouseButtons.Right
                     {
-                        if ((pc1.combatLocX == gridx + UpperLeftSquare.X) && (pc1.combatLocY == gridy + UpperLeftSquare.Y))
+                        bool hide = true;
+                        foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
                         {
-                            string am = "";
-                            ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc1.AmmoRefs.resref);
-                            if (itr != null)
+                            //if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
+                            //1=normal, 2=wide, 3=tall, 4=large  
+                            int crtSize = crt.creatureSize;
+
+                            //normal  
+                            if (crtSize == 1)
                             {
-                                am = itr.quantity + "";
-                            }
-                            else
-                            {
-                                am = "";
+                                if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
+                                {
+                                    /*
+                                    gv.cc.floatyText = crt.cr_name;
+                                    gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
+                                    gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
+                                    gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
+
+                                    gv.cc.floatyTextActorInfoName = crt.cr_name;
+                                    */
+                                    hide = false;
+                                    if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                    {
+                                        showActorInfo(crt);
+                                    }
+                                }
                             }
 
-                            gv.cc.floatyText = pc1.name;
-                            int actext = 0;
-                            if (gv.mod.ArmorClassAscending) { actext = pc1.AC; }
-                            else { actext = 20 - pc1.AC; }
-                            gv.cc.floatyText2 = "AC:" + actext + " " + pc1.charStatus;
-                            gv.cc.floatyText3 = "Ammo: " + am;
-                            gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc1.combatLocX), getPixelLocY(pc1.combatLocY));
+                            //wide  
+                            else if (crtSize == 2)
+                            {
+                                if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)))
+                                {
+                                    /*
+                                   gv.cc.floatyText = crt.cr_name;
+                                   gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
+                                   gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
+                                   gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
 
-                            gv.cc.floatyTextActorInfoName = pc1.name;
+                                   gv.cc.floatyTextActorInfoName = crt.cr_name;
+                                   */
+                                    hide = false;
+                                    if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                    {
+                                        showActorInfo(crt);
+                                    }
+                                }
+                            }
+
+                            //tall  
+                            else if (crtSize == 3)
+                            {
+                                if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)))
+                                {
+                                    /*
+                                    gv.cc.floatyText = crt.cr_name;
+                                    gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
+                                    gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
+                                    gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
+
+                                    gv.cc.floatyTextActorInfoName = crt.cr_name;
+                                    */
+                                    hide = false;
+                                    if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                    {
+                                        showActorInfo(crt);
+                                    }
+                                }
+                            }
+
+                            //large  
+                            else if (crtSize == 4)
+                            {
+                                if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) ||
+                                ((crt.combatLocX == gridx + +UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)) ||
+                                ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)))
+                                {
+                                    /*
+                                    gv.cc.floatyText = crt.cr_name;
+                                    gv.cc.floatyText2 = "HP:" + crt.hp + " SP:" + crt.sp;
+                                    gv.cc.floatyText3 = "AC:" + crt.getAc() + " " + crt.cr_status;
+                                    gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
+
+                                    gv.cc.floatyTextActorInfoName = crt.cr_name;
+                                    */
+                                    hide = false;
+                                    if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                    {
+                                        showActorInfo(crt);
+                                    }
+                                }
+                            }
+                        }
+                        foreach (Player pc1 in gv.mod.playerList)
+                        {
+                            if ((pc1.combatLocX == gridx + UpperLeftSquare.X) && (pc1.combatLocY == gridy + UpperLeftSquare.Y))
+                            {
+                                /*
+                                string am = "";
+                                ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc1.AmmoRefs.resref);
+                                if (itr != null)
+                                {
+                                    am = itr.quantity + "";
+                                }
+                                else
+                                {
+                                    am = "";
+                                }
+
+                                gv.cc.floatyText = pc1.name;
+                                int actext = 0;
+                                if (gv.mod.ArmorClassAscending) { actext = pc1.AC; }
+                                else { actext = 20 - pc1.AC; }
+                                gv.cc.floatyText2 = "AC:" + actext + " " + pc1.charStatus;
+                                gv.cc.floatyText3 = "Ammo: " + am;
+                                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc1.combatLocX), getPixelLocY(pc1.combatLocY));
+
+                                gv.cc.floatyTextActorInfoName = pc1.name;
+                                */
+                                hide = false;
+
+                                if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                {
+                                    showActorInfo(pc1);
+                                }
+                            }
+                        }
+                        if (hide)
+                        {
+                            hideActorInfo();
                         }
                     }
                     #endregion
@@ -17579,8 +18952,85 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         //NEW SYSTEM
                         string rtn = combatUiLayout.getImpact(x, y);
 
-                        #region Toggles
-                        if (rtn.Equals("tglHP"))
+                    if (true) //e.Button == MouseButtons.Left
+                    {
+                        gv.cc.inEffectMode = false;
+                    }
+
+                    if (false) //e.Button == MouseButtons.Right
+                    {
+                        gridx = (int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
+                        gridy = (int)(eY - (gv.squareSize / 2)) / gv.squareSize;
+                        foreach (Player pc1 in gv.mod.playerList)
+                        {
+                            if ((pc1.combatLocX == gridx + UpperLeftSquare.X) && (pc1.combatLocY == gridy + UpperLeftSquare.Y))
+                            {
+
+                                //if (!gv.cc.showingEffects)
+                                //{
+                                showActorInfoRightHold(pc1);
+                                //}
+                                //else
+                                //{
+                                //showActorInfo(pc1);
+                                //gv.cc.showingEffects = false;
+                                //}
+                                break;
+                            }
+                        }
+
+                        foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                        {
+                            //if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
+                            //1=normal, 2=wide, 3=tall, 4=large  
+                            int crtSize = crt.creatureSize;
+
+                            //normal  
+                            if (crtSize == 1)
+                            {
+                                if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
+                                {
+                                    showActorInfoRightHold(crt);
+                                    break;
+                                }
+                            }
+
+                            //wide  
+                            else if (crtSize == 2)
+                            {
+                                if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)))
+                                {
+                                    showActorInfoRightHold(crt);
+                                    break;
+                                }
+                            }
+
+                            //tall  
+                            else if (crtSize == 3)
+                            {
+                                if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)))
+                                {
+                                    showActorInfoRightHold(crt);
+                                    break;
+                                }
+                            }
+
+                            //large  
+                            else if (crtSize == 4)
+                            {
+                                if (((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) || ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y)) ||
+                                ((crt.combatLocX == gridx + +UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)) ||
+                                ((crt.combatLocX + 1 == gridx + UpperLeftSquare.X) && (crt.combatLocY + 1 == gridy + UpperLeftSquare.Y)))
+                                {
+                                    showActorInfoRightHold(crt);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    #region Toggles
+                    if (rtn.Equals("tglHP"))
                         {
                             IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
                             if (tgl == null) { return; }
@@ -17782,15 +19232,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                         if (IsInVisibleCombatWindow(gridx, gridy))
                         {
-                            gv.cc.floatyText = "";
-                            gv.cc.floatyText2 = "";
-                            gv.cc.floatyText3 = "";
-                            gv.cc.floatyText4 = "";
-                            gv.cc.floatyText0 = "";
-                            gv.cc.floatyTextA = "";
-                            gv.cc.floatyTextB = "";
-
-                            gv.cc.floatyTextActorInfoName = "";
+                            if (true) //e.Button != MouseButtons.Right
+                        {
+                                //hideActorInfo();
+                            }
 
                             if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             {
@@ -21447,8 +22892,729 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         }
 
         //Helper Methods
-        public void CalculateUpperLeft()
+        public void showActorInfoRightHold(Object actor)
         {
+            /*
+            if (!gv.cc.showingEffects)
+            {
+                gv.cc.showingEffects = true;
+            }
+            else
+            {
+                gv.cc.showingEffects = false;
+            }
+            */
+            if (actor is Player)
+            {
+                gv.cc.inEffectMode = true;
+                //gv.cc.showingEffects = true;
+                /*
+                showHP = false;
+                showSP = false;
+                showMoveOrder = false;
+                
+
+                Player pc = (Player)(actor);
+                string am = "";
+                ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc.AmmoRefs.resref);
+                if (itr != null)
+                {
+                    am = itr.quantity + "";
+                }
+                else
+                {
+                    am = "";
+                }
+
+                //drawText(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY) - (int)gv.drawFontRegHeight, pc.name, Color.Lime);
+                int mo = pc.moveOrder + 1;
+
+                gv.cc.floatyText0 = pc.name; 
+                //gv.cc.floatyText = "Ini " + mo.ToString();
+                int actext = 0;
+                if (gv.mod.ArmorClassAscending) { actext = pc.AC; }
+                else { actext = 20 - pc.AC; }
+                gv.cc.floatyText = "AC " + actext;
+                gv.cc.floatyText2 = "HP: " + pc.hp + "/" + pc.hpMax;
+                gv.cc.floatyText3 = "SP: " + pc.sp + "/" + pc.spMax;
+                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY));
+                */
+                showHP = true;
+                showSP = true;
+                showMoveOrder = true;
+                Player pc = (Player)(actor);
+                //gv.cc.floatyTextActorInfoName = pc.name;
+                string effectsText = "";
+                foreach (Effect ef in pc.effectsList)
+                {
+                    effectsText += ef.name;
+                }
+                gv.cc.floatyTextActorInfoTempEffects1 = effectsText;
+
+                if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                {
+                    gv.cc.floatyTextActorInfoTempEffects1 = "No temporary effects";
+                }
+
+                //hide the normal info when efects are shown
+                gv.cc.floatyTextActorInfoMoveOrder = "";
+                gv.cc.floatyTextActorInfoInitiative = "";
+                gv.cc.floatyTextActorInfoAC = "";
+                gv.cc.floatyTextActorInfoMovementRange = "";
+                gv.cc.floatyTextActorInfoHP = "";
+                gv.cc.floatyTextActorInfoSP = "";
+                gv.cc.floatyTextActorInfoToHit = "";
+                gv.cc.floatyTextActorInfoNumberOfAttacks = "";
+                gv.cc.floatyTextActorInfoOnScoringHitSpellName = "";
+                gv.cc.floatyTextActorInfoOnScoringHitSpellNameSelf = "";
+                gv.cc.floatyTextActorInfoAttackRange = "";
+                gv.cc.floatyTextActorInfoAttackType = "";
+                gv.cc.floatyTextActorInfoDamage = "";
+                gv.cc.floatyTextActorInfoSaves = "";
+                gv.cc.floatyTextActorInfoSaves2 = "";
+                gv.cc.floatyTextActorInfoSaves3 = "";
+                gv.cc.floatyTextActorInfoDamageType = "";
+                gv.cc.floatyTextActorInfoAmmo = "";
+                gv.cc.floatyTextActorInfoResistances1 = "";
+                gv.cc.floatyTextActorInfoResistances2 = "";
+                gv.cc.floatyTextActorInfoResistances3 = "";
+                gv.cc.floatyTextActorInfoResistances4 = "";
+                gv.cc.floatyTextActorInfoResistances5 = "";
+                gv.cc.floatyTextActorInfoResistances6 = "";
+                gv.cc.floatyTextActorInfoResistances7 = "";
+
+                gv.cc.floatyTextActorInfoRegenerationHP = "";
+                gv.cc.floatyTextActorInfoRegenerationSP = "";
+                gv.cc.floatyTextActorInfoSpellsKnown1 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown2 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown3 = "";
+                gv.cc.floatyTextActorInfoAIType = "";
+                gv.cc.floatyTextActorInfoAIAffinityForCasting = "";//0 to 100
+                gv.cc.floatyTextActorInfoInjuryThreshold = "";
+                gv.cc.floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+                gv.cc.floatyTextActorInfoOnDeathScriptName = "";
+                gv.cc.floatyTextActorInfoRMB1 = "";
+                gv.cc.floatyTextActorInfoRMB2 = "";
+
+            }
+            else if (actor is Creature)
+            {
+                gv.cc.inEffectMode = true;
+                //gv.cc.showingEffects = true;
+                /*
+                showHP = false;
+                showSP = false;
+                showMoveOrder = false;
+                Creature crt = (Creature)(actor);
+                gv.cc.floatyText0 = crt.cr_name;
+                //gv.cc.floatyText = "Ini " + mo.ToString();
+                int actext = 0;
+                if (gv.mod.ArmorClassAscending) { actext = crt.getAc(); }
+                else { actext = 20 - crt.getAc(); }
+                gv.cc.floatyText = "AC " + actext;
+                int maxHP = crt.hpMax + crt.getMaxHPModifier();
+                gv.cc.floatyText2 = "HP: " + crt.hp + "/" + maxHP;
+                gv.cc.floatyText3 = "SP: " + crt.sp + "/" + crt.spMax;
+                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(crt.combatLocX), getPixelLocY(crt.combatLocY));
+                */
+
+                //only for right clikc (effects)
+                showHP = true;
+                showSP = true;
+                showMoveOrder = true;
+                Creature crt = (Creature)(actor);
+                //gv.cc.floatyTextActorInfoName = crt.cr_name;
+
+                gv.cc.floatyTextActorInfoMoveOrder = "";
+                gv.cc.floatyTextActorInfoInitiative = "";
+                gv.cc.floatyTextActorInfoAC = "";
+                gv.cc.floatyTextActorInfoMovementRange = "";
+                gv.cc.floatyTextActorInfoHP = "";
+                gv.cc.floatyTextActorInfoSP = "";
+                gv.cc.floatyTextActorInfoToHit = "";
+                gv.cc.floatyTextActorInfoNumberOfAttacks = "";
+                gv.cc.floatyTextActorInfoAmmo = "";
+                gv.cc.floatyTextActorInfoOnScoringHitSpellName = "";
+                gv.cc.floatyTextActorInfoOnScoringHitSpellNameSelf = "";
+                gv.cc.floatyTextActorInfoAttackRange = "";
+                gv.cc.floatyTextActorInfoAttackType = "";
+                gv.cc.floatyTextActorInfoDamage = "";
+                gv.cc.floatyTextActorInfoSaves = "";
+                gv.cc.floatyTextActorInfoSaves2 = "";
+                gv.cc.floatyTextActorInfoSaves3 = "";
+                gv.cc.floatyTextActorInfoDamageType = "";
+                gv.cc.floatyTextActorInfoResistances1 = "";
+                gv.cc.floatyTextActorInfoResistances2 = "";
+                gv.cc.floatyTextActorInfoResistances3 = "";
+                gv.cc.floatyTextActorInfoResistances4 = "";
+                gv.cc.floatyTextActorInfoResistances5 = "";
+                gv.cc.floatyTextActorInfoResistances6 = "";
+                gv.cc.floatyTextActorInfoResistances7 = "";
+                gv.cc.floatyTextActorInfoRegenerationHP = "";
+                gv.cc.floatyTextActorInfoRegenerationSP = "";
+                gv.cc.floatyTextActorInfoSpellsKnown1 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown2 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown3 = "";
+                gv.cc.floatyTextActorInfoAIType = "";
+                gv.cc.floatyTextActorInfoAIAffinityForCasting = "";//0 to 100
+                gv.cc.floatyTextActorInfoInjuryThreshold = "";
+                gv.cc.floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+                gv.cc.floatyTextActorInfoOnDeathScriptName = "";
+                gv.cc.floatyTextActorInfoRMB1 = "";
+                gv.cc.floatyTextActorInfoRMB2 = "";
+
+
+                string effectsText = "";
+                foreach (Effect ef in crt.cr_effectsList)
+                {
+                    effectsText += ef.name;
+                }
+                gv.cc.floatyTextActorInfoTempEffects1 = effectsText;
+
+                if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                {
+                    gv.cc.floatyTextActorInfoTempEffects1 = "No temporary effects";
+                }
+            }
+
+        }
+
+
+        public void showActorInfo(Object actor)
+        {
+            if (actor is Player)
+            {
+
+                showHP = true;
+                showSP = true;
+                showMoveOrder = true;
+                Player pc = (Player)(actor);
+                gv.cc.floatyTextActorInfoName = pc.name;
+                //(pc.dexterity - 10) / 2) *5
+                gv.cc.floatyTextActorInfoMoveOrder = "Ord. " + (pc.moveOrder + 1);
+                gv.cc.floatyTextActorInfoInitiative = "Ini " + ((pc.dexterity - 10) / 2) * 5;
+                gv.cc.floatyTextActorInfoAC = "AC " + pc.AC;
+                gv.cc.floatyTextActorInfoMovementRange = "Moves " + pc.moveDistance;
+                gv.cc.floatyTextActorInfoHP = "HP " + pc.hp + "/" + pc.hpMax;
+                gv.cc.floatyTextActorInfoSP = "SP " + pc.sp + "/" + pc.spMax;
+
+                int numAtt = 1;
+                numAtt = gv.sf.CalcNumberOfAttacks(pc);
+                if (numAtt < 1)
+                {
+                    numAtt = 1;
+                }
+                int attackMod = 0;
+                int modifier = 0;
+
+                if (gv.sf.isMeleeAttack(pc))
+                {
+                    modifier = gv.sf.CalcPcMeleeAttackAttributeModifier(pc);
+                }
+                else //ranged weapon used
+                {
+                    modifier = (pc.dexterity - 10) / 2;
+
+                    int preciseShotAdder = 0;
+                    preciseShotAdder = gv.sf.CalcPcRangedAttackModifier(pc);
+                    if (preciseShotAdder > 0)
+                    {
+                        modifier += preciseShotAdder;
+                    }
+
+                    if (gv.sf.hasTrait(pc, "preciseshot2"))
+                    {
+                        modifier += 2;
+                    }
+                    else if (gv.sf.hasTrait(pc, "preciseshot"))
+                    {
+                        modifier++;
+                    }
+
+                    Item it2 = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref);
+                    if (it2 != null)
+                    {
+                        modifier += gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).attackBonus;
+                    }
+                }
+                attackMod = modifier + pc.baseAttBonus + gv.sf.CalcAttackBonusesNoAmmo(pc);
+
+                bool autoHit = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).automaticallyHitsTarget;
+
+                int numberOfDiceRolled = 0;
+                int typeOfDieRolled = 0;
+                int dammodifier = 0;
+                string damageType = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).typeOfDamage;
+
+                if (gv.sf.isMeleeAttack(pc))
+                {
+                    /*
+                    dammodifier = (pc.strength - 10) / 2;
+                    //if has critical strike trait use dexterity for damage modifier in melee if greater than strength modifier
+                    if (gv.sf.hasTrait(pc, "criticalstrike"))
+                    {
+                        int dammodifierDex = (pc.dexterity - 10) / 4;
+                        if (dammodifierDex > dammodifier)
+                        {
+                            dammodifier = (pc.dexterity - 10) / 2;
+                        }
+                    }
+                    */
+                    dammodifier = gv.sf.CalcPcMeleeDamageAttributeModifier(pc);
+                }
+                else //ranged weapon used
+                {
+                    dammodifier = 0;
+                    int preciseShotAdder = 0;
+                    preciseShotAdder = gv.sf.CalcPcRangedDamageModifier(pc);
+                    if (preciseShotAdder > 0)
+                    {
+                        //dammodifier += 2;
+                        dammodifier += preciseShotAdder;
+                    }
+                    else
+                    {
+                        if (gv.sf.hasTrait(pc, "preciseshot2"))
+                        {
+                            dammodifier += 2;
+                        }
+                        else if (gv.sf.hasTrait(pc, "preciseshot"))
+                        {
+                            dammodifier++;
+                        }
+
+                    }
+                    Item it3 = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref);
+                    if (it3 != null)
+                    {
+                        dammodifier += gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).damageAdder;
+                        damageType = gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).typeOfDamage;
+                    }
+
+                }
+
+                dammodifier += gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).damageAdder;
+                numberOfDiceRolled = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).damageNumDice;
+                typeOfDieRolled = gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).damageDie;
+
+                string am = "";
+                ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc.AmmoRefs.resref);
+                if (itr != null)
+                {
+                    am = itr.quantity + "";
+                }
+                else
+                {
+                    am = "";
+                }
+
+
+                gv.cc.floatyTextActorInfoNumberOfAttacks = "#A " + numAtt;
+
+                if (autoHit)
+                {
+                    gv.cc.floatyTextActorInfoToHit = "Autohit";
+                }
+                else
+                {
+                    if (attackMod > 0)
+                    {
+                        gv.cc.floatyTextActorInfoToHit = "To hit +" + attackMod;
+                    }
+                    else if (attackMod <= 0)
+                    {
+                        gv.cc.floatyTextActorInfoToHit = "To hit " + attackMod;
+                    }
+                }
+                if (am != "")
+                {
+                    gv.cc.floatyTextActorInfoAmmo = "Ammo " + am;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoAmmo = "";
+                }
+                if (dammodifier >= 0)
+                {
+                    gv.cc.floatyTextActorInfoDamage = "Damage " + numberOfDiceRolled + "d" + typeOfDieRolled + "+" + dammodifier;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoDamage = "Damage " + numberOfDiceRolled + "d" + typeOfDieRolled + dammodifier;
+                }
+                gv.cc.floatyTextActorInfoDamageType = damageType;
+
+                if ((gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).category.Equals("Ranged"))
+                       && (!gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).name.Equals("none")))
+                {
+                    if (!gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).onScoringHitCastOnSelf)
+                    {
+                        if (gv.cc.floatyTextActorInfoOnScoringHitSpellName != "none")
+                        {
+                            gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit: " + gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).onScoringHitCastSpellTag;
+                        }
+                        else
+                        {
+                            gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit: " + gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).onScoringHit;
+                        }
+                    }
+                    else
+                    {
+                        gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit self: " + gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).onScoringHitCastSpellTag;
+                    }
+                }
+                else
+                {
+                    if (!gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).onScoringHitCastOnSelf)
+                    {
+                        if (gv.cc.floatyTextActorInfoOnScoringHitSpellName != "none")
+                        {
+                            gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit: " + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).onScoringHitCastSpellTag;
+                        }
+                        else
+                        {
+                            gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit: " + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).onScoringHit;
+                        }
+                    }
+                    else
+                    {
+                        gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit self: " + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).onScoringHitCastSpellTag;
+                    }
+                }
+                //gv.cc.floatyTextActorInfoOnDeathScriptName
+                //gv.cc.floatyTextActorInfoAttackRange = "";
+
+                if (pc.fortitude < 0)
+                {
+                    gv.cc.floatyTextActorInfoSaves = "Fort " + pc.fortitude;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoSaves = "Fort " + "+" + pc.fortitude;
+                }
+                if (pc.reflex < 0)
+                {
+                    gv.cc.floatyTextActorInfoSaves2 = "Ref " + pc.reflex;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoSaves2 = "Ref " + "+" + pc.reflex;
+                }
+                if (pc.will < 0)
+                {
+                    gv.cc.floatyTextActorInfoSaves3 = "Will " + pc.will;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoSaves3 = "Will " + "+" + pc.will;
+                }
+                gv.cc.floatyTextActorInfoResistances1 = "N% " + pc.damageTypeResistanceTotalNormal;
+                gv.cc.floatyTextActorInfoResistances2 = "M% " + pc.damageTypeResistanceTotalMagic;
+                gv.cc.floatyTextActorInfoResistances3 = "P% " + pc.damageTypeResistanceTotalPoison;
+                gv.cc.floatyTextActorInfoResistances4 = "F% " + pc.damageTypeResistanceTotalFire;
+                gv.cc.floatyTextActorInfoResistances5 = "C% " + pc.damageTypeResistanceTotalCold;
+                gv.cc.floatyTextActorInfoResistances6 = "A% " + pc.damageTypeResistanceTotalAcid;
+                gv.cc.floatyTextActorInfoResistances7 = "E% " + pc.damageTypeResistanceTotalElectricity;
+                gv.cc.floatyTextActorInfoAttackRange = "Range " + gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).attackRange;
+                if ((gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).category.Equals("Ranged")))
+                {
+                    gv.cc.floatyTextActorInfoAttackType = "Ranged";
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoAttackType = "Melee";
+                }
+                gv.cc.floatyTextActorInfoRMB1 = "Press RMB to show current";
+                gv.cc.floatyTextActorInfoRMB2 = "temporary effects";
+
+                //To do: must set all creature exclusive innfo to "" here
+                //public string floatyTextActorInfoFaction = "";
+                gv.cc.floatyTextActorInfoRegenerationHP = "";
+                gv.cc.floatyTextActorInfoRegenerationSP = "";
+                gv.cc.floatyTextActorInfoSpellsKnown1 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown2 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown3 = "";
+                gv.cc.floatyTextActorInfoAIType = "";
+                gv.cc.floatyTextActorInfoAIAffinityForCasting = "";//0 to 100
+                gv.cc.floatyTextActorInfoInjuryThreshold = "";
+                gv.cc.floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+                gv.cc.floatyTextActorInfoOnDeathScriptName = "";
+
+            }
+            else if (actor is Creature)
+            {
+                showHP = true;
+                showSP = true;
+                showMoveOrder = true;
+                Creature crt = (Creature)(actor);
+                gv.cc.floatyTextActorInfoName = crt.cr_name;
+                gv.cc.floatyTextActorInfoAC = "AC " + crt.getAc();
+                gv.cc.floatyTextActorInfoInitiative = "Ini " + crt.initiativeBonus;
+                gv.cc.floatyTextActorInfoMoveOrder = "Ord. " + (crt.moveOrder + 1);
+                gv.cc.floatyTextActorInfoNumberOfAttacks = "#A " + crt.getNumberOfAttacks();
+                if (crt.getAttackBonus() > 0)
+                {
+                    gv.cc.floatyTextActorInfoToHit = "To hit +" + crt.getAttackBonus();
+                }
+                else if (crt.getAttackBonus() <= 0)
+                {
+                    gv.cc.floatyTextActorInfoToHit = "To hit " + crt.getAttackBonus();
+                }
+
+                gv.cc.floatyTextActorInfoHP = "HP " + crt.hp + "/" + crt.hpMax;
+
+                int spMax = 0;
+                foreach (Creature crt2 in gv.mod.currentEncounter.encounterCreatureList)
+                {
+                    foreach (Creature crtOrg in gv.mod.moduleCreaturesList)
+                    {
+                        if (crt2.cr_resref == crtOrg.cr_resref)
+                        {
+                            spMax = crtOrg.sp;
+                        }
+                    }
+
+                }
+                gv.cc.floatyTextActorInfoSP = "SP " + crt.sp + "/" + spMax;
+                gv.cc.floatyTextActorInfoAttackType = crt.cr_category;
+                gv.cc.floatyTextActorInfoAttackRange = "Range " + crt.cr_attRange;
+                if (crt.cr_damageAdder >= 0)
+                {
+                    gv.cc.floatyTextActorInfoDamage = "Damage " + crt.cr_damageNumDice + "d" + crt.cr_damageDie + "+" + crt.cr_damageAdder;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoDamage = "Damage " + crt.cr_damageNumDice + "d" + crt.cr_damageDie + crt.cr_damageAdder;
+                }
+                gv.cc.floatyTextActorInfoDamageType = crt.cr_typeOfDamage;
+                if (crt.onScoringHitCastSpellTag != "none" && crt.onScoringHitCastSpellTag != "")
+                {
+                    gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit: " + crt.onScoringHitCastSpellTag;
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoOnScoringHitSpellName = "On hit: " + crt.onScoringHit;
+                }
+
+
+                if (crt.getFortitude() < 0)
+                {
+                    gv.cc.floatyTextActorInfoSaves = "Fort " + crt.getFortitude();
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoSaves = "Fort " + "+" + crt.getFortitude();
+                }
+                if (crt.getReflex() < 0)
+                {
+                    gv.cc.floatyTextActorInfoSaves2 = "Ref " + crt.getReflex();
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoSaves2 = "Ref " + "+" + crt.getReflex();
+                }
+                if (crt.getWill() < 0)
+                {
+                    gv.cc.floatyTextActorInfoSaves3 = "Will " + crt.getWill();
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoSaves3 = "Will " + "+" + crt.getWill();
+                }
+                gv.cc.floatyTextActorInfoResistances1 = "N% " + crt.getDamageTypeResistanceValueNormal();
+                gv.cc.floatyTextActorInfoResistances2 = "M% " + crt.getDamageTypeResistanceValueMagic();
+                gv.cc.floatyTextActorInfoResistances3 = "P% " + crt.getDamageTypeResistanceValuePoison();
+                gv.cc.floatyTextActorInfoResistances4 = "F% " + crt.getDamageTypeResistanceValueFire();
+                gv.cc.floatyTextActorInfoResistances5 = "C% " + crt.getDamageTypeResistanceValueCold();
+                gv.cc.floatyTextActorInfoResistances6 = "A% " + crt.getDamageTypeResistanceValueAcid();
+                gv.cc.floatyTextActorInfoResistances7 = "E% " + crt.getDamageTypeResistanceValueElectricity();
+
+                //CreatureTypeTags: Undead, Lycan, Animal, etc. (efefcts use these),alreday i via local ints
+                //CreatureREquiredWeaponTypes: Silver, lesserMagic, greaterMagic, dragonGlass/Obsidian, Holy, Unholy, to do on cretaures and items
+
+                gv.cc.floatyTextActorInfoRegenerationHP = "HPReg " + crt.hpRegenerationPerRound;
+                gv.cc.floatyTextActorInfoRegenerationSP = "SPReg " + crt.spRegenerationPerRound;
+                gv.cc.floatyTextActorInfoSpellsKnown1 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown2 = "";
+                gv.cc.floatyTextActorInfoSpellsKnown3 = "";
+                int counter = 0;
+                foreach (String spell in crt.knownSpellsTags)
+                {
+                    counter++;
+                    string spellName = "";
+                    foreach (Spell sp in gv.mod.moduleSpellsList)
+                    {
+                        if (sp.tag == spell)
+                        {
+                            spellName = sp.name;
+                            break;
+                        }
+                    }
+                    if (counter == 1)
+                    {
+                        gv.cc.floatyTextActorInfoSpellsKnown1 += spellName + ", ";
+                    }
+                    if (counter == 2)
+                    {
+                        gv.cc.floatyTextActorInfoSpellsKnown1 += spellName;
+                    }
+                    if (counter == 3)
+                    {
+                        gv.cc.floatyTextActorInfoSpellsKnown2 += spellName + ", ";
+                    }
+                    if (counter == 4)
+                    {
+                        gv.cc.floatyTextActorInfoSpellsKnown2 += spellName;
+                    }
+                    if (counter == 5)
+                    {
+                        gv.cc.floatyTextActorInfoSpellsKnown3 += spellName + ", ";
+                    }
+                    if (counter == 6)
+                    {
+                        gv.cc.floatyTextActorInfoSpellsKnown3 += spellName;
+                    }
+                    if (counter >= 7)
+                    {
+                        break;
+                    }
+                }
+
+                if (crt.cr_ai == "BasicAttacker")
+                {
+                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Straight forward";
+                }
+                if (crt.cr_ai == "GeneralCaster")
+                {
+                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Caster";
+                }
+                if (crt.cr_ai == "bloodHunter")
+                {
+                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Preys on the weak";
+                }
+                if (crt.cr_ai == "mindHunter")
+                {
+                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Witch Hunter";
+                }
+                if (crt.cr_ai == "softTargetHunter")
+                {
+                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Goes for soft targets";
+                }
+
+                if (crt.cr_ai == "GeneralCaster")
+                {
+                    gv.cc.floatyTextActorInfoAIAffinityForCasting = "Cast% " + crt.percentChanceToCastSpell; //0 to 100
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoAIAffinityForCasting = "Cast% " + 0;
+                }
+
+                if (crt.cr_ai == "GeneralCaster")
+                {
+                    gv.cc.floatyTextActorInfoInjuryThreshold = "Loss threshold " + crt.percentRequirementOfTargetInjuryForHealSpells + "%";
+                }
+                else
+                {
+                    gv.cc.floatyTextActorInfoInjuryThreshold = "";
+                }
+                counter = 0;
+                gv.cc.floatyTextActorInfoCreatureTags = "Tags: ";
+                foreach (LocalString tag in crt.CreatureLocalStrings)
+                {
+                    counter++;
+                    if (counter == 1)
+                    {
+                        gv.cc.floatyTextActorInfoCreatureTags += tag.Value + ", ";
+                    }
+                    if (counter == 2)
+                    {
+                        gv.cc.floatyTextActorInfoCreatureTags += tag.Value + ", ";
+                    }
+                    if (counter == 3)
+                    {
+                        gv.cc.floatyTextActorInfoCreatureTags += tag.Value;
+                    }
+                    if (counter >= 4)
+                    {
+                        break;
+                    }
+                }
+                if (crt.CreatureLocalStrings.Count == 0)
+                {
+                    gv.cc.floatyTextActorInfoCreatureTags += "none";
+                }
+                //gv.cc.floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+
+                gv.cc.floatyTextActorInfoOnDeathScriptName = "On death: " + crt.onDeathIBScript;
+
+                gv.cc.floatyTextActorInfoRMB1 = "Press RMB to show current";
+                gv.cc.floatyTextActorInfoRMB2 = "temporary effects";
+            }
+            else if (actor is Prop)
+            {
+                Prop prp = (Prop)(actor);
+            }
+            else if (actor is Trigger)
+            {
+                Trigger trg = (Trigger)(actor);
+            }
+            else if (actor is Effect)
+            {
+                Effect ef = (Effect)(actor);
+            }
+        }
+
+        public void hideActorInfo()
+        {
+            gv.cc.inEffectMode = false;
+
+            //gv.cc.showingEffects = false;
+            /*
+            if (rtn.Equals("tglHP"))
+            {
+                IB2ToggleButton tgl = combatUiLayout.GetToggleByTag(rtn);
+                if (tgl == null) { return; }
+                tgl.toggleOn = !tgl.toggleOn;
+                showHP = !showHP;
+            }
+            */
+            try
+            {
+                IB2ToggleButton tgl = combatUiLayout.GetToggleByTag("tglHP");
+                if (tgl.toggleOn)
+                {
+                    showHP = true;
+                }
+                else
+                {
+                    showHP = false;
+                }
+
+                tgl = combatUiLayout.GetToggleByTag("tglSP");
+                if (tgl.toggleOn)
+                {
+                    showSP = true;
+                }
+                else
+                {
+                    showSP = false;
+                }
+
+
+                tgl = combatUiLayout.GetToggleByTag("tglMoveOrder");
+                if (tgl.toggleOn)
+                {
+                    showMoveOrder = true;
+                }
+                else
+                {
+                    showMoveOrder = false;
+                }
+            }
+            catch
+            { }
+
 
             gv.cc.floatyText = "";
             gv.cc.floatyText2 = "";
@@ -21458,7 +23624,55 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             gv.cc.floatyTextA = "";
             gv.cc.floatyTextB = "";
 
+            //this will hide second page with effects on mouse move and left click
+            //if (gv.cc.floatyTextActorInfoName == "")
+            //{
+            gv.cc.floatyTextActorInfoTempEffects1 = "";
+            //}
             gv.cc.floatyTextActorInfoName = "";
+            gv.cc.floatyTextActorInfoMoveOrder = "";
+            gv.cc.floatyTextActorInfoInitiative = "";
+            gv.cc.floatyTextActorInfoAC = "";
+            gv.cc.floatyTextActorInfoMovementRange = "";
+            gv.cc.floatyTextActorInfoHP = "";
+            gv.cc.floatyTextActorInfoSP = "";
+            gv.cc.floatyTextActorInfoToHit = "";
+            gv.cc.floatyTextActorInfoNumberOfAttacks = "";
+            gv.cc.floatyTextActorInfoOnScoringHitSpellName = "";
+            gv.cc.floatyTextActorInfoOnScoringHitSpellNameSelf = "";
+            gv.cc.floatyTextActorInfoAttackRange = "";
+            gv.cc.floatyTextActorInfoAttackType = "";
+            gv.cc.floatyTextActorInfoDamage = "";
+            gv.cc.floatyTextActorInfoSaves = "";
+            gv.cc.floatyTextActorInfoSaves2 = "";
+            gv.cc.floatyTextActorInfoSaves3 = "";
+            gv.cc.floatyTextActorInfoDamageType = "";
+            gv.cc.floatyTextActorInfoAmmo = "";
+            gv.cc.floatyTextActorInfoResistances1 = "";
+            gv.cc.floatyTextActorInfoResistances2 = "";
+            gv.cc.floatyTextActorInfoResistances3 = "";
+            gv.cc.floatyTextActorInfoResistances4 = "";
+            gv.cc.floatyTextActorInfoResistances5 = "";
+            gv.cc.floatyTextActorInfoResistances6 = "";
+            gv.cc.floatyTextActorInfoResistances7 = "";
+            gv.cc.floatyTextActorInfoRegenerationHP = "";
+            gv.cc.floatyTextActorInfoRegenerationSP = "";
+            gv.cc.floatyTextActorInfoSpellsKnown1 = "";
+            gv.cc.floatyTextActorInfoSpellsKnown2 = "";
+            gv.cc.floatyTextActorInfoSpellsKnown3 = "";
+            gv.cc.floatyTextActorInfoAIType = "";
+            gv.cc.floatyTextActorInfoAIAffinityForCasting = "";//0 to 100
+            gv.cc.floatyTextActorInfoInjuryThreshold = "";
+            gv.cc.floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+            gv.cc.floatyTextActorInfoOnDeathScriptName = "";
+            gv.cc.floatyTextActorInfoRMB1 = "";
+            gv.cc.floatyTextActorInfoRMB2 = "";
+            //gv.cc.showingEffects = false;
+        }
+        public void CalculateUpperLeft()
+        {
+
+            hideActorInfo();
 
             Player pc2 = gv.mod.playerList[currentPlayerIndex];
             if (pc2.hp > 0)
@@ -21515,15 +23729,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
         public void CalculateUpperLeftCreature(Creature crt)
         {
-            gv.cc.floatyText = "";
-            gv.cc.floatyText2 = "";
-            gv.cc.floatyText3 = "";
-            gv.cc.floatyText4 = "";
-            gv.cc.floatyText0 = "";
-            gv.cc.floatyTextA = "";
-            gv.cc.floatyTextB = "";
-
-            gv.cc.floatyTextActorInfoName = "";
+            hideActorInfo();
 
             FormerUpperLeftSquare.X = UpperLeftSquare.X;
             FormerUpperLeftSquare.Y = UpperLeftSquare.Y;
