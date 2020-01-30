@@ -18,6 +18,7 @@ namespace IBx
         public List<String> tagsOfEffectsToRemoveOnMove = new List<String>();
 
         public float maxTurnTimeCounter = 0;
+        public List<LocalString> requiredWeaponTypesToHarmCreature = new List<LocalString>();
 
         public bool showNormalFrame = false;//0
         public bool showAttackingFrame = false;//1
@@ -286,6 +287,16 @@ namespace IBx
                 Lstr.Value = l.Value;
                 copy.CreatureLocalStrings.Add(Lstr);
             }
+
+            copy.requiredWeaponTypesToHarmCreature = new List<LocalString>();
+            foreach (LocalString l in this.requiredWeaponTypesToHarmCreature)
+            {
+                LocalString Lstr = new LocalString();
+                Lstr.Key = l.Key;
+                Lstr.Value = l.Value;
+                copy.requiredWeaponTypesToHarmCreature.Add(Lstr);
+            }
+
             return copy;
         }
 

@@ -187,6 +187,7 @@ namespace IBx
         public string floatyTextActorInfoSP = "";
         public string floatyTextActorInfoToHit = "";
         public string floatyTextActorInfoNumberOfAttacks = "";
+        public string floatyTextActorInfoWeaponTags = "";
         public string floatyTextActorInfoAmmo = "";
         public string floatyTextActorInfoOnScoringHitSpellName = "";
         public string floatyTextActorInfoOnScoringHitSpellNameSelf = "";
@@ -246,6 +247,7 @@ namespace IBx
         public string floatyTextActorInfoInjuryThreshold = "";
 
         public string floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+        public string floatyTextActorInfoHitBy = "";
         public string floatyTextActorInfoOnDeathScriptName = "";
 
         public Coordinate floatyTextLoc = new Coordinate();
@@ -17516,11 +17518,11 @@ namespace IBx
 
                 if (src.labelForCastAction != "none" && src.labelForCastAction != "CAST")
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + src.cr_name + " <font color='white'>" + src.labelForCastAction + " " + spell.name + "</font><BR>");
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " creates " + spell.name + "</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + src.cr_name + " <font color='white'>creates " + spell.name + "</font><BR>");
                 }
             }
             else if (source is Player)
@@ -17531,22 +17533,22 @@ namespace IBx
                 {
                     if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.playerClass.labelForCastAction + " " + spell.name + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForCastAction + " " + spell.name + "</font><BR>");
                     }
                     else
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + spell.name + "</font><BR>");
                     }
                 }
                 else
                 {
                     if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.playerClass.labelForUseTraitAction + " " + spell.name + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForUseTraitAction + " " + spell.name + "</font><BR>");
                     }
                     else
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + spell.name + "</font><BR>");
                     }
                 }
 
@@ -17558,11 +17560,11 @@ namespace IBx
                 //powerLevel = 
                 if (src.labelForCastAction != "none")
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
+                    gv.cc.addLogText("<font color='white'>" + src.name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                    gv.cc.addLogText("<font color='white'>" + src.name + " creates " + spell.name + "</font><BR>");
                 }
 
                 //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
@@ -17680,11 +17682,11 @@ namespace IBx
 
                 if (src.labelForCastAction != "none" && src.labelForCastAction != "CAST")
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " " + src.labelForCastAction + " " + traitName + "</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + src.cr_name + " <font color='white'>" + src.labelForCastAction + " " + traitName + "</font><BR>");
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.cr_name + " creates " + traitName + "</font><BR>");
+                    gv.cc.addLogText("<font color='red'>" + src.cr_name + " <font color='white'>creates " + traitName + "</font><BR>");
                 }
             }
             else if (source is Player)
@@ -17695,22 +17697,22 @@ namespace IBx
                 {
                     if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.playerClass.labelForCastAction + " " + traitName + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForCastAction + " " + traitName + "</font><BR>");
                     }
                     else
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + traitName + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
                     }
                 }
                 else
                 {
                     if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.playerClass.labelForUseTraitAction + " " + traitName + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForUseTraitAction + " " + traitName + "</font><BR>");
                     }
                     else
                     {
-                        gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + traitName + "</font><BR>");
+                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
                     }
                 }
 
@@ -17722,11 +17724,11 @@ namespace IBx
                 //powerLevel = 
                 if (src.labelForCastAction != "none")
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.name + " " + src.labelForCastAction + " " + traitName + "</font><BR>");
+                    gv.cc.addLogText("<font color='white'>" + src.name + " <font color='white'>" + src.labelForCastAction + " " + traitName + "</font><BR>");
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + traitName + "</font><BR>");
+                    gv.cc.addLogText("<font color='white'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
                 }
 
                 //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
