@@ -327,6 +327,22 @@ namespace IBx
                         }
                     }
 
+                    else if (pnlC.tag.Equals("BottomPanel"))
+                    {
+                        pnlC.currentLocY = (int)((gv.screenHeight - (2 * gv.squareSize)) / gv.screenDensity);
+                        pnlC.shownLocY = (int)((gv.screenHeight - (2 * gv.squareSize)) / gv.screenDensity);
+                    }
+                    else if (pnlC.tag.Equals("portraitPanel"))
+                    {
+                        pnlC.currentLocX = (int)((gv.screenWidth - gv.ibpwidth - gv.pS - gv.squareSize) / gv.screenDensity);
+                        pnlC.shownLocX = (int)((gv.screenWidth - gv.ibpwidth - gv.pS - gv.squareSize) / gv.screenDensity);
+                    }
+                    else if (pnlC.tag.Equals("arrowPanel"))
+                    {
+                        pnlC.currentLocX = (int)((gv.screenWidth - gv.ibpwidth - (gv.squareSize * 3) - gv.pS - gv.squareSize) / gv.screenDensity);
+                        pnlC.shownLocX = (int)((gv.screenWidth - gv.ibpwidth - (gv.squareSize * 3) - gv.pS - gv.squareSize) / gv.screenDensity);
+                    }
+
                     if (gv.mod.useMinimalisticUI)
                     {
                         if (pnlC.tag.Equals("arrowPanel"))

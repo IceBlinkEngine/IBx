@@ -249,11 +249,11 @@ namespace IBx
             if (gv.mod.logOpacity > 0)
             {
                 IbRect src = new IbRect(0, 0, gv.cc.GetFromBitmapList(backgroundImageFilename).Width, gv.cc.GetFromBitmapList(backgroundImageFilename).Height);
-                IbRect dst = new IbRect((int)(currentLocX * gv.screenDensity + gv.oXshift - 2.5 * gv.pS), (int)(currentLocY * gv.screenDensity) - 3 * gv.pS, (int)(Width * gv.screenDensity + 6.5 * gv.pS), (int)(Height * gv.screenDensity - 1 * gv.squareSize + 12 * gv.pS - 0 * gv.pS));
+                IbRect dst = new IbRect((int)(currentLocX * gv.screenDensity - 2.5 * gv.pS), (int)(currentLocY * gv.screenDensity) - 3 * gv.pS, (int)(Width * gv.screenDensity + 6.5 * gv.pS), (int)(Height * gv.screenDensity - 1 * gv.squareSize + 12 * gv.pS - 0 * gv.pS));
 
                 if (gv.mod.useComplexCoordinateSystem && gv.screenType != "combat")
                 {
-                    dst = new IbRect((int)(currentLocX * gv.screenDensity + gv.oXshift - 2.5 * gv.pS), (int)(currentLocY * gv.screenDensity) + 5 * gv.pS, (int)(Width * gv.screenDensity + 6.5 * gv.pS), (int)(Height * gv.screenDensity - 1 * gv.squareSize + 12 * gv.pS - 2 * gv.pS));
+                    dst = new IbRect((int)(currentLocX * gv.screenDensity - 2.5 * gv.pS), (int)(currentLocY * gv.screenDensity) + 5 * gv.pS, (int)(Width * gv.screenDensity + 6.5 * gv.pS), (int)(Height * gv.screenDensity - 1 * gv.squareSize + 12 * gv.pS - 2 * gv.pS));
                 }
                 if (gv.cc.floatyTextActorInfoName != "")
                 {
@@ -266,7 +266,7 @@ namespace IBx
                 //}
                 int txtH = (int)gv.drawFontRegHeight;
                 gv.cc.floatyTextLocInfo.X = gv.squareSize / 2;
-                gv.cc.floatyTextLocInfo.Y = gv.squareSize * 1;
+                gv.cc.floatyTextLocInfo.Y = gv.squareSize / 4;
                 bool isPlayer = false;
                 foreach (Player p in gv.mod.playerList)
                 {
@@ -320,7 +320,7 @@ namespace IBx
                             }
                             if (gv.cc.floatyTextActorInfoDamageType == "Electricity")
                             {
-                                gv.DrawTextOutlined(gv.cc.floatyTextActorInfoDamageType, gv.cc.floatyTextLocInfo.X + 2.7f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 12 * txtH, 0.9f, "blue");
+                                gv.DrawTextOutlined(gv.cc.floatyTextActorInfoDamageType, gv.cc.floatyTextLocInfo.X + 2.7f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 12 * txtH, 0.9f, "turquoise");
                             }
                             //gv.DrawTextOutlined(gv.cc.floatyTextActorInfoDamageType, gv.cc.floatyTextLocInfo.X + 2.7f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 12 * txtH, 0.9f, "white");
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoWeaponTags, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 13 * txtH, 0.9f, "white");
@@ -334,7 +334,7 @@ namespace IBx
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances4, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 19 * txtH, 0.9f, "orange");
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances5, gv.cc.floatyTextLocInfo.X + 1.5f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 19 * txtH, 0.9f, "blue");
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances6, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 20 * txtH, 0.9f, "purple");
-                            gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances7, gv.cc.floatyTextLocInfo.X + 1.5f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 20 * txtH, 0.9f, "blue");
+                            gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances7, gv.cc.floatyTextLocInfo.X + 1.5f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 20 * txtH, 0.9f, "turquoise");
 
                             gv.DrawTextOutlined("Press RMB to show current", gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 26 * txtH, 0.9f, "white");
                             gv.DrawTextOutlined("temporary effects", gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 27 * txtH, 0.9f, "white");
@@ -390,7 +390,7 @@ namespace IBx
                             }
                             if (gv.cc.floatyTextActorInfoDamageType == "Electricity")
                             {
-                                gv.DrawTextOutlined(gv.cc.floatyTextActorInfoDamageType, gv.cc.floatyTextLocInfo.X + 2.7f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 9 * txtH, 0.9f, "blue");
+                                gv.DrawTextOutlined(gv.cc.floatyTextActorInfoDamageType, gv.cc.floatyTextLocInfo.X + 2.7f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 9 * txtH, 0.9f, "turquoise");
                             }
 
                             //gv.DrawTextOutlined(gv.cc.floatyTextActorInfoDamageType, gv.cc.floatyTextLocInfo.X + 2.7f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 9 * txtH, 0.9f, "white");
@@ -404,7 +404,7 @@ namespace IBx
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances4, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 14 * txtH, 0.9f, "orange");
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances5, gv.cc.floatyTextLocInfo.X + 1.5f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 14 * txtH, 0.9f, "blue");
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances6, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 15 * txtH, 0.9f, "purple");
-                            gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances7, gv.cc.floatyTextLocInfo.X + 1.5f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 15 * txtH, 0.9f, "blue");
+                            gv.DrawTextOutlined(gv.cc.floatyTextActorInfoResistances7, gv.cc.floatyTextLocInfo.X + 1.5f * gv.squareSize, gv.cc.floatyTextLocInfo.Y + 15 * txtH, 0.9f, "turquoise");
                             //17
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoCreatureTags, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 17 * txtH, 0.9f, "white");
                             gv.DrawTextOutlined(gv.cc.floatyTextActorInfoHitBy, gv.cc.floatyTextLocInfo.X, gv.cc.floatyTextLocInfo.Y + 18 * txtH, 0.9f, "white");

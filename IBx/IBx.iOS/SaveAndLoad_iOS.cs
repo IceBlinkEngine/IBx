@@ -192,9 +192,48 @@ namespace IBx.iOS
         {
             string[] lines;
             List<string> linesArray = new List<string>();
-            linesArray.Add("");            
-            lines = linesArray.ToArray();
             
+            int pos = userFolderpath.LastIndexOf("\\") + 1;
+            string filename = userFolderpath.Substring(pos, userFolderpath.Length - pos);
+            //check in module folder first
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string convertedFullPath = documents + ConvertFullPath(userFolderpath, "/");
+            if (File.Exists(convertedFullPath))
+            {
+                try
+                {
+                    lines = File.ReadAllLines(convertedFullPath);
+                }
+                catch (Exception ex)
+                {
+                    linesArray.Add("");
+                    lines = linesArray.ToArray();
+                }
+                
+                return lines;
+            }
+            //check in Assests folder last
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+            Stream stream = assembly.GetManifestResourceStream("IBx.iOS.Assets" + ConvertFullPath(assetFolderpath, "."));
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS." + filename);
+            }
+            if (stream != null)
+            {
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        linesArray.Add(line);
+                    }
+                }
+                lines = linesArray.ToArray();
+                return lines;
+            }
+            linesArray.Add("");
+            lines = linesArray.ToArray();
             return lines;
         }
 
@@ -681,27 +720,86 @@ namespace IBx.iOS
 
         Stream GetStreamFromFile(GameView gv, string filename)
         {
+            //MODULE'S GRAPHICS FOLDER
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var modulesDir = Path.Combine(documents, "modules");
+            var modFolder = Path.Combine(modulesDir, gv.mod.moduleName);
+            var modSoundFolder = Path.Combine(modFolder, "sounds");
+            var filePath = Path.Combine(modSoundFolder, filename);
+
+            if (File.Exists(filePath))
+            {
+                return File.OpenRead(filePath);
+            }
+            else if (File.Exists(filePath + ".wav"))
+            {
+                return File.OpenRead(filePath + ".wav");
+            }
+            else if (File.Exists(filePath + ".mp3"))
+            {
+                return File.OpenRead(filePath + ".mp3");
+            }
+            modSoundFolder = Path.Combine(modFolder, "music");
+            filePath = Path.Combine(modSoundFolder, filename);
+            if (File.Exists(filePath))
+            {
+                return File.OpenRead(filePath);
+            }
+            else if (File.Exists(filePath + ".wav"))
+            {
+                return File.OpenRead(filePath + ".wav");
+            }
+            else if (File.Exists(filePath + ".mp3"))
+            {
+                return File.OpenRead(filePath + ".mp3");
+            }
+
+            //DEFAULT ASSETS
             Assembly assembly = GetType().GetTypeInfo().Assembly;
-            var stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.modules." + gv.mod.moduleName + "." + filename);
+            var stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + gv.mod.moduleName + ".sounds." + filename);
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.modules." + gv.mod.moduleName + "." + filename + ".wav");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + gv.mod.moduleName + ".sounds." + filename + ".wav");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.modules." + gv.mod.moduleName + "." + filename + ".mp3");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + gv.mod.moduleName + ".sounds." + filename + ".mp3");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.sounds." + filename);
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + gv.mod.moduleName + ".music." + filename);
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.sounds." + filename + ".wav");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + gv.mod.moduleName + ".music." + filename + ".wav");
             }
             if (stream == null)
             {
-                stream = assembly.GetManifestResourceStream("IBbasic.iOS.Assets.sounds." + filename + ".mp3");
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.modules." + gv.mod.moduleName + ".music." + filename + ".mp3");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.sounds." + filename);
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.sounds." + filename + ".wav");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.sounds." + filename + ".mp3");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.music." + filename);
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.music." + filename + ".wav");
+            }
+            if (stream == null)
+            {
+                stream = assembly.GetManifestResourceStream("IBx.iOS.Assets.music." + filename + ".mp3");
             }
             return stream;
         }
@@ -745,22 +843,32 @@ namespace IBx.iOS
                 if (areaMusicPlayer == null)
                 {
                     areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+                    areaMusicPlayer.PlaybackEnded += AreaMusicPlayer_PlaybackEnded;
                 }
-                try
+                if (!areaMusicPlayer.IsPlaying)
                 {
-                    areaMusicPlayer.Loop = true;
-                    areaMusicPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
-                    areaMusicPlayer.Play();
-                }
-                catch (Exception ex)
-                {
-                    if (gv.mod.debugMode) //SD_20131102
+                    try
                     {
-                        gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                        areaMusicPlayer.Loop = true;
+                        areaMusicPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                        areaMusicPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (gv.mod.debugMode) //SD_20131102
+                        {
+                            gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                        }
                     }
                 }
             }
         }
+
+        private void AreaMusicPlayer_PlaybackEnded(object sender, EventArgs e)
+        {
+            RestartAreaMusicIfEnded();
+        }
+
         public void PlayAreaAmbientSounds(GameView gv, string filenameNoExtension)
         {
             if ((filenameNoExtension.Equals("none")) || (filenameNoExtension.Equals("")) || (!gv.mod.playSoundFx))
@@ -774,17 +882,20 @@ namespace IBx.iOS
                 {
                     areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
                 }
-                try
+                if (!areaAmbientSoundsPlayer.IsPlaying)
                 {
-                    areaAmbientSoundsPlayer.Loop = true;
-                    areaAmbientSoundsPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
-                    areaAmbientSoundsPlayer.Play();
-                }
-                catch (Exception ex)
-                {
-                    if (gv.mod.debugMode) //SD_20131102
+                    try
                     {
-                        gv.cc.addLogText("<yl>failed to play area music" + filenameNoExtension + "</yl><BR>");
+                        areaAmbientSoundsPlayer.Loop = true;
+                        areaAmbientSoundsPlayer.Load(GetStreamFromFile(gv, filenameNoExtension));
+                        areaAmbientSoundsPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (gv.mod.debugMode) //SD_20131102
+                        {
+                            gv.cc.addLogText("<yl>failed to play area ambient sounds" + filenameNoExtension + "</yl><BR>");
+                        }
                     }
                 }
             }
@@ -823,6 +934,56 @@ namespace IBx.iOS
             try
             {
                 if ((!areaAmbientSoundsPlayer.IsPlaying) && (gv.mod.playSoundFx))
+                {
+                    try
+                    {
+                        areaAmbientSoundsPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        public void RestartAreaMusicIfEnded()
+        {
+            //restart area music
+            if (areaMusicPlayer == null)
+            {
+                areaMusicPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if (!areaMusicPlayer.IsPlaying)
+                {
+                    try
+                    {
+                        areaMusicPlayer.Play();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            //restart area ambient sounds
+            if (areaAmbientSoundsPlayer == null)
+            {
+                areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if (!areaAmbientSoundsPlayer.IsPlaying)
                 {
                     try
                     {

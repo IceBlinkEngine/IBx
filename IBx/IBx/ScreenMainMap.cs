@@ -125,6 +125,21 @@ namespace IBx
                         gv.cc.addLogText("fuchsia", "You can scroll this message log box, use mouse wheel");
                         gv.cc.addLogText("yellow", "'x' will hide/show all UI panels");
                     }
+                    else if (pnl.tag.Equals("BottomPanel"))
+                    {
+                        pnl.currentLocY = (int)((gv.screenHeight - (2 * gv.squareSize)) / gv.screenDensity);
+                        pnl.shownLocY = (int)((gv.screenHeight - (2 * gv.squareSize)) / gv.screenDensity);
+                    }
+                    else if (pnl.tag.Equals("portraitPanel"))
+                    {
+                        pnl.currentLocX = (int)((gv.screenWidth - gv.ibpwidth - gv.pS - gv.squareSize) / gv.screenDensity);
+                        pnl.shownLocX = (int)((gv.screenWidth - gv.ibpwidth - gv.pS - gv.squareSize) / gv.screenDensity);
+                    }
+                    else if (pnl.tag.Equals("arrowPanel"))
+                    {
+                        pnl.currentLocX = (int)((gv.screenWidth - gv.ibpwidth - (gv.squareSize * 3) - gv.pS - gv.squareSize) / gv.screenDensity);
+                        pnl.shownLocX = (int)((gv.screenWidth - gv.ibpwidth - (gv.squareSize * 3) - gv.pS - gv.squareSize) / gv.screenDensity);
+                    }
 
                     if (gv.mod.useMinimalisticUI)
                     {

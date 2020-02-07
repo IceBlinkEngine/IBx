@@ -13,7 +13,7 @@ namespace IBx
 {
     public class GameView
     {
-        public string IBversion = "1.182.009";
+        public string IBversion = "1.183.008";
         public ContentPage cp;
         public SKCanvas canvas;
         public bool textFormatSet = false;
@@ -188,15 +188,18 @@ namespace IBx
             if (sqrW > sqrH)
             {
                 squareSize = (int)(sqrH);
+                squaresInWidth = screenWidth / squareSize;
             }
             else
             {
                 squareSize = (int)(sqrW);
+                squaresInHeight = screenHeight / squareSize;
             }
             if ((squareSize >= 99) && (squareSize < 105))
             {
                 squareSize = 100;
             }
+            
             //makes it a straight number in any case
             //better for working with half fractions of it (two half ints always form a complete whole)
             //squareSize = 2 * (int)(squareSize / 2f);
@@ -1311,9 +1314,9 @@ namespace IBx
                 }
             }*/
             
-            drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.4);
-            drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.3);
-            drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.2);
+            drawFontLargeHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.45);
+            drawFontRegHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.3375);
+            drawFontSmallHeight = (int)(ibbheight * screenDensity * mod.fontD2DScaleMultiplier * 0.225);
             drawFontRegWidth = 10.0f;
         }
 
@@ -1374,6 +1377,7 @@ namespace IBx
                     LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic);
                     PlayAreaMusic(mod.currentArea.AreaMusic);
                 }
+                currentMainMusic = mod.currentArea.AreaMusic;
             }
             catch (Exception ex)
             {
@@ -1762,6 +1766,7 @@ namespace IBx
                     DrawText(text, x + xx, y + yy, size, "black", style, 255, isUnderlined);
                 }
             }*/
+            DrawText(text, x - 2, y - 2, size, "black", style, 255, isUnderlined);
             DrawText(text, x + 2, y + 2, size, "black", style, 255, isUnderlined);
             DrawText(text, x, y, size, color, style, 255, isUnderlined);
         }
@@ -1891,6 +1896,22 @@ namespace IBx
             else if (color.Equals("aqua"))
             {
                 textPaint.Color = SKColors.Aqua.WithAlpha(opacity);
+            }
+            else if (color.Equals("blue"))
+            {
+                textPaint.Color = SKColors.CornflowerBlue.WithAlpha(opacity);
+            }
+            else if (color.Equals("orange"))
+            {
+                textPaint.Color = SKColors.OrangeRed.WithAlpha(opacity);
+            }
+            else if (color.Equals("purple"))
+            {
+                textPaint.Color = SKColors.Purple.WithAlpha(opacity);
+            }
+            else if (color.Equals("turquoise"))
+            {
+                textPaint.Color = SKColors.Turquoise.WithAlpha(opacity);
             }
             else if (color.Equals("fuchsia"))
             {
@@ -2314,8 +2335,8 @@ namespace IBx
                         DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, x + 5, screenHeight - txtH - 5 + y - oYshift, "black");
                     }
                 }*/
-                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 2 + 5, screenHeight - txtH - 5 + 2 - oYshift, "black");
-                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 5, screenHeight - txtH - 5 - oYshift, "white");                
+                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, 2 + oXshift, screenHeight - txtH - 5 + 2 - oYshift, "black");
+                DrawText("FPS:" + fps.ToString() + "(" + MouseX + "," + MouseY + ")" + " v" + IBversion, oXshift, screenHeight - txtH - 5 - oYshift, "white");                
             }
 
             //EndDraw(); //uncomment this for DIRECT2D ADDITIONS
@@ -2721,7 +2742,7 @@ namespace IBx
         }
         public void PlaySound(string filenameNoExtension)
         {
-            //TODO DependencyService.Get<ISaveAndLoad>().PlaySound(this, filenameNoExtension);
+            DependencyService.Get<ISaveAndLoad>().PlaySound(this, filenameNoExtension);
         }
         public void CreateAreaMusicPlayer()
         {

@@ -32,7 +32,7 @@
 	<key>CFBundleName</key>
 	<string>IBx</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.03</string>
+	<string>1.183.003</string>
 	<key>XSAppIconAssets</key>
 	<string>Media.xcassets/AppIcons.appiconset</string>
 	<key>UILaunchStoryboardName</key>
@@ -40,6 +40,6 @@
 	<key>UIStatusBarHidden</key>
 	<true/>
 	<key>CFBundleVersion</key>
-	<string>3</string>
+	<string>4</string>
 </dict>
 </plist>
