@@ -87,9 +87,16 @@ namespace IBx.UWP
             //check in Assests folder last
             Assembly assembly = GetType().GetTypeInfo().Assembly;
             Stream stream = assembly.GetManifestResourceStream("IBx.UWP.Assets" + ConvertFullPath(assetFolderpath, "."));
-            using (var reader = new System.IO.StreamReader(stream))
+            if (stream == null)
             {
-                text = reader.ReadToEnd();
+                stream = assembly.GetManifestResourceStream("IBx.UWP." + ConvertFullPath(assetFolderpath, "."));
+            }
+            if (stream != null)
+            {
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    text = reader.ReadToEnd();
+                }
             }
             return text;
         }

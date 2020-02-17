@@ -19,7 +19,7 @@ namespace IBx.iOS
 {
     public class SaveAndLoad_iOS : ISaveAndLoad
     {
-        public string TrackingId = "UA-60615839-12";
+        public string TrackingId = "UA-60615839-5";
         public ITracker Tracker;
         const string AllowTrackingKey = "AllowTracking";
         int numOfTrackerEventHitsInThisSession = 0;
@@ -1011,6 +1011,22 @@ namespace IBx.iOS
                 if (areaMusicPlayer.IsPlaying)
                 {
                     areaMusicPlayer.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            if (areaAmbientSoundsPlayer == null)
+            {
+                areaAmbientSoundsPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+            }
+            try
+            {
+                if (areaAmbientSoundsPlayer.IsPlaying)
+                {
+                    areaAmbientSoundsPlayer.Stop();
                 }
             }
             catch (Exception ex)

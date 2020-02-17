@@ -11571,7 +11571,7 @@ namespace IBx
                 int targetSizeY = gv.squareSize;
                 IbRect src = new IbRect(0, 0, 100, 100);
                 IbRect dst = new IbRect(startBarX + i * gv.squareSize - (int)(targetSizeX * 0.1), startBarY - (int)(targetSizeY * 0.1), (int)(targetSizeX * 1.2f), (int)(targetSizeY * 1.2f));
-                gv.DrawBitmap(gv.cc.offScreen, src, dst, false);
+                gv.DrawBitmap(gv.cc.offScreen, src, dst, false, false);
             }
 
             //draw creature in current bar
@@ -11690,10 +11690,10 @@ namespace IBx
                                 IbRect dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
                                 if (crt.moveOrder + 1 == currentMoveOrderIndex)
                                 {
-                                    gv.DrawBitmap(gv.cc.turn_marker, src, dst, false);
+                                    gv.DrawBitmap(gv.cc.turn_marker, src, dst, false, false);
                                 }
 
-                                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, false);
+                                gv.DrawBitmap(gv.cc.GetFromBitmapList(crt.cr_tokenFilename), src, dst, false, false);
                                 int mo = crt.moveOrder + 1;
                                 targetSizeX = gv.squareSize / 2;
                                 targetSizeY = gv.squareSize / 2;
@@ -11807,10 +11807,10 @@ namespace IBx
                             IbRect dst = new IbRect(startBarX + creatureSpacesUsed * gv.squareSize / 2, startBarY + marchingLineHeight, targetSizeX, targetSizeY);
                             if (ply.moveOrder + 1 == currentMoveOrderIndex)
                             {
-                                gv.DrawBitmap(gv.cc.turn_marker, src, dst, false);
+                                gv.DrawBitmap(gv.cc.turn_marker, src, dst, false, false);
                             }
 
-                            gv.DrawBitmap(gv.cc.GetFromBitmapList(ply.tokenFilename), src, dst, false);
+                            gv.DrawBitmap(gv.cc.GetFromBitmapList(ply.tokenFilename), src, dst, false, false);
                             int mo = ply.moveOrder + 1;
                             //if (gv.cc.GetFromBitmapList(ply.tokenFilename).Width <= 100)
                             //{
@@ -13901,7 +13901,7 @@ namespace IBx
                             }
 
                         }
-                        gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft);
+                        gv.DrawBitmap(gv.cc.GetFromBitmapList(pc.tokenFilename), src, dst, !pc.combatFacingLeft, false);
                         src = new IbRect(0, 0, gv.cc.GetFromBitmapList(pc.tokenFilename).Width, gv.cc.GetFromBitmapList(pc.tokenFilename).Width);
                         //show effects always
                         //if (!animationsOn)

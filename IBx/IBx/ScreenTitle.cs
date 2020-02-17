@@ -149,6 +149,7 @@ namespace IBx
                         if (btnNewGame.getImpact(x, y))
                         {
                             gv.PlaySound("btn_click");
+                            gv.TrackerSendEvent(":RES:" + gv.screenWidth + "x" + gv.screenHeight + ":NEWGAME:" + gv.mod.moduleName, "none", false);
                             if (gv.mod.mustUsePreMadePC)
                             {
                                 //no spell selection offered
@@ -168,6 +169,7 @@ namespace IBx
                         else if (btnLoadSavedGame.getImpact(x, y))
                         {
                             gv.PlaySound("btn_click");
+                            gv.TrackerSendEvent(":LOADSAVE:" + gv.mod.moduleName, "none", false);
                             if (gv.cc.slot5.Equals(""))
                             {
                                 //Toast.makeText(gv.gameContext, "Still Loading Data... try again in a second", Toast.LENGTH_SHORT).show();
@@ -180,16 +182,19 @@ namespace IBx
                         else if (btnPlayerGuide.getImpact(x, y))
                         {
                             gv.PlaySound("btn_click");
+                            gv.TrackerSendEvent(":READ_PLAYER_GUIDE:", "none", true);
                             gv.cc.tutorialPlayersGuide();
                         }
                         else if (btnBeginnerGuide.getImpact(x, y))
                         {
                             gv.PlaySound("btn_click");
+                            gv.TrackerSendEvent(":READ_BEGINNER_GUIDE:", "none", true);
                             gv.cc.tutorialBeginnersGuide();
                         }
                         else if (btnAbout.getImpact(x, y))
                         {
                             gv.PlaySound("btn_click");
+                            gv.TrackerSendEvent(":READ_ABOUT:", "none", true);
                             gv.cc.doAboutDialog();
                         }
                         else if (btnExit.getImpact(x, y))

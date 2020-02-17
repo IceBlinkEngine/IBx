@@ -13,9 +13,10 @@ namespace IBx
 {
     public class GameView
     {
-        public string IBversion = "1.183.008";
+        public string IBversion = "1.183.010 ";
         public ContentPage cp;
         public SKCanvas canvas;
+        public IBxPreferences IBprefs;
         public bool textFormatSet = false;
         public int elapsed = 0;
         public int elapsed2 = 0;
@@ -155,6 +156,8 @@ namespace IBx
             mainDirectory = Directory.GetCurrentDirectory();
             CreateUserFolders();
 
+            loadPreferences();
+
             try
             {
                 //playerButtonClick.SoundLocation = mainDirectory + "\\default\\NewModule\\sounds\\btn_click.wav";
@@ -263,6 +266,32 @@ namespace IBx
             //gameTimer.Start();
         }
 
+        public void loadPreferences()
+        {
+            IBprefs = new IBxPreferences();
+            string s = LoadStringFromEitherFolder("\\IBxPreferences.json", "\\IBxPreferences.json");
+            if (s != "")
+            {
+                try
+                {
+                    using (StringReader sr = new StringReader(s))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        IBprefs = (IBxPreferences)serializer.Deserialize(sr, typeof(IBxPreferences));
+                    }
+                }
+                catch { }
+            }
+        }
+        public void savePreferences()
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(IBprefs, Newtonsoft.Json.Formatting.Indented);
+                SaveText("\\IBxPreferences.json", json);
+            }
+            catch { }
+        }
         public void onTimedEvent2()
         {
             //left slice
@@ -1374,7 +1403,7 @@ namespace IBx
                 }
                 else
                 {
-                    LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic);
+                    //LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaMusic);
                     PlayAreaMusic(mod.currentArea.AreaMusic);
                 }
                 currentMainMusic = mod.currentArea.AreaMusic;
@@ -1387,6 +1416,24 @@ namespace IBx
         }
         public void startAmbient()
         {
+            try
+            {
+                if (currentAmbientMusic.Equals(mod.currentArea.AreaSounds))
+                {
+                    PlayAreaAmbientSounds(mod.currentArea.AreaSounds);
+                }
+                else
+                {
+                    //LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentArea.AreaSounds);
+                    PlayAreaAmbientSounds(mod.currentArea.AreaSounds);
+                }
+                currentAmbientMusic = mod.currentArea.AreaSounds;
+            }
+            catch (Exception ex)
+            {
+                cc.addLogText("red", "Failed on startAmbient(): " + ex.ToString());
+                errorLog(ex.ToString());
+            }
             /*try
             {
                 if ((currentAmbientMusic.Equals(mod.currentArea.AreaSounds)) && (areaSounds != null))
@@ -1439,6 +1486,24 @@ namespace IBx
         }
         public void startCombatMusic()
         {
+            try
+            {
+                if (currentCombatMusic.Equals(mod.currentEncounter.AreaMusic))
+                {
+                    PlayAreaMusic(mod.currentEncounter.AreaMusic);
+                }
+                else
+                {
+                    //LoadAreaMusicFile("\\modules\\" + this.mod.moduleName + "\\music\\" + mod.currentEncounter.AreaMusic);
+                    PlayAreaMusic(mod.currentEncounter.AreaMusic);
+                }
+                currentCombatMusic = mod.currentEncounter.AreaMusic;
+            }
+            catch (Exception ex)
+            {
+                cc.addLogText("red", "Failed on startMusic(): " + ex.ToString());
+                errorLog(ex.ToString());
+            }
             /*try
             {
                 if ((currentCombatMusic.Equals(mod.currentEncounter.AreaMusic)) && (areaMusic != null))
@@ -1598,8 +1663,9 @@ namespace IBx
 	    }
 	    public void stopCombatMusic()
 	    {
+            StopAreaMusic();
             //areaMusic.controls.pause();
-	    }
+        }
 	    public void initializeSounds()
 	    {
             /*oSoundStreams.Clear();
@@ -2082,84 +2148,198 @@ namespace IBx
                 //renderTarget2D.DrawLine(new Vector2(lastX + oXshift, lastY + oYshift), new Vector2(nextX + oXshift, nextY + oYshift), scb, penWidth);
             }
         }
-        
+
+        public IbRectF srcIbRectF = new IbRectF(0, 0, 0, 0);
+        public IbRectF trgIbRectF = new IbRectF(0, 0, 0, 0);
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target)
         {
-            DrawBitmap(bitmap, source, target, 0f, false, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, false, false);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool isParty)
+        {
+            DrawBitmap(bitmap, source, target, false, isParty);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target)
         {
-            DrawBitmap(bitmap, source, target, 0f, false, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, false, false);
         }
-        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror)
+        
+        /*public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror)
         {
             DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
-        }
+        }*/
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror, bool isParty)
         {
             //chnaged to recognize party being drawn
             //TODO add isParty part
-            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1, isParty);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, bool mirror, bool isParty)
+        {
+            //chnaged to recognize party being drawn
+            //TODO add isParty part
+            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1, isParty);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, bool mirror)
         {
-            DrawBitmap(bitmap, source, target, 0f, mirror, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, mirror, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror)
         {
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, int angleInDegrees, bool mirror)
         {
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror)
         {
             float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, 0, 0, 1, 1, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity)
         {
+            if (bitmap == cc.night_tile_NE || bitmap == cc.night_tile_NW || bitmap == cc.night_tile_SW || bitmap == cc.night_tile_SE || bitmap == cc.tint_night)
+            {
+                //opacity *= 0.6f;
+                opacity *= mod.nightTimeDarknessOpacity;
+
+            }
             float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1, false);
+        }
+        public void DrawBitmapParallelToPlayer(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity)
+        {
+            //test
+            //orgi
+            if (bitmap == cc.night_tile_NE || bitmap == cc.night_tile_NW || bitmap == cc.night_tile_SW || bitmap == cc.night_tile_SE || bitmap == cc.tint_night)
+            {
+                //opacity *= 0.6f;
+                opacity *= mod.nightTimeDarknessOpacity;
+
+            }
+            //DrawD2DBitmapParallelToPlayer(bitmap, src, tar, angleInRadians, mirror, opacity);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, float opacity, bool isParty)
         {
+            if (bitmap == cc.night_tile_NE || bitmap == cc.night_tile_NW || bitmap == cc.night_tile_SW || bitmap == cc.night_tile_SE || bitmap == cc.tint_night)
+            {
+                //opacity *= 0.6f;
+                opacity *= mod.nightTimeDarknessOpacity;
+
+            }
             float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, 0, 0, 1, 1, isParty);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift)
         {
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, Xshift, Yshift, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift)
         {
             float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, 1, 1);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, Xshift, Yshift, 1, 1);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
         {
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, int angleInDegrees, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale, float opacity)
         {
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, Xshift, Yshift, Xscale, Yscale);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, opacity, Xshift, Yshift, Xscale, Yscale, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, float angleInRadians, bool mirror, int Xshift, int Yshift, int Xscale, int Yscale)
         {
             float angleInDegrees = (angleInRadians * 360.0f) / (float)(Math.PI * 2);
-            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale);
+            DrawBitmap(bitmap, source, target, angleInDegrees, mirror, 1.0f, Xshift, Yshift, Xscale, Yscale, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror, float opacity)
         {
-            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1, false);
         }
         public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF target, bool mirror, float opacity)
         {
-            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1);
+            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1, false);
         }
-        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect destination, float angleInDegrees, bool mirror, float opacity, int Xshift, int Yshift, int Xscale, int Yscale)
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect target, bool mirror, float opacity, bool NearestNeighbourInterpolation)
         {
+            DrawBitmap(bitmap, source, target, 0f, mirror, opacity, 0, 0, 1, 1, false);
+        }
+        public void DrawBitmap(SKBitmap bitmap, IbRect source, IbRect destination, float angleInDegrees, bool mirror, float opacity, int Xshift, int Yshift, int Xscale, int Yscale, bool isParty)
+        {
+            //mod.useScrollingSystem = false;
+            if (mod.useScrollingSystem)
+            {
+                if (this.screenType == "main")
+                {
+                    if (mod.isScrollingNow && !isParty)
+                    {
+                        if (mod.scrollingDirection == "up")
+                        {
+                            destination.Top = destination.Top - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "down")
+                        {
+                            destination.Top = destination.Top + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "left")
+                        {
+                            destination.Left = destination.Left - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "right")
+                        {
+                            destination.Left = destination.Left + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+                    }
+                }
+
+                if (this.screenType == "combat")
+                {
+                    if (mod.isScrollingNowCombat)
+                    {
+                        //projectcombatscrolling
+                        //we needdirection and speed by comparison of curent and former upper left
+                        //is scrollingtimer normalized (elapsed)?
+                        //direction are not limited to four, but actually every angle seems possible, even inbetween diagonals
+
+                        //get diffecrence for x
+                        //get difference for y
+                        //example: form (4,8) to 8,7) (scrolling to right and slightly upwards)
+                        //example: difference x is +4
+                        //example: difference y is -1
+
+                        //maybe not needed, ex: turn negative to positives for speed
+                        //maybe not needed, ex: speed is 4 square + (-1) square = root (result)
+                        //maybe not needed, ex: 16 + 1 = root (17) = 4,12
+
+                        //example: on every call change pixel x by +4 pix
+                        //example on every call chnage crease pixel y 
+                        if (mod.scrollingDirection == "up")
+                        {
+                            destination.Top = destination.Top - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "down")
+                        {
+                            destination.Top = destination.Top + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "left")
+                        {
+                            destination.Left = destination.Left - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "right")
+                        {
+                            destination.Left = destination.Left + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+                    }
+                }
+            }
+
             int mir = 1;
             if (mirror) { mir = -1; }
             float xshf = (float)Xshift * 2 * screenDensity;
@@ -2184,8 +2364,81 @@ namespace IBx
             canvas.DrawBitmap(bitmap, srcRect, dstRect, drawPaint);
             canvas.Restore();
         }
-        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF destination, float angleInDegrees, bool mirror, float opacity, int Xshift, int Yshift, int Xscale, int Yscale)
+        public void DrawBitmap(SKBitmap bitmap, IbRectF source, IbRectF destination, float angleInDegrees, bool mirror, float opacity, int Xshift, int Yshift, int Xscale, int Yscale, bool isParty)
         {
+            //mod.useScrollingSystem = false;
+            if (mod.useScrollingSystem)
+            {
+                if (this.screenType == "main")
+                {
+                    if (mod.isScrollingNow)
+                    {
+                        if (mod.scrollingDirection == "up")
+                        {
+                            destination.Top = destination.Top - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "down")
+                        {
+                            destination.Top = destination.Top + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "left")
+                        {
+                            destination.Left = destination.Left - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "right")
+                        {
+                            destination.Left = destination.Left + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+                    }
+                }
+
+                if (this.screenType == "combat")
+                {
+                    if (mod.isScrollingNowCombat)
+                    {
+                        //projectcombatscrolling
+                        //we needdirection and speed by comparison of curent and former upper left
+                        //is scrollingtimer normalized (elapsed)?
+                        //direction are not limited to four, but actually every angle seems possible, even inbetween diagonals
+
+                        //get diffecrence for x
+                        //get difference for y
+                        //example: form (4,8) to 8,7) (scrolling to right and slightly upwards)
+                        //example: difference x is +4
+                        //example: difference y is -1
+
+                        //maybe not needed, ex: turn negative to positives for speed
+                        //maybe not needed, ex: speed is 4 square + (-1) square = root (result)
+                        //maybe not needed, ex: 16 + 1 = root (17) = 4,12
+
+                        //example: on every call change pixel x by +4 pix
+                        //example on every call chnage crease pixel y 
+                        if (mod.scrollingDirection == "up")
+                        {
+                            destination.Top = destination.Top - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "down")
+                        {
+                            destination.Top = destination.Top + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "left")
+                        {
+                            destination.Left = destination.Left - (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+
+                        if (mod.scrollingDirection == "right")
+                        {
+                            destination.Left = destination.Left + (int)(squareSize * (mod.scrollingTimer / 100f));
+                        }
+                    }
+                }
+            }
+
             int mir = 1;
             if (mirror) { mir = -1; }
             float xshf = (float)Xshift * 2 * screenDensity;
@@ -2774,6 +3027,139 @@ namespace IBx
         {
             string filename = "\\IB2ErrorLog.txt";
             SaveText(filename, text);
+        }
+
+
+        //ANALYTICS
+        public void TrackerSendEvent(string action, string label, bool mustSend)
+        {
+            //if (myTracker != null)
+            //{
+            string realtime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            //string mainPcName = GetMainPcName();
+            int totalHP = 0;
+            int totalSP = 0;
+            int totalXP = 0;
+            int totalLVL = 0;
+            int partySize = 0;
+            if (IBprefs.UserID.Equals("none"))
+            {
+                IBprefs.GenerateUniqueUserID();
+                savePreferences();
+            }
+            if (mod.playerList.Count > 0)
+            {
+                foreach (Player pc in mod.playerList)
+                {
+                    totalHP += pc.hp;
+                    totalSP += pc.sp;
+                    totalXP += pc.XP;
+                    totalLVL += pc.classLevel;
+                    partySize++;
+                }
+            }
+            string totals = "HP" + totalHP + ":SP" + totalSP + ":XP" + totalXP + ":LVL" + totalLVL + ":PS" + partySize;
+            string totAction = mod.moduleName + "(v" + mod.moduleVersion + ")" + ":(IBv" + IBversion + ")" + ":" + IBprefs.UserID + "_" + IBprefs.UserName + ":" + realtime + ":" + mod.WorldTime.ToString("D8") + ":" + totals + ":" + action;
+
+            try
+            {
+                //Hearkenwold:Drin_586842:20170101123456:00027546:HP234:SP123:XP4567:LVL18:PS6::CONVO:guard
+                string category = mod.moduleName + "(v" + mod.moduleVersion + ")" + ":(IBv" + IBversion + ")" + ":" + IBprefs.UserID + "_" + IBprefs.UserName;
+                TrackAppEvent(category, totAction, label, mustSend);
+            }
+            catch (Exception e)
+            {
+                //e.printStackTrace();               
+            }
+        }
+        public void TrackerSendMilestoneEvent(string milestone)
+        {
+            //string mainPcName = GetMainPcName();
+            TrackerSendEvent("none", mod.moduleName + "(v" + mod.moduleVersion + ")" + ":(IBv" + IBversion + ")" + ":" + IBprefs.UserID + "_" + IBprefs.UserName + "::" + milestone, false);
+            TrackerSendEventFullPartyInfo("PARTYINFO");
+        }
+        public void TrackerSendEventEncounter(string encounterName)
+        {
+            TrackerSendEvent(":ENC:" + encounterName, "none", false);
+            //TrackerSendEventFullPartyInfo("PARTYINFO");
+        }
+        public void TrackerSendEventJournal(string category_entry)
+        {
+            TrackerSendEvent(":JOURNAL:" + category_entry, "none", false);
+        }
+        public void TrackerSendEventConvo(string convoName)
+        {
+            TrackerSendEvent(":CONVO:" + convoName, "none", false);
+        }
+        public void TrackerSendEventArea(string areaName)
+        {
+            TrackerSendEvent(":AREA:" + areaName, "none", false);
+        }
+        public void TrackerSendEventContainer(string containerName)
+        {
+            TrackerSendEvent(":CONTAINER:" + containerName, "none", false);
+        }
+        public void TrackerSendEventFullPartyInfo(string actionLabel)
+        {
+            //actions: PartyStart, PartyAddCompanion, PartyEndingCh1
+            if (mod.playerList.Count > 0)
+            {
+                try
+                {
+                    int x = 1;
+                    foreach (Player pc in mod.playerList)
+                    {
+                        string partyInfo = PlayerInfoFull(pc, x);
+                        TrackerSendEvent(":::" + actionLabel + ":::" + partyInfo, "none", false);
+                        x++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //e.printStackTrace();
+                }
+            }
+        }
+        public string GetMainPcName()
+        {
+            string name = "none";
+            foreach (Player pc in mod.playerList)
+            {
+                if (pc.mainPc)
+                {
+                    return pc.name;
+                }
+            }
+            return name;
+        }
+        public string PlayerInfoFull(Player pc, int index)
+        {
+            string info = "";
+            info = "INDEX:" + index + ",NAME:" + pc.name + ",TOKEN:" + pc.tokenFilename + ",RACE:" + pc.raceTag + ",CLASS:" + pc.classTag
+                    + ",STR:" + pc.strength + ",DEX:" + pc.dexterity + ",CON:" + pc.constitution + ",INT:" + pc.intelligence + ",WIS:" + pc.wisdom + ",CHA:" + pc.charisma
+                    + ",LVL:" + pc.classLevel + ",XP:" + pc.XP + ",AC:" + pc.AC + ",HP:" + pc.hp + "/" + pc.hpMax + ",SP:" + pc.sp + "/" + pc.spMax + ",WEAPON:" + pc.MainHandRefs.name
+                    + ",HEAD:" + pc.HeadRefs.name + ",NECK:" + pc.NeckRefs.name + ",BODY:" + pc.BodyRefs.name
+                    + ",OFFHAND:" + pc.OffHandRefs.name + ",RING1:" + pc.RingRefs.name + ",RING2:" + pc.Ring2Refs.name
+                    + ",FEET:" + pc.FeetRefs.name + ",AMMO:" + pc.AmmoRefs.name;
+            info += ",TRAITS:";
+            foreach (string tag in pc.knownTraitsTags)
+            {
+                info += tag + ",";
+            }
+            info += ",SPELLS:";
+            foreach (string tag in pc.knownSpellsTags)
+            {
+                info += tag + ",";
+            }
+            return info;
+        }
+
+        public void TrackAppEvent(string Category, string EventAction, string EventLabel, bool mustSend)
+        {
+            if ((IBprefs.GoogleAnalyticsOn) || (mustSend))
+            {
+                DependencyService.Get<ISaveAndLoad>().TrackAppEvent(Category, EventAction, EventLabel);
+            }
         }
     }
 }

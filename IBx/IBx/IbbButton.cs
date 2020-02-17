@@ -84,34 +84,34 @@ namespace IBx
             //draw glow first if on
             if ((this.glowOn) && (this.Glow != null))
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(Glow), srcGlow, dstGlow);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(Glow), srcGlow, dstGlow, true);
             }
             //draw the proper button State
             if ((this.btnState == buttonState.On) && (this.ImgOn != null))
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOn), src, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOn), src, dst, true);
             }
             else if ((this.btnState == buttonState.Off) && (this.ImgOff != null))
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOff), src, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(ImgOff), src, dst, true);
             }
             else
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img), src, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img), src, dst, true);
             }
             //draw the standard overlay image if has one
             if ((this.btnState == buttonState.Off) && (this.Img2Off != null))
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2Off), src2, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2Off), src2, dst, true);
             }
             else if (this.Img2 != null)
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2), src2, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img2), src2, dst, true);
             }
             //draw the notification image if turned on (like a level up or additional convo nodes image)
             if ((this.btnNotificationOn) && (this.Img3 != null))
             {
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img3), src3, dst);
+                gv.DrawBitmap(gv.cc.GetFromBitmapList(Img3), src3, dst, true);
             }
 
             float thisFontHeight = gv.drawFontRegHeight;

@@ -20,7 +20,7 @@ namespace IBx.Droid
 {
     public class SaveAndLoad_Android : ISaveAndLoad
     {
-        public string TrackingId = "UA-60615839-12";
+        public string TrackingId = "UA-60615839-5";
         private static GoogleAnalytics GAInstance;
         private static Tracker GATracker;
         public Context thisContext;

@@ -503,6 +503,8 @@ namespace IBx
             }
             backupListOfAreaTileLists.Clear();
 
+            gv.TrackerSendEventFullPartyInfo(":SAVEGAME:");
+            gv.TrackerSendEvent(":SAVEGAME:" + gv.mod.moduleName, "none", false);
         }
         public void SaveGameInfo(string filename)
         {
