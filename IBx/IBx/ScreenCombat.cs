@@ -906,6 +906,7 @@ namespace IBx
 
             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
             {
+
                 if (gv.mod.useCombatSmoothMovement)
                 {
                     crt.inactiveTimer = gv.sf.RandInt(200);
@@ -935,7 +936,7 @@ namespace IBx
             //could be used for placing temporary allies
             gv.cc.doIBScriptBasedOnFilename(gv.mod.currentEncounter.OnSetupCombatIBScript, gv.mod.currentEncounter.OnSetupCombatIBScriptParms);
 
-            //Place and prepare all PCs
+            //Place and preapre all PCs
             for (int index = 0; index < gv.mod.playerList.Count; index++)
             {
                 gv.mod.playerList[index].coolDownTimes.Clear();
@@ -2062,7 +2063,6 @@ namespace IBx
                         applyEffectsFromSquare(crt.combatLocX, crt.combatLocY);
                         applyEffectsCombat(crt, false);
 
-                        //applyEffectsFromSquare(crt.combatLocX, crt.combatLocY);
                         //tiereimpark
                         checkEndEncounter();
                         //change creatureIndex or currentPlayerIndex
@@ -4149,6 +4149,8 @@ namespace IBx
                     }
                 }
 
+
+
                 foreach (Effect ef in crtr.cr_effectsList)
                 {
                     if (!ef.isPermanent && !onlyStepBasedEffects)
@@ -4174,7 +4176,8 @@ namespace IBx
                             }
                         }
                         //}
-                        /*else
+                        /*
+                        else
                         {
                             if (crtr.cr_effectsList[i].durationInUnits <= 0)
                             {
@@ -4184,7 +4187,8 @@ namespace IBx
                                     crtr.cr_effectsList.RemoveAt(i);
                                 }
                             }
-                        }*/
+                        }
+                        */
                     }
                 }
 
@@ -4212,7 +4216,7 @@ namespace IBx
 
                     //if (!ef.isPermanent && !onlyStepBasedEffects)
                     //{
-                    //    ef.durationInUnits -= gv.mod.TimePerRound;
+                    //ef.durationInUnits -= gv.mod.TimePerRound;
                     //}
                 }
 
@@ -4291,6 +4295,7 @@ namespace IBx
                 //**********************************************************
                 //europa3
 
+
                 foreach (Effect ef in pc.effectsList)
                 {
                     if (!ef.isPermanent && !onlyStepBasedEffects)
@@ -4358,7 +4363,7 @@ namespace IBx
 
                     //if (!ef.isPermanent && !onlyStepBasedEffects)
                     //{
-                    //   ef.durationInUnits -= gv.mod.TimePerRound;
+                    //ef.durationInUnits -= gv.mod.TimePerRound;
                     //}
                 }
 
@@ -4706,6 +4711,7 @@ namespace IBx
             {
                 automaticallyHits = itChk.automaticallyHitsTarget;
             }
+
             //natural 20 always hits
             if ((attack >= defense) || (attackRoll == 20) || (automaticallyHits == true)) //HIT
             {
@@ -4846,6 +4852,7 @@ namespace IBx
                 }
             }
             */
+
             updateStatsAllCreatures();
             currentMoves = 0;
             creatureMoves = 0;
@@ -5176,6 +5183,8 @@ namespace IBx
                     }
                 }
             }
+
+            //CalculateUpperLeftCreature(crt);
             //Creature crt = gv.mod.currentEncounter.encounterCreatureList[creatureIndex];
 
             foreach (string eTag in crt.tagsOfEffectsToRemoveOnMove)
@@ -6245,9 +6254,9 @@ namespace IBx
                         creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
                         //set attack animation and do a delay
                         attackAnimationTimeElapsed = 0;
-                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) );
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f) );
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
 
                         //add projectile animation
                         startX = getPixelLocX(crt.combatLocX);
@@ -6255,6 +6264,8 @@ namespace IBx
                         endX = getPixelLocX(pc.combatLocX);
                         endY = getPixelLocY(pc.combatLocY);
                         string filename = crt.cr_projSpriteFilename;
+                        //php
+                        //animationSeqStack.Clear();
                         AnimationSequence newSeq = new AnimationSequence();
                         animationSeqStack.Add(newSeq);
                         AnimationStackGroup newGroup = new AnimationStackGroup();
@@ -6307,6 +6318,7 @@ namespace IBx
                         {
                             //adjustCamToRangedCreature = true;
                             //michael
+                            //beckhelling
                             //CenterScreenOnPC(pc);
                             //CalculateUpperLeftCreature(crt);
                             //adjustCamToRangedCreature = false;
@@ -6323,10 +6335,12 @@ namespace IBx
 
                         attackAnimationTimeElapsed = 0;
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f));
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
 
-                        //do melee attack stuff and animations  
+                        //do melee attack stuff and animations
+                        //php
+                        //animationSeqStack.Clear();
                         AnimationSequence newSeq = new AnimationSequence();
                         animationSeqStack.Add(newSeq);
                         doStandardCreatureAttack(crt, pc);
@@ -6366,7 +6380,8 @@ namespace IBx
                 CreatureMoves();
             }
         }
-        
+
+
         //leavethretaned overload
         public void CreatureDoesAttack(Creature crt, bool allowAnimationActivation, Player pc, int futurePosX, int futurePosY)
         {
@@ -6429,6 +6444,8 @@ namespace IBx
                         endX = getPixelLocX(pc.combatLocX);
                         endY = getPixelLocY(pc.combatLocY);
                         string filename = crt.cr_projSpriteFilename;
+                        //php
+                        //animationSeqStack.Clear();
                         AnimationSequence newSeq = new AnimationSequence();
                         animationSeqStack.Add(newSeq);
                         AnimationStackGroup newGroup = new AnimationStackGroup();
@@ -6500,7 +6517,9 @@ namespace IBx
                         //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
                         //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
 
-                        //do melee attack stuff and animations  
+                        //do melee attack stuff and animations
+                        //php
+                        //animationSeqStack.Clear();
                         AnimationSequence newSeq = new AnimationSequence();
                         animationSeqStack.Add(newSeq);
                         doStandardCreatureAttack(crt, pc, futurePosX, futurePosY);
@@ -6540,7 +6559,6 @@ namespace IBx
                 CreatureMoves();
             }
         }
-
         //AoO overload (for non-moving situarions, like casting)
         public void CreatureDoesAttack(Creature crt, bool allowAnimationActivation, Player pc)
         {
@@ -6577,6 +6595,7 @@ namespace IBx
                         if (gv.mod.useManualCombatCam)
                         {
                             adjustCamToRangedCreature = true;
+                            //beckhelling
                             //CenterScreenOnPC();
                             //CalculateUpperLeftCreature(crt);
                             adjustCamToRangedCreature = false;
@@ -6593,9 +6612,9 @@ namespace IBx
                         creatureTargetLocation = new Coordinate(pc.combatLocX, pc.combatLocY);
                         //set attack animation and do a delay
                         attackAnimationTimeElapsed = 0;
-                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) );
+                        //attackAnimationLengthInMilliseconds = (int) ( (5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f) );
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
 
                         //add projectile animation
                         startX = getPixelLocX(crt.combatLocX);
@@ -6603,6 +6622,8 @@ namespace IBx
                         endX = getPixelLocX(pc.combatLocX);
                         endY = getPixelLocY(pc.combatLocY);
                         string filename = crt.cr_projSpriteFilename;
+                        //php
+                        //animationSeqStack.Clear();
                         AnimationSequence newSeq = new AnimationSequence();
                         animationSeqStack.Add(newSeq);
                         AnimationStackGroup newGroup = new AnimationStackGroup();
@@ -6654,6 +6675,7 @@ namespace IBx
                         if (gv.mod.useManualCombatCam)
                         {
                             //adjustCamToRangedCreature = true;
+                            //beckhelling
                             //CenterScreenOnPC();
                             //CalculateUpperLeftCreature(crt);
                             //adjustCamToRangedCreature = false;
@@ -6670,10 +6692,12 @@ namespace IBx
 
                         attackAnimationTimeElapsed = 0;
                         attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f));
-                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
+                        //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
 
-                        //do melee attack stuff and animations  
+                        //do melee attack stuff and animations
+                        //php
+                        //animationSeqStack.Clear();
                         AnimationSequence newSeq = new AnimationSequence();
                         animationSeqStack.Add(newSeq);
                         doStandardCreatureAttack(crt, pc);
@@ -6782,8 +6806,8 @@ namespace IBx
                 //set attack animation and do a delay
                 attackAnimationTimeElapsed = 0;
                 attackAnimationLengthInMilliseconds = (int)(5f * gv.mod.attackAnimationSpeed);
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f));
-                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)gv.cc.GetFromBitmapList(crt.tokenFilename).Height / 100f) * 100);
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) * (-1 + (int)crt.token.PixelSize.Height / 100f));
+                //attackAnimationLengthInMilliseconds = (int)((5f * gv.mod.attackAnimationSpeed) + (-1 + (int)crt.token.PixelSize.Height / 100f) * 100);
                 AnimationSequence newSeq = new AnimationSequence();
                 animationSeqStack.Add(newSeq);
                 //add projectile animation
@@ -7508,11 +7532,13 @@ namespace IBx
 
                     }
                 }
+
             }
         }
 
         public void endCreatureTurn(Creature crt)
         {
+            //gv.cc.addLogText("<font color='red'>" + "Reached end turn routine" + "</font><BR>");
             /*
             //if remaining duration <= 0, remove from list
             for (int i = crt.cr_effectsList.Count - 1; i >= 0; i--)
@@ -7628,12 +7654,12 @@ namespace IBx
                 animationsOn = true;
             }
             //if (!gv.mod.useCombatSmoothMovement)
-            //{
+            ///{
             gv.screenCombat.blockAnimationBridge = false;
             //}
             crt.glideAdderX = 0;
             crt.glideAdderY = 0;
-            //gv.cc.addLogText("<font color='silver'>" + "Right before calling truncontroller" + "</font><BR>");
+            //gv.cc.addLogText("<font color='red'>" + "Right before calling truncontroller" + "</font><BR>");
             turnController();
         }
 
@@ -7740,6 +7766,7 @@ namespace IBx
                 //}
             }
         }
+
 
         public void doStandardCreatureAttack(Creature crt, Player pc)
         {
@@ -7855,6 +7882,7 @@ namespace IBx
 
             if ((attack >= defense) || (attackRoll == 20))
             {
+                //attackAnimationTimeElapsed = 500;
                 pc.hp = pc.hp - damage;
                 gv.cc.addLogText("Attacks " +
                         "<font color='lime'>" + pc.name + "</font><BR>");
@@ -7993,6 +8021,7 @@ namespace IBx
                 return false;
             }
         }
+
         public void doCreatureCombatFacing(Creature crt, int tarX, int tarY)
         {
             if ((tarX == crt.combatLocX) && (tarY > crt.combatLocY)) { crt.combatFacing = 2; }
@@ -8885,6 +8914,13 @@ namespace IBx
                         }
                         else if ((!isPlayerTurn) && (prp.canBeTriggeredByCreature)) //only do if creature can trigger  
                         {
+                            /*
+                            int i = 0;
+                            while (i < 500000000)
+                            {
+                                i++;
+                            }
+                            */
                             gv.cc.doIBScriptBasedOnFilename(prp.OnEnterSquareIBScript, prp.OnEnterSquareIBScriptParms);
                             decrementAndRemoveProp(prp);
                         }
@@ -8899,6 +8935,13 @@ namespace IBx
                         }
                         else if ((!isPlayerTurn) && (prp.canBeTriggeredByCreature)) //only do if creature can trigger  
                         {
+                            /*
+                            int i = 0;
+                            while (i < 500000000)
+                            {
+                                i++;
+                            }
+                            */
                             gv.cc.doScriptBasedOnFilename(prp.OnEnterSquareScript, prp.OnEnterSquareScriptParm1, prp.OnEnterSquareScriptParm2, prp.OnEnterSquareScriptParm3, prp.OnEnterSquareScriptParm4);
                             decrementAndRemoveProp(prp);
                         }
@@ -9012,9 +9055,17 @@ namespace IBx
 
                     if ((triggerIndexCombat == 1) && (trig.EnabledEvent1) && (!trig.Event1FilenameOrTag.Equals("none")))
                     {
+                        /*
+                        int i = 0;
+                        while (i < 2000000000)
+                        {
+                            i++;
+                        }
+                        */
                         //check to see what type of event
                         if (trig.Event1Type.Equals("script"))
                         {
+
 
                             if (trig.Event1Parm1 == "spell_doubleStrike")
                             {
@@ -9059,6 +9110,7 @@ namespace IBx
                     //check to see if enabled and parm not "none"
                     else if ((triggerIndexCombat == 2) && (trig.EnabledEvent2) && (!trig.Event2FilenameOrTag.Equals("none")))
                     {
+
                         if (!trig.event2RequiresTrueReturnCheck || (trig.event2RequiresTrueReturnCheck && gv.mod.returnCheck))
                         {
                             //check to see what type of event
@@ -9105,6 +9157,8 @@ namespace IBx
                     //check to see if enabled and parm not "none"
                     else if ((triggerIndexCombat == 3) && (trig.EnabledEvent3) && (!trig.Event3FilenameOrTag.Equals("none")))
                     {
+
+
                         if (!trig.event3RequiresFalseReturnCheck || (trig.event3RequiresFalseReturnCheck && !gv.mod.returnCheck))
                         {
                             //check to see what type of event
@@ -9206,15 +9260,30 @@ namespace IBx
             }
 
             //add ending animation  
+            //ulrepforte
             string filename = sp.spriteEndingFilename;
             AnimationSequence newSeq = new AnimationSequence();
             animationSeqStack.Add(newSeq);
             AnimationStackGroup newGroup = new AnimationStackGroup();
+
+            //ulrepforte
+
             animationSeqStack[0].AnimationSeq.Add(newGroup);
             foreach (Coordinate coor in gv.sf.AoeSquaresList)
             {
                 addEndingAnimation(newGroup, new Coordinate(getPixelLocX(coor.X), getPixelLocY(coor.Y)), filename);
             }
+
+            /*
+            foreach (Coordinate coor in gv.sf.AoeSquaresList)
+            {
+                Sprite spr = new Sprite(gv, filename, getPixelLocX(coor.X), getPixelLocY(coor.Y), 0,0,0,0,1,1000,false,500);
+                spriteList.Add(spr);
+            }
+            */
+
+
+
             //add floaty text  
             //add death animations  
             newGroup = new AnimationStackGroup();
@@ -9224,6 +9293,7 @@ namespace IBx
                 addDeathAnimation(newGroup, new Coordinate(getPixelLocX(coor.X), getPixelLocY(coor.Y)));
             }
             animationsOn = true;
+
         }
 
 
@@ -9232,6 +9302,8 @@ namespace IBx
         {
             combatUiLayout.Update(elapsed);
             refreshCreatureCoveredSquares();
+
+
 
             #region PROP AMBIENT SPRITES
             foreach (Sprite spr in spriteList)
@@ -9326,14 +9398,14 @@ namespace IBx
                                     crt.showIdlingFrame = false;
                                     //p.idleAnimationDelayCounter = 0;
                                     crt.showBreathingFrame = false;
-                                    //p.breathAnimationDelayCounter = 0;
+                            //p.breathAnimationDelayCounter = 0;
 
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 300)
-                                    {
-                                        //use value form prop.currentWalkingSpeed
-                                        //p.currentWalkingSpeed = elapsed / 30f * ((float)gv.squareSize / ((float)gv.mod.realTimeTimerLengthInMilliSeconds * 0.03f)) * (float)p.pixelMoveSpeed * 0.9f * p.propMovingHalfSpeedMulti;
+                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 300)
+                            {
+                                //use value form prop.currentWalkingSpeed
+                                //p.currentWalkingSpeed = elapsed / 30f * ((float)gv.squareSize / ((float)gv.mod.realTimeTimerLengthInMilliSeconds * 0.03f)) * (float)p.pixelMoveSpeed * 0.9f * p.propMovingHalfSpeedMulti;
 
-                                        crt.walkAnimationDelayCounter += elapsed / 30f * ((float)gv.squareSize / 50f);
+                                crt.walkAnimationDelayCounter += elapsed / 30f * ((float)gv.squareSize / 50f);
                                         float walkThreshold = 20f;
                                         if ((crt.glideAdderX != 0 || crt.glideAdderY != 0))
                                         {
@@ -9366,13 +9438,13 @@ namespace IBx
                                     //show default sprite when not scrolling in any case
                                     crt.showWalkingFrame = false;
 
-                                    //add idling code
-                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 400)
-                                    {
-                                        //TODO:
-                                        //add idle frequency property in
-                                        //randomize idlign a bit for different pc
-                                        crt.idleAnimationDelayCounter += (1f * elapsed / 30f * gv.mod.idleAnimationFrequency / 100f);
+                            //add idling code
+                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 400)
+                            {
+                                //TODO:
+                                //add idle frequency property in
+                                //randomize idlign a bit for different pc
+                                crt.idleAnimationDelayCounter += (1f * elapsed / 30f * gv.mod.idleAnimationFrequency / 100f);
                                         //gv.mod.hurdle = 3f + (float)gv.sf.RandInt(700) / 100f;
                                         if (crt.idleAnimationDelayCounter >= crt.hurdle)
                                         {
@@ -9393,9 +9465,9 @@ namespace IBx
                                         //breathing code, hurdle for idle not reached
                                         else
                                         {
-                                            if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 500)
-                                            {
-                                                crt.breathAnimationDelayCounter += (1f * elapsed / 30f * gv.mod.breathAnimationFrequency / 100f);
+                                    if (gv.cc.GetFromBitmapList(crt.cr_tokenFilename).Height / heightMultiplierDueToSize >= 500)
+                                    {
+                                        crt.breathAnimationDelayCounter += (1f * elapsed / 30f * gv.mod.breathAnimationFrequency / 100f);
                                                 if (crt.breathAnimationDelayCounter >= (4.0f + (float)gv.sf.RandInt(250) / 100f))
                                                 {
                                                     //osgosg
@@ -9521,7 +9593,7 @@ namespace IBx
                 //
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
                 //bewlo was working
-                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds*1.5f) && (attackAnimationFrameCounter >= maxUsableCounterValue))
+                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds * 1.5f) && (attackAnimationFrameCounter >= maxUsableCounterValue))
                 //if ((attackAnimationTimeElapsed >= 2*attackAnimationLengthInMilliseconds))
 
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
@@ -9768,7 +9840,7 @@ namespace IBx
                 //hurgh1000
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds) && ((attackAnimationFrameCounter >= maxUsableCounterValue) || (isPlayerTurn)))
                 //below worked
-                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds*1.5f))
+                if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds * 1.5f))
                 //if ((attackAnimationTimeElapsed >= 0))
                 //if ((attackAnimationTimeElapsed >= attackAnimationLengthInMilliseconds))
                 {
@@ -22190,7 +22262,9 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
         public void doUpdate(Player pc)
         {
+            //beckhelling
             CalculateUpperLeft();
+
             //checkEndEncounter();
             if (moveCost == gv.mod.diagonalMoveCost)
             {
@@ -22989,6 +23063,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         }
 
         //Helper Methods
+        //projectcombatscrollling
         public void showActorInfoRightHold(Object actor)
         {
             /*
@@ -23156,6 +23231,8 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     gv.cc.floatyTextActorInfoTempEffects1 = "No temporary effects";
                 }
             }
+
+
             else if (actor is Creature)
             {
                 gv.cc.inEffectMode = true;
@@ -23281,7 +23358,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         gv.cc.floatyTextActorInfoTempEffects10custom = ef.description;
                     }
                 }
-                
+
                 if (gv.cc.floatyTextActorInfoTempEffects1 == "")
                 {
                     gv.cc.floatyTextActorInfoTempEffects1 = "No temporary effects";
@@ -24020,6 +24097,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             gv.cc.floatyTextActorInfoRMB2 = "";
             //gv.cc.showingEffects = false;
         }
+
         public void CalculateUpperLeft()
         {
 
@@ -24076,6 +24154,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     }
                 }
             }
+
         }
 
         public void CalculateUpperLeftCreature(Creature crt)
@@ -24099,7 +24178,6 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             {
                 return;
             }
-            
             int minX = crt.combatLocX - gv.playerOffsetX;
             if (!gv.mod.useManualCombatCam)
             {
@@ -24132,7 +24210,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 //return;
             }
 
-            else
+            //else
             {
                 if ((gv.mod.useManualCombatCam) && !gv.mod.fastMode)
                 {
@@ -24170,6 +24248,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                     }
                                 }
                             }
+
                             break;
                         }
 
@@ -24291,7 +24370,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     {
                         if (minY < -gv.playerOffsetY) { minY = -gv.playerOffsetY; }
                     }
-
+                    //gv.screenCombat.animationSeqStack.Clear();
                     UpperLeftSquare.X = minX;
                     UpperLeftSquare.Y = minY;
                     //TODO: transform sprite position here, based on delta between current and older upper left, also for creatue
@@ -24316,6 +24395,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             }
                         }
                     }
+
                 }
             }
         }
@@ -24324,6 +24404,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         {
             if (pc != null)
             {
+
 
                 if (pc.combatLocX == 0 && pc.combatLocY == 0)
                 {
@@ -24349,7 +24430,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 {
                     if (minY < -gv.playerOffsetY) { minY = -gv.playerOffsetY; }
                 }
-
+                //gv.screenCombat.animationSeqStack.Clear();
                 UpperLeftSquare.X = minX;
                 UpperLeftSquare.Y = minY;
                 //TODO: transform sprite position here, based on delta between current and older upper left, also for creatue
@@ -25011,6 +25092,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
         }
         public void LeaveThreatenedCheck(Player pc, int futurePlayerLocationX, int futurePlayerLocationY)
         {
+
             int passX = pc.combatLocX;
             int passY = pc.combatLocY;
 
@@ -25053,6 +25135,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 dontEndTurn = true;
             }
 
+
+
+
+
+
             foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
             {
                 if ((crt.hp > 0) && (!crt.isHeld()))
@@ -25076,6 +25163,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         }
                         else
                         {
+
                             //gv.mod.numberOfAoOAttackers++;
                             gv.touchEnabled = false;
                             gv.cc.addLogText("<font color='white'>Attack of Opportunity by: <font color='white'>" + crt.cr_name + "</font><BR>");
@@ -25094,6 +25182,8 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     }
                 }
             }
+            //gv.mod.AoOHitSymbolHasBeenDrawn = false;
+            //gv.mod.numberOfAoOAttackers = 0;
         }
 
         public int CalcPcAttackModifier(Player pc, Creature crt)
@@ -25298,6 +25388,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                      || (pc.MainHandRefs.name.Equals("none"))
                      || (gv.mod.getItemByResRefForInfo(pc.AmmoRefs.resref).name.Equals("none")))
             {
+
                 //hit by immunity code and messging (floaty, log) here
                 //loop hrough cretaure ahremd by list
                 //forahc entry, compare wtherer pc perks are matched
