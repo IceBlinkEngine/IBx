@@ -112,7 +112,7 @@ namespace IBx
 
         //COMBAT STUFF
         public bool adjustCamToRangedCreature = false;
-        public bool isPlayerTurn = true;
+        public bool isPlayerTurn = false;
         public bool dontEndTurn = false;
         public bool dontEndCreatureTurn = false;
         public bool continueTurn = false;
@@ -463,6 +463,8 @@ namespace IBx
         public void doCombatSetup()
         {
             gv.cc.addLogText("<font color='yellow'>" + "Encounter setup" + "</font><BR><BR>");
+
+
             //surprise round system
             creaturesHaveUpperHand = false;
             partyHasUpperHand = false;
@@ -8275,7 +8277,7 @@ namespace IBx
 
             if (gv.screenType.Equals("combat") && (gv.mod.currentEncounter.assassinationConditionMet || foundOneCrtr == 0 || standGroundConditionMet) || gv.mod.currentEncounter.conquerConditionMet)
             {
-
+                hideActorInfo();
                 for (int i = gv.mod.currentEncounter.encounterCreatureList.Count - 1; i >= 0; i--)
                 {
                     gv.mod.currentEncounter.encounterCreatureList.RemoveAt(i);
@@ -8562,7 +8564,7 @@ namespace IBx
 
             if (gv.screenType.Equals("combat") && (foundOnePc == 0 || timeLimitConditionMet || gv.mod.currentEncounter.protectionConditionMet || gv.mod.currentEncounter.holdConditionMet))
             {
-
+                hideActorInfo();
                 if (gv.mod.currentEncounter.allSpellsSPCostDoubled)
                 {
                     foreach (Spell sp in gv.mod.moduleSpellsList)
@@ -10527,6 +10529,7 @@ namespace IBx
             drawHPText();
             drawSPText();
             drawFloatyTextList(elapsed);
+            drawActorFloatyOnMouseOver();
 
             scrollOnCreatureMove(elapsed);
 
@@ -11143,7 +11146,24 @@ namespace IBx
                 {
                     dst = new IbRect(getPixelLocX(prp.LocationX) - (int)cr.glideAdderX, getPixelLocY(prp.LocationY) - (int)cr.glideAdderY, gv.squareSize, gv.squareSize);
                 }
-                gv.DrawBitmap(gv.cc.GetFromBitmapList(prp.ImageFileName), src, dst);
+                bool skipDraw = false;
+                foreach (Trigger t in gv.mod.currentEncounter.Triggers)
+                {
+                    foreach (Coordinate coord in t.TriggerSquaresList)
+                    {
+                        if (coord.X == prp.LocationX && coord.Y == prp.LocationY)
+                        {
+                            if (t.chkTrigHidden)
+                            {
+                                skipDraw = true;
+                            }
+                        }
+                    }
+                }
+                if (!skipDraw)
+                {
+                    gv.DrawBitmap(gv.cc.GetFromBitmapList(prp.ImageFileName), src, dst);
+                }
             }
         }
 
@@ -16545,6 +16565,86 @@ namespace IBx
                 }
             }
         }
+        public void drawActorFloatyOnMouseOver()
+        {
+            int gridx = (int)(gv.mod.mousePosX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
+            int gridy = (int)(gv.mod.mousePosY - (gv.squareSize / 2)) / gv.squareSize;
+            int txtH = (int)gv.drawFontRegHeight;
+            //pistazien
+
+            Creature cr = new Creature();
+            int highestLivingCrtMoveOrderfound = 0;
+            foreach (Creature c in gv.mod.currentEncounter.encounterCreatureList)
+            {
+                if (currentMoveOrderIndex == 0)
+                {
+                    if (c.moveOrder >= highestLivingCrtMoveOrderfound)
+                    {
+                        highestLivingCrtMoveOrderfound = c.moveOrder;
+                        cr = c;
+                    }
+                }
+                else
+                {
+                    if (c.moveOrder == currentMoveOrderIndex - 1)
+                    {
+                        cr = c;
+                        break;
+                    }
+                }
+            }
+
+            foreach (Player pc1 in gv.mod.playerList)
+            {
+                if ((pc1.combatLocX == gridx + UpperLeftSquare.X) && (pc1.combatLocY == gridy + UpperLeftSquare.Y))
+                {
+                    int mo = pc1.moveOrder + 1;
+                    bool noCreatureOnTop = true;
+                    foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+                    {
+                        if (crt.combatLocX == pc1.combatLocX && crt.combatLocY == pc1.combatLocY)
+                        {
+                            noCreatureOnTop = false;
+                        }
+                    }
+
+                    if (noCreatureOnTop)
+                    {
+                        drawText(getPixelLocX(pc1.combatLocX) - (int)cr.glideAdderX, getPixelLocY(pc1.combatLocY) - (int)gv.drawFontRegHeight - (int)cr.glideAdderY, mo.ToString(), "white");
+                        drawText(getPixelLocX(pc1.combatLocX) - (int)(cr.glideAdderX), getPixelLocY(pc1.combatLocY) - (int)(cr.glideAdderY), pc1.hp + "/" + pc1.hpMax, "lime");
+                        drawText(getPixelLocX(pc1.combatLocX) - (int)(cr.glideAdderX), getPixelLocY(pc1.combatLocY) - (int)(cr.glideAdderY) + txtH, pc1.sp + "/" + pc1.spMax, "yellow");
+                    }
+                }
+
+            }
+
+            foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
+            {
+
+                foreach (Coordinate coord in crt.tokenCoveredSquares)
+                {
+                    if ((coord.X == gridx + UpperLeftSquare.X) && (coord.Y == gridy + UpperLeftSquare.Y))
+                    {
+                        int moCr = crt.moveOrder + 1;
+                        if (crt == cr)
+                        {
+                            if (IsInVisibleCombatWindow(crt.combatLocX, crt.combatLocY))
+                            {
+                                drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight + (int)crt.roamDistanceY, moCr.ToString(), "white");
+                                drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY, crt.hp + "/" + crt.hpMax, "red");
+                                drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY + txtH, crt.sp + "/" + crt.spMax, "yellow");
+                            }
+                        }
+                        else
+                        {
+                            drawText(getPixelLocX(crt.combatLocX) - (int)(cr.glideAdderX) + (int)crt.roamDistanceX, getPixelLocY(crt.combatLocY) - (int)gv.drawFontRegHeight - (int)(cr.glideAdderY) + (int)crt.roamDistanceY, moCr.ToString(), "white");
+                            drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX - (int)cr.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY - (int)(cr.glideAdderY), crt.hp + "/" + crt.hpMax, "red");
+                            drawText(getPixelLocX(crt.combatLocX) + (int)crt.roamDistanceX - (int)cr.glideAdderX, getPixelLocY(crt.combatLocY) + (int)crt.roamDistanceY - (int)(cr.glideAdderY) + txtH, crt.sp + "/" + crt.spMax, "yellow");
+                        }
+                    }
+                }
+            }
+        }
         public void drawHPText()
         {
             if ((showHP) && (!animationsOn))
@@ -18868,6 +18968,8 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 
                     int x = (int)eX;
                     int y = (int)eY;
+                    gv.mod.mousePosX = x;
+                    gv.mod.mousePosY = y;
 
                     if (isTouchWithinMapArea(eX, eY))
                     {
@@ -18887,14 +18989,17 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     int gridx = (int)(eX - gv.oXshift - mapStartLocXinPixels) / gv.squareSize;
                     int gridy = (int)(eY - gv.oYshift + (gv.squareSize / 2)) / gv.squareSize;
 
-                    #region Floaty info on props
-                    gv.cc.floatyTextPropMouseOver = ""
-; foreach (Prop p in gv.mod.currentEncounter.propsList)
+                    #region Floaty info on props, triggers and effect squares
+                    gv.cc.floatyTextPropMouseOver = "";
+                    bool propFound = false;
+                    bool triggerFound = false;
+                    foreach (Prop p in gv.mod.currentEncounter.propsList)
                     {
                         if ((p.LocationX == gridx + UpperLeftSquare.X) && (p.LocationY == gridy + UpperLeftSquare.Y))
                         {
                             if (!p.MouseOverText.Equals("none") && (isPlayerTurn))
                             {
+                                propFound = true;
                                 gv.cc.floatyTextPropMouseOver = p.MouseOverText;
                                 float floatyPushUp = 0;
 
@@ -18949,12 +19054,145 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                             }
                         }
                     }
+                    if (!propFound)
+                    {
+                        foreach (Trigger t in gv.mod.currentEncounter.Triggers)
+                        {
+                            foreach (Coordinate c in t.TriggerSquaresList)
+                            {
+                                if ((c.X == gridx + UpperLeftSquare.X) && (c.Y == gridy + UpperLeftSquare.Y))
+                                {
+                                    if (!t.mouseOverText.Equals("none") && (isPlayerTurn))
+                                    {
+                                        triggerFound = true;
+                                        gv.cc.floatyTextPropMouseOver = t.mouseOverText;
+                                        float floatyPushUp = 0;
+
+                                        if (gv.cc.floatyTextPropMouseOver.Length <= 20)
+                                        {
+                                            floatyPushUp = 0.0f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 35)
+                                        {
+                                            floatyPushUp = 0.0f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 52)
+                                        {
+                                            floatyPushUp = 0.12f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 70)
+                                        {
+                                            floatyPushUp = 0.3f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 87)
+                                        {
+                                            floatyPushUp = 0.7f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 105)
+                                        {
+                                            floatyPushUp = 1.0f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 122)
+                                        {
+                                            floatyPushUp = 1.35f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 140)
+                                        {
+                                            floatyPushUp = 1.5f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 157)
+                                        {
+                                            floatyPushUp = 1.62f;
+                                        }
+                                        else if (gv.cc.floatyTextPropMouseOver.Length <= 175)
+                                        {
+                                            floatyPushUp = 1.75f;
+                                        }
+                                        else
+                                        {
+                                            floatyPushUp = 2.0f;
+                                        }
+                                        gv.cc.floatyPushUp = floatyPushUp;
+                                        //aggroman
+                                        gv.cc.floatyTextLocPropMouseOver = new Coordinate(gridx * gv.squareSize, (gridy) * gv.squareSize - (int)(floatyPushUp * 2 * gv.squareSize));
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!propFound && !triggerFound)
+                    {
+                        foreach (Effect ef in gv.mod.currentEncounter.effectsList)
+                        {
+                            if ((ef.combatLocX == gridx + UpperLeftSquare.X) && (ef.combatLocY == gridy + UpperLeftSquare.Y))
+                            {
+                                if (!ef.description.Equals("none") && (isPlayerTurn))
+                                {
+                                    gv.cc.floatyTextPropMouseOver = ef.description;
+                                    float floatyPushUp = 0;
+
+                                    if (gv.cc.floatyTextPropMouseOver.Length <= 20)
+                                    {
+                                        floatyPushUp = 0.0f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 35)
+                                    {
+                                        floatyPushUp = 0.0f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 52)
+                                    {
+                                        floatyPushUp = 0.12f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 70)
+                                    {
+                                        floatyPushUp = 0.3f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 87)
+                                    {
+                                        floatyPushUp = 0.7f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 105)
+                                    {
+                                        floatyPushUp = 1.0f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 122)
+                                    {
+                                        floatyPushUp = 1.35f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 140)
+                                    {
+                                        floatyPushUp = 1.5f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 157)
+                                    {
+                                        floatyPushUp = 1.62f;
+                                    }
+                                    else if (gv.cc.floatyTextPropMouseOver.Length <= 175)
+                                    {
+                                        floatyPushUp = 1.75f;
+                                    }
+                                    else
+                                    {
+                                        floatyPushUp = 2.0f;
+                                    }
+                                    gv.cc.floatyPushUp = floatyPushUp;
+                                    //aggroman
+                                    gv.cc.floatyTextLocPropMouseOver = new Coordinate(gridx * gv.squareSize, (gridy) * gv.squareSize - (int)(floatyPushUp * 2 * gv.squareSize));
+
+                                }
+                            }
+                        }
+                    }
                     #endregion
 
                     #region FloatyText Creatures and pc
                     if (true) //e.Button != MouseButtons.Right
                     {
                         bool hide = true;
+                        bool foundActor = false;
+
                         foreach (Creature crt in gv.mod.currentEncounter.encounterCreatureList)
                         {
                             //if ((crt.combatLocX == gridx + UpperLeftSquare.X) && (crt.combatLocY == gridy + UpperLeftSquare.Y))
@@ -18977,6 +19215,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                     hide = false;
                                     if (gv.cc.floatyTextActorInfoTempEffects1 == "")
                                     {
+                                        foundActor = true;
                                         showActorInfo(crt);
                                     }
                                 }
@@ -18998,6 +19237,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                     hide = false;
                                     if (gv.cc.floatyTextActorInfoTempEffects1 == "")
                                     {
+                                        foundActor = true;
                                         showActorInfo(crt);
                                     }
                                 }
@@ -19019,6 +19259,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                     hide = false;
                                     if (gv.cc.floatyTextActorInfoTempEffects1 == "")
                                     {
+                                        foundActor = true;
                                         showActorInfo(crt);
                                     }
                                 }
@@ -19042,6 +19283,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                                     hide = false;
                                     if (gv.cc.floatyTextActorInfoTempEffects1 == "")
                                     {
+                                        foundActor = true;
                                         showActorInfo(crt);
                                     }
                                 }
@@ -19051,36 +19293,75 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         {
                             if ((pc1.combatLocX == gridx + UpperLeftSquare.X) && (pc1.combatLocY == gridy + UpperLeftSquare.Y))
                             {
-                                /*
-                                string am = "";
-                                ItemRefs itr = gv.mod.getItemRefsInInventoryByResRef(pc1.AmmoRefs.resref);
-                                if (itr != null)
-                                {
-                                    am = itr.quantity + "";
-                                }
-                                else
-                                {
-                                    am = "";
-                                }
 
-                                gv.cc.floatyText = pc1.name;
-                                int actext = 0;
-                                if (gv.mod.ArmorClassAscending) { actext = pc1.AC; }
-                                else { actext = 20 - pc1.AC; }
-                                gv.cc.floatyText2 = "AC:" + actext + " " + pc1.charStatus;
-                                gv.cc.floatyText3 = "Ammo: " + am;
-                                gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc1.combatLocX), getPixelLocY(pc1.combatLocY));
-
-                                gv.cc.floatyTextActorInfoName = pc1.name;
-                                */
                                 hide = false;
-
-                                if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                if (!foundActor)
                                 {
-                                    showActorInfo(pc1);
+                                    if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                    {
+                                        foundActor = true;
+                                        showActorInfo(pc1);
+                                    }
                                 }
                             }
                         }
+
+                        foreach (Trigger t in gv.mod.currentEncounter.Triggers)
+                        {
+                            foreach (Coordinate coord in t.TriggerSquaresList)
+                            {
+                                if ((coord.X == gridx + UpperLeftSquare.X) && (coord.Y == gridy + UpperLeftSquare.Y))
+                                {
+                                    hide = false;
+                                    if (!foundActor)
+                                    {
+                                        if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                        {
+                                            foundActor = true;
+                                            showActorInfo(t);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                        foreach (Prop p in gv.mod.currentEncounter.propsList)
+                        {
+                            if ((p.LocationX == gridx + UpperLeftSquare.X) && (p.LocationY == gridy + UpperLeftSquare.Y))
+                            {
+                                if (p.canBeTriggeredByCreature || p.canBeTriggeredByPc)
+                                {
+                                    hide = false;
+                                    if (!foundActor)
+                                    {
+                                        if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                        {
+                                            foundActor = true;
+                                            showActorInfo(p);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach (Effect ef in gv.mod.currentEncounter.effectsList)
+                        {
+                            if ((ef.combatLocX == gridx + UpperLeftSquare.X) && (ef.combatLocY == gridy + UpperLeftSquare.Y))
+                            {
+                                hide = false;
+                                if (!foundActor)
+                                {
+                                    if (gv.cc.floatyTextActorInfoTempEffects1 == "")
+                                    {
+                                        foundActor = true;
+                                        showActorInfo(ef);
+                                    }
+                                }
+                            }
+                        }
+
+
                         if (hide)
                         {
                             hideActorInfo();
@@ -23111,9 +23392,9 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 gv.cc.floatyText3 = "SP: " + pc.sp + "/" + pc.spMax;
                 gv.cc.floatyTextLoc = new Coordinate(getPixelLocX(pc.combatLocX), getPixelLocY(pc.combatLocY));
                 */
-                showHP = true;
-                showSP = true;
-                showMoveOrder = true;
+                //showHP = true;
+                //showSP = true;
+                //showMoveOrder = true;
                 Player pc = (Player)(actor);
                 //gv.cc.floatyTextActorInfoName = pc.name;
                 string effectsText = "";
@@ -23127,6 +23408,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 {
                     gv.cc.floatyTextActorInfoTempEffects1 = "No temporary effects";
                 }
+
+                gv.cc.floatyTextActorInfoText = "";
+                gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoCharges = "";
+                gv.cc.floatyTextActorInfoEveryStep = "";
 
                 //hide the normal info when efects are shown
                 gv.cc.floatyTextActorInfoMoveOrder = "";
@@ -23169,6 +23455,21 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 gv.cc.floatyTextActorInfoOnDeathScriptName = "";
                 gv.cc.floatyTextActorInfoRMB1 = "";
                 gv.cc.floatyTextActorInfoRMB2 = "";
+
+                gv.cc.floatyTextActorInfoText = "";
+                gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoCharges = "";
+                gv.cc.floatyTextActorInfoEveryStep = "";
+                gv.cc.floatyTextActorInfoSpellName = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel = "";
+                gv.cc.floatyTextActorInfoSpellName2 = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel2 = "";
+                gv.cc.floatyTextActorInfoSpellName3 = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel3 = "";
+
 
                 int counter = 0;
                 foreach (Effect ef in pc.effectsList)
@@ -23255,11 +23556,16 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 */
 
                 //only for right clikc (effects)
-                showHP = true;
-                showSP = true;
-                showMoveOrder = true;
+                //showHP = true;
+                //showSP = true;
+                //showMoveOrder = true;
                 Creature crt = (Creature)(actor);
                 //gv.cc.floatyTextActorInfoName = crt.cr_name;
+
+                gv.cc.floatyTextActorInfoText = "";
+                gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoCharges = "";
+                gv.cc.floatyTextActorInfoEveryStep = "";
 
                 gv.cc.floatyTextActorInfoMoveOrder = "";
                 gv.cc.floatyTextActorInfoInitiative = "";
@@ -23300,6 +23606,20 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 gv.cc.floatyTextActorInfoOnDeathScriptName = "";
                 gv.cc.floatyTextActorInfoRMB1 = "";
                 gv.cc.floatyTextActorInfoRMB2 = "";
+
+                gv.cc.floatyTextActorInfoText = "";
+                gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoCharges = "";
+                gv.cc.floatyTextActorInfoEveryStep = "";
+                gv.cc.floatyTextActorInfoSpellName = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel = "";
+                gv.cc.floatyTextActorInfoSpellName2 = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel2 = "";
+                gv.cc.floatyTextActorInfoSpellName3 = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel3 = "";
 
 
                 //string effectsText = "";
@@ -23373,9 +23693,9 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             if (actor is Player)
             {
 
-                showHP = true;
-                showSP = true;
-                showMoveOrder = true;
+                //showHP = true;
+                //showSP = true;
+                //showMoveOrder = true;
                 Player pc = (Player)(actor);
                 gv.cc.floatyTextActorInfoName = pc.name;
                 //(pc.dexterity - 10) / 2) *5
@@ -23677,13 +23997,27 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 gv.cc.floatyTextActorInfoHitBy = "";
                 gv.cc.floatyTextActorInfoOnDeathScriptName = "";
 
+                gv.cc.floatyTextActorInfoText = "";
+                gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoCharges = "";
+                gv.cc.floatyTextActorInfoEveryStep = "";
+                gv.cc.floatyTextActorInfoSpellName = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel = "";
+                gv.cc.floatyTextActorInfoSpellName2 = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel2 = "";
+                gv.cc.floatyTextActorInfoSpellName3 = "";//get via tag
+                gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "";
+                gv.cc.floatyTextActorInfoOnlyCasterLevel3 = "";
+
             }
             else if (actor is Creature)
             {
                 gv.cc.floatyTextActorInfoWeaponTags = "";
-                showHP = true;
-                showSP = true;
-                showMoveOrder = true;
+                //showHP = true;
+                //showSP = true;
+                //showMoveOrder = true;
                 Creature crt = (Creature)(actor);
                 gv.cc.floatyTextActorInfoName = crt.cr_name;
                 gv.cc.floatyTextActorInfoAC = "AC " + crt.getAc();
@@ -23839,7 +24173,7 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 }
                 if (crt.cr_ai == "mindHunter")
                 {
-                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Witch Hunter";
+                    gv.cc.floatyTextActorInfoAIType = "AI Type: " + "Attracted by energy";
                 }
                 if (crt.cr_ai == "softTargetHunter")
                 {
@@ -23965,6 +24299,188 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             else if (actor is Trigger)
             {
                 Trigger trg = (Trigger)(actor);
+                if (!trg.chkTrigHidden)
+                {
+                    gv.cc.floatyTextActorInfoName = "Trigger Square";
+
+                    if (trg.mouseOverText == "none")
+                    {
+                        gv.cc.floatyTextActorInfoText = "Triggers actions described below";
+                    }
+                    else
+                    {
+                        gv.cc.floatyTextActorInfoText = trg.mouseOverText;
+                    }
+                    if (trg.canBeTriggeredByPc && trg.canBeTriggeredByCreature)
+                    {
+                        gv.cc.floatyTextActorInfoWorksFor = "Applies to: players and creatures";
+                    }
+                    if (!trg.canBeTriggeredByPc && trg.canBeTriggeredByCreature)
+                    {
+                        gv.cc.floatyTextActorInfoWorksFor = "Applies to: creatures";
+                    }
+                    if (trg.canBeTriggeredByPc && !trg.canBeTriggeredByCreature)
+                    {
+                        gv.cc.floatyTextActorInfoWorksFor = "Applies to: players";
+                    }
+                    if (trg.numberOfScriptCallsRemaining == -1 || trg.numberOfScriptCallsRemaining == 999)
+                    {
+                        gv.cc.floatyTextActorInfoCharges = "Charges: unlimited";
+                    }
+                    else if (trg.numberOfScriptCallsRemaining == 0)
+                    {
+                        gv.cc.floatyTextActorInfoCharges = "Charges: depleted";
+                    }
+                    else
+                    {
+                        gv.cc.floatyTextActorInfoCharges = "Charges: " + trg.numberOfScriptCallsRemaining.ToString();
+                    }
+
+                    if (trg.encounterTriggerOnEveryStep)
+                    {
+                        gv.cc.floatyTextActorInfoEveryStep = "Only once a turn";
+                    }
+                    else
+                    {
+                        gv.cc.floatyTextActorInfoEveryStep = "Multiple times during a turn";
+                    }
+
+                    if (trg.Event1FilenameOrTag == "gaCastSpellEncounterTrigger.cs")
+                    {
+                        foreach (Spell sp in gv.mod.moduleSpellsList)
+                        {
+                            if (sp.tag == trg.Event1Parm1)
+                            {
+                                gv.cc.floatyTextActorInfoSpellName = "Event: " + sp.name;
+                                break;
+                            }
+                        }
+                        if (trg.Event1Parm2 == "true" || trg.Event1Parm2 == "True")
+                        {
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "Only works on this square";
+                        }
+                        else
+                        {
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "Works after leaving, too";
+                        }
+                        gv.cc.floatyTextActorInfoOnlyCasterLevel = "Power: " + trg.Event1Parm3;
+                    }
+
+                    if (trg.Event2FilenameOrTag == "gaCastSpellEncounterTrigger.cs")
+                    {
+                        foreach (Spell sp in gv.mod.moduleSpellsList)
+                        {
+                            if (sp.tag == trg.Event2Parm1)
+                            {
+                                gv.cc.floatyTextActorInfoSpellName2 = "Event: " + sp.name;
+                                break;
+                            }
+                        }
+                        if (trg.Event2Parm2 == "true" || trg.Event2Parm2 == "True")
+                        {
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "Only works on this square";
+                        }
+                        else
+                        {
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "Works after leaving, too";
+                        }
+                        gv.cc.floatyTextActorInfoOnlyCasterLevel2 = "Power: " + trg.Event2Parm3;
+                    }
+
+                    if (trg.Event3FilenameOrTag == "gaCastSpellEncounterTrigger.cs")
+                    {
+                        foreach (Spell sp in gv.mod.moduleSpellsList)
+                        {
+                            if (sp.tag == trg.Event3Parm1)
+                            {
+                                gv.cc.floatyTextActorInfoSpellName3 = "Event: " + sp.name;
+                                break;
+                            }
+                        }
+                        if (trg.Event3Parm2 == "true" || trg.Event3Parm2 == "True")
+                        {
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "Only works on this square";
+                        }
+                        else
+                        {
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "Works after leaving, too";
+                        }
+                        gv.cc.floatyTextActorInfoOnlyCasterLevel3 = "Power: " + trg.Event3Parm3;
+                    }
+
+
+
+
+                    //hide the normal info when efects are shown
+                    gv.cc.floatyTextActorInfoMoveOrder = "";
+                    gv.cc.floatyTextActorInfoInitiative = "";
+                    gv.cc.floatyTextActorInfoAC = "";
+                    gv.cc.floatyTextActorInfoMovementRange = "";
+                    gv.cc.floatyTextActorInfoHP = "";
+                    gv.cc.floatyTextActorInfoSP = "";
+                    gv.cc.floatyTextActorInfoToHit = "";
+                    gv.cc.floatyTextActorInfoNumberOfAttacks = "";
+                    gv.cc.floatyTextActorInfoWeaponTags = "";
+                    gv.cc.floatyTextActorInfoOnScoringHitSpellName = "";
+                    gv.cc.floatyTextActorInfoOnScoringHitSpellNameSelf = "";
+                    gv.cc.floatyTextActorInfoAttackRange = "";
+                    gv.cc.floatyTextActorInfoAttackType = "";
+                    gv.cc.floatyTextActorInfoDamage = "";
+                    gv.cc.floatyTextActorInfoSaves = "";
+                    gv.cc.floatyTextActorInfoSaves2 = "";
+                    gv.cc.floatyTextActorInfoSaves3 = "";
+                    gv.cc.floatyTextActorInfoDamageType = "";
+                    gv.cc.floatyTextActorInfoAmmo = "";
+                    gv.cc.floatyTextActorInfoResistances1 = "";
+                    gv.cc.floatyTextActorInfoResistances2 = "";
+                    gv.cc.floatyTextActorInfoResistances3 = "";
+                    gv.cc.floatyTextActorInfoResistances4 = "";
+                    gv.cc.floatyTextActorInfoResistances5 = "";
+                    gv.cc.floatyTextActorInfoResistances6 = "";
+                    gv.cc.floatyTextActorInfoResistances7 = "";
+
+
+                    //To do: must set all creature exclusive innfo to "" here
+                    //public string floatyTextActorInfoFaction = "";
+                    gv.cc.floatyTextActorInfoRegenerationHP = "";
+                    gv.cc.floatyTextActorInfoRegenerationSP = "";
+                    gv.cc.floatyTextActorInfoSpellsKnown1 = "";
+                    gv.cc.floatyTextActorInfoSpellsKnown2 = "";
+                    gv.cc.floatyTextActorInfoSpellsKnown3 = "";
+                    gv.cc.floatyTextActorInfoAIType = "";
+                    gv.cc.floatyTextActorInfoAIAffinityForCasting = "";//0 to 100
+                    gv.cc.floatyTextActorInfoInjuryThreshold = "";
+                    gv.cc.floatyTextActorInfoCreatureTags = "";//used for immunities, special weaknesses, eg "undead" are affected by turn spells and immunne to paralyze...
+                    gv.cc.floatyTextActorInfoHitBy = "";
+                    gv.cc.floatyTextActorInfoOnDeathScriptName = "";
+
+                    gv.cc.floatyTextActorInfoRMB1 = "";
+                    gv.cc.floatyTextActorInfoRMB2 = "";
+
+                    //more draw routines missing
+                    //nedd to celar all not needed infos
+
+
+                    //mouseOverText on top (one liner, count chars)
+                    //works for pc/creature/all
+                    //charges
+                    //every step (With multi square triggers)
+
+                    //for all 3 events
+                    //do the following only for scripts that call "gaCastSpellEncounterTrigger.cs" (ie no ibscripts), in case of event1.filenameortag
+                    //get more info from the parms
+                    //in case of event1.filenameortag
+                    //filename.Equals("gaCastSpellEncounterTrigger.cs"
+                    //string parm1 tag of spell
+                    //bool parm2 remove effect immediately when leaving trigger square (true/false); this is handy for triggers that give positional buffs for position, simualting eg height advantage 
+                    //add effect tag for with duration > 0 (or buff/debuff) to tagsOfEffectsToRemoveOnMove list of cretaure/pc
+                    //string parm3 caster level
+                    //string parm4 custom log text override (this will not be needed)  
+                    //might finally do a efects contained
+
+                    //eventually add trait related info to this for eg traps (disarm on step on mechnaism or trait use on the trap?), useability trait requiremnts (to have effect when stepping on it), spawn requiremnets (at start of battle), spawn prevention requirements (at start of battle),
+                    //unveiling requirements for hidden triggers (successful triatc ehck of nearby character, might cerate nice gameplay where a thief scous a path)
+                }
             }
             else if (actor is Effect)
             {
@@ -24055,6 +24571,12 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             gv.cc.floatyTextActorInfoTempEffects9custom = "";
             gv.cc.floatyTextActorInfoTempEffects10custom = "";
             //}
+
+            gv.cc.floatyTextActorInfoText = "";
+            gv.cc.floatyTextActorInfoWorksFor = "";
+            gv.cc.floatyTextActorInfoCharges = "";
+            gv.cc.floatyTextActorInfoEveryStep = "";
+
             gv.cc.floatyTextActorInfoName = "";
             gv.cc.floatyTextActorInfoMoveOrder = "";
             gv.cc.floatyTextActorInfoInitiative = "";
@@ -24096,6 +24618,20 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
             gv.cc.floatyTextActorInfoRMB1 = "";
             gv.cc.floatyTextActorInfoRMB2 = "";
             //gv.cc.showingEffects = false;
+
+            gv.cc.floatyTextActorInfoText = "";
+            gv.cc.floatyTextActorInfoWorksFor = "";
+            gv.cc.floatyTextActorInfoCharges = "";
+            gv.cc.floatyTextActorInfoEveryStep = "";
+            gv.cc.floatyTextActorInfoSpellName = "";//get via tag
+            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "";
+            gv.cc.floatyTextActorInfoOnlyCasterLevel = "";
+            gv.cc.floatyTextActorInfoSpellName2 = "";//get via tag
+            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "";
+            gv.cc.floatyTextActorInfoOnlyCasterLevel2 = "";
+            gv.cc.floatyTextActorInfoSpellName3 = "";//get via tag
+            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "";
+            gv.cc.floatyTextActorInfoOnlyCasterLevel3 = "";
         }
 
         public void CalculateUpperLeft()
@@ -24345,11 +24881,88 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                 if (gv.mod.playerList[currentPlayerIndex] != null)
                 {
                     Player pc = gv.mod.playerList[currentPlayerIndex];
-
-                    if (pc.combatLocX == 0 && pc.combatLocY == 0)
+                    foreach (Trigger t in gv.mod.currentEncounter.Triggers)
                     {
-                        int hgjh = 0;
+                        foreach (Coordinate coord in t.TriggerSquaresList)
+                        {
+                            if (pc.combatLocX <= coord.X + 1 && pc.combatLocX >= coord.X - 1)
+                            {
+                                if (pc.combatLocY <= coord.Y + 1 && pc.combatLocY >= coord.Y - 1)
+                                {
+                                    if (t.chkTrigHidden)
+                                    {
+                                        if (t.txtTrigFindingTraitTag != "" && t.txtTrigFindingTraitTag != "None" && t.txtTrigFindingTraitTag != "none" && t.txtTrigFindingTraitTag != null)
+                                        {
+
+
+                                            if (gv.sf.CheckPassSkill(currentPlayerIndex, t.txtTrigFindingTraitTag, Convert.ToInt32(t.txtTrigFindingDC), true, true))
+                                            {
+
+                                                //find out trait name
+                                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                                /*
+                                                foreach (LocalImmunityString lis in gv.mod.getItemByResRefForInfo(pc.MainHandRefs.resref).entriesForPcTags)
+                    {
+                        string typeWeapon = lis.Value.Remove(lis.Value.Length - 1);
+                        //string typeWeapon = lis.Value;
+                        //typeWeapon.Remove(typeWeapon.Length - 1);
+
+                        //string amount = ls.Value;
+                        //amount.Remove(0, amount.Length - 1);
+                        char c2 = lis.Value[lis.Value.Length - 1];
+                        int amountNumberWeapon = 0;
+                        if (Char.IsDigit(c2))
+                        {
+                            amountNumberWeapon = Convert.ToInt32(c2);
+                        }
+                        else
+                        {
+                            typeWeapon = lis.Value;
+                        }
+                                                */
+                                                //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+                                                string groupName = "none";
+                                                foreach (Trait trait in gv.mod.moduleTraitsList)
+                                                {
+                                                    if (trait.tag.Contains(t.txtTrigFindingTraitTag))
+                                                    {
+                                                        groupName = trait.nameOfTraitGroup;
+                                                    }
+                                                }
+                                                if (groupName != "none")
+                                                {
+                                                    gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>found event square (" + groupName + ", DC " + t.txtTrigFindingDC + ")</font><BR>");
+                                                }
+                                                else
+                                                {
+                                                    gv.cc.addLogText("<font color='lime'>" + pc.name + " <font color='white'>found event square (" + t.txtTrigFindingTraitTag + ", DC " + t.txtTrigFindingDC + ")</font><BR>");
+                                                }
+                                                t.chkTrigHidden = false;
+                                                if (t.chkTrigEnableOnFinding)
+                                                {
+                                                    t.Enabled = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            /*
+                            foreach (Prop p in gv.mod.currentEncounter.propsList)
+                            {
+                                if (p.LocationX == coord.X && p.LocationY == coord.Y)
+                                {
+
+                                }
+                            }
+                            */
+                        }
                     }
+                    //if (pc.combatLocX == 0 && pc.combatLocY == 0)
+                    //{
+                    //int hgjh = 0;
+                    //}
 
                     int minX = pc.combatLocX - gv.playerOffsetX;
                     if (!gv.mod.useManualCombatCam)

@@ -177,6 +177,32 @@ namespace IBx
         public Coordinate floatyTextLocPropMouseOver = new Coordinate();
         public float floatyPushUp = 0;
 
+        public string floatyTextActorInfoText = "";
+        public string floatyTextActorInfoWorksFor = "";
+        public string floatyTextActorInfoCharges = "";
+        public string floatyTextActorInfoEveryStep = "";
+        public string floatyTextActorInfoSpellName = "";//get via tag
+        public string floatyTextActorInfoOnlyWhileOnSquare = "";
+        public string floatyTextActorInfoOnlyCasterLevel = "";
+        public string floatyTextActorInfoSpellName2 = "";//get via tag
+        public string floatyTextActorInfoOnlyWhileOnSquare2 = "";
+        public string floatyTextActorInfoOnlyCasterLevel2 = "";
+        public string floatyTextActorInfoSpellName3 = "";//get via tag
+        public string floatyTextActorInfoOnlyWhileOnSquare3 = "";
+        public string floatyTextActorInfoOnlyCasterLevel3 = "";
+
+
+        //do the following only for scripts that call "gaCastSpellEncounterTrigger.cs" (ie no ibscripts), in case of event1.filenameortag
+        //get more info from the parms
+        //in case of event1.filenameortag
+        //filename.Equals("gaCastSpellEncounterTrigger.cs"
+        //string parm1 tag of spell
+        //bool parm2 remove effect immediately when leaving trigger square (true/false); this is handy for triggers that give positional buffs for position, simualting eg height advantage 
+        //add effect tag for with duration > 0 (or buff/debuff) to tagsOfEffectsToRemoveOnMove list of cretaure/pc
+        //string parm3 caster level
+        //string parm4 custom log text override (this will not be needed) 
+
+
         public bool inEffectMode = false;
         public string floatyTextActorInfoName = "";
         public string floatyTextActorInfoMoveOrder = "";
@@ -17295,7 +17321,11 @@ namespace IBx
             //THIEF SKILL 
             else if (spell.spellScript.Equals("trRemoveTrap"))
             {
-                gv.sf.trRemoveTrap(source, target);
+                gv.sf.trRemoveTrap(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("trEnableTarget"))
+            {
+                gv.sf.trEnableTarget(source, target, spell);
             }
         }
 
@@ -17529,47 +17559,60 @@ namespace IBx
             }
             else if (source is Player)
             {
-                Player src = (Player)source;
-                ///powerLevel = src.classLevel;
-                if (!isTraitUsage)
+                if (spell.spellScript.Equals("trRemoveTrap") || spell.spellScript.Equals("trEnableTrap"))
                 {
-                    if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
-                    {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForCastAction + " " + spell.name + "</font><BR>");
-                    }
-                    else
-                    {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + spell.name + "</font><BR>");
-                    }
                 }
                 else
                 {
-                    if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
+                    Player src = (Player)source;
+                    ///powerLevel = src.classLevel;
+                    if (!isTraitUsage)
                     {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForUseTraitAction + " " + spell.name + "</font><BR>");
+                        if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForCastAction + " " + spell.name + "</font><BR>");
+                        }
+                        else
+                        {
+
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + spell.name + "</font><BR>");
+
+                        }
                     }
                     else
                     {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + spell.name + "</font><BR>");
+                        if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForUseTraitAction + " " + spell.name + "</font><BR>");
+                        }
+                        else
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + spell.name + "</font><BR>");
+                        }
                     }
                 }
-
                 //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
             }
             else if (source is Item)
             {
-                Item src = (Item)source;
-                //powerLevel = 
-                if (src.labelForCastAction != "none")
+                if (spell.spellScript.Equals("trRemoveTrap") || spell.spellScript.Equals("trEnableTrap"))
                 {
-                    gv.cc.addLogText("<font color='white'>" + src.name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='white'>" + src.name + " creates " + spell.name + "</font><BR>");
-                }
+                    Item src = (Item)source;
+                    //powerLevel = 
+                    if (src.labelForCastAction != "none")
+                    {
+                        gv.cc.addLogText("<font color='white'>" + src.name + " " + src.labelForCastAction + " " + spell.name + "</font><BR>");
+                    }
+                    else
+                    {
+                        gv.cc.addLogText("<font color='white'>" + src.name + " creates " + spell.name + "</font><BR>");
+                    }
 
-                //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                    //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                }
             }
 
             gv.sf.AoeTargetsList.Clear();
@@ -17669,7 +17712,11 @@ namespace IBx
             //THIEF SKILL 
             else if (spell.spellScript.Equals("trRemoveTrap"))
             {
-                gv.sf.trRemoveTrap(source, target);
+                gv.sf.trRemoveTrap(source, target, spell);
+            }
+            else if (spell.spellScript.Equals("trEnableTarget"))
+            {
+                gv.sf.trEnableTarget(source, target, spell);
             }
         }
 
@@ -17693,28 +17740,34 @@ namespace IBx
             }
             else if (source is Player)
             {
-                Player src = (Player)source;
-                ///powerLevel = src.classLevel;
-                if (!isTraitUsage)
+                if (spell.spellScript.Equals("trRemoveTrap") || spell.spellScript.Equals("trEnableTrap"))
                 {
-                    if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
-                    {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForCastAction + " " + traitName + "</font><BR>");
-                    }
-                    else
-                    {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
-                    }
                 }
                 else
                 {
-                    if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
+                    Player src = (Player)source;
+                    ///powerLevel = src.classLevel;
+                    if (!isTraitUsage)
                     {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForUseTraitAction + " " + traitName + "</font><BR>");
+                        if (src.playerClass.labelForCastAction != "none" && src.playerClass.labelForCastAction != "CAST")
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForCastAction + " " + traitName + "</font><BR>");
+                        }
+                        else
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
+                        }
                     }
                     else
                     {
-                        gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
+                        if (src.playerClass.labelForUseTraitAction != "none" && src.playerClass.labelForUseTraitAction != "USE")
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>" + src.playerClass.labelForUseTraitAction + " " + traitName + "</font><BR>");
+                        }
+                        else
+                        {
+                            gv.cc.addLogText("<font color='lime'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
+                        }
                     }
                 }
 
@@ -17722,18 +17775,24 @@ namespace IBx
             }
             else if (source is Item)
             {
-                Item src = (Item)source;
-                //powerLevel = 
-                if (src.labelForCastAction != "none")
+                if (spell.spellScript.Equals("trRemoveTrap") || spell.spellScript.Equals("trEnableTrap"))
                 {
-                    gv.cc.addLogText("<font color='white'>" + src.name + " <font color='white'>" + src.labelForCastAction + " " + traitName + "</font><BR>");
                 }
                 else
                 {
-                    gv.cc.addLogText("<font color='white'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
-                }
+                    Item src = (Item)source;
+                    //powerLevel = 
+                    if (src.labelForCastAction != "none")
+                    {
+                        gv.cc.addLogText("<font color='white'>" + src.name + " <font color='white'>" + src.labelForCastAction + " " + traitName + "</font><BR>");
+                    }
+                    else
+                    {
+                        gv.cc.addLogText("<font color='white'>" + src.name + " <font color='white'>creates " + traitName + "</font><BR>");
+                    }
 
-                //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                    //gv.cc.addLogText("<font color='yellow'>" + src.name + " creates " + spell.name + "</font><BR>");
+                }
             }
 
             gv.sf.AoeTargetsList.Clear();
@@ -17832,10 +17891,13 @@ namespace IBx
             //THIEF SKILL 
             else if (spell.spellScript.Equals("trRemoveTrap"))
             {
-                gv.sf.trRemoveTrap(source, target);
+                gv.sf.trRemoveTrap(source, target, spell);
             }
-        }
-        /*
+            else if (spell.spellScript.Equals("trEnableTarget"))
+            {
+                gv.sf.trEnableTarget(source, target, spell);
+            }
+        }/*
                 public void doSpellBasedOnScriptOrEffectTag(Spell spell, object source, object target, bool outsideCombat)
         2614         { 
         2615             gv.sf.AoeTargetsList.Clear(); 

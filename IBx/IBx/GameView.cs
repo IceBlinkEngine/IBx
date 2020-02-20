@@ -13,7 +13,7 @@ namespace IBx
 {
     public class GameView
     {
-        public string IBversion = "1.183.011 ";
+        public string IBversion = "1.184.001";
         public ContentPage cp;
         public SKCanvas canvas;
         public IBxPreferences IBprefs;

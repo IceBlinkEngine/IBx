@@ -11,6 +11,8 @@ namespace IBx
 {
     public class Module
     {
+        public int mousePosX = 0;
+        public int mousePosY = 0;
         public bool isCastFromUsedItem = false;
         public string tagOfItemUsedForCast = "none";
 
