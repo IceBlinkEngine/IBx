@@ -23411,6 +23411,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                 gv.cc.floatyTextActorInfoText = "";
                 gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoEnableTrait = "";
+                gv.cc.floatyTextActorInfoEnableDC = "";
+                gv.cc.floatyTextActorInfoDisableTrait = "";
+                gv.cc.floatyTextActorInfoDisableDC = "";
                 gv.cc.floatyTextActorInfoCharges = "";
                 gv.cc.floatyTextActorInfoEveryStep = "";
 
@@ -23458,6 +23462,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                 gv.cc.floatyTextActorInfoText = "";
                 gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoEnableTrait = "";
+                gv.cc.floatyTextActorInfoEnableDC = "";
+                gv.cc.floatyTextActorInfoDisableTrait = "";
+                gv.cc.floatyTextActorInfoDisableDC = "";
                 gv.cc.floatyTextActorInfoCharges = "";
                 gv.cc.floatyTextActorInfoEveryStep = "";
                 gv.cc.floatyTextActorInfoSpellName = "";//get via tag
@@ -23564,6 +23572,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                 gv.cc.floatyTextActorInfoText = "";
                 gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoEnableTrait = "";
+                gv.cc.floatyTextActorInfoEnableDC = "";
+                gv.cc.floatyTextActorInfoDisableTrait = "";
+                gv.cc.floatyTextActorInfoDisableDC = "";
                 gv.cc.floatyTextActorInfoCharges = "";
                 gv.cc.floatyTextActorInfoEveryStep = "";
 
@@ -23609,6 +23621,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                 gv.cc.floatyTextActorInfoText = "";
                 gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoEnableTrait = "";
+                gv.cc.floatyTextActorInfoEnableDC = "";
+                gv.cc.floatyTextActorInfoDisableTrait = "";
+                gv.cc.floatyTextActorInfoDisableDC = "";
                 gv.cc.floatyTextActorInfoCharges = "";
                 gv.cc.floatyTextActorInfoEveryStep = "";
                 gv.cc.floatyTextActorInfoSpellName = "";//get via tag
@@ -23999,6 +24015,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
                 gv.cc.floatyTextActorInfoText = "";
                 gv.cc.floatyTextActorInfoWorksFor = "";
+                gv.cc.floatyTextActorInfoEnableTrait = "";
+                gv.cc.floatyTextActorInfoEnableDC = "";
+                gv.cc.floatyTextActorInfoDisableTrait = "";
+                gv.cc.floatyTextActorInfoDisableDC = "";
                 gv.cc.floatyTextActorInfoCharges = "";
                 gv.cc.floatyTextActorInfoEveryStep = "";
                 gv.cc.floatyTextActorInfoSpellName = "";//get via tag
@@ -24311,6 +24331,45 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     {
                         gv.cc.floatyTextActorInfoText = trg.mouseOverText;
                     }
+
+                    if (trg.txtTrigEnablingTraitTag != "" && trg.txtTrigEnablingTraitTag != "none" && trg.txtTrigEnablingTraitTag != "None" && trg.txtTrigEnablingTraitTag != null)
+                    {
+                        //enable info
+                        string traitName = "";
+                        foreach (Trait t in gv.mod.moduleTraitsList)
+                        {
+                            if (t.tag.Contains(trg.txtTrigEnablingTraitTag))
+                            {
+                                traitName = t.nameOfTraitGroup;
+                            }
+                        }
+                        gv.cc.floatyTextActorInfoEnableTrait = "Use " + traitName + " to enable";
+                        gv.cc.floatyTextActorInfoEnableDC = "Roll for DC " + trg.txtTrigEnablingDC;
+                    }
+                    else
+                    {
+                        if (trg.txtTrigDisablingTraitTag != "" && trg.txtTrigDisablingTraitTag != "none" && trg.txtTrigDisablingTraitTag != "None" && trg.txtTrigDisablingTraitTag != null)
+                        {
+                            //disable info
+                            string traitName = "";
+                            foreach (Trait t in gv.mod.moduleTraitsList)
+                            {
+                                if (t.tag.Contains(trg.txtTrigDisablingTraitTag))
+                                {
+                                    traitName = t.nameOfTraitGroup;
+                                }
+                            }
+                            gv.cc.floatyTextActorInfoDisableTrait = "Use " + traitName + " to disable";
+                            gv.cc.floatyTextActorInfoDisableDC = "Roll for DC " + trg.txtTrigDisablingDC;
+                        }
+                        else
+                        {
+                            //neutral info
+                            gv.cc.floatyTextActorInfoDisableTrait = "Always working";
+                            gv.cc.floatyTextActorInfoDisableDC = "Cannot be disabled";
+                        }
+                    }
+
                     if (trg.canBeTriggeredByPc && trg.canBeTriggeredByCreature)
                     {
                         gv.cc.floatyTextActorInfoWorksFor = "Applies to: players and creatures";
@@ -24323,11 +24382,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                     {
                         gv.cc.floatyTextActorInfoWorksFor = "Applies to: players";
                     }
-                    if (trg.numberOfScriptCallsRemaining == -1 || trg.numberOfScriptCallsRemaining == 999)
+                    if ((trg.numberOfScriptCallsRemaining == -1 || trg.numberOfScriptCallsRemaining > 100) && gv.cc.floatyTextActorInfoCharges != "Charges: depleted")
                     {
                         gv.cc.floatyTextActorInfoCharges = "Charges: unlimited";
                     }
-                    else if (trg.numberOfScriptCallsRemaining == 0)
+                    else if (trg.numberOfScriptCallsRemaining <= 0)
                     {
                         gv.cc.floatyTextActorInfoCharges = "Charges: depleted";
                     }
@@ -24357,11 +24416,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         }
                         if (trg.Event1Parm2 == "true" || trg.Event1Parm2 == "True")
                         {
-                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "Only works on this square";
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "Only works while on this square";
                         }
                         else
                         {
-                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "Works after leaving, too";
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare = "Instant or lasting effect";
                         }
                         gv.cc.floatyTextActorInfoOnlyCasterLevel = "Power: " + trg.Event1Parm3;
                     }
@@ -24378,11 +24437,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         }
                         if (trg.Event2Parm2 == "true" || trg.Event2Parm2 == "True")
                         {
-                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "Only works on this square";
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "Only works while on this square";
                         }
                         else
                         {
-                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "Works after leaving, too";
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare2 = "Instant or lasting effect";
                         }
                         gv.cc.floatyTextActorInfoOnlyCasterLevel2 = "Power: " + trg.Event2Parm3;
                     }
@@ -24399,11 +24458,11 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
                         }
                         if (trg.Event3Parm2 == "true" || trg.Event3Parm2 == "True")
                         {
-                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "Only works on this square";
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "Only works while on this square";
                         }
                         else
                         {
-                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "Works after leaving, too";
+                            gv.cc.floatyTextActorInfoOnlyWhileOnSquare3 = "Instant or lasting effect";
                         }
                         gv.cc.floatyTextActorInfoOnlyCasterLevel3 = "Power: " + trg.Event3Parm3;
                     }
@@ -24621,6 +24680,10 @@ if ((currentCombatMode.Equals("attack")) || (currentCombatMode.Equals("cast")))
 
             gv.cc.floatyTextActorInfoText = "";
             gv.cc.floatyTextActorInfoWorksFor = "";
+            gv.cc.floatyTextActorInfoEnableTrait = "";
+            gv.cc.floatyTextActorInfoEnableDC = "";
+            gv.cc.floatyTextActorInfoDisableTrait = "";
+            gv.cc.floatyTextActorInfoDisableDC = "";
             gv.cc.floatyTextActorInfoCharges = "";
             gv.cc.floatyTextActorInfoEveryStep = "";
             gv.cc.floatyTextActorInfoSpellName = "";//get via tag
