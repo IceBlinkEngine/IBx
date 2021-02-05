@@ -17,6 +17,9 @@ namespace IBx
         [JsonIgnore]
         public List<String> tagsOfEffectsToRemoveOnMove = new List<String>();
 
+        [JsonIgnore]
+        public IBx.AI.IModel aiModel = null;
+
         public float maxTurnTimeCounter = 0;
         public List<LocalString> requiredWeaponTypesToHarmCreature = new List<LocalString>();
 
@@ -78,6 +81,7 @@ namespace IBx
         public string cr_attackSound = "none"; //Filename of sound to play when the creature attacks (no extension)
         public int cr_numberOfAttacks = 1;
         public string cr_ai = "BasicAttacker";
+        public string ai_script = "ai_script.js";
         public int fortitude = 0;
         public int will = 0;
         public int reflex = 0;
@@ -909,6 +913,15 @@ namespace IBx
                     }
                 }
             }
+        }
+
+        public void InvokeAI(GameView gv, ScreenCombat sc)
+        {
+            if (this.aiModel == null) {
+                // Lazy initialization so as not to disturb existing code
+                this.aiModel = AI.ModelFactory.createModel(this.cr_ai);
+            }
+            this.aiModel.InvokeAI(gv, sc, this);
         }
     }
 }

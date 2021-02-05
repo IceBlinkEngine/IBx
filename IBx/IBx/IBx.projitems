@@ -14,6 +14,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Action.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AI\AITarget.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AI\BasicAttacker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AI\GeneralCaster.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AI\IModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AI\ModelFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AI\ScriptedAttacker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AnimationSequence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AnimationStackGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AnimationState.cs" />
@@ -112,6 +118,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)ScreenTraitLevelUp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScreenTraitUseSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptFunctions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scripting\ScriptEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scripting\ScriptException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scripting\ScriptInputs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scripting\ScriptOutputs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shop.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spell.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpellAllowed.cs" />
@@ -1741,6 +1751,7 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\tiles\woodenwindow.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Assets\ibscript\ai_script.js" />
     <None Include="$(MSBuildThisFileDirectory)Assets\modules\Blackwinter\areas\BanbergBridge.lvl" />
     <None Include="$(MSBuildThisFileDirectory)Assets\modules\Blackwinter\areas\BlackwinterCrypt1.lvl" />
     <None Include="$(MSBuildThisFileDirectory)Assets\modules\Blackwinter\areas\BlackwinterCrypt2.lvl" />
